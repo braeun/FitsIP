@@ -1,0 +1,27 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/icons/zoom-fit-best.png</file>
+        <file>resources/icons/zoom-in.png</file>
+        <file>resources/icons/zoom-original.png</file>
+        <file>resources/icons/zoom-out.png</file>
+        <file>resources/icons/window-close.png</file>
+        <file>resources/icons/document-save-as.png</file>
+        <file>resources/icons/document-save.png</file>
+        <file>resources/icons/document-open.png</file>
+        <file>resources/icons/document-close.png</file>
+        <file>resources/icons/document-open-folder.png</file>
+        <file>resources/icons/edit-undo.png</file>
+        <file>resources/fits.png</file>
+        <file>resources/icons/document-export-table.png</file>
+        <file>resources/icons/edit-clear-list.png</file>
+        <file>resources/icons/edit-guides.png</file>
+        <file>resources/icons/edit-table-delete-row.png</file>
+        <file>resources/icons/view-process-all.png</file>
+        <file>resources/icons/configure.png</file>
+        <file>resources/icons/go-next-view.png</file>
+        <file>resources/icons/go-previous-view.png</file>
+        <file>resources/icons/edit-table-insert-row-above.png</file>
+        <file>resources/icons/view-filter.png</file>
+        <file>resources/icons/view-pim-notes.png</file>
+    </qresource>
+</RCC>
