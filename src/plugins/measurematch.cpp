@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to match two images                                          *
  *                                                                              *
- * modified: 2022-11-27                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -38,6 +38,8 @@ MeasureMatch::MeasureMatch():
   subsample(1),
   firstPassDelta(1),
   factor(1),
+  aoiShiftX(0),
+  aoiShiftY(0),
   dlg(nullptr)
 {
   profiler = SimpleProfiler("MeasureMatch");
@@ -128,6 +130,9 @@ void MeasureMatch::setTemplate(std::shared_ptr<FitsImage> image, QRect a)
   }
   meanR = sumR / (aoi.width() * aoi.height());
   sigmaR = sqrt(sumR2-sumR*meanR);
+  initialAOI = aoi;
+  aoiShiftX = 0;
+  aoiShiftY = 0;
 }
 
 /*
@@ -239,12 +244,21 @@ double MeasureMatch::getY() const
 
 double MeasureMatch::getDx() const
 {
-  return dx / static_cast<double>(factor);
+  return (dx + aoiShiftX) / static_cast<double>(factor);
 }
 
 double MeasureMatch::getDy() const
 {
-  return dy / static_cast<double>(factor);
+  return (dy + aoiShiftY) / static_cast<double>(factor);
+}
+
+void MeasureMatch::shiftAOI(double dx, double dy)
+{
+  int idx = static_cast<int>(std::round(dx*factor));
+  int idy = static_cast<int>(std::round(dy*factor));
+  aoi = initialAOI.translated(idx,idy);
+  aoiShiftX = idx;
+  aoiShiftY = idy;
 }
 
 

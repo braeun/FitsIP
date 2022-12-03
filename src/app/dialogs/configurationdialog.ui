@@ -67,6 +67,11 @@
           <string>I/O</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Logbook</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
@@ -78,7 +83,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="guiPage">
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -257,7 +262,56 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="page_2"/>
+        <widget class="QWidget" name="logbookPage">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Logbook</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_3" native="true">
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="logLoadingBox">
+               <property name="text">
+                <string>Log loading of files</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>

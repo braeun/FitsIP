@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog for plugin to align images                                   *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,16 +37,19 @@ public:
   explicit OpAlignDialog(QWidget *parent = nullptr);
   ~OpAlignDialog();
 
-  void setOutputPath(const QString& p);
-
   QString getOutputPath() const;
+
+  bool isMatchFull() const;
+
+  int getMatchRange() const;
+
+  bool isAdaptAOI() const;
 
 private slots:
   void on_browseButton_clicked();
 
 private:
   Ui::OpAlignDialog *ui;
-  QString outputPath;
 };
 
 #endif // OPALIGNDIALOG_H

@@ -88,6 +88,29 @@ QString IOFactory::getWriteFilters() const
   return a;
 }
 
+QString IOFactory::assertSuffix(const QString &fn, QString filter)
+{
+  int i = filter.lastIndexOf('(');
+  if (i >= 0) filter = filter.mid(i+1);
+  i = filter.lastIndexOf(')');
+  if (i >= 0) filter = filter.left(i);
+  QStringList suffixes = filter.split(" ",Qt::SkipEmptyParts);
+  for (QString suffix : suffixes)
+  {
+    i = suffix.indexOf('.');
+    if (i < 0) return fn;
+    suffix = suffix.mid(i);
+    if (fn.endsWith(suffix)) return fn;
+  }
+  if (suffixes.empty()) return fn;
+  QString suffix = suffixes.front();
+  i = suffix.indexOf('.');
+  if (i < 0) return fn;
+  suffix = suffix.mid(i);
+  return fn + suffix;
+}
+
+
 
 
 IOHandler* IOFactory::createHandler(QString filename)

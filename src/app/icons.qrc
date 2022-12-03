@@ -23,5 +23,6 @@
         <file>resources/icons/edit-table-insert-row-above.png</file>
         <file>resources/icons/view-filter.png</file>
         <file>resources/icons/view-pim-notes.png</file>
+        <file>resources/icons/address-book-new.png</file>
     </qresource>
 </RCC>

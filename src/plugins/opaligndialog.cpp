@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog for plugin to align images                                   *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,14 +22,16 @@
 
 #include "opaligndialog.h"
 #include "ui_opaligndialog.h"
+#include <settings.h>
 #include <QFileDialog>
 
+static const char* PATH_OPALIGN = "fits/path/opalign";
+
 OpAlignDialog::OpAlignDialog(QWidget *parent):QDialog(parent),
-  ui(new Ui::OpAlignDialog),
-  outputPath(".")
+  ui(new Ui::OpAlignDialog)
 {
   ui->setupUi(this);
-  ui->outputDirField->setText(outputPath);
+  ui->outputDirField->setText(Settings().getString(PATH_OPALIGN,"."));
 }
 
 OpAlignDialog::~OpAlignDialog()
@@ -37,20 +39,32 @@ OpAlignDialog::~OpAlignDialog()
   delete ui;
 }
 
-void OpAlignDialog::setOutputPath(const QString &p)
-{
-  ui->outputDirField->setText(p);
-}
-
 QString OpAlignDialog::getOutputPath() const
 {
   return ui->outputDirField->text();
 }
 
+bool OpAlignDialog::isMatchFull() const
+{
+  return ui->matchFullButton->isChecked();
+}
+
+int OpAlignDialog::getMatchRange() const
+{
+  return ui->matchRangeBox->value();
+}
+
+bool OpAlignDialog::isAdaptAOI() const
+{
+  return ui->dynamicAOIBox->isChecked();
+}
+
+
+
 
 void OpAlignDialog::on_browseButton_clicked()
 {
-  QString dir = QFileDialog::getExistingDirectory(this,QApplication::applicationDisplayName(),ui->outputDirField->text());
+  QString dir = Settings().getExistingDirectory(this,PATH_OPALIGN);
   if (!dir.isEmpty())
   {
     ui->outputDirField->setText(dir);

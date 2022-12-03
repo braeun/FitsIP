@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - rank images by sharpness                                            *
  *                                                                              *
- * modified: 2022-11-21                                                         *
+ * modified: 2022-12-02                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -81,7 +81,9 @@ OpPlugin::ResultType MeasureRank::execute(const std::vector<QFileInfo>& list, QR
   {
     MeasureRankResultDialog d;
     d.setResult(results);
+    connect(&d,&MeasureRankResultDialog::writeToLogbook,this,&MeasureRank::copyToLog);
     d.exec();
+    disconnect(&d);
     filelist = d.getFileList();
   }
   return OK;
@@ -116,3 +118,12 @@ RankEntry MeasureRank::evaluate(const QFileInfo info, QRect selection)
   return RankEntry();
 }
 
+void MeasureRank::copyToLog()
+{
+  QString s = "";
+  for (const RankEntry& entry : results)
+  {
+    s += entry.info.fileName() + ": " + QString::number(entry.result) + "\n";
+  }
+  log(std::shared_ptr<FitsImage>(),s);
+}

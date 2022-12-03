@@ -500,7 +500,8 @@ void MainWindow::open(const QFileInfo &fileinfo)
       ui->openFileList->selectionModel()->setCurrentIndex(ImageCollection::getGlobal().index(ImageCollection::getGlobal().rowCount()-1,0),QItemSelectionModel::SelectCurrent);
 //      ui->scrollArea->setWidgetResizable(false);
       display(file);
-      logbook.add(LogbookEntry::Op,image->getName(),"Loaded from file "+fileinfo.absoluteFilePath());
+      if (AppSettings().isLogbookLogOpen())
+        logbook.add(LogbookEntry::Op,image->getName(),"Loaded from file "+fileinfo.absoluteFilePath());
       QApplication::restoreOverrideCursor();
     }
     catch (std::exception& ex)
@@ -561,6 +562,7 @@ void MainWindow::openLogbook(const QString &name)
     std::unique_ptr<LogbookStorage> s = std::make_unique<XMLLogbookStorage>(name);
     logbook.open(s);
     ui->logbookDockWidget->setWindowTitle("Logbook - "+logbook.getTitle());
+    ui->logbookWidget->setLogbook(&logbook);
     settings.setLogbook(name);
   }
   catch (std::exception& ex)
@@ -681,11 +683,13 @@ void MainWindow::on_actionSave_As_triggered()
   std::shared_ptr<FileObject> activeFile = ImageCollection::getGlobal().getActiveFile();
   if (activeFile == nullptr) return;
   AppSettings settings;
-  QString fn = settings.getSaveFilename(this,AppSettings::PATH_IMAGE,IOFactory::getInstance()->getWriteFilters());
+  QString filter;
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_IMAGE,IOFactory::getInstance()->getWriteFilters(),&filter);
   if (!fn.isNull())
   {
     try
     {
+      fn = IOFactory::assertSuffix(fn,filter);
       activeFile->save(fn);
       logbook.add(LogbookEntry::Op,activeFile->getImage()->getName(),"Saved to file "+fn);
     }
@@ -860,7 +864,7 @@ void MainWindow::on_actionExport_Logbook_triggered()
   QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOG,"Plain Text (*.txt);;HTML (*.html)");
   if (!fn.isNull())
   {
-    ui->logbookWidget->exportToFile(fn);
+    logbook.exportToFile(fn);
   }
 }
 

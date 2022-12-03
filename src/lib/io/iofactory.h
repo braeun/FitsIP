@@ -41,6 +41,8 @@ public:
 
   static IOFactory* getInstance();
 
+  static QString assertSuffix(const QString& fn, QString filter);
+
 signals:
   void logProfilerResult(QString profiler, QString image, int w, int h, int64_t t, QString notes);
 

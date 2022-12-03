@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the log book                                      *
  *                                                                              *
- * modified: 2022-11-29                                                         *
+ * modified: 2022-12-02                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -51,8 +51,6 @@ public:
 
   void setDisplay(Display d);
 
-  void exportToFile(const QString& filename);
-
 public slots:
   void dockLocationChanged(Qt::DockWidgetArea area);
 
@@ -76,7 +74,6 @@ private:
   void setProject(QString p);
   void setStep(QString s);
   void addLastEntry();
-  QString getTag(const LogbookEntry& e);
   void addEntry(const LogbookEntry& e);
   void addEntryByDate(const LogbookEntry& e);
   void addEntryByProject(const LogbookEntry& e);

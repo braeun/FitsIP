@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2022-12-02                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -43,6 +43,11 @@ Settings::Settings()
 {
 }
 
+QString Settings::getString(const QString &setting, const QString &def)
+{
+  return settings.value(setting,def).toString();
+}
+
 QString Settings::getOpenFilename(QWidget* parent, const QString &setting, const QString &filter)
 {
   QString path = settings.value(setting,".").toString();
@@ -55,16 +60,24 @@ QString Settings::getOpenFilename(QWidget* parent, const QString &setting, const
   return fn;
 }
 
-QString Settings::getSaveFilename(QWidget* parent, const QString &setting, const QString &filter)
+QString Settings::getSaveFilename(QWidget* parent, const QString &setting, const QString &filter, QString* selectedFilter)
 {
   QString path = settings.value(setting,".").toString();
-  QString fn = QFileDialog::getSaveFileName(parent,QApplication::applicationDisplayName(),path,filter);
+  QString fn = QFileDialog::getSaveFileName(parent,QApplication::applicationDisplayName(),path,filter,selectedFilter);
   if (!fn.isNull())
   {
     QFileInfo info(fn);
     settings.setValue(setting,info.filePath());
   }
   return fn;
+}
+
+QString Settings::getExistingDirectory(QWidget *parent, const QString &setting)
+{
+  QString path = settings.value(setting,".").toString();
+  QString dir = QFileDialog::getExistingDirectory(parent,QApplication::applicationDisplayName(),path);
+  if (!dir.isEmpty()) settings.setValue(setting,dir);
+  return dir;
 }
 
 void Settings::setPreviewWidth(int w)

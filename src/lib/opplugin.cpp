@@ -103,8 +103,13 @@ OpPlugin::ResultType OpPlugin::save(std::shared_ptr<FitsImage> image, const QStr
 
 void OpPlugin::log(std::shared_ptr<FitsImage> image, const QString &msg)
 {
-  image->log(msg);
-  emit logOperation(image->getName(),msg);
+  if (image)
+  {
+    image->log(msg);
+    emit logOperation(image->getName(),msg);
+  }
+  else
+    emit logOperation("",msg);
 }
 
 void OpPlugin::logProfiler(const QString& image, const QString& msg)

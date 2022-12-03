@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -44,6 +44,10 @@ public:
   void setLogbook(const QString& name);
 
   QString getLogbook() const;
+
+  bool isLogbookLogOpen() const;
+
+  void setLogbookLogOpen(bool flag);
 
   void setLogwidgetStyle(int32_t style);
 

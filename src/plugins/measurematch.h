@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to match two images                                          *
  *                                                                              *
- * modified: 2022-11-27                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,9 +37,7 @@ class MeasureMatchDialog;
  * @brief The MeasureMatch plugin matches a region of one image (the templete) to another image.
  *
  * It uses only the gray intensity values of both images. The location of the
- * maximum correlation is printed in the console window. A new image is
- * generated, containing the local correlation coefficient. A value of -1
- * means maximum difference, a value of +1 means best match.
+ * maximum correlation is printed in the logbook.
  * Algorithm taken from: W.Burger and M.J. Burge, Digitale Bildverarbeitung
  */
 class MeasureMatch: public OpPlugin
@@ -88,6 +86,18 @@ public:
 
   double getDy() const;
 
+  /**
+   * @brief Shift the AOI by the given amount.
+   *
+   * This method can be used to keep the AOI in sync with shifting images
+   * allowing for a smaller match range. The shift is always based on the
+   * initial AOI set. It is accounted
+   * for in the calculated displacement of the matched image.
+   * @param dx shift in x
+   * @param dy shift in y
+   */
+  void shiftAOI(double dx, double dy);
+
 private:
   void createI(std::shared_ptr<FitsImage> image);
   double getMatchValue(int32_t r, int32_t s, int32_t n);
@@ -110,7 +120,10 @@ private:
   int32_t offsetY;
   int32_t height;
   int32_t width;
-  QRect aoi;
+  QRect aoi;            // AOI to use
+  QRect initialAOI;     // initial AOI
+  int32_t aoiShiftX;
+  int32_t aoiShiftY;
   MeasureMatchDialog* dlg;
 
 };

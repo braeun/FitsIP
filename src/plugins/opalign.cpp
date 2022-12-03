@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to align images                                              *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -32,7 +32,10 @@
 
 OpAlign::OpAlign():
   dlg(nullptr),
-  outputPath("")
+  outputPath(""),
+  matchFull(false),
+  matchRange(100),
+  adaptAOI(false)
 {
   profiler = SimpleProfiler("OpAlign");
 }
@@ -56,10 +59,12 @@ OpPlugin::ResultType OpAlign::execute(const std::vector<QFileInfo>& list, QRect 
 {
   if (list.size() < 2) return CANCELLED;
   if (!dlg) dlg = new OpAlignDialog();
-  dlg->setOutputPath(list[0].absolutePath());
   if (dlg->exec())
   {
     outputPath = dlg->getOutputPath();
+    matchFull = dlg->isMatchFull();
+    matchRange = dlg->getMatchRange();
+    adaptAOI = dlg->isAdaptAOI();
     ProgressDialog* prog = list.size() > 2 ? new ProgressDialog() : nullptr;
     if (prog)
     {
@@ -115,9 +120,16 @@ OpPlugin::ResultType OpAlign::prepare(const QFileInfo& file, QRect aoi)
     qCritical() << ex.what();
     return ERROR;
   }
-  matcher.setMatchFull(false);
-  matcher.setMatchRange(100);
+  matcher.setMatchFull(matchFull);
+  matcher.setMatchRange(matchRange);
   matcher.setTemplate(img,aoi);
+  QString txt = QString::asprintf("base for alignment using AOI [%d,%d+%dx%d]",aoi.x(),aoi.y(),aoi.width(),aoi.height());
+  if (matchFull)
+    txt += "; match full";
+  else
+    txt += "; match range " + QString::number(matchRange);
+  if (adaptAOI) txt += "; adapt AOI";
+  log(img,txt);
   return OK;
 }
 
@@ -137,6 +149,7 @@ OpPlugin::ResultType OpAlign::align(const QFileInfo &file)
     shift.shift(img1,-matcher.getDx(),-matcher.getDy());
     save(img1,outputPath,file,"aligned");
     log(img1,QString::asprintf("shifted by [%.1f,%.1f]",-matcher.getDx(),-matcher.getDy()));
+    if (adaptAOI) matcher.shiftAOI(matcher.getDx(),matcher.getDy());
   }
   catch (std::exception& ex)
   {
@@ -146,14 +159,3 @@ OpPlugin::ResultType OpAlign::align(const QFileInfo &file)
   return OK;
 }
 
-//OpPlugin::ResultType OpAlign::save(std::shared_ptr<FitsImage> image, const QFileInfo &info)
-//{
-//  QString fn = info.baseName() + "_aligned." + info.suffix();
-//  QDir dir(outputPath);
-//  if (!dir.exists()) dir.mkpath(outputPath);
-//  fn = dir.absoluteFilePath(fn);
-//  IOHandler* handler = IOFactory::getInstance()->getHandler(fn);
-//  if (!handler) return ERROR;
-//  handler->write(fn,image);
-//  return OK;
-//}

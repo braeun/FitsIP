@@ -239,9 +239,9 @@ void QtImageIO::writeExif(QString filename, std::shared_ptr<FitsImage> img)
   if (image.get() == nullptr) return;
   image->readMetadata();
   Exiv2::ExifData& exifData = image->exifData();
-  Exiv2::StringValue sv(img->getMetadata().observer.toStdString());
+  Exiv2::AsciiValue sv(img->getMetadata().observer.toStdString());
   exifData.add(Exiv2::ExifKey("Exif.Photo.CameraOwnerName"),&sv);
-  sv = Exiv2::StringValue(img->getMetadata().instrument.toStdString());
+  sv = Exiv2::AsciiValue(img->getMetadata().instrument.toStdString());
   exifData.add(Exiv2::ExifKey("Exif.Image.Model"),&sv);
   Exiv2::FloatValue fv(static_cast<float>(img->getMetadata().exposure));
   exifData.add(Exiv2::ExifKey("Exif.Photo.ExposureTime"),&fv);

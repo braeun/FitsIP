@@ -44,10 +44,17 @@ public:
 
   const std::vector<QFileInfo>& getFileList() const;
 
+signals:
+  void writeToLogbook();
+
 private slots:
   void on_copyButton_clicked();
 
   void on_removeRowsButton_clicked();
+
+  void on_saveButton_clicked();
+
+  void on_logButton_clicked();
 
 private:
   Ui::MeasureRankResultDialog *ui;

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2022-11-27                                                         *
+ * modified: 2022-12-02                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,8 @@
 #include "logbookstorage.h"
 #include <QDateTime>
 #include <QDebug>
+#include <QFile>
+#include <QTextStream>
 
 Logbook::Logbook():QObject(),
   active(true),
@@ -169,10 +171,57 @@ void Logbook::assignStep(int64_t id, const QString& s)
   if (store) store->assignStep(id,s);
 }
 
+bool Logbook::exportToFile(const QString &file)
+{
+  if (!store) return false;
+  return exportPlainText(file);
+}
+
 
 
 
 void Logbook::activate(bool flag)
 {
   active = flag;
+  emit activated(flag);
 }
+
+
+
+
+
+bool Logbook::exportPlainText(const QString &file)
+{
+  QFile f(file);
+  if (!f.open(QIODevice::WriteOnly)) return false;
+  QTextStream os(&f);
+  QString t = getTitle();
+  int n = (80 - t.size()) / 2;
+  if (n > 0) os << QString(n,' ');
+  os << t << Qt::endl << Qt::endl;
+  os << "Description:" << Qt::endl;
+  os << getDescription() << Qt::endl;
+  os << Qt::endl;
+  QDate lastDate;
+  for (const LogbookEntry& e : getEntries())
+  {
+    if (e.timestamp.date() != lastDate)
+    {
+      lastDate = e.timestamp.date();
+      os << Qt::endl;
+      os << lastDate.toString(Qt::ISODate) << Qt::endl;
+    }
+    os << "  ";
+    os << e.timestamp.time().toString(Qt::ISODateWithMs) << ": ";
+    os << "Project " << e.getProject() << "; ";
+    os << "Step " << e.getStep() << "; ";
+    os << e.getTag() << Qt::endl;
+    os << "    " << e.txt << Qt::endl;
+  }
+  os.flush();
+  f.close();
+  return true;
+}
+
+
+

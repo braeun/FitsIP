@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to align images                                              *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -58,6 +58,9 @@ private:
   QString outputPath;
   std::shared_ptr<FitsImage> img;
   MeasureMatch matcher;
+  bool matchFull;
+  int matchRange;
+  bool adaptAOI;
 };
 
 #endif // OPALIGN_H

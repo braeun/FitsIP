@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,6 +37,7 @@ static const char* FILELIST_ADD_ON_COPY = "files/addoncopy";
 
 static const char* LOGBOOK_NAME = "logbook/name";
 static const char* LOGBOOK_STYLE = "logbook/style";
+static const char* LOGBOOK_LOGOPEN = "logbook/logopen";
 
 static const char* DISPLAY_SHOWPIXELLIST = "display/showpixellist";
 static const char* DISPLAY_SHOWSTARLIST = "display/showstarlist";
@@ -72,6 +73,16 @@ void AppSettings::setLogbook(const QString &name)
 QString AppSettings::getLogbook() const
 {
   return settings.value(LOGBOOK_NAME,"").toString();
+}
+
+bool AppSettings::isLogbookLogOpen() const
+{
+  return settings.value(LOGBOOK_LOGOPEN,true).toBool();
+}
+
+void AppSettings::setLogbookLogOpen(bool flag)
+{
+  settings.setValue(LOGBOOK_LOGOPEN,flag);
 }
 
 void AppSettings::setLogwidgetStyle(int32_t style)

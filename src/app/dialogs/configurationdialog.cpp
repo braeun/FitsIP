@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - configuration dialog                                                *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -62,6 +62,7 @@ void ConfigurationDialog::commitFields(AppSettings &settings)
     settings.setFitsImageFormat(0);
   else
     settings.setFitsImageFormat(1);
+  settings.setLogbookLogOpen(ui->logLoadingBox->isChecked());
 
   QString style = settings.getStyle();
   QApplication::setStyle(QStyleFactory::create(style));
@@ -86,4 +87,5 @@ void ConfigurationDialog::updateFields(const AppSettings &settings)
       ui->fitsFloatButton->setChecked(true);
       break;
   }
+  ui->logLoadingBox->setChecked(settings.isLogbookLogOpen());
 }

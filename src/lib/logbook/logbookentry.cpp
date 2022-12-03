@@ -81,5 +81,21 @@ const QString& LogbookEntry::getStep() const
   return step;
 }
 
+QString LogbookEntry::getTag() const
+{
+  if (image.isEmpty())
+  {
+    switch (type)
+    {
+      case LogbookEntry::Note:
+      default:
+        return "Note";
+      case LogbookEntry::Op:
+        return "Op";
+    }
+  }
+  return image;
+}
+
 
 

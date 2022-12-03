@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2022-12-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,9 +40,13 @@ public:
 
   Settings();
 
+  QString getString(const QString& setting, const QString& def=QString());
+
   QString getOpenFilename(QWidget* parent, const QString& setting, const QString& filter=QString());
 
-  QString getSaveFilename(QWidget* parent, const QString& setting, const QString& filter=QString());
+  QString getSaveFilename(QWidget* parent, const QString& setting, const QString& filter=QString(), QString* selectedFilter=nullptr);
+
+  QString getExistingDirectory(QWidget* parent, const QString& setting);
 
   /**
    * @brief Set the default width for previews in plugins.

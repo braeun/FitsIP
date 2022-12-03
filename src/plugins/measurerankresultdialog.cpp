@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog for the result of the ranking by sharpness                   *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2022-12-02                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,9 @@
 #include "measurerankresultdialog.h"
 #include "ui_measurerankresultdialog.h"
 #include "measurerank.h"
+#include <settings.h>
+#include <io/iofactory.h>
+#include <QTextStream>
 
 MeasureRankResultDialog::MeasureRankResultDialog(QWidget *parent) :
   QDialog(parent),
@@ -80,4 +83,30 @@ void MeasureRankResultDialog::on_removeRowsButton_clicked()
     }
   }
   setResult(list);
+}
+
+void MeasureRankResultDialog::on_saveButton_clicked()
+{
+  QString filter;
+  QString fn = Settings().getSaveFilename(this,Settings::PATH_IMAGE,"Text files (*.txt)",&filter);
+  if (!fn.isEmpty())
+  {
+    fn = IOFactory::assertSuffix(fn,filter);
+    QFile file(fn);
+    if (file.open(QIODevice::WriteOnly))
+    {
+      QTextStream s(&file);
+      for (const RankEntry& entry : entries)
+      {
+        s << entry.info.absoluteFilePath() << "," << entry.result << Qt::endl;
+      }
+      s.flush();
+      file.close();
+    }
+  }
+}
+
+void MeasureRankResultDialog::on_logButton_clicked()
+{
+  emit writeToLogbook();
 }

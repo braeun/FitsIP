@@ -55,6 +55,8 @@ public:
 
   const QString& getStep() const;
 
+  QString getTag() const;
+
   static const LogbookEntry invalid;
 
 private:

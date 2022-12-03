@@ -275,6 +275,7 @@ void XMLLogbookStorage::read()
         if (e.tagName() == "entry")
         {
           QString project = e.attribute("project","generic");
+          if (project.isEmpty()) project = "generic";
           QString step = e.attribute("step","generic");
           QString image = e.attribute("image");
           QDateTime timestamp = QDateTime::fromString(e.attribute("timestamp"),Qt::ISODateWithMs);
@@ -306,6 +307,7 @@ void XMLLogbookStorage::read()
     QDomElement root = doc.createElement("logbook");
     doc.appendChild(root);
   }
+  if (projects.empty()) projects.insert("generic");
 }
 
 void XMLLogbookStorage::write()
