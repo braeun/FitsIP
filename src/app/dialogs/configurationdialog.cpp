@@ -63,6 +63,7 @@ void ConfigurationDialog::commitFields(AppSettings &settings)
   else
     settings.setFitsImageFormat(1);
   settings.setLogbookLogOpen(ui->logLoadingBox->isChecked());
+  settings.setLogbookOpenLast(ui->openLastLogBox->isChecked());
 
   QString style = settings.getStyle();
   QApplication::setStyle(QStyleFactory::create(style));
@@ -88,4 +89,5 @@ void ConfigurationDialog::updateFields(const AppSettings &settings)
       break;
   }
   ui->logLoadingBox->setChecked(settings.isLogbookLogOpen());
+  ui->openLastLogBox->setChecked(settings.isLogbookOpenLast());
 }

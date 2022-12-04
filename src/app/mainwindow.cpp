@@ -119,7 +119,7 @@ MainWindow::MainWindow(QWidget *parent) :
   }
 
   AppSettings settings;
-  if (!settings.getLogbook().isEmpty()) openLogbook(settings.getLogbook());
+  if (!settings.getLogbook().isEmpty() && settings.isLogbookOpenLast()) openLogbook(settings.getLogbook());
   ui->logbookWidget->setLogbook(&logbook);
 
   connect(PluginFactory::instance(),&PluginFactory::logOperation,this,&MainWindow::logPluginOperation);
