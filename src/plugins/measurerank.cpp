@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - rank images by sharpness                                            *
  *                                                                              *
- * modified: 2022-12-02                                                         *
+ * modified: 2022-12-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,7 +22,7 @@
 
 #include "measurerank.h"
 #include "measurerankresultdialog.h"
-#include "measurestatistics.h"
+#include "imagestatistics.h"
 #include "opkernel.h"
 #include "kernelrepository.h"
 #include <fitsimage.h>
@@ -105,11 +105,10 @@ RankEntry MeasureRank::evaluate(const QFileInfo info, QRect selection)
     QRect r(5,5,img->getWidth()-10,img->getHeight()-10);
     img = img->subImage(r);
     /* calculate statistics */
-    MeasureStatistics s(false);
-    s.execute(img,selection);
+    ImageStatistics s(*img,selection);
     RankEntry entry;
     entry.info = info;
-    entry.result = s.getStatistics().getGlobalStatistics().stddev;
+    entry.result = s.getGlobalStatistics().stddev;
     return entry;
   }
   catch (std::exception& ex)

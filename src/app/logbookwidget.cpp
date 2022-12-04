@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the log book                                      *
  *                                                                              *
- * modified: 2022-12-03                                                         *
+ * modified: 2022-12-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -88,6 +88,9 @@ void LogbookWidget::rebuild()
     case TreeByProjectByDate:
       rebuildTreeByProjectByDate();
       break;
+    case TreeByProjectByStep:
+      rebuildTreeByProjectByStep();
+      break;
   }
 }
 
@@ -151,36 +154,43 @@ void LogbookWidget::addLastEntry()
   {
     if (filter.check(e))
     {
+      QTreeWidgetItem* item = nullptr;
       switch (display)
       {
         case Table:
-          addEntry(e);
+          item = addEntry(e);
           break;
         case TreeByDate:
-          addEntryByDate(e);
+          item = addEntryByDate(e);
           break;
         case TreeByProject:
-          addEntryByProject(e);
+          item = addEntryByProject(e);
           break;
         case TreeByProjectByDate:
-          addEntryByProjectByDate(e);
+          item = addEntryByProjectByDate(e);
+          break;
+        case TreeByProjectByStep:
+          item = addEntryByProjectByStep(e);
           break;
       }
+      if (item) ui->logbookTreeWidget->scrollToItem(item);
     }
   }
 }
 
-void LogbookWidget::addEntry(const LogbookEntry &e)
+QTreeWidgetItem* LogbookWidget::addEntry(const LogbookEntry &e)
 {
   QStringList columns;
   QString tag = e.getTag();
   columns << e.timestamp.toString(Qt::ISODateWithMs)
           << e.getProject() << e.getStep()
           << tag << e.txt << QString::number(e.getId());
-  ui->logbookTreeWidget->addTopLevelItem(new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr),columns));
+  QTreeWidgetItem* item = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr),columns);
+  ui->logbookTreeWidget->addTopLevelItem(item);
+  return item;
 }
 
-void LogbookWidget::addEntryByDate(const LogbookEntry &e)
+QTreeWidgetItem* LogbookWidget::addEntryByDate(const LogbookEntry &e)
 {
   QString tag = e.getTag();
   QString date = e.timestamp.date().toString(Qt::ISODate);
@@ -198,9 +208,10 @@ void LogbookWidget::addEntryByDate(const LogbookEntry &e)
     ui->logbookTreeWidget->addTopLevelItem(parent);
   }
   parent->addChild(item);
+  return item;
 }
 
-void LogbookWidget::addEntryByProject(const LogbookEntry &e)
+QTreeWidgetItem* LogbookWidget::addEntryByProject(const LogbookEntry &e)
 {
   QString tag = e.getTag();
   QStringList columns;
@@ -217,9 +228,10 @@ void LogbookWidget::addEntryByProject(const LogbookEntry &e)
     ui->logbookTreeWidget->addTopLevelItem(parent);
   }
   parent->addChild(item);
+  return item;
 }
 
-void LogbookWidget::addEntryByProjectByDate(const LogbookEntry &e)
+QTreeWidgetItem* LogbookWidget::addEntryByProjectByDate(const LogbookEntry &e)
 {
   QString tag = e.getTag();
   QString date = e.timestamp.date().toString(Qt::ISODate);
@@ -238,6 +250,28 @@ void LogbookWidget::addEntryByProjectByDate(const LogbookEntry &e)
   }
   parent = findAndCreateItem(parent,date);
   parent->addChild(item);
+  return item;
+}
+
+QTreeWidgetItem* LogbookWidget::addEntryByProjectByStep(const LogbookEntry &e)
+{
+  QString tag = e.getTag();
+  QStringList columns;
+  columns << "" << e.timestamp.toString(Qt::ISODateWithMs)
+          << e.getStep()
+          << tag << e.txt << QString::number(e.getId());
+  QTreeWidgetItem* item = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr),columns);
+  QTreeWidgetItem* parent = findItem(e.getProject());
+  if (!parent)
+  {
+    QStringList columns;
+    columns << e.getProject();
+    parent = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr),columns);
+    ui->logbookTreeWidget->addTopLevelItem(parent);
+  }
+  parent = findAndCreateItem(parent,e.getStep());
+  parent->addChild(item);
+  return item;
 }
 
 void LogbookWidget::rebuildTree()
@@ -314,7 +348,7 @@ void LogbookWidget::rebuildTreeByProjectByDate()
   ui->logbookTreeWidget->clear();
   ui->logbookTreeWidget->setColumnCount(5);
   QStringList header;
-  header << "Project" << "Date" << "Step" << "Object" << "Text";
+  header << "Project / Date" << "Time" << "Step" << "Object" << "Text";
   ui->logbookTreeWidget->setHeaderLabels(header);
   ui->logbookTreeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
   QList<QTreeWidgetItem*> items;
@@ -329,6 +363,29 @@ void LogbookWidget::rebuildTreeByProjectByDate()
     QTreeWidgetItem* item = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr),columns);
     QTreeWidgetItem* parent = findAndCreateItem(items,e.getProject());
     parent = findAndCreateItem(parent,date);
+    parent->addChild(item);
+  }
+  ui->logbookTreeWidget->insertTopLevelItems(0,items);
+}
+
+void LogbookWidget::rebuildTreeByProjectByStep()
+{
+  ui->logbookTreeWidget->clear();
+  ui->logbookTreeWidget->setColumnCount(4);
+  QStringList header;
+  header << "Project / Step" << "Date" << "Object" << "Text";
+  ui->logbookTreeWidget->setHeaderLabels(header);
+  ui->logbookTreeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  QList<QTreeWidgetItem*> items;
+  for (const auto& e : logbook->getEntries(filter))
+  {
+    QString tag = e.getTag();
+    QStringList columns;
+    columns << "" << e.timestamp.toString(Qt::ISODateWithMs)
+            << tag << e.txt << QString::number(e.getId());
+    QTreeWidgetItem* item = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr),columns);
+    QTreeWidgetItem* parent = findAndCreateItem(items,e.getProject());
+    parent = findAndCreateItem(parent,e.getStep());
     parent->addChild(item);
   }
   ui->logbookTreeWidget->insertTopLevelItems(0,items);

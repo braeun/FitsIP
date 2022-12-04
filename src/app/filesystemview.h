@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the filesystem view and associated controls       *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2022-12-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -65,6 +65,8 @@ private slots:
 private:
   void selectRoot();
   void rootChanged();
+  void selectedAsRoot();
+  void setRoot(const QString& dir);
   void showContextMenu(const QPoint& pos);
   void newFolder();
   void rename();

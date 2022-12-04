@@ -24,5 +24,7 @@
         <file>resources/icons/view-filter.png</file>
         <file>resources/icons/view-pim-notes.png</file>
         <file>resources/icons/address-book-new.png</file>
+        <file>resources/icons/collapse_all.png</file>
+        <file>resources/icons/expand_all.png</file>
     </qresource>
 </RCC>

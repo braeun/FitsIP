@@ -446,6 +446,7 @@
      <addaction name="actionBy_Date"/>
      <addaction name="actionTree_By_Project"/>
      <addaction name="actionTree_By_Project_and_Date"/>
+     <addaction name="actionTree_By_Project_and_Step"/>
     </widget>
     <addaction name="actionActive"/>
     <addaction name="separator"/>
@@ -1231,6 +1232,14 @@
    </property>
    <property name="text">
     <string>Tree By Project and Date</string>
+   </property>
+  </action>
+  <action name="actionTree_By_Project_and_Step">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tree By Project and Step</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

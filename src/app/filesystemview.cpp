@@ -55,6 +55,8 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
 //  ui->filesystemView->hideColumn(3);
 
   folderContextMenu = new QMenu(this);
+  connect(folderContextMenu->addAction("Set as Root"),&QAction::triggered,this,[this]{selectedAsRoot();});
+  folderContextMenu->addSeparator();
   connect(folderContextMenu->addAction("New Folder..."),&QAction::triggered,this,[this]{newFolder();});
   connect(folderContextMenu->addAction("Rename Folder..."),&QAction::triggered,this,[this]{rename();});
   folderContextMenu->addSeparator();
@@ -106,20 +108,25 @@ void FileSystemView::selectRoot()
   QSettings settings;
   QString rootpath = settings.value(AppSettings::PATH_ROOT,QDir::homePath()).toString();
   QString dir = QFileDialog::getExistingDirectory(this,QApplication::applicationDisplayName(),rootpath);
-  if (!dir.isEmpty())
-  {
-    ui->rootField->setText(dir);
-    filesystemModel->setRootPath(dir);
-    ui->filesystemView->setRootIndex(filesystemModel->index(dir));
-    settings.setValue(AppSettings::PATH_ROOT,dir);
-  }
+  setRoot(dir);
 }
 
 void FileSystemView::rootChanged()
 {
-  QString dir = ui->rootField->text();
+  setRoot(ui->rootField->text());
+}
+
+void FileSystemView::selectedAsRoot()
+{
+  QFileInfo info(filesystemModel->filePath(contextIndex));
+  if (info.isDir()) setRoot(info.absoluteFilePath());
+}
+
+void FileSystemView::setRoot(const QString &dir)
+{
   if (!dir.isEmpty() && QDir(dir).exists())
   {
+    ui->rootField->setText(dir);
     filesystemModel->setRootPath(dir);
     ui->filesystemView->setRootIndex(filesystemModel->index(dir));
     QSettings settings;

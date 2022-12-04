@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the log book                                      *
  *                                                                              *
- * modified: 2022-12-02                                                         *
+ * modified: 2022-12-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,7 +40,7 @@ class LogbookWidget : public QWidget
 {
   Q_OBJECT
 public:
-  enum Display { Table, TreeByDate, TreeByProject, TreeByProjectByDate };
+  enum Display { Table, TreeByDate, TreeByProject, TreeByProjectByDate, TreeByProjectByStep };
 
   explicit LogbookWidget(QWidget *parent = nullptr);
   ~LogbookWidget();
@@ -74,14 +74,16 @@ private:
   void setProject(QString p);
   void setStep(QString s);
   void addLastEntry();
-  void addEntry(const LogbookEntry& e);
-  void addEntryByDate(const LogbookEntry& e);
-  void addEntryByProject(const LogbookEntry& e);
-  void addEntryByProjectByDate(const LogbookEntry& e);
+  QTreeWidgetItem* addEntry(const LogbookEntry& e);
+  QTreeWidgetItem* addEntryByDate(const LogbookEntry& e);
+  QTreeWidgetItem* addEntryByProject(const LogbookEntry& e);
+  QTreeWidgetItem* addEntryByProjectByDate(const LogbookEntry& e);
+  QTreeWidgetItem* addEntryByProjectByStep(const LogbookEntry& e);
   void rebuildTree();
   void rebuildTreeByDate();
   void rebuildTreeByProject();
   void rebuildTreeByProjectByDate();
+  void rebuildTreeByProjectByStep();
   QTreeWidgetItem* findItem(const QString& text);
   QTreeWidgetItem* findItem(const QList<QTreeWidgetItem*>& list, const QString& text);
   QTreeWidgetItem* findItem(QTreeWidgetItem* parent, const QString& text);
