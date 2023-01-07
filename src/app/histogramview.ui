@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>368</width>
-    <height>257</height>
+    <height>260</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -73,12 +73,17 @@
         </item>
         <item>
          <property name="text">
-          <string>Logarithmic</string>
+          <string>Sine</string>
          </property>
         </item>
         <item>
          <property name="text">
           <string>Square Root</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Logarithmic</string>
          </property>
         </item>
        </widget>

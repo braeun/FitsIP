@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the log book                                      *
  *                                                                              *
- * modified: 2022-12-04                                                         *
+ * modified: 2023-01-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -258,7 +258,6 @@ QTreeWidgetItem* LogbookWidget::addEntryByProjectByStep(const LogbookEntry &e)
   QString tag = e.getTag();
   QStringList columns;
   columns << "" << e.timestamp.toString(Qt::ISODateWithMs)
-          << e.getStep()
           << tag << e.txt << QString::number(e.getId());
   QTreeWidgetItem* item = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr),columns);
   QTreeWidgetItem* parent = findItem(e.getProject());

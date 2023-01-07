@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2023-01-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -443,6 +443,8 @@ QImage FitsImage::toQImage(ValueType min, ValueType max, Scale scale) const
       return toQImageLog(min,max);
     case SQRT:
       return toQImageSqrt(min,max);
+    case SINE:
+      return toQImageSine(min,max);
   }
   return toQImageLin(min,max);
 }
@@ -496,6 +498,22 @@ QImage FitsImage::toQImageSqrt(ValueType min, ValueType max) const
   {
     ++p;
     *d++ = p.getRGB().toUIntSqrt(lmin,scale);
+  }
+  QImage img(reinterpret_cast<const uchar*>(data),static_cast<int32_t>(width),static_cast<int32_t>(height),QImage::Format_RGB32);
+  return img;
+}
+
+QImage FitsImage::toQImageSine(ValueType min, ValueType max) const
+{
+  uint32_t* data = new uint32_t[width*height];
+  ValueType scale = M_PI_2 / (max - min);
+  uint32_t* d = data;
+  ConstPixelIterator p = getConstPixelIterator();
+  *d++ = p.getRGB().toUIntSine(min,scale);
+  while (p.hasNext())
+  {
+    ++p;
+    *d++ = p.getRGB().toUIntSine(min,scale);
   }
   QImage img(reinterpret_cast<const uchar*>(data),static_cast<int32_t>(width),static_cast<int32_t>(height),QImage::Format_RGB32);
   return img;

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2022-12-04                                                         *
+ * modified: 2022-12-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -799,7 +799,7 @@ void MainWindow::on_actionPreferences_triggered()
 void MainWindow::on_actionOpen_Logbook_triggered()
 {
   AppSettings settings;
-  QString fn = settings.getOpenFilename(this,AppSettings::PATH_LOGBOOK,"File list (*.lbk);;All files (*)");
+  QString fn = settings.getOpenFilename(this,AppSettings::PATH_LOGBOOK,"Logbook (*.lbk *.log);;All files (*)");
   if (!fn.isNull())
   {
     openLogbook(fn);
@@ -821,9 +821,10 @@ void MainWindow::on_actionShow_Detected_Stars_toggled(bool flag)
 void MainWindow::on_actionNew_Logbook_triggered()
 {
   AppSettings settings;
-  QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOGBOOK,"File list (*.lbk);;All files (*)");
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOGBOOK,"Logbook (*.lbk *.log);;All files (*)");
   if (!fn.isNull())
   {
+    fn = IOFactory::assertSuffix(fn,"Logbook (*.lbk *.log)");
     openLogbook(fn);
   }
 }

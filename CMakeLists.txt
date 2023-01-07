@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-project(FitsIP VERSION 0.4.0)
+project(FitsIP VERSION 0.4.1)
 
 # Forbid in-tree building
 if(CMAKE_SOURCE_DIR MATCHES CMAKE_BINARY_DIR)
@@ -33,11 +33,6 @@ include(CMakePackageConfigHelpers)
 # do NOT use CMAKE_PREFIX_PATH as it is used by qtcreator to select the Qt version
 set(ENV{PKG_CONFIG_PATH} "${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig")
 find_package(PkgConfig REQUIRED)
-
-# find libraries for hscript
-#pkg_check_modules(LIBHVM REQUIRED libhvm)
-#pkg_check_modules(LIBHASM REQUIRED libhasm)
-#pkg_check_modules(LIBHSCRIPT REQUIRED libhscript)
 
 # check for Qt5
 find_package(Qt5 COMPONENTS Widgets Xml REQUIRED)

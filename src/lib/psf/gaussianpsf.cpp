@@ -46,4 +46,3 @@ std::vector<QString> GaussianPSF::getParameterNames() const
   return std::vector<QString>{"Sigma X", "Sigma Y"};
 }
 
-

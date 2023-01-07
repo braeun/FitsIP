@@ -63,10 +63,29 @@ OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsImage>
       else
         func = Constant;
       parameter = dlg->getParameter();
+      auto psfpar = dlg->getParameters();
       profiler.start();
-      deconvolve(image,psf,dlg->getParameters(),dlg->getIterationCount(),true);
+      deconvolve(image,psf,psfpar,dlg->getIterationCount(),true);
       profiler.stop();
-      log(image,QString::asprintf("van Cittert deconvolution: %s  niter=%d",psf->getName().toLatin1().data(),dlg->getIterationCount()));
+      QString msg = "van Cittert deconvolution: ";
+      msg += psf->getName() + " par=";
+      for (size_t i=0;i<psfpar.size();++i)
+      {
+        if (i > 0) msg += ",";
+        msg += QString::asprintf("%.1f",psfpar[i]);
+      }
+      msg += QString::asprintf("  niter=%d",dlg->getIterationCount());
+      if (cutImage) msg += "  cut image";
+      switch (func)
+      {
+        case Constant:
+          msg += QString::asprintf("  relaxation=%.2f",parameter);
+          break;
+        case Sine:
+          msg += QString::asprintf("  sine relaxation=%.2f",parameter);
+          break;
+      }
+      log(image,msg);
       logProfiler(image);
       return OK;
     }

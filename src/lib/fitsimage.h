@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2023-01-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -73,7 +73,7 @@ class FitsImage
 {
 public:
 
-  enum Scale { LINEAR=0, LOG, SQRT };
+  enum Scale { LINEAR=0, SINE, SQRT, LOG };
 
   FitsImage();
   FitsImage(const QString& name, uint32_t width, uint32_t height, uint32_t depth=1);
@@ -193,6 +193,7 @@ private:
   QImage toQImageLin(ValueType min, ValueType max) const;
   QImage toQImageLog(ValueType min, ValueType max) const;
   QImage toQImageSqrt(ValueType min, ValueType max) const;
+  QImage toQImageSine(ValueType min, ValueType max) const;
 
   QString name;
   uint32_t width;

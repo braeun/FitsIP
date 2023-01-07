@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - class to represent na RGB value                                     *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2023-01-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -87,6 +87,18 @@ class RGBValue {
    * @return the ARGB value
    */
   inline uint32_t toUIntSqrt(ValueType min, ValueType scale) const;
+
+  /**
+   * @brief Convert the rgb value to a 32bit unsigned int value for ARGB images using a sine scale.
+   *
+   * Note: the min value and the scale must already be prepared for sqrt scaling. If mi and ma are the
+   * images min and max pixel value, than the parameter min = mi and the scale is
+   * PI/2 / (ma - mi).
+   * @param min the minimum value corresponding to black
+   * @param scale the scale
+   * @return the ARGB value
+   */
+  inline uint32_t toUIntSine(ValueType min, ValueType scale) const;
 
   inline ValueType min() const;
 
@@ -198,6 +210,20 @@ inline uint32_t RGBValue::toUIntSqrt(ValueType min, ValueType scale) const
   if (ig < 0) ig = 0;
   if (ig > 255) ig = 255;
   int32_t ib = b < 0 ? 0 : static_cast<int32_t>((sqrt(b) - min) * scale);
+  if (ib < 0) ib = 0;
+  if (ib > 255) ib = 255;
+  return 0xFF000000 + ((static_cast<uint32_t>(ir) & 0xFF) << 16)  + ((static_cast<uint32_t>(ig) & 0xFF) << 8)  + (static_cast<uint32_t>(ib) & 0xFF);
+}
+
+inline uint32_t RGBValue::toUIntSine(ValueType min, ValueType scale) const
+{
+  int32_t ir = r < 0 ? 0 : static_cast<int32_t>(sin((r-min)*scale)*255);
+  if (ir < 0) ir = 0;
+  if (ir > 255) ir = 255;
+  int32_t ig = g < 0 ? 0 : static_cast<int32_t>(sin((g-min)*scale)*255);
+  if (ig < 0) ig = 0;
+  if (ig > 255) ig = 255;
+  int32_t ib = b < 0 ? 0 : static_cast<int32_t>(sin((b-min)*scale)*255);
   if (ib < 0) ib = 0;
   if (ib > 255) ib = 255;
   return 0xFF000000 + ((static_cast<uint32_t>(ir) & 0xFF) << 16)  + ((static_cast<uint32_t>(ig) & 0xFF) << 8)  + (static_cast<uint32_t>(ib) & 0xFF);
