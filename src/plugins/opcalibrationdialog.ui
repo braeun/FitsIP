@@ -178,6 +178,12 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>outputFolderField</tabstop>
+  <tabstop>browseButton</tabstop>
+  <tabstop>outputPrefixField</tabstop>
+  <tabstop>outputSuffixField</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

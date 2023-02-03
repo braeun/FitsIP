@@ -48,6 +48,7 @@ set(private_header_list
   math/filter/simplebandpassfilter.h
   math/filter/simplehighpassfilter.h
   math/filter/simplelowpassfilter.h
+  psf/cosinebellpsf.h
   psf/gaussianpsf.h
   psf/psf.h
   psf/psffactory.h
@@ -112,6 +113,7 @@ add_library(fitsbase
   math/filter/simplebandpassfilter.cpp
   math/filter/simplehighpassfilter.cpp
   math/filter/simplelowpassfilter.cpp
+  psf/cosinebellpsf.cpp
   psf/gaussianpsf.cpp
   psf/psf.cpp
   psf/psffactory.cpp

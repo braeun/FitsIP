@@ -1,6 +1,6 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - create gaussian test image                                          *
+ * FitsIP - create a test image from a PSF                                      *
  *                                                                              *
  * modified: 2023-02-03                                                         *
  *                                                                              *
@@ -20,71 +20,79 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "gaussiantestimage.h"
-#include "gaussiantestimagedialog.h"
+#include "psftestimage.h"
+#include "psftestimagedialog.h"
 #include <fitsimage.h>
-#include <math/mathfunctions.h>
+#include <psf/psffactory.h>
 
-GaussianTestImage::GaussianTestImage():
+PSFTestImage::PSFTestImage():
   dlg(nullptr)
 {
 }
 
-GaussianTestImage::~GaussianTestImage()
+PSFTestImage::~PSFTestImage()
 {
 }
 
-bool GaussianTestImage::requiresImage() const
-{
-  return false;
-}
-
-bool GaussianTestImage::requiresFileList() const
+bool PSFTestImage::requiresImage() const
 {
   return false;
 }
 
-bool GaussianTestImage::createsNewImage() const
+bool PSFTestImage::requiresFileList() const
+{
+  return false;
+}
+
+bool PSFTestImage::createsNewImage() const
 {
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> GaussianTestImage::getCreatedImages() const
+std::vector<std::shared_ptr<FitsImage>> PSFTestImage::getCreatedImages() const
 {
   return std::vector<std::shared_ptr<FitsImage>>{img};
 }
 
 
-QString GaussianTestImage::getMenuEntry() const
+QString PSFTestImage::getMenuEntry() const
 {
-  return "Image/Test Images/Gaussian...";
+  return "Image/Test Images/PSF...";
 }
 
-OpPlugin::ResultType GaussianTestImage::execute(std::shared_ptr<FitsImage> /*image*/, QRect /*selection*/)
+OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsImage> /*image*/, QRect /*selection*/)
 {
   if (!dlg)
   {
-    dlg = new GaussianTestImageDialog();
+    dlg = new PSFTestImageDialog();
   }
   if (dlg->exec())
   {
-    img = std::make_shared<FitsImage>("Gauss",dlg->getWidth(),dlg->getHeight());
-    double a = dlg->getAmplitude();
-    double cx = dlg->getCenterX();
-    double sx = dlg->getSigmaX();
-    double cy = dlg->getCenterY();
-    double sy = dlg->getSigmaY();
-    PixelIterator it = img->getPixelIterator();
-    for (uint32_t y=0;y<img->getHeight();y++)
+    img = std::make_shared<FitsImage>(dlg->getFunction(),dlg->getWidth(),dlg->getHeight());
+    ValueType a = dlg->getAmplitude();
+    ValueType cx = dlg->getCenterX();
+    ValueType cy = dlg->getCenterY();
+    std::vector<ValueType> par = dlg->getParameters();
+    auto psf = PSFFactory::getInstance()->getPSF(dlg->getFunction());
+    if (psf)
     {
-      for (uint32_t x=0;x<img->getWidth();x++)
+      PixelIterator it = img->getPixelIterator();
+      for (uint32_t y=0;y<img->getHeight();y++)
       {
-        it[0] = MathFunctions::gaussian(x,y,a,cx,sx,cy,sy);
-        ++it;
+        for (uint32_t x=0;x<img->getWidth();x++)
+        {
+          it[0] = a * psf->value(x-cx,y-cy,par);
+          ++it;
+        }
       }
+      emit logOperation("New Image","Created test image for "+dlg->getFunction());
+      return OK;
     }
-    emit logOperation("New Image","Created gaussian");
-    return OK;
+    else
+    {
+      setError("Internal Error: PSF '"+dlg->getFunction()+"' not found!");
+      return ERROR;
+    }
   }
   return CANCELLED;
 }

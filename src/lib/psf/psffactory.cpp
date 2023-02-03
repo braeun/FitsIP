@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - factory for point-spread-functions                                  *
  *                                                                              *
- * modified: 2022-11-25                                                         *
+ * modified: 2023-02-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,11 +22,13 @@
 
 #include "psffactory.h"
 #include "gaussianpsf.h"
+#include "cosinebellpsf.h"
 
 std::unique_ptr<PSFFactory> PSFFactory::instance;
 
 PSFFactory::PSFFactory()
 {
+  list.push_back(std::shared_ptr<PSF>(new CosineBellPSF()));
   list.push_back(std::shared_ptr<PSF>(new GaussianPSF()));
 }
 

@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - factory for point-spread-functions                                  *
+ * FitsIP - dialog to create a test image fom a PSF                             *
  *                                                                              *
- * modified: 202-02-03                                                         *
+ * modified: 2023-02-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,29 +20,41 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PSFFACTORY_H
-#define PSFFACTORY_H
+#ifndef PSFTESTIMAGEDIALOG_H
+#define PSFTESTIMAGEDIALOG_H
 
-#include "psf.h"
-#include <memory>
+#include <QDialog>
+#include <fitstypes.h>
 #include <vector>
-#include <QString>
 
-class PSFFactory
+namespace Ui {
+class PSFTestImageDialog;
+}
+
+class PSFTestImageDialog : public QDialog
 {
+  Q_OBJECT
+
 public:
-  PSFFactory();
+  explicit PSFTestImageDialog(QWidget *parent = nullptr);
+  ~PSFTestImageDialog();
 
-  const PSF* getPSF(const QString& name) const;
+  QString getFunction() const;
 
-  const std::vector<std::shared_ptr<PSF>>& getList() const;
+  std::vector<ValueType> getParameters() const;
 
-  static PSFFactory* getInstance();
+  int getWidth() const;
+
+  int getHeight() const;
+
+  double getAmplitude() const;
+
+  double getCenterX() const;
+
+  double getCenterY() const;
 
 private:
-  std::vector<std::shared_ptr<PSF>> list;
-
-  static std::unique_ptr<PSFFactory> instance;
+  Ui::PSFTestImageDialog *ui;
 };
 
-#endif // PSFFACTORY_H
+#endif // PSFTESTIMAGEDIALOG_H

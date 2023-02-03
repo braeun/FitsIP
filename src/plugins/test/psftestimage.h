@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - factory for point-spread-functions                                  *
+ * FitsIP - create a test image from a PSF                                      *
  *                                                                              *
- * modified: 202-02-03                                                         *
+ * modified: 2023-02-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,29 +20,41 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PSFFACTORY_H
-#define PSFFACTORY_H
+#ifndef PSFTESTIMAGE_H
+#define PSFTESTIMAGE_H
 
-#include "psf.h"
-#include <memory>
-#include <vector>
-#include <QString>
+#include <opplugin.h>
+#include <QObject>
 
-class PSFFactory
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
+class PSFTestImageDialog;
+
+class PSFTestImage: public OpPlugin
 {
+  Q_OBJECT
+  Q_PLUGIN_METADATA(IID OpPlugin_iid)
+  Q_INTERFACES(OpPlugin)
 public:
-  PSFFactory();
+  PSFTestImage();
+  virtual ~PSFTestImage() override;
 
-  const PSF* getPSF(const QString& name) const;
+  virtual bool requiresImage() const override;
 
-  const std::vector<std::shared_ptr<PSF>>& getList() const;
+  virtual bool requiresFileList() const override;
 
-  static PSFFactory* getInstance();
+  virtual bool createsNewImage() const override;
+
+  virtual std::vector<std::shared_ptr<FitsImage>> getCreatedImages() const override;
+
+  virtual QString getMenuEntry() const override;
+
+  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect()) override;
 
 private:
-  std::vector<std::shared_ptr<PSF>> list;
-
-  static std::unique_ptr<PSFFactory> instance;
+  std::shared_ptr<FitsImage> img;
+  PSFTestImageDialog* dlg;
 };
 
-#endif // PSFFACTORY_H
+#endif // PSFTESTIMAGE_H

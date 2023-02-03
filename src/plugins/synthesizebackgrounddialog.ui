@@ -204,6 +204,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>degreeSpinner</tabstop>
+  <tabstop>selectionBox</tabstop>
+  <tabstop>pointSpinner</tabstop>
+  <tabstop>skyMeanField</tabstop>
+  <tabstop>skySigmaField</tabstop>
+  <tabstop>skyNSigmaField</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

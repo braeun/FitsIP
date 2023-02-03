@@ -314,6 +314,23 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>blurBox</tabstop>
+  <tabstop>boxSizeBox</tabstop>
+  <tabstop>moveMaxField</tabstop>
+  <tabstop>iterationBox</tabstop>
+  <tabstop>skyMeanField</tabstop>
+  <tabstop>skySigmaField</tabstop>
+  <tabstop>skyMinSigmaField</tabstop>
+  <tabstop>fwhmMinField</tabstop>
+  <tabstop>fwhmMaxField</tabstop>
+  <tabstop>roundnessMinField</tabstop>
+  <tabstop>roundnessMaxField</tabstop>
+  <tabstop>sharpnessMinField</tabstop>
+  <tabstop>sharpnessMaxField</tabstop>
+  <tabstop>hotnessMinField</tabstop>
+  <tabstop>hotnessMaxField</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

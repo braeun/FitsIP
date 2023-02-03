@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - factory for point-spread-functions                                  *
+ * FitsIP - cosine bell shaped point-spread-function                            *
  *                                                                              *
- * modified: 202-02-03                                                         *
+ * modified: 2023-02-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,29 +20,23 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PSFFACTORY_H
-#define PSFFACTORY_H
+#ifndef COSINEBELLPSF_H
+#define COSINEBELLPSF_H
 
 #include "psf.h"
-#include <memory>
-#include <vector>
-#include <QString>
 
-class PSFFactory
+class CosineBellPSF: public PSF
 {
 public:
-  PSFFactory();
+  CosineBellPSF();
+  virtual ~CosineBellPSF() override;
 
-  const PSF* getPSF(const QString& name) const;
+  virtual QString getName() const override;
 
-  const std::vector<std::shared_ptr<PSF>>& getList() const;
+  virtual ValueType value(ValueType x, ValueType y, const std::vector<ValueType>& par) const override;
 
-  static PSFFactory* getInstance();
+  virtual std::vector<QString> getParameterNames() const override;
 
-private:
-  std::vector<std::shared_ptr<PSF>> list;
-
-  static std::unique_ptr<PSFFactory> instance;
 };
 
-#endif // PSFFACTORY_H
+#endif // COSINEBELLPSF_H

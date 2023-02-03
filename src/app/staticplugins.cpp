@@ -67,6 +67,6 @@ Q_IMPORT_PLUGIN(MeasureMatch)
 Q_IMPORT_PLUGIN(SynthesizeBackground)
 Q_IMPORT_PLUGIN(FindStars)
 
-Q_IMPORT_PLUGIN(PSFImage)
 Q_IMPORT_PLUGIN(GaussianTestImage)
+Q_IMPORT_PLUGIN(PSFTestImage)
 

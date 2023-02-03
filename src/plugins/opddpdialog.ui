@@ -196,6 +196,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>backgroundField</tabstop>
+  <tabstop>sigmaField</tabstop>
+  <tabstop>aField</tabstop>
+  <tabstop>bField</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -112,6 +112,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>xField</tabstop>
+  <tabstop>widthField</tabstop>
+  <tabstop>yField</tabstop>
+  <tabstop>heightField</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

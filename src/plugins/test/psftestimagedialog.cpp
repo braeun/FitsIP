@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - factory for point-spread-functions                                  *
+ * FitsIP - dialog to create a test image fom a PSF                             *
  *                                                                              *
- * modified: 202-02-03                                                         *
+ * modified: 2023-02-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,29 +20,53 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PSFFACTORY_H
-#define PSFFACTORY_H
+#include "psftestimagedialog.h"
+#include "ui_psftestimagedialog.h"
 
-#include "psf.h"
-#include <memory>
-#include <vector>
-#include <QString>
-
-class PSFFactory
+PSFTestImageDialog::PSFTestImageDialog(QWidget *parent) :
+  QDialog(parent),
+  ui(new Ui::PSFTestImageDialog)
 {
-public:
-  PSFFactory();
+  ui->setupUi(this);
+}
 
-  const PSF* getPSF(const QString& name) const;
+PSFTestImageDialog::~PSFTestImageDialog()
+{
+  delete ui;
+}
 
-  const std::vector<std::shared_ptr<PSF>>& getList() const;
+QString PSFTestImageDialog::getFunction() const
+{
+  return ui->psfWidget->getFunction();
+}
 
-  static PSFFactory* getInstance();
+std::vector<ValueType> PSFTestImageDialog::getParameters() const
+{
+  return ui->psfWidget->getParameters();
+}
 
-private:
-  std::vector<std::shared_ptr<PSF>> list;
+int PSFTestImageDialog::getWidth() const
+{
+  return ui->widthBox->value();
+}
 
-  static std::unique_ptr<PSFFactory> instance;
-};
+int PSFTestImageDialog::getHeight() const
+{
+  return  ui->heightBox->value();
+}
 
-#endif // PSFFACTORY_H
+double PSFTestImageDialog::getAmplitude() const
+{
+  return ui->amplitudeField->text().toDouble();
+}
+
+double PSFTestImageDialog::getCenterX() const
+{
+  return ui->centerXField->text().toDouble();
+}
+
+double PSFTestImageDialog::getCenterY() const
+{
+  return ui->centerYField->text().toDouble();
+}
+

@@ -226,6 +226,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>modeBox</tabstop>
+  <tabstop>matchFullBox</tabstop>
+  <tabstop>matchRangeField</tabstop>
+  <tabstop>subtractSkyBox</tabstop>
+  <tabstop>allowRotationBox</tabstop>
+  <tabstop>searchboxSizeField</tabstop>
+  <tabstop>starboxSizeField</tabstop>
+  <tabstop>maxMovementField</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

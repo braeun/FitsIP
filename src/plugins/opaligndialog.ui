@@ -160,6 +160,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>outputDirField</tabstop>
+  <tabstop>browseButton</tabstop>
+  <tabstop>matchFullButton</tabstop>
+  <tabstop>matchRangeButton</tabstop>
+  <tabstop>matchRangeBox</tabstop>
+  <tabstop>dynamicAOIBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

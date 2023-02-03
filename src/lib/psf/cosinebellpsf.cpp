@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - factory for point-spread-functions                                  *
+ * FitsIP - cosine bell shaped point-spread-function                            *
  *                                                                              *
- * modified: 202-02-03                                                         *
+ * modified: 2023-02-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,29 +20,35 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PSFFACTORY_H
-#define PSFFACTORY_H
+#include "cosinebellpsf.h"
+#include <cmath>
 
-#include "psf.h"
-#include <memory>
-#include <vector>
-#include <QString>
-
-class PSFFactory
+CosineBellPSF::CosineBellPSF():PSF()
 {
-public:
-  PSFFactory();
+}
 
-  const PSF* getPSF(const QString& name) const;
+CosineBellPSF::~CosineBellPSF()
+{
+}
 
-  const std::vector<std::shared_ptr<PSF>>& getList() const;
+QString CosineBellPSF::getName() const
+{
+  return "Cosine Bell";
+}
 
-  static PSFFactory* getInstance();
+ValueType CosineBellPSF::value(ValueType x, ValueType y, const std::vector<ValueType>& par) const
+{
+  if (par[1] <= par[0]) return 0;
+  ValueType r = sqrt(x*x+y*y);
+  if (r <= par[0]) return 1;
+  if (r >= par[1]) return 0;
+  ValueType R = par[1] - par[0];
+  ValueType q = (r - par[0]) / R;
+  return sqrt(1 - q * q);
+}
 
-private:
-  std::vector<std::shared_ptr<PSF>> list;
+std::vector<QString> CosineBellPSF::getParameterNames() const
+{
+  return std::vector<QString>{"Inner Radius", "Outer Radius"};
+}
 
-  static std::unique_ptr<PSFFactory> instance;
-};
-
-#endif // PSFFACTORY_H

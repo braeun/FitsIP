@@ -180,6 +180,14 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>iterationsBox</tabstop>
+  <tabstop>cutBox</tabstop>
+  <tabstop>valueRelaxationBox</tabstop>
+  <tabstop>singleValueBox</tabstop>
+  <tabstop>sineRelaxationBox</tabstop>
+  <tabstop>sineValueBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -47,6 +47,7 @@ set(plugin_headers
   psfimage.h
   synthesizebackground.h
   test/gaussiantestimage.h
+  test/psftestimage.h
   )
 
 set(plugin_sources
@@ -85,6 +86,7 @@ set(plugin_sources
   psfimage.cpp
   synthesizebackground.cpp
   test/gaussiantestimage.cpp
+  test/psftestimage.cpp
   )
 
 if (FFTW_FOUND)
@@ -129,7 +131,8 @@ set(private_header_list
   synthesizebackgrounddialog.h
   vancittertdeconvolutiondialog.h
   test/gaussiantestimagedialog.h
-  )
+  test/psftestimagedialog.h
+)
 
 add_library(fitsplugins
   findstarsdialog.cpp
@@ -170,6 +173,8 @@ add_library(fitsplugins
   vancittertdeconvolutiondialog.ui
   test/gaussiantestimagedialog.cpp
   test/gaussiantestimagedialog.ui
+  test/psftestimagedialog.cpp
+  test/psftestimagedialog.ui
   ${plugin_sources}
   ${plugin_mocs}
   ${private_header_list}
