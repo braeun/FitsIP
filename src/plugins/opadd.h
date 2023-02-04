@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to add two images                                            *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,6 +41,8 @@ public:
   virtual ~OpAdd() override;
 
   virtual QString getMenuEntry() const override;
+
+  virtual QIcon getIcon() const override;
 
   virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect()) override;
 

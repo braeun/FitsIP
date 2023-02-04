@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - subtract to images                                                  *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,7 @@
 OpSub::OpSub():
   dlg(nullptr)
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpSub");
 }
 
@@ -40,6 +41,11 @@ OpSub::~OpSub()
 QString OpSub::getMenuEntry() const
 {
   return "Math/Sub...";
+}
+
+QIcon OpSub::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/minus.png");
 }
 
 OpPlugin::ResultType OpSub::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

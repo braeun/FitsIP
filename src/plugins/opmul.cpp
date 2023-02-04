@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - multiply two images                                                 *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,7 @@
 OpMul::OpMul():
   dlg(nullptr)
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpMul");
 }
 
@@ -40,6 +41,11 @@ OpMul::~OpMul()
 QString OpMul::getMenuEntry() const
 {
   return "Math/Mul...";
+}
+
+QIcon OpMul::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/mul.png");
 }
 
 OpPlugin::ResultType OpMul::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

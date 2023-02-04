@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - scale image intensity by square root                                *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,6 +27,7 @@
 
 OpSqrt::OpSqrt()
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpSqrt");
 }
 
@@ -37,6 +38,11 @@ OpSqrt::~OpSqrt()
 QString OpSqrt::getMenuEntry() const
 {
   return "Math/Sqrt";
+}
+
+QIcon OpSqrt::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/opsqrt.png");
 }
 
 OpPlugin::ResultType OpSqrt::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

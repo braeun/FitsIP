@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - shift image with subpixel accuracy                                  *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,6 +28,7 @@
 OpShift::OpShift():
   dlg(nullptr)
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpShift");
 }
 
@@ -39,6 +40,11 @@ OpShift::~OpShift()
 QString OpShift::getMenuEntry() const
 {
   return "Image/Shift...";
+}
+
+QIcon OpShift::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/transform-move.png");
 }
 
 OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

@@ -115,17 +115,14 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
   fftsize = fftwidth * fftheight;
   fftw_complex* hfft = fft(*h,0);
   ImageStatistics stat;
+  std::shared_ptr<FitsImage> c;
   while (niter-- > 0)
   {
     if (image->getDepth() == 1)
     {
       fftw_complex* offt = fft(*o,0);
       mul(offt,hfft,fftsize);
-      std::shared_ptr<FitsImage> c = invfft(offt,image->getWidth(),image->getHeight());
-      auto s = std::make_shared<FitsImage>(*image);
-      *s -= *c;
-      stat = ImageStatistics(*s);
-      *o += *s;
+      c = invfft(offt,image->getWidth(),image->getHeight());
       delete [] offt;
     }
     else if (image->getDepth() == 3)
@@ -136,24 +133,24 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
       mul(offt1,hfft,fftsize);
       mul(offt2,hfft,fftsize);
       mul(offt3,hfft,fftsize);
-      std::shared_ptr<FitsImage> c = invfft(offt1,offt2,offt3,image->getWidth(),image->getHeight());
-      auto s = std::make_shared<FitsImage>(*image);
-      *s -= *c;
-      stat = ImageStatistics(*s);
-      switch (func)
-      {
-        case Constant:
-          *s *= parameter;
-          break;
-        case Sine:
-          applySineRelaxation(o,basestat,s);
-          break;
-      }
-      *o += *s;
+      c = invfft(offt1,offt2,offt3,image->getWidth(),image->getHeight());
       delete [] offt1;
       delete [] offt2;
       delete [] offt3;
     }
+    auto s = std::make_shared<FitsImage>(*image);
+    *s -= *c;
+    stat = ImageStatistics(*s);
+    switch (func)
+    {
+      case Constant:
+        *s *= parameter;
+        break;
+      case Sine:
+        applySineRelaxation(o,basestat,s);
+        break;
+    }
+    *o += *s;
     if (cutImage)
     {
       OpCut().cut(o,basestat.getGlobalStatistics().minValue,basestat.getGlobalStatistics().maxValue);

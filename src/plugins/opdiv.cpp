@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - divide two images                                                   *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,7 @@
 OpDiv::OpDiv():
   dlg(nullptr)
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpDiv");
 }
 
@@ -40,6 +41,11 @@ OpDiv::~OpDiv()
 QString OpDiv::getMenuEntry() const
 {
   return "Math/Div...";
+}
+
+QIcon OpDiv::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/div.png");
 }
 
 OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

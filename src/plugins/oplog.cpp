@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - scale image by logarithm                                            *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,7 @@
 
 OpLog::OpLog()
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpLog");
 }
 
@@ -36,6 +37,11 @@ OpLog::~OpLog()
 QString OpLog::getMenuEntry() const
 {
   return "Math/Log";
+}
+
+QIcon OpLog::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/oplog.png");
 }
 
 OpPlugin::ResultType OpLog::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

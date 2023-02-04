@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin base class                                                   *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QIcon>
 
 class Plugin: public QObject
 {
@@ -34,6 +35,8 @@ public:
   virtual ~Plugin();
 
   virtual QString getMenuEntry() const = 0;
+
+  virtual QIcon getIcon() const;
 
 };
 

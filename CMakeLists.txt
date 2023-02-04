@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-project(FitsIP VERSION 0.4.1)
+project(FitsIP VERSION 0.5.0)
 
 # Forbid in-tree building
 if(CMAKE_SOURCE_DIR MATCHES CMAKE_BINARY_DIR)

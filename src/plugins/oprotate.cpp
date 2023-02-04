@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - rotate images                                                       *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,7 @@
 OpRotate::OpRotate():
   dlg(nullptr)
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpRotate");
 }
 
@@ -40,6 +41,11 @@ OpRotate::~OpRotate()
 QString OpRotate::getMenuEntry() const
 {
   return "Image/Rotate...";
+}
+
+QIcon OpRotate::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/transform-rotate.png");
 }
 
 OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

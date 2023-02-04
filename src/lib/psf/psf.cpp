@@ -47,7 +47,7 @@ std::shared_ptr<FitsImage> PSF::createPSF(uint32_t w, uint32_t h, const std::vec
       ++it;
     }
   }
-  *img /= sum;
+  if (sum != 0) *img /= sum;
   return img;
 }
 

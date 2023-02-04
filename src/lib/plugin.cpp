@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin base class                                                   *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,4 +28,9 @@ Plugin::Plugin()
 
 Plugin::~Plugin()
 {
+}
+
+QIcon Plugin::getIcon() const
+{
+  return QIcon();
 }

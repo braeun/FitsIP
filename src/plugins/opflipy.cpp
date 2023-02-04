@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - flip image vertically                                               *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,7 @@
 
 OpFlipY::OpFlipY()
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpFlipY");
 }
 
@@ -35,6 +36,11 @@ OpFlipY::~OpFlipY()
 QString OpFlipY::getMenuEntry() const
 {
   return "Image/Flip Y";
+}
+
+QIcon OpFlipY::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/object-flip-vertical.png");
 }
 
 OpPlugin::ResultType OpFlipY::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

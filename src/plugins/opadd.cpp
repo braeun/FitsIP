@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to add two images                                            *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,7 @@
 OpAdd::OpAdd():
   dlg(nullptr)
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpAdd");
 }
 
@@ -40,6 +41,11 @@ OpAdd::~OpAdd()
 QString OpAdd::getMenuEntry() const
 {
   return "Math/Add...";
+}
+
+QIcon OpAdd::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/plus.png");
 }
 
 OpPlugin::ResultType OpAdd::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

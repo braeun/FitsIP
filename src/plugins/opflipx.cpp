@@ -25,6 +25,7 @@
 
 OpFlipX::OpFlipX()
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("OpFlipX");
 }
 
@@ -35,6 +36,11 @@ OpFlipX::~OpFlipX()
 QString OpFlipX::getMenuEntry() const
 {
   return "Image/Flip X";
+}
+
+QIcon OpFlipX::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/object-flip-horizontal.png");
 }
 
 OpPlugin::ResultType OpFlipX::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

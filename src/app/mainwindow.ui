@@ -966,6 +966,9 @@
    <property name="text">
     <string>Original Size</string>
    </property>
+   <property name="shortcut">
+    <string>1</string>
+   </property>
   </action>
   <action name="actionFit_Window">
    <property name="icon">
@@ -975,10 +978,16 @@
    <property name="text">
     <string>Fit Window</string>
    </property>
+   <property name="shortcut">
+    <string>F</string>
+   </property>
   </action>
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -1122,11 +1131,6 @@
   <action name="action4_1">
    <property name="text">
     <string>4 : 1</string>
-   </property>
-  </action>
-  <action name="action1">
-   <property name="text">
-    <string>1</string>
    </property>
   </action>
   <action name="actionExport_Image">

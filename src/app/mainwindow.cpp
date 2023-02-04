@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2022-12-26                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -86,19 +86,31 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->action4_1,&QAction::triggered,this,[=](){ zoom(4); });
 
   ui->menuWindow->addAction(ui->fileSystemDockWidget->toggleViewAction());
+  ui->fileSystemDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F1));
   ui->menuWindow->addAction(ui->fileListDockWidget->toggleViewAction());
+  ui->fileListDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F2));
   ui->menuWindow->addAction(ui->openFilesDockWidget->toggleViewAction());
+  ui->openFilesDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F3));
   ui->menuWindow->addSeparator();
   ui->menuWindow->addAction(ui->metadataDockWidget->toggleViewAction());
+  ui->metadataDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F4));
   ui->menuWindow->addAction(ui->historyDockWidget->toggleViewAction());
+  ui->historyDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F5));
   ui->menuWindow->addAction(ui->histogramDockWidget->toggleViewAction());
+  ui->histogramDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F6));
   ui->menuWindow->addAction(ui->profilesDockWidget->toggleViewAction());
+  ui->profilesDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F7));
   ui->menuWindow->addAction(ui->starlistDockWidget->toggleViewAction());
+  ui->starlistDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F8));
   ui->menuWindow->addAction(ui->pixellistDockWidget->toggleViewAction());
+  ui->pixellistDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F9));
   ui->menuWindow->addSeparator();
   ui->menuWindow->addAction(ui->logbookDockWidget->toggleViewAction());
+  ui->logbookDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F10));
   ui->menuWindow->addAction(ui->consoleDockWidget->toggleViewAction());
+  ui->consoleDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F11));
   ui->menuWindow->addAction(ui->profilerDockWidget->toggleViewAction());
+  ui->profilerDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F12));
 
   ui->fileListDockWidget->close();
   ui->profilesDockWidget->close();
@@ -186,7 +198,14 @@ LogWidget* MainWindow::getLogWidget()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-  event->accept();
+  if (QMessageBox::question(this,QApplication::applicationDisplayName(),"Really quit?\nUnsaved data will be lost!") == QMessageBox::Yes)
+  {
+    event->accept();
+  }
+  else
+  {
+    event->ignore();
+  }
 }
 
 void MainWindow::loadPlugins()
@@ -206,7 +225,7 @@ void MainWindow::addOpPlugin(OpPlugin *op)
     qWarning() << "No menu entry provided for plugin!";
     return;
   }
-  QAction* a = addMenuEntry(op->getMenuEntry());
+  QAction* a = addMenuEntry(op->getMenuEntry(),op->getIcon());
   if (a != nullptr)
   {
     PluginMenuEntry entry;
@@ -217,7 +236,7 @@ void MainWindow::addOpPlugin(OpPlugin *op)
   }
 }
 
-QAction* MainWindow::addMenuEntry(QString entry)
+QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
 {
   QStringList entries = entry.split("/");
   if (entries.size() < 2)
@@ -263,6 +282,22 @@ QAction* MainWindow::addMenuEntry(QString entry)
   }
   if (!lastmenu) return nullptr;
   QAction* action = lastmenu->addAction(entries.last());
+  if (!icon.isNull())
+  {
+    action->setIcon(icon);
+    QToolBar* tb;
+    if (pluginToolbars.find(entries[0]) == pluginToolbars.end())
+    {
+      tb = addToolBar(entries[0]);
+      tb->setObjectName(entries[0]);
+      pluginToolbars[entries[0]] = tb;
+    }
+    else
+    {
+      tb = pluginToolbars[entries[0]];
+    }
+    tb->addAction(action);
+  }
   return action;
 }
 

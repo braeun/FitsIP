@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - cut low and high values                                             *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,7 @@
 
 OpCut::OpCut()
 {
+  Q_INIT_RESOURCE(pluginresources);
   dlg.setTitle("Cut Image");
   dlg.setValue1Label("Lower limit:");
   dlg.setValue2Label("Upper limit:");
@@ -40,6 +41,11 @@ OpCut::~OpCut()
 QString OpCut::getMenuEntry() const
 {
   return "Math/Cut...";
+}
+
+QIcon OpCut::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/opcut.png");
 }
 
 OpPlugin::ResultType OpCut::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)

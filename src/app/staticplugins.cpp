@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - declaration of static plugins                                       *
  *                                                                              *
- * modified: 2022-11-27                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,8 +23,9 @@
 #include <QtPlugin>
 
 Q_IMPORT_PLUGIN(OpCrop)
-Q_IMPORT_PLUGIN(OpShrink)
-Q_IMPORT_PLUGIN(OpGrow)
+Q_IMPORT_PLUGIN(OpResize)
+//Q_IMPORT_PLUGIN(OpShrink)
+//Q_IMPORT_PLUGIN(OpGrow)
 Q_IMPORT_PLUGIN(OpFlipX)
 Q_IMPORT_PLUGIN(OpFlipY)
 Q_IMPORT_PLUGIN(OpRotate)
@@ -58,6 +59,7 @@ Q_IMPORT_PLUGIN(OpUnsharpMask)
 Q_IMPORT_PLUGIN(OpDDP)
 #ifdef HAVE_FFTW
 Q_IMPORT_PLUGIN(VanCittertDeconvolution)
+Q_IMPORT_PLUGIN(LucyRichardsonDeconvolution)
 #endif
 
 Q_IMPORT_PLUGIN(MeasureStatistics)

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2022-11-27                                                         *
+ * modified: 2023-02-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,6 +28,7 @@
 #include <logbook/logbook.h>
 #include <QMainWindow>
 #include <vector>
+#include <map>
 #include <memory>
 
 namespace Ui {
@@ -132,7 +133,7 @@ private:
 
   void loadPlugins();
   void addOpPlugin(OpPlugin* op);
-  QAction* addMenuEntry(QString entry);
+  QAction* addMenuEntry(QString entry, QIcon icon);
   void executeOpPlugin(OpPlugin* op);
   void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsImage> img, QRect roi);
   std::vector<QFileInfo> getFileList();
@@ -148,6 +149,7 @@ private:
 
   Ui::MainWindow *ui;
   std::vector<PluginMenuEntry> pluginMenus;
+  std::map<QString,QToolBar*> pluginToolbars;
   ImageWidget* imageWidget;
   EditMetadataDialog* editMetadataDialog;
   Logbook logbook;

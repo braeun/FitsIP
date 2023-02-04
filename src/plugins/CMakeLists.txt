@@ -33,6 +33,7 @@ set(plugin_headers
   oplog.h
   opmedian.h
   opmul.h
+  opresize.h
   oprotate.h
   opscale.h
   opshift.h
@@ -72,6 +73,7 @@ set(plugin_sources
   oplog.cpp
   opmedian.cpp
   opmul.cpp
+  opresize.cpp
   oprotate.cpp
   opscale.cpp
   opshift.cpp
@@ -91,11 +93,13 @@ set(plugin_sources
 
 if (FFTW_FOUND)
   list(APPEND plugin_headers
+    lucyrichardsondeconvolution.h
     opfft.h
     opinvfft.h
     vancittertdeconvolution.h
     )
   list(APPEND plugin_sources
+    lucyrichardsondeconvolution.cpp
     opfft.cpp
     opinvfft.cpp
     vancittertdeconvolution.cpp
@@ -113,6 +117,7 @@ qt5_wrap_cpp(plugin_mocs
 
 set(private_header_list
   findstarsdialog.h
+  lucyrichardsondeconvolutiondialog.h
   measurematchdialog.h
   measurerankresultdialog.h
   opaligndialog.h
@@ -123,6 +128,7 @@ set(private_header_list
   opgrowdialog.h
   opkerneldialog.h
   opmediandialog.h
+  opresizedialog.h
   oprotatedialog.h
   opshiftdialog.h
   opshrinkdialog.h
@@ -137,6 +143,8 @@ set(private_header_list
 add_library(fitsplugins
   findstarsdialog.cpp
   findstarsdialog.ui
+  lucyrichardsondeconvolutiondialog.cpp
+  lucyrichardsondeconvolutiondialog.ui
   measurematchdialog.cpp
   measurematchdialog.ui
   measurerankresultdialog.cpp
@@ -157,6 +165,8 @@ add_library(fitsplugins
   opkerneldialog.ui
   opmediandialog.cpp
   opmediandialog.ui
+  opresizedialog.cpp
+  opresizedialog.ui
   oprotatedialog.cpp
   oprotatedialog.ui
   opshiftdialog.cpp
@@ -167,6 +177,7 @@ add_library(fitsplugins
   opstackdialog.ui
   opunsharpmaskdialog.cpp
   opunsharpmaskdialog.ui
+  pluginresources.qrc
   synthesizebackgrounddialog.cpp
   synthesizebackgrounddialog.ui
   vancittertdeconvolutiondialog.cpp
