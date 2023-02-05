@@ -9,7 +9,7 @@
         <file>resources/icons/document-save.png</file>
         <file>resources/icons/document-open.png</file>
         <file>resources/icons/document-close.png</file>
-        <file>resources/icons/document-open-folder.png</file>
+        <file>resources/icons/folder.png</file>
         <file>resources/icons/edit-undo.png</file>
         <file>resources/fits.png</file>
         <file>resources/icons/document-export-table.png</file>
@@ -24,7 +24,10 @@
         <file>resources/icons/view-filter.png</file>
         <file>resources/icons/view-pim-notes.png</file>
         <file>resources/icons/address-book-new.png</file>
-        <file>resources/icons/collapse_all.png</file>
-        <file>resources/icons/expand_all.png</file>
+        <file>resources/icons/collapse-all.png</file>
+        <file>resources/icons/expand-all.png</file>
+        <file>resources/icons/document-export.png</file>
+        <file>resources/icons/go-next.png</file>
+        <file>resources/icons/go-previous.png</file>
     </qresource>
 </RCC>

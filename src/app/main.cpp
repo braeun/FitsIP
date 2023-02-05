@@ -51,6 +51,8 @@ int main(int argc, char* argv[])
   QApplication::setApplicationDisplayName("Fits");
   QApplication a(argc, argv);
 
+  QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << ":/resources/icons" << ":/pluginicons/resources/icons");
+
   qInstallMessageHandler(msgHandler);
 
   PaletteFactory::registerDefaultPalette(QApplication::palette());

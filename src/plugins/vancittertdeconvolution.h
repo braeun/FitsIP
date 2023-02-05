@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - vanCittert deconvolution                                            *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2023-02-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -54,6 +54,8 @@ public:
   virtual ~VanCittertDeconvolution();
 
   virtual QString getMenuEntry() const override;
+
+  virtual QIcon getIcon() const override;
 
   virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect()) override;
 

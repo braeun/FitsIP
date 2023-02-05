@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Lucy Richardson deconvolution                                       *
  *                                                                              *
- * modified: 2023-02-03                                                         *
+ * modified: 2023-02-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,6 +37,7 @@ LucyRichardsonDeconvolution::LucyRichardsonDeconvolution():
   parameter(1),
   dlg(nullptr)
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("LucyRichardsonDeconvolution");
 }
 
@@ -47,6 +48,11 @@ LucyRichardsonDeconvolution::~LucyRichardsonDeconvolution()
 QString LucyRichardsonDeconvolution::getMenuEntry() const
 {
   return "Filter/Lucy Richardson Deconvolution...";
+}
+
+QIcon LucyRichardsonDeconvolution::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/lr.png");
 }
 
 OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsImage> image, QRect selection)
@@ -114,7 +120,6 @@ void LucyRichardsonDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, c
   fftheight = image->getHeight();
   fftsize = fftwidth * fftheight;
   fftw_complex* hfft = fft(*h,0);
-  ImageStatistics stat;
   std::shared_ptr<FitsImage> c;
   while (niter-- > 0)
   {
@@ -151,17 +156,14 @@ void LucyRichardsonDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, c
         break;
     }
     *s += 1;
-    stat = ImageStatistics(*s);
     *o *= *s;
     if (cutImage)
     {
       OpCut().cut(o,basestat.getGlobalStatistics().minValue,basestat.getGlobalStatistics().maxValue);
     }
-    qInfo() << "remaining" << niter << " stddev=" << stat.getGlobalStatistics().stddev;
     if (prog)
     {
       prog->setProgress(niter);
-      prog->appendMessage(QString::asprintf("stddev=%f",stat.getGlobalStatistics().stddev));
       QApplication::processEvents();
       if (prog->isCancelled()) break;
     }

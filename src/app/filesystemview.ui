@@ -53,9 +53,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normalon>:/resources/icons/document-open-folder.png</normalon>
-         </iconset>
+         <iconset theme="folder">
+          <normaloff>.</normaloff>.</iconset>
         </property>
        </widget>
       </item>
@@ -97,9 +96,8 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
-             <normalon>:/resources/icons/document-open.png</normalon>
-            </iconset>
+            <iconset theme="document-open">
+             <normaloff>.</normaloff>.</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
@@ -115,9 +113,8 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
-             <normalon>:/resources/icons/edit-table-insert-row-above.png</normalon>
-            </iconset>
+            <iconset theme="list-add">
+             <normaloff>.</normaloff>.</iconset>
            </property>
            <property name="autoRaise">
             <bool>true</bool>

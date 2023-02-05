@@ -47,8 +47,8 @@
          <string>Filter</string>
         </property>
         <property name="icon">
-         <iconset resource="icons.qrc">
-          <normaloff>:/resources/icons/view-filter.png</normaloff>:/resources/icons/view-filter.png</iconset>
+         <iconset theme="view-filter">
+          <normaloff>.</normaloff>.</iconset>
         </property>
        </widget>
       </item>
@@ -58,9 +58,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normalon>:/resources/icons/expand_all.png</normalon>
-         </iconset>
+         <iconset theme="expand-all">
+          <normaloff>.</normaloff>.</iconset>
         </property>
        </widget>
       </item>
@@ -70,9 +69,8 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normalon>:/resources/icons/collapse_all.png</normalon>
-         </iconset>
+         <iconset theme="collapse-all">
+          <normaloff>.</normaloff>.</iconset>
         </property>
        </widget>
       </item>
@@ -144,8 +142,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="icons.qrc">
-          <normaloff>:/resources/icons/view-pim-notes.png</normaloff>:/resources/icons/view-pim-notes.png</iconset>
+         <iconset theme="view-pim-notes"/>
         </property>
        </widget>
       </item>
@@ -188,9 +185,7 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="icons.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>expandAllButton</sender>

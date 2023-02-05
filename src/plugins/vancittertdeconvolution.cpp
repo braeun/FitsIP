@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - vanCittert deconvolution                                            *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2023-02-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,6 +37,7 @@ VanCittertDeconvolution::VanCittertDeconvolution():
   parameter(1),
   dlg(nullptr)
 {
+  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("VanCittertDeconvolution");
 }
 
@@ -47,6 +48,11 @@ VanCittertDeconvolution::~VanCittertDeconvolution()
 QString VanCittertDeconvolution::getMenuEntry() const
 {
   return "Filter/van Cittert Deconvolution...";
+}
+
+QIcon VanCittertDeconvolution::getIcon() const
+{
+  return QIcon(":/pluginicons/resources/icons/vc.png");
 }
 
 OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsImage> image, QRect selection)

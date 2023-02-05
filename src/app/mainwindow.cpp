@@ -198,14 +198,16 @@ LogWidget* MainWindow::getLogWidget()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-  if (QMessageBox::question(this,QApplication::applicationDisplayName(),"Really quit?\nUnsaved data will be lost!") == QMessageBox::Yes)
+  if (!ImageCollection::getGlobal().isEmpty())
   {
-    event->accept();
+    if (QMessageBox::question(this,QApplication::applicationDisplayName(),
+                              "Really quit?\nUnsaved data will be lost!") != QMessageBox::Yes)
+    {
+      event->ignore();
+      return;
+    }
   }
-  else
-  {
-    event->ignore();
-  }
+  event->accept();
 }
 
 void MainWindow::loadPlugins()
