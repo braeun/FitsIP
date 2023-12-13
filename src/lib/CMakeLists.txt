@@ -140,8 +140,10 @@ target_compile_definitions(fitsbase PRIVATE ${FITS_DEF})
 target_compile_options(fitsbase PRIVATE -fPIC)
 
 target_link_libraries(fitsbase
-  PUBLIC ${CCFITS_LIBRARY}
-  PUBLIC ${CFITSIO_LIBRARY}
+  PUBLIC PkgConfig::CCfits
+  PUBLIC PkgConfig::cfitsio
+#  PUBLIC ${CCFITS_LIBRARY}
+#  PUBLIC ${CFITSIO_LIBRARY}
   PUBLIC Qt5::Xml
   PUBLIC Qt5::Widgets
   PUBLIC Qt5::Core

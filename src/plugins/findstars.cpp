@@ -872,7 +872,7 @@ void FindStars::markpix(std::shared_ptr<FitsImage> image, double xc, double yc, 
   {
     for (uint32_t j=msx;j<=mex;j++)
     {
-      bitmap[i*image->getWidth()+j];
+      bitmap[i*image->getWidth()+j] = 1;
     }
   }
 }

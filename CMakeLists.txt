@@ -45,7 +45,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 pkg_check_modules(QWT IMPORTED_TARGET Qt5Qwt6)
 
 # check for CCfits library
-find_package(CCfits REQUIRED)
+pkg_check_modules(cfitsio IMPORTED_TARGET REQUIRED cfitsio)
+pkg_check_modules(CCfits IMPORTED_TARGET REQUIRED CCfits)
+#find_package(CCFITS REQUIRED)
 
 # find astro libraries
 # pkg_check_modules(LIBASTRO IMPORTED_TARGET libastro)
