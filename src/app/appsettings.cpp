@@ -51,14 +51,14 @@ AppSettings::AppSettings()
 {
 }
 
-void AppSettings::setFileFilter(QString filter)
+void AppSettings::setFileFilters(const QStringList& filters)
 {
-  settings.setValue(FILE_FILTER,filter);
+  settings.setValue(FILE_FILTER,filters);
 }
 
-QString AppSettings::getFileFilter() const
+QStringList AppSettings::getFileFilters() const
 {
-  return settings.value(FILE_FILTER,"").toString();
+  return settings.value(FILE_FILTER,QStringList()).toStringList();
 }
 
 bool AppSettings::isFilelistAddOnCopy() const

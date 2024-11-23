@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2022-12-04                                                         *
+ * modified: 2024-11-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,7 @@
 
 #include <settings.h>
 #include <QByteArray>
+#include <QStringList>
 
 /**
  * @brief The AppSettings class extends the generic Settings class with settings
@@ -35,9 +36,9 @@ class AppSettings: public Settings
 public:
   AppSettings();
 
-  void setFileFilter(QString filter);
+  void setFileFilters(const QStringList& filters);
 
-  QString getFileFilter() const;
+  QStringList getFileFilters() const;
 
   bool isFilelistAddOnCopy() const;
 

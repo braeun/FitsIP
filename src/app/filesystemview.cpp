@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the filesystem view and associated controls       *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-11-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -38,6 +38,11 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   ui(new Ui::FileSystemView)
 {
   ui->setupUi(this);
+  filterList = AppSettings().getFileFilters();
+  if (filterList.isEmpty())
+  {
+    filterList.push_back("*.fts*");
+  }
   filesystemModel = new QFileSystemModel();
   filesystemModel->setNameFilterDisables(false);
   QSettings settings;
@@ -46,7 +51,7 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   ui->filesystemView->setModel(filesystemModel);
   ui->filesystemView->setRootIndex(filesystemModel->index(rootpath));
   ui->rootField->setText(rootpath);
-  ui->filterField->setText(AppSettings().getFileFilter());
+  ui->filterBox->addItems(filterList);
   ui->filesystemView->header()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
   QString path = settings.value(AppSettings::PATH_IMAGE,".").toString();
   ui->filesystemView->setCurrentIndex(filesystemModel->index(path));
@@ -77,7 +82,14 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   connect(ui->openSelectionButton,&QAbstractButton::clicked,this,[this]{emit openSelection();});
   connect(ui->copySelectionToListButton,&QAbstractButton::clicked,this,[this]{emit copySelectionToFilelist();});
 
-  on_filterField_returnPressed();
+  connect(ui->filterBox->lineEdit(),&QLineEdit::editingFinished,this,[this](){filterChanged(ui->filterBox->currentText());});
+  connect(ui->filterBox,qOverload<int>(&QComboBox::currentIndexChanged),this,[this](int i){filterChanged(ui->filterBox->currentText());});
+
+  if (!filterList.isEmpty())
+  {
+    ui->filterBox->setCurrentIndex(0);
+    filterChanged(ui->filterBox->currentText());
+  }
 }
 
 FileSystemView::~FileSystemView()
@@ -211,14 +223,21 @@ void FileSystemView::remove()
   }
 }
 
-void FileSystemView::on_filterField_returnPressed()
+void FileSystemView::filterChanged(const QString& text)
 {
   QStringList list;
-  if (!ui->filterField->text().isEmpty())
+  if (!text.isEmpty())
   {
-    list.append(ui->filterField->text());
+    list.append(text);
   }
   filesystemModel->setNameFilters(list);
-  AppSettings().setFileFilter(ui->filterField->text());
+  if (!text.isEmpty())
+  {
+    if (!filterList.contains(text))
+    {
+      filterList.push_back(text);
+      AppSettings().setFileFilters(filterList);
+    }
+  }
 }
 

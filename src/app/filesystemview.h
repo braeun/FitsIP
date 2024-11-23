@@ -58,10 +58,6 @@ signals:
   void openSelection();
   void copySelectionToFilelist();
 
-private slots:
-
-  void on_filterField_returnPressed();
-
 private:
   void selectRoot();
   void rootChanged();
@@ -71,12 +67,14 @@ private:
   void newFolder();
   void rename();
   void remove();
+  void filterChanged(const QString& text);
 
   Ui::FileSystemView *ui;
   QFileSystemModel* filesystemModel;
   QMenu* folderContextMenu;
   QMenu* fileContextMenu;
   QModelIndex contextIndex;
+  QStringList filterList;
 };
 
 #endif // FILESYSTEMVIEW_H
