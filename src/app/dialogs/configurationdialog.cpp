@@ -64,6 +64,7 @@ void ConfigurationDialog::commitFields(AppSettings &settings)
     settings.setFitsImageFormat(1);
   settings.setLogbookLogOpen(ui->logLoadingBox->isChecked());
   settings.setLogbookOpenLast(ui->openLastLogBox->isChecked());
+  settings.setProfileStopTracking(ui->profileClickBox->isChecked());
 
   QString style = settings.getStyle();
   QApplication::setStyle(QStyleFactory::create(style));
@@ -90,4 +91,5 @@ void ConfigurationDialog::updateFields(const AppSettings &settings)
   }
   ui->logLoadingBox->setChecked(settings.isLogbookLogOpen());
   ui->openLastLogBox->setChecked(settings.isLogbookOpenLast());
+  ui->profileClickBox->setChecked(settings.isProfileStopTracking());
 }

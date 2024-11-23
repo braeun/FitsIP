@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the profiles and associated controls              *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-11-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,15 +22,24 @@
 
 #include "profileview.h"
 #include "ui_profileview.h"
+#include "appsettings.h"
 #include "fileobject.h"
 #include <qwt_picker_machine.h>
 #include <qwt_plot_grid.h>
 #include <qwt_scale_engine.h>
 #include <qwt_plot_picker.h>
+#include <QSettings>
 
-ProfileView::ProfileView(QWidget *parent) :
-  QWidget(parent),
-  ui(new Ui::ProfileView)
+
+static const char* PROFILEVIEW_LOGY = "profile/logy";
+static const char* PROFILEVIEW_TRACK = "profile/track";
+static const char* PROFILEVIEW_RANGE = "profile/range";
+static const char* PROFILEVIEW_RANGE_LENGTH = "profile/rangelength";
+
+
+ProfileView::ProfileView(QWidget *parent):QWidget(parent),
+  ui(new Ui::ProfileView),
+  clickEndsTracking(AppSettings().isProfileStopTracking())
 {
   ui->setupUi(this);
   horizontalProfile = new QwtPlotCurve("X");
@@ -69,11 +78,30 @@ ProfileView::ProfileView(QWidget *parent) :
   QwtPickerMachine* verticalPickerMachine = new QwtPickerTrackerMachine();
   verticalPicker->setStateMachine(verticalPickerMachine);
 
+  connect(ui->logYBox,&QCheckBox::toggled,this,&ProfileView::logYToggled);
+  connect(ui->rangeBox,&QCheckBox::toggled,this,[this](bool){settingsChanged();});
+  connect(ui->rangeSpinBox,qOverload<int>(&QSpinBox::valueChanged),this,[this](int){settingsChanged();});
+
+  QSettings settings;
+  ui->logYBox->setChecked(settings.value(PROFILEVIEW_LOGY,false).toBool());
+  ui->trackingBox->setChecked(settings.value(PROFILEVIEW_TRACK,false).toBool());
+  ui->rangeBox->setChecked(settings.value(PROFILEVIEW_RANGE,false).toBool());
+  ui->rangeSpinBox->setValue(settings.value(PROFILEVIEW_RANGE_LENGTH,200).toInt());
 }
 
 ProfileView::~ProfileView()
 {
   delete ui;
+}
+
+bool ProfileView::getClickEndsTracking() const
+{
+  return clickEndsTracking;
+}
+
+void ProfileView::setClickEndsTracking(bool newClickEndsTracking)
+{
+  clickEndsTracking = newClickEndsTracking;
 }
 
 void ProfileView::setImage(std::shared_ptr<FileObject> obj)
@@ -91,7 +119,7 @@ void ProfileView::setImage(std::shared_ptr<FileObject> obj)
 
 void ProfileView::updateCursor(QPoint p)
 {
-  if (ui->trackingButton->isChecked())
+  if (ui->trackingBox->isChecked())
   {
     cursor = p;
     redraw();
@@ -100,11 +128,9 @@ void ProfileView::updateCursor(QPoint p)
 
 void ProfileView::setCursor(QPoint p)
 {
-  if (ui->onClickButton->isChecked())
-  {
-    cursor = p;
-    redraw();
-  }
+  cursor = p;
+  redraw();
+  if (clickEndsTracking) ui->trackingBox->setChecked(false);
 }
 
 
@@ -129,17 +155,42 @@ void ProfileView::redraw()
   QVector<QPointF> v;
   if (image)
   {
-    ConstPixelIterator it = image->getImage()->getConstPixelIterator(0,cursor.y());
-    for (uint32_t x=0;x<image->getImage()->getWidth();x++)
+    if (ui->rangeBox->isChecked())
     {
-      h.push_back(QPointF(x,it.getAbs()));
-      ++it;
+      int r = ui->rangeSpinBox->value() / 2;
+      int left = std::max(cursor.x()-r,0);
+      int right = std::min(cursor.x()+r,(int)image->getImage()->getWidth());
+      ConstPixelIterator it = image->getImage()->getConstPixelIterator(0,cursor.y());
+      it += left;
+      for (int x=left;x<right;x++)
+      {
+        h.push_back(QPointF(x,it.getAbs()));
+        ++it;
+      }
+      int top = std::max(cursor.y()-r,0);
+      int bottom = std::min(cursor.y()+r,(int)image->getImage()->getHeight());
+      it = image->getImage()->getConstPixelIterator(cursor.x(),0);
+      it += top * image->getImage()->getWidth();
+      for (int y=top;y<bottom;y++)
+      {
+        v.push_back(QPointF(y,it.getAbs()));
+        it += image->getImage()->getWidth();
+      }
     }
-    it = image->getImage()->getConstPixelIterator(cursor.x(),0);
-    for (uint32_t y=0;y<image->getImage()->getHeight();y++)
+    else
     {
-      v.push_back(QPointF(y,it.getAbs()));
-      it += image->getImage()->getWidth();
+      ConstPixelIterator it = image->getImage()->getConstPixelIterator(0,cursor.y());
+      for (uint32_t x=0;x<image->getImage()->getWidth();x++)
+      {
+        h.push_back(QPointF(x,it.getAbs()));
+        ++it;
+      }
+      it = image->getImage()->getConstPixelIterator(cursor.x(),0);
+      for (uint32_t y=0;y<image->getImage()->getHeight();y++)
+      {
+        v.push_back(QPointF(y,it.getAbs()));
+        it += image->getImage()->getWidth();
+      }
     }
   }
   horizontalMarker->setXValue(cursor.x());
@@ -150,10 +201,7 @@ void ProfileView::redraw()
   ui->verticalProfileWidget->replot();
 }
 
-
-
-
-void ProfileView::on_logYBox_toggled(bool checked)
+void ProfileView::logYToggled(bool checked)
 {
   if (checked)
   {
@@ -167,4 +215,15 @@ void ProfileView::on_logYBox_toggled(bool checked)
   }
   ui->horizontalProfileWidget->replot();
   ui->verticalProfileWidget->replot();
+  QSettings().setValue(PROFILEVIEW_LOGY,checked);
 }
+
+void ProfileView::settingsChanged()
+{
+  QSettings settings;
+  QSettings().setValue(PROFILEVIEW_TRACK,ui->trackingBox->isChecked());
+  QSettings().setValue(PROFILEVIEW_RANGE,ui->rangeBox->isChecked());
+  QSettings().setValue(PROFILEVIEW_RANGE_LENGTH,ui->rangeSpinBox->value());
+  redraw();
+}
+

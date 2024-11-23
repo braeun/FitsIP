@@ -74,6 +74,10 @@ public:
 
   QString getPalette() const;
 
+  void setProfileStopTracking(bool flag);
+
+  bool isProfileStopTracking() const;
+
   static const char* MAINWINDOW_STATE;
   static const char* MAINWINDOW_GEOMETRY;
   static const char* PATH_LOG;

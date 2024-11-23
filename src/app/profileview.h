@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the profiles and associated controls              *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-11-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -45,6 +45,10 @@ public:
   explicit ProfileView(QWidget *parent = nullptr);
   ~ProfileView();
 
+  bool getClickEndsTracking() const;
+
+  void setClickEndsTracking(bool newClickEndsTracking);
+
   void setImage(std::shared_ptr<FileObject> obj);
 
 public slots:
@@ -55,11 +59,10 @@ public slots:
 protected:
   void changeEvent(QEvent* event);
 
-private slots:
-  void on_logYBox_toggled(bool checked);
-
 private:
   void redraw();
+  void logYToggled(bool checked);
+  void settingsChanged();
 
   Ui::ProfileView *ui;
   std::shared_ptr<FileObject> image;
@@ -72,6 +75,7 @@ private:
   QwtPlotGrid* verticalGrid;
   QwtPlotPicker* horizontalPicker;
   QwtPlotPicker* verticalPicker;
+  bool clickEndsTracking;
 };
 
 #endif // PROFILEVIEW_H

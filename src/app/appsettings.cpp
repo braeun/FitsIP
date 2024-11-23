@@ -46,6 +46,8 @@ static const char* DISPLAY_SHOWSTARLIST = "display/showstarlist";
 static const char* STYLE_STYLE = "style/style";
 static const char* STYLE_PALETTE = "style/palette";
 
+static const char* PROFILE_CLICK_STOPS_TRACK = "profile/clickstops";
+
 
 AppSettings::AppSettings()
 {
@@ -144,5 +146,15 @@ void AppSettings::setPalette(const QString &p)
 QString AppSettings::getPalette() const
 {
   return settings.value(STYLE_PALETTE).toString();
+}
+
+void AppSettings::setProfileStopTracking(bool flag)
+{
+  settings.setValue(PROFILE_CLICK_STOPS_TRACK,flag);
+}
+
+bool AppSettings::isProfileStopTracking() const
+{
+  return settings.value(PROFILE_CLICK_STOPS_TRACK,true).toBool();
 }
 

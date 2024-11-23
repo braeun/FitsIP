@@ -829,6 +829,7 @@ void MainWindow::on_actionPreferences_triggered()
   {
     dlg->commit();
     ui->logbookWidget->rebuild();
+    ui->profileWidget->setClickEndsTracking(AppSettings().isProfileStopTracking());
   }
   delete dlg;
 }

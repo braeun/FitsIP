@@ -36,7 +36,7 @@
 class ConstPixelIterator {
  public:
   inline ConstPixelIterator(uint32_t size, const std::vector<const ValueType*>& layers);
-  inline ConstPixelIterator(const ConstPixelIterator&);
+//  inline ConstPixelIterator(const ConstPixelIterator&);
 
   inline bool hasNext() const;
   inline bool hasPrevious() const;
@@ -70,13 +70,13 @@ inline ConstPixelIterator::ConstPixelIterator(uint32_t size, const std::vector<c
 {
 }
 
-inline ConstPixelIterator::ConstPixelIterator(const ConstPixelIterator &p):
-  color(p.color),
-  size(p.size),
-  index(p.index),
-  layers(p.layers)
-{
-}
+//inline ConstPixelIterator::ConstPixelIterator(const ConstPixelIterator &p):
+//  color(p.color),
+//  size(p.size),
+//  index(p.index),
+//  layers(p.layers)
+//{
+//}
 
 inline ValueType ConstPixelIterator::operator[](uint32_t layer) const
 {
@@ -230,7 +230,7 @@ inline ValueType ConstPixelIterator::max() const
 class PixelIterator {
  public:
   inline PixelIterator(uint32_t size, const std::vector<ValueType*>& layers);
-  inline PixelIterator(const PixelIterator&);
+//  inline PixelIterator(const PixelIterator&);
 
   inline bool hasNext() const;
   inline bool hasPrevious() const;
@@ -268,13 +268,13 @@ inline PixelIterator::PixelIterator(uint32_t size, const std::vector<ValueType*>
 {
 }
 
-inline PixelIterator::PixelIterator(const PixelIterator &p):
-  color(p.color),
-  size(p.size),
-  index(p.index),
-  layers(p.layers)
-{
-}
+//inline PixelIterator::PixelIterator(const PixelIterator &p):
+//  color(p.color),
+//  size(p.size),
+//  index(p.index),
+//  layers(p.layers)
+//{
+//}
 
 inline ValueType PixelIterator::operator[](uint32_t layer) const
 {
