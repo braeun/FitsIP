@@ -21,9 +21,9 @@
  ********************************************************************************/
 
 #include "opaverage.h"
-#include <fitsimage.h>
-#include <dialogs/progressdialog.h>
-#include <io/iofactory.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/dialogs/progressdialog.h>
+#include <fitsbase/io/iofactory.h>
 #include <algorithm>
 #include <QApplication>
 #include <QDebug>

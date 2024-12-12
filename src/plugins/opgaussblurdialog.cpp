@@ -23,9 +23,9 @@
 #include "opgaussblurdialog.h"
 #include "ui_opgaussblurdialog.h"
 #include "opgaussblur.h"
-#include <fitsimage.h>
-#include <histogram.h>
-#include <settings.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/histogram.h>
+#include <fitsbase/settings.h>
 
 
 OpGaussBlurDialog::OpGaussBlurDialog(QWidget *parent):AbstractPreviewDialog(parent),

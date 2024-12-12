@@ -23,7 +23,7 @@
 #include "opunsharpmask.h"
 #include "opunsharpmaskdialog.h"
 #include "opgaussblur.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpUnsharpMask::OpUnsharpMask():
   dlg(nullptr)

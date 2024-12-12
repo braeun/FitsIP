@@ -25,7 +25,7 @@
 #include "appsettings.h"
 #include "dialogs/addlogbookentrydialog.h"
 #include "dialogs/logbookfilter1dialog.h"
-#include <logbook/logbook.h>
+#include <fitsbase/logbook/logbook.h>
 #include <QDebug>
 #include <QInputDialog>
 #include <QSettings>

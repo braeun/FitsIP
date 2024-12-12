@@ -22,7 +22,7 @@
 
 #include "starlistwidget.h"
 #include "ui_starlistwidget.h"
-#include <starlist.h>
+#include <fitsbase/starlist.h>
 #include <QMenu>
 
 StarListWidget::StarListWidget(QWidget *parent) :

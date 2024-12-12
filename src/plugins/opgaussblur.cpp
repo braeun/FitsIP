@@ -22,7 +22,7 @@
 
 #include "opgaussblur.h"
 #include "opgaussblurdialog.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 #include <cmath>
 #include <climits>
 

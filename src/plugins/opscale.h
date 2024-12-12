@@ -24,8 +24,8 @@
 #define OPSCALE_H
 
 
-#include <opplugin.h>
-#include <dialogs/twovaluedialog.h>
+#include <fitsbase/opplugin.h>
+#include <fitsbase/dialogs/twovaluedialog.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

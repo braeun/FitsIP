@@ -33,9 +33,9 @@
 #ifndef FINDSTARS_H
 #define FINDSTARS_H
 
-#include <fitstypes.h>
-#include <opplugin.h>
-#include <star.h>
+#include <fitsbase/fitstypes.h>
+#include <fitsbase/opplugin.h>
+#include <fitsbase/star.h>
 #include <QObject>
 #include <vector>
 

@@ -22,7 +22,7 @@
 
 #include "synthesizebackground.h"
 #include "synthesizebackgrounddialog.h"
-#include <histogram.h>
+#include <fitsbase/histogram.h>
 #include <cmath>
 
 std::mt19937 SynthesizeBackground::rng;

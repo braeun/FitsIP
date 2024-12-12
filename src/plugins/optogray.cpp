@@ -21,7 +21,7 @@
  ********************************************************************************/
 
 #include "optogray.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpToGray::OpToGray()
 {

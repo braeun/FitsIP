@@ -117,7 +117,7 @@
   <customwidget>
    <class>QxtSpanSlider</class>
    <extends>QSlider</extends>
-   <header location="global">qxt/qxtspanslider.h</header>
+   <header>fitsbase/qxt/qxtspanslider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -22,7 +22,7 @@
 
 #include "addlogbookentrydialog.h"
 #include "ui_addlogbookentrydialog.h"
-#include <imagecollection.h>
+#include <fitsbase/imagecollection.h>
 
 AddLogbookEntryDialog::AddLogbookEntryDialog(QWidget *parent) :
   QDialog(parent),

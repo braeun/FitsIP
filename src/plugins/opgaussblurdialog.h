@@ -23,7 +23,7 @@
 #ifndef OPGAUSSBLURDIALOG_H
 #define OPGAUSSBLURDIALOG_H
 
-#include <dialogs/abstractpreviewdialog.h>
+#include <fitsbase/dialogs/abstractpreviewdialog.h>
 
 namespace Ui {
 class OpGaussBlurDialog;

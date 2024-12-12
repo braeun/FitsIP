@@ -22,7 +22,7 @@
 
 #include "histogramview.h"
 #include "ui_histogramview.h"
-#include "fileobject.h"
+#include <fitsbase/fileobject.h>
 #include <qwt_scale_engine.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_zoomer.h>

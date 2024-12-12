@@ -22,7 +22,7 @@
 
 #include "opshrink.h"
 #include "opshrinkdialog.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpShrink::OpShrink():
   dlg(nullptr)

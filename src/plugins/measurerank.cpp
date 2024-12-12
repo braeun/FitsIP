@@ -22,12 +22,12 @@
 
 #include "measurerank.h"
 #include "measurerankresultdialog.h"
-#include "imagestatistics.h"
 #include "opkernel.h"
-#include "kernelrepository.h"
-#include <fitsimage.h>
-#include <dialogs/progressdialog.h>
-#include <io/iofactory.h>
+#include <fitsbase/kernelrepository.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/imagestatistics.h>
+#include <fitsbase/dialogs/progressdialog.h>
+#include <fitsbase/io/iofactory.h>
 #include <algorithm>
 #include <QApplication>
 

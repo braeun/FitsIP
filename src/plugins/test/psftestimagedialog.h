@@ -24,7 +24,7 @@
 #define PSFTESTIMAGEDIALOG_H
 
 #include <QDialog>
-#include <fitstypes.h>
+#include <fitsbase/fitstypes.h>
 #include <vector>
 
 namespace Ui {

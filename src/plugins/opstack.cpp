@@ -25,10 +25,10 @@
 #include "oprotate.h"
 #include "opshift.h"
 #include "measurematch.h"
-#include <fitsimage.h>
-#include <histogram.h>
-#include <dialogs/progressdialog.h>
-#include <io/iofactory.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/histogram.h>
+#include <fitsbase/dialogs/progressdialog.h>
+#include <fitsbase/io/iofactory.h>
 #include <algorithm>
 #include <QApplication>
 #include <QDebug>

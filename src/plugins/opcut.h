@@ -23,9 +23,9 @@
 #ifndef OPCUT_H
 #define OPCUT_H
 
-#include <fitstypes.h>
-#include <opplugin.h>
-#include <dialogs/twovaluedialog.h>
+#include <fitsbase/fitstypes.h>
+#include <fitsbase/opplugin.h>
+#include <fitsbase/dialogs/twovaluedialog.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

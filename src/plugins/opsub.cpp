@@ -21,9 +21,9 @@
  ********************************************************************************/
 
 #include "opsub.h"
-#include <imagecollection.h>
-#include <fileobject.h>
-#include <fitsimage.h>
+#include <fitsbase/imagecollection.h>
+#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsimage.h>
 #include <QDebug>
 
 OpSub::OpSub():

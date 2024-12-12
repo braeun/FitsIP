@@ -23,7 +23,7 @@
 #ifndef OPMEDIANDIALOG_H
 #define OPMEDIANDIALOG_H
 
-#include <dialogs/abstractpreviewdialog.h>
+#include <fitsbase/dialogs/abstractpreviewdialog.h>
 
 namespace Ui {
 class OpMedianDialog;

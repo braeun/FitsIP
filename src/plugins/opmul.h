@@ -23,8 +23,8 @@
 #ifndef OPMUL_H
 #define OPMUL_H
 
-#include <opplugin.h>
-#include <dialogs/imageselectdialog.h>
+#include <fitsbase/opplugin.h>
+#include <fitsbase/dialogs/imageselectdialog.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

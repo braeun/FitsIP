@@ -23,7 +23,7 @@
 #ifndef OPAVERAGE_H
 #define OPAVERAGE_H
 
-#include <opplugin.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 #include <vector>
 

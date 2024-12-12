@@ -23,7 +23,7 @@
 #include "opddp.h"
 #include "opddpdialog.h"
 #include "opgaussblur.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 #include <cmath>
 
 OpDDP::OpDDP():

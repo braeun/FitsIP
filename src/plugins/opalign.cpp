@@ -23,8 +23,8 @@
 #include "opalign.h"
 #include "opaligndialog.h"
 #include "opshift.h"
-#include <io/iofactory.h>
-#include <dialogs/progressdialog.h>
+#include <fitsbase/io/iofactory.h>
+#include <fitsbase/dialogs/progressdialog.h>
 #include <algorithm>
 #include <QApplication>
 #include <QDebug>

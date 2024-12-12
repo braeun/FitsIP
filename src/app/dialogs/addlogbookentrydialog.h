@@ -23,7 +23,7 @@
 #ifndef ADDLOGBOOKENTRYDIALOG_H
 #define ADDLOGBOOKENTRYDIALOG_H
 
-#include <logbook/logbookentry.h>
+#include <fitsbase/logbook/logbookentry.h>
 #include <QDialog>
 
 namespace Ui {

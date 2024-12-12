@@ -22,18 +22,18 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "pluginfactory.h"
+#include <fitsbase/pluginfactory.h>
 #include "profilertablemodel.h"
 #include "appsettings.h"
 #include "dialogs/aboutdialog.h"
 #include "dialogs/configurationdialog.h"
 #include "dialogs/editmetadatadialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
-#include <filelist.h>
-#include <imagecollection.h>
-#include <pixellist.h>
-#include <io/iofactory.h>
-#include <logbook/xmllogbookstorage.h>
+#include <fitsbase/filelist.h>
+#include <fitsbase/imagecollection.h>
+#include <fitsbase/pixellist.h>
+#include <fitsbase/io/iofactory.h>
+#include <fitsbase/logbook/xmllogbookstorage.h>
 #include <QActionGroup>
 #include <QCloseEvent>
 #include <QDir>

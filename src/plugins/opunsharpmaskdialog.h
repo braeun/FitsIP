@@ -23,7 +23,7 @@
 #ifndef OPUNSHARPMASKDIALOG_H
 #define OPUNSHARPMASKDIALOG_H
 
-#include <dialogs/abstractpreviewdialog.h>
+#include <fitsbase/dialogs/abstractpreviewdialog.h>
 
 namespace Ui {
 class OpUnsharpMaskDialog;

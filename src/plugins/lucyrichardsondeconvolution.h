@@ -23,8 +23,8 @@
 #ifndef LUCYRICHARDSONDECONVOLUTION_H
 #define LUCYRICHARDSONDECONVOLUTION_H
 
-#include <fitstypes.h>
-#include <opplugin.h>
+#include <fitsbase/fitstypes.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 #include <vector>
 #include <fftw3.h>

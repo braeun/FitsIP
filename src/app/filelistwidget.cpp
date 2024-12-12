@@ -23,7 +23,7 @@
 #include "filelistwidget.h"
 #include "ui_filelistwidget.h"
 #include "appsettings.h"
-#include <filelist.h>
+#include <fitsbase/filelist.h>
 #include <QMenu>
 
 FileListWidget::FileListWidget(QWidget *parent) :

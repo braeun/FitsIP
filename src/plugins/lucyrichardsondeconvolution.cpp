@@ -23,11 +23,11 @@
 #include "lucyrichardsondeconvolution.h"
 #include "lucyrichardsondeconvolutiondialog.h"
 #include "opcut.h"
-#include <imagestatistics.h>
-#include <fitsimage.h>
-#include <dialogs/progressdialog.h>
-#include <psf/psf.h>
-#include <psf/psffactory.h>
+#include <fitsbase/imagestatistics.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/dialogs/progressdialog.h>
+#include <fitsbase/psf/psf.h>
+#include <fitsbase/psf/psffactory.h>
 #include <QApplication>
 #include <QDebug>
 

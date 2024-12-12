@@ -25,8 +25,8 @@
 #ifndef MEASURESTATISTICS_H
 #define MEASURESTATISTICS_H
 
-#include <imagestatistics.h>
-#include <opplugin.h>
+#include <fitsbase/imagestatistics.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 #include <vector>
 

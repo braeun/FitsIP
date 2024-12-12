@@ -21,8 +21,8 @@
  ********************************************************************************/
 
 #include "opsobel.h"
-#include <fitsimage.h>
-#include <kernelrepository.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/kernelrepository.h>
 
 OpSobel::OpSobel()
 {

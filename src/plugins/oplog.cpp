@@ -21,7 +21,7 @@
  ********************************************************************************/
 
 #include "oplog.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 #include <cmath>
 
 OpLog::OpLog()

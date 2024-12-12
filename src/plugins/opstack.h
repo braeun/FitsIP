@@ -25,9 +25,9 @@
 
 #include "measurematch.h"
 #include "findstars.h"
-#include <opplugin.h>
-#include <pixellist.h>
-#include <starlist.h>
+#include <fitsbase/opplugin.h>
+#include <fitsbase/pixellist.h>
+#include <fitsbase/starlist.h>
 #include <QObject>
 #include <vector>
 #include <tuple>

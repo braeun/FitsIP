@@ -23,8 +23,8 @@
 #ifndef SYNTHESIZEBACKGROUND_H
 #define SYNTHESIZEBACKGROUND_H
 
-#include <fitsimage.h>
-#include <opplugin.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 #include <vector>
 #include <random>

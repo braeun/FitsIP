@@ -23,8 +23,8 @@
 #ifndef OPROTATE_H
 #define OPROTATE_H
 
-#include <fitstypes.h>
-#include <opplugin.h>
+#include <fitsbase/fitstypes.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

@@ -23,8 +23,8 @@
  ********************************************************************************/
 
 #include "measurestatistics.h"
-#include <fitsimage.h>
-#include <dialogs/textinfodialog.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/dialogs/textinfodialog.h>
 #include <limits>
 #include <algorithm>
 #include <cmath>

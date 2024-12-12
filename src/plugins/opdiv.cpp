@@ -21,9 +21,9 @@
  ********************************************************************************/
 
 #include "opdiv.h"
-#include <imagecollection.h>
-#include <fileobject.h>
-#include <math.h>
+#include <fitsbase/imagecollection.h>
+#include <fitsbase/fileobject.h>
+#include <cmath>
 #include <QDebug>
 
 OpDiv::OpDiv():

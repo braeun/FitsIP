@@ -23,8 +23,8 @@
 #include "measurerankresultdialog.h"
 #include "ui_measurerankresultdialog.h"
 #include "measurerank.h"
-#include <settings.h>
-#include <io/iofactory.h>
+#include <fitsbase/settings.h>
+#include <fitsbase/io/iofactory.h>
 #include <QTextStream>
 
 MeasureRankResultDialog::MeasureRankResultDialog(QWidget *parent) :

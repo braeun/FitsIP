@@ -22,8 +22,8 @@
 
 #include "opkernel.h"
 #include "opkerneldialog.h"
-#include <fitsimage.h>
-#include <kernelrepository.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/kernelrepository.h>
 #include <iostream>
 
 OpKernel::OpKernel():

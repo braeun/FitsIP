@@ -23,8 +23,8 @@
 #ifndef OPKERNEL_H
 #define OPKERNEL_H
 
-#include <opplugin.h>
-#include <kernel.h>
+#include <fitsbase/opplugin.h>
+#include <fitsbase/kernel.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

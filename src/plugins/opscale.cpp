@@ -21,7 +21,7 @@
  ********************************************************************************/
 
 #include "opscale.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpScale::OpScale()
 {

@@ -22,8 +22,8 @@
 
 #include "gaussiantestimage.h"
 #include "gaussiantestimagedialog.h"
-#include <fitsimage.h>
-#include <math/mathfunctions.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/math/mathfunctions.h>
 
 GaussianTestImage::GaussianTestImage():
   dlg(nullptr)

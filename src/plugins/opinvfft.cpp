@@ -21,8 +21,7 @@
  ********************************************************************************/
 
 #include "opinvfft.h"
-
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 #include <fftw3.h>
 
 /**

@@ -23,7 +23,7 @@
 #ifndef PROFILERTABLEMODEL_H
 #define PROFILERTABLEMODEL_H
 
-#include <profiling/profilerentry.h>
+#include <fitsbase/profiling/profilerentry.h>
 #include <QAbstractTableModel>
 #include <vector>
 

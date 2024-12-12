@@ -23,7 +23,7 @@
 #ifndef VANCITTERTDECONVOLUTIONDIALOG_H
 #define VANCITTERTDECONVOLUTIONDIALOG_H
 
-#include <fitstypes.h>
+#include <fitsbase/fitstypes.h>
 #include <QDialog>
 
 namespace Ui {

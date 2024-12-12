@@ -23,7 +23,7 @@
 #ifndef IMAGESTATISTICS_H
 #define IMAGESTATISTICS_H
 
-#include <fitstypes.h>
+#include "fitstypes.h"
 #include <QRect>
 #include <vector>
 #include <memory>

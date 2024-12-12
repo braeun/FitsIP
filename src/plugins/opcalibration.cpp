@@ -22,12 +22,12 @@
 
 #include "opcalibration.h"
 #include "opcalibrationdialog.h"
-#include "measurestatistics.h"
-#include <dialogs/progressdialog.h>
-#include <imagecollection.h>
-#include <fileobject.h>
-#include <fitsimage.h>
-#include <io/iofactory.h>
+#include <fitsbase/dialogs/progressdialog.h>
+#include <fitsbase/imagecollection.h>
+#include <fitsbase/imagestatistics.h>
+#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/io/iofactory.h>
 #include <algorithm>
 #include <QApplication>
 #include <QDebug>

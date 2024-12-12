@@ -23,7 +23,7 @@
 #ifndef OPGROW_H
 #define OPGROW_H
 
-#include <opplugin.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

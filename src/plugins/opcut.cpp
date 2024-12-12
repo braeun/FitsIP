@@ -21,7 +21,7 @@
  ********************************************************************************/
 
 #include "opcut.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpCut::OpCut()
 {

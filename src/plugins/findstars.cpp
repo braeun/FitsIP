@@ -33,10 +33,10 @@
 #include "findstars.h"
 #include "findstarsdialog.h"
 #include "optogray.h"
-#include <fitsimage.h>
-#include <histogram.h>
-#include <starlist.h>
-#include <math/gaussfit.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/histogram.h>
+#include <fitsbase/starlist.h>
+#include <fitsbase/math/gaussfit.h>
 #include <cmath>
 #include <algorithm>
 #include <QDebug>

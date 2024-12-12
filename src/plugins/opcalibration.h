@@ -23,7 +23,7 @@
 #ifndef OPCALIBRATION_H
 #define OPCALIBRATION_H
 
-#include <opplugin.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 #include <memory>
 

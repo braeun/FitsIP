@@ -23,7 +23,7 @@
 #ifndef PSFIMAGE_H
 #define PSFIMAGE_H
 
-#include <opplugin.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

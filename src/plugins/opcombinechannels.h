@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - combine RGB channels                                                *
  *                                                                              *
- * modified: 2024-11-30                                                         *
+ * modified: 2024-12-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,7 +23,7 @@
 #ifndef OPCOMBINECHANNELS_H
 #define OPCOMBINECHANNELS_H
 
-#include <opplugin.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

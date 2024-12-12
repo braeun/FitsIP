@@ -23,8 +23,8 @@
 #ifndef OPGAUSSBLUR_H
 #define OPGAUSSBLUR_H
 
-#include <fitstypes.h>
-#include <opplugin.h>
+#include <fitsbase/fitstypes.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 #include <vector>
 

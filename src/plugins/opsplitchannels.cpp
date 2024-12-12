@@ -21,7 +21,7 @@
  ********************************************************************************/
 
 #include "opsplitchannels.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpSplitChannels::OpSplitChannels()
 {

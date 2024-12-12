@@ -22,7 +22,7 @@
 
 #include "opresize.h"
 #include "opresizedialog.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpResize::OpResize():
   dlg(nullptr)

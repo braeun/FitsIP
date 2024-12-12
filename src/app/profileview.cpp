@@ -23,7 +23,7 @@
 #include "profileview.h"
 #include "ui_profileview.h"
 #include "appsettings.h"
-#include "fileobject.h"
+#include <fitsbase/fileobject.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_grid.h>
 #include <qwt_scale_engine.h>

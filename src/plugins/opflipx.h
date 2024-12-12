@@ -23,7 +23,7 @@
 #ifndef OPFLIPX_H
 #define OPFLIPX_H
 
-#include <opplugin.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

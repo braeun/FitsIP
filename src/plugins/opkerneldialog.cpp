@@ -23,8 +23,8 @@
 #include "opkerneldialog.h"
 #include "ui_opkerneldialog.h"
 #include "opkernel.h"
-#include <fitsimage.h>
-#include <kernelrepository.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/kernelrepository.h>
 
 OpKernelDialog::OpKernelDialog(QWidget *parent):AbstractPreviewDialog(parent),
   ui(new Ui::OpKernelDialog)

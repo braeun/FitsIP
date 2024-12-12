@@ -23,9 +23,9 @@
 #include "opunsharpmaskdialog.h"
 #include "ui_opunsharpmaskdialog.h"
 #include "opunsharpmask.h"
-#include <fitsimage.h>
-#include <histogram.h>
-#include <settings.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/histogram.h>
+#include <fitsbase/settings.h>
 
 OpUnsharpMaskDialog::OpUnsharpMaskDialog(QWidget *parent):AbstractPreviewDialog(parent),
   ui(new Ui::OpUnsharpMaskDialog)

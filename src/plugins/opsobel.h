@@ -23,9 +23,9 @@
 #ifndef OPSOBEL_H
 #define OPSOBEL_H
 
-#include <fitstypes.h>
-#include <opplugin.h>
-#include <dialogs/imageselectdialog.h>
+#include <fitsbase/fitstypes.h>
+#include <fitsbase/opplugin.h>
+#include <fitsbase/dialogs/imageselectdialog.h>
 #include <QObject>
 #include <vector>
 

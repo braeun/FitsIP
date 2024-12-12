@@ -22,7 +22,7 @@
 
 #include "oprotate.h"
 #include "oprotatedialog.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 #include <cmath>
 #include <limits>
 

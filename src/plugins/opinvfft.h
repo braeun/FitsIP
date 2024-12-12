@@ -23,7 +23,7 @@
 #ifndef OPINVFFT_H
 #define OPINVFFT_H
 
-#include <opplugin.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

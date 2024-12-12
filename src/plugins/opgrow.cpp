@@ -22,7 +22,7 @@
 
 #include "opgrow.h"
 #include "opgrowdialog.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpGrow::OpGrow():
   dlg(nullptr)

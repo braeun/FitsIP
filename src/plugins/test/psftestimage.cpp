@@ -22,8 +22,8 @@
 
 #include "psftestimage.h"
 #include "psftestimagedialog.h"
-#include <fitsimage.h>
-#include <psf/psffactory.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/psf/psffactory.h>
 
 PSFTestImage::PSFTestImage():
   dlg(nullptr)

@@ -21,7 +21,7 @@
  ********************************************************************************/
 
 #include "opsqrt.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 #include <cmath>
 #include <iostream>
 

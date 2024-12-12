@@ -21,8 +21,8 @@
  ********************************************************************************/
 
 #include "measurecrosscorrelation.h"
-#include <imagecollection.h>
-#include <fileobject.h>
+#include <fitsbase/imagecollection.h>
+#include <fitsbase/fileobject.h>
 #include <fftw3.h>
 
 MeasureCrossCorrelation::MeasureCrossCorrelation():

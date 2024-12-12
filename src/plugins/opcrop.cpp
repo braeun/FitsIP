@@ -22,7 +22,7 @@
 
 #include "opcrop.h"
 #include "opcropdialog.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpCrop::OpCrop():
   dlg(nullptr)

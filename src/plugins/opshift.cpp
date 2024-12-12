@@ -22,7 +22,7 @@
 
 #include "opshift.h"
 #include "opshiftdialog.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 #include <algorithm>
 
 OpShift::OpShift():

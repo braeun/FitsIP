@@ -23,8 +23,8 @@
 #ifndef OPSHIFT_H
 #define OPSHIFT_H
 
-#include <fitstypes.h>
-#include <opplugin.h>
+#include <fitsbase/fitstypes.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

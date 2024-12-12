@@ -23,7 +23,7 @@
 #ifndef OPRESIZE_H
 #define OPRESIZE_H
 
-#include <opplugin.h>
+#include <fitsbase/opplugin.h>
 #include <QObject>
 
 #define QT_STATICPLUGIN

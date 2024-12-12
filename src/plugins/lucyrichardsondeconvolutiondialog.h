@@ -23,7 +23,7 @@
 #ifndef LUCYRICHARDSONDECONVOLUTIONDIALOG_H
 #define LUCYRICHARDSONDECONVOLUTIONDIALOG_H
 
-#include <fitstypes.h>
+#include <fitsbase/fitstypes.h>
 #include <QDialog>
 
 namespace Ui {

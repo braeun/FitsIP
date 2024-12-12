@@ -23,9 +23,9 @@
 #include "opmediandialog.h"
 #include "ui_opmediandialog.h"
 #include "opmedian.h"
-#include <fitsimage.h>
-#include <histogram.h>
-#include <settings.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/histogram.h>
+#include <fitsbase/settings.h>
 
 
 OpMedianDialog::OpMedianDialog(QWidget *parent) :

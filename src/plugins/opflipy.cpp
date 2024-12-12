@@ -21,7 +21,7 @@
  ********************************************************************************/
 
 #include "opflipy.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpFlipY::OpFlipY()
 {

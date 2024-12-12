@@ -21,11 +21,11 @@
  ********************************************************************************/
 
 #include "psfimage.h"
-#include <fitsimage.h>
-#include <dialogs/psfdialog.h>
-#include <psf/psf.h>
-#include <psf/psffactory.h>
-#include <math/mathfunctions.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/dialogs/psfdialog.h>
+#include <fitsbase/psf/psf.h>
+#include <fitsbase/psf/psffactory.h>
+#include <fitsbase/math/mathfunctions.h>
 
 PSFImage::PSFImage()
 {

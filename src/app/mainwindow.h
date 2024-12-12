@@ -24,8 +24,8 @@
 #define MAINWINDOW_H
 
 #include "imagewidget.h"
-#include "fileobject.h"
-#include <logbook/logbook.h>
+#include <fitsbase/fileobject.h>
+#include <fitsbase/logbook/logbook.h>
 #include <QMainWindow>
 #include <vector>
 #include <map>

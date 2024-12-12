@@ -23,7 +23,7 @@
 #ifndef OPKERNELDIALOG_H
 #define OPKERNELDIALOG_H
 
-#include <dialogs/abstractpreviewdialog.h>
+#include <fitsbase/dialogs/abstractpreviewdialog.h>
 
 namespace Ui {
 class OpKernelDialog;

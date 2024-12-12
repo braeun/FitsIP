@@ -22,8 +22,8 @@
 
 #include "logbookfilter1dialog.h"
 #include "ui_logbookfilter1dialog.h"
-#include <logbook/logbook.h>
-#include <logbook/logbookfilter.h>
+#include <fitsbase/logbook/logbook.h>
+#include <fitsbase/logbook/logbookfilter.h>
 
 LogbookFilter1Dialog::LogbookFilter1Dialog(const Logbook* logbook, QWidget *parent):QDialog(parent),
   ui(new Ui::LogbookFilter1Dialog),

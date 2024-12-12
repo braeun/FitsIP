@@ -23,7 +23,7 @@
 #ifndef SYNTHESIZEBACKGROUNDDIALOG_H
 #define SYNTHESIZEBACKGROUNDDIALOG_H
 
-#include <fitstypes.h>
+#include <fitsbase/fitstypes.h>
 #include <QDialog>
 
 namespace Ui {

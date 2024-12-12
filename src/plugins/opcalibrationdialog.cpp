@@ -22,7 +22,7 @@
 
 #include "opcalibrationdialog.h"
 #include "ui_opcalibrationdialog.h"
-#include <settings.h>
+#include <fitsbase/settings.h>
 #include <QSettings>
 #include <QFileDialog>
 

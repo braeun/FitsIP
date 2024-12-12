@@ -23,9 +23,9 @@
 #include "opddpdialog.h"
 #include "ui_opddpdialog.h"
 #include "opddp.h"
-#include <fitsimage.h>
-#include <histogram.h>
-#include <settings.h>
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/histogram.h>
+#include <fitsbase/settings.h>
 
 OpDDPDialog::OpDDPDialog(QWidget *parent):AbstractPreviewDialog(parent),
   ui(new Ui::OpDDPDialog)

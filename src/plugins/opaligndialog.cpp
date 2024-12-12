@@ -22,7 +22,7 @@
 
 #include "opaligndialog.h"
 #include "ui_opaligndialog.h"
-#include <settings.h>
+#include <fitsbase/settings.h>
 #include <QFileDialog>
 
 static const char* PATH_OPALIGN = "fits/path/opalign";

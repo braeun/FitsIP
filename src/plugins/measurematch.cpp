@@ -23,9 +23,9 @@
 #include "measurematch.h"
 #include "measurematchdialog.h"
 #include "opgrow.h"
-#include <imagecollection.h>
-#include <fileobject.h>
-#include <fitsimage.h>
+#include <fitsbase/imagecollection.h>
+#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsimage.h>
 #include <cmath>
 #include <algorithm>
 #include <limits>

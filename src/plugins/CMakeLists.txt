@@ -114,7 +114,7 @@ endforeach()
 
 qt5_wrap_cpp(plugin_mocs
   ${plugin_headers}
-  OPTIONS -I${PROJECT_SOURCE_DIR}/src/lib
+  OPTIONS -I${PROJECT_SOURCE_DIR}/src
   )
 
 set(private_header_list

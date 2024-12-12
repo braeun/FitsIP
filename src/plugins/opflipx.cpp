@@ -21,7 +21,7 @@
  ********************************************************************************/
 
 #include "opflipx.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 
 OpFlipX::OpFlipX()
 {

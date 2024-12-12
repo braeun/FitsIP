@@ -23,7 +23,7 @@
 #ifndef OPDDPDIALOG_H
 #define OPDDPDIALOG_H
 
-#include <dialogs/abstractpreviewdialog.h>
+#include <fitsbase/dialogs/abstractpreviewdialog.h>
 
 namespace Ui {
 class OpDDPDialog;

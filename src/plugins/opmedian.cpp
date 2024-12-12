@@ -22,7 +22,7 @@
 
 #include "opmedian.h"
 #include "opmediandialog.h"
-#include <fitsimage.h>
+#include <fitsbase/fitsimage.h>
 #include <algorithm>
 #include <QApplication>
 
