@@ -21,6 +21,7 @@ set(plugin_headers
   opalign.h
   opaverage.h
   opcalibration.h
+  opcombinechannels.h
   opcrop.h
   opcut.h
   opddp.h
@@ -61,6 +62,7 @@ set(plugin_sources
   opalign.cpp
   opaverage.cpp
   opcalibration.cpp
+  opcombinechannels.cpp
   opcrop.cpp
   opcut.cpp
   opddp.cpp
@@ -122,6 +124,7 @@ set(private_header_list
   measurerankresultdialog.h
   opaligndialog.h
   opcalibrationdialog.h
+  opcombinechannelsdialog.h
   opcropdialog.h
   opddpdialog.h
   opgaussblurdialog.h
@@ -153,6 +156,7 @@ add_library(fitsplugins
   opaligndialog.ui
   opcalibrationdialog.cpp
   opcalibrationdialog.ui
+  opcombinechannelsdialog.cpp opcombinechannelsdialog.ui
   opcropdialog.cpp
   opcropdialog.ui
   opddpdialog.cpp

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - collection of file objects, i.e. opened images                      *
  *                                                                              *
- * modified: 2023-02-05                                                         *
+ * modified: 2024-12-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -32,6 +32,11 @@ ImageCollection::ImageCollection()
 bool ImageCollection::isEmpty() const
 {
   return files.empty();
+}
+
+size_t ImageCollection::size() const
+{
+  return files.size();
 }
 
 void ImageCollection::setActiveFile(std::shared_ptr<FileObject> file)
