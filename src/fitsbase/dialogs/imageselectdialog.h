@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to select an image from memory or filesystem                 *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -42,6 +42,8 @@ public:
   ~ImageSelectDialog();
 
   void setTitle(QString title);
+
+  void setPrompt(QString txt);
 
   void setImageCollection(ImageCollection* collection);
 

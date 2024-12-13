@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the selected pixel list                           *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,12 +40,17 @@ public:
   explicit PixelListWidget(QWidget *parent = nullptr);
   ~PixelListWidget();
 
+  void clear();
+
+  void save();
+
+  void load();
+
 private slots:
   void on_pixellistTable_customContextMenuRequested(const QPoint &pos);
 
 private:
   void removeRows();
-  void clear();
 
   Ui::PixelListWidget *ui;
   PixelList* pixellist;

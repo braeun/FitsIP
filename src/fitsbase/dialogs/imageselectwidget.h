@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to select an image from memory or filesystem                 *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,6 +40,8 @@ class ImageSelectWidget : public QWidget
 public:
   explicit ImageSelectWidget(QWidget *parent = nullptr);
   ~ImageSelectWidget();
+
+  void setNoneAllowed(bool flag);
 
   void setImageCollection(ImageCollection* collection);
 

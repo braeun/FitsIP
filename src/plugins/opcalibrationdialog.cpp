@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog for image calibration with flatfield and dark image          *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -31,6 +31,8 @@ OpCalibrationDialog::OpCalibrationDialog(QWidget *parent) :
   ui(new Ui::OpCalibrationDialog)
 {
   ui->setupUi(this);
+  ui->darkFrameSelectWidget->setNoneAllowed(true);
+  ui->flatFieldSelectWidget->setNoneAllowed(true);
   connect(ui->browseButton,&QAbstractButton::clicked,this,[this]{browse();});
 }
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - xml file based logbook data storage                                 *
  *                                                                              *
- * modified: 2022-11-27                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -71,21 +71,18 @@ bool XMLLogbookStorage::add(LogbookEntry entry)
 void XMLLogbookStorage::setTitle(const QString &t)
 {
   title = t;
-  QDomNodeList list = doc.documentElement().elementsByTagName("title");
-  if (list.isEmpty())
+  QDomElement element = doc.documentElement().firstChildElement("title");
+  if (element.isNull())
   {
-    QDomElement element = doc.createElement("title");
-    QDomText text = doc.createTextNode(title);
-    element.appendChild(text);
+    element = doc.createElement("title");
     doc.documentElement().appendChild(element);
   }
   else
   {
-    QDomElement element = list.at(0).toElement();
-    element.clear();
-    QDomText text = doc.createTextNode(title);
-    element.appendChild(text);
+    element.removeChild(element.firstChild());
   }
+  QDomText text = doc.createTextNode(title);
+  element.appendChild(text);
   write();
 }
 
@@ -97,21 +94,18 @@ QString XMLLogbookStorage::getTitle() const
 void XMLLogbookStorage::setDescription(const QString &d)
 {
   desc = d;
-  QDomNodeList list = doc.documentElement().elementsByTagName("title");
-  if (list.isEmpty())
+  QDomElement element = doc.documentElement().firstChildElement("description");
+  if (element.isNull())
   {
-    QDomElement element = doc.createElement("description");
-    QDomText text = doc.createTextNode(desc);
-    element.appendChild(text);
+    element = doc.createElement("description");
     doc.documentElement().appendChild(element);
   }
   else
   {
-    QDomElement element = list.at(0).toElement();
-    element.clear();
-    QDomText text = doc.createTextNode(desc);
-    element.appendChild(text);
+    element.removeChild(element.firstChild());
   }
+  QDomText text = doc.createTextNode(desc);
+  element.appendChild(text);
   write();
 }
 

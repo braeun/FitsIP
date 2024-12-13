@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the actual image                                  *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -57,14 +57,17 @@ void ImageWidget::setImage(const QImage& img)
   if (zoom < -1)
   {
     image = origImage.scaled(origImage.width()/abs(zoom),origImage.height()/abs(zoom));
+    zoomFactor = 1.0 / abs(zoom);
   }
   else if (zoom > 1)
   {
     image = origImage.scaled(origImage.width()*abs(zoom),origImage.height()*abs(zoom));
+    zoomFactor = 1.0 * abs(zoom);
   }
   else
   {
     image = origImage;
+    zoomFactor = 1.0;
   }
   if (zoom != 0) adjustSize();
   update();
@@ -109,7 +112,7 @@ void ImageWidget::paintEvent(QPaintEvent* /*event*/)
     p.drawImage(imageRect,image);
 //    drawRectangle(p,dragStart,dragStop);
     drawAOI(p);
-    if (settings.isShowStarlist()) drawPixelList(p);
+    if (settings.isShowPixellist()) drawPixelList(p);
     if (settings.isShowStarlist()) drawStarList(p);
   }
 }
@@ -142,7 +145,7 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent *event)
       double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
       QPoint p = (event->pos() - imageRect.topLeft()) * scale;
       emit cursorSet(p);
-      if (dragStart == dragStop) emit setPixel(p);
+      if (dragStart == dragStop) emit setPixel(p/zoomFactor);
     }
   }
 }
@@ -155,34 +158,34 @@ void ImageWidget::mouseMoveEvent(QMouseEvent *event)
     if (event->buttons().testFlag(Qt::MouseButton::LeftButton))
     {
       dragStop = event->pos();
-      QPoint tl = (dragStart - imageRect.topLeft()) * scale;
-      QPoint br = (dragStop - imageRect.topLeft()) * scale;
+      QPoint tl = (dragStart - imageRect.topLeft()) * scale / zoomFactor;
+      QPoint br = (dragStop - imageRect.topLeft()) * scale / zoomFactor;
       aoi = QRect(tl,br).normalized();
       repaint();
       emit aoiChanged(aoi);
     }
-    QPoint p = (event->pos() - imageRect.topLeft()) * scale;
+    QPoint p = (event->pos() - imageRect.topLeft()) * scale / zoomFactor;
     emit cursorMoved(p);
   }
 }
 
-void ImageWidget::drawRectangle(QPainter& p, QPoint start, QPoint stop)
-{
-  p.save();
-  p.setPen(Qt::yellow);
-  if (!(start.isNull() || stop.isNull()))
-  {
-    p.drawRect(start.x(),start.y(),stop.x()-start.x(),stop.y()-start.y());
-  }
-  p.restore();
-}
+//void ImageWidget::drawRectangle(QPainter& p, QPoint start, QPoint stop)
+//{
+//  p.save();
+//  p.setPen(Qt::yellow);
+//  if (!(start.isNull() || stop.isNull()))
+//  {
+//    p.drawRect(start.x(),start.y(),stop.x()-start.x(),stop.y()-start.y());
+//  }
+//  p.restore();
+//}
 
 void ImageWidget::drawAOI(QPainter &p)
 {
   if (aoi.isEmpty()) return;
   double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
-  QPoint tl = aoi.topLeft() / scale + imageRect.topLeft();
-  QPoint br = aoi.bottomRight() / scale + imageRect.topLeft();
+  QPoint tl = aoi.topLeft() / scale * zoomFactor + imageRect.topLeft();
+  QPoint br = aoi.bottomRight() / scale * zoomFactor + imageRect.topLeft();
   p.save();
   p.setPen(Qt::yellow);
   p.drawRect(QRect(tl,br));
@@ -196,7 +199,7 @@ void ImageWidget::drawPixelList(QPainter& p)
   double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
   for (const Pixel& pixel : PixelList::getGlobalInstance()->getPixels())
   {
-    QPoint pt = QPoint(pixel.x,pixel.y) / scale + imageRect.topLeft();
+    QPoint pt = QPoint(pixel.x,pixel.y) / scale * zoomFactor + imageRect.topLeft();
     p.drawLine(pt-QPoint(5,0),pt+QPoint(5,0));
     p.drawLine(pt-QPoint(0,5),pt+QPoint(0,5));
   }
@@ -210,7 +213,7 @@ void ImageWidget::drawStarList(QPainter& p)
   double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
   for (const Star& star : StarList::getGlobalInstance()->getStars())
   {
-    QPointF pt = QPointF(star.x,star.y) / scale + imageRect.topLeft();
+    QPointF pt = QPointF(star.x,star.y) / scale * zoomFactor + imageRect.topLeft();
     double r = star.fwhm / 2 / scale;
     p.drawEllipse(pt,r,r);
   }

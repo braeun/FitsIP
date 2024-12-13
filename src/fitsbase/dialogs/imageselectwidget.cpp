@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to select an image from memory or filesystem                 *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -35,11 +35,17 @@ ImageSelectWidget::ImageSelectWidget(QWidget *parent):QWidget(parent),
   collection(nullptr)
 {
   ui->setupUi(this);
+  ui->noneButton->setVisible(false);
 }
 
 ImageSelectWidget::~ImageSelectWidget()
 {
   delete ui;
+}
+
+void ImageSelectWidget::setNoneAllowed(bool flag)
+{
+  ui->noneButton->setVisible(flag);
 }
 
 void ImageSelectWidget::setImageCollection(ImageCollection* c)
@@ -55,7 +61,7 @@ std::shared_ptr<FileObject> ImageSelectWidget::getImage()
     QModelIndex index = ui->fileList->currentIndex();
     if (index.isValid()) return collection->getFiles()[index.row()];
   }
-  else
+  else if (ui->fromFileButton->isChecked())
   {
     QString fn = ui->filenameField->text();
     if (!fn.isEmpty())

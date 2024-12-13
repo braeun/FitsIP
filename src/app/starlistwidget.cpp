@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the selected/detected star list                   *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,7 @@
 
 #include "starlistwidget.h"
 #include "ui_starlistwidget.h"
+#include "appsettings.h"
 #include <fitsbase/starlist.h>
 #include <QMenu>
 
@@ -33,11 +34,35 @@ StarListWidget::StarListWidget(QWidget *parent) :
   starlist = StarList::getGlobalInstance();
   ui->starlistTable->setModel(starlist);
   contextMenu = new QMenu();
+  QAction* load = contextMenu->addAction("Load...");
+  connect(load,&QAction::triggered,this,&StarListWidget::load);
+  QAction* save = contextMenu->addAction("Save...");
+  connect(save,&QAction::triggered,this,&StarListWidget::save);
 }
 
 StarListWidget::~StarListWidget()
 {
   delete ui;
+}
+
+void StarListWidget::load()
+{
+  AppSettings settings;
+  QString fn = settings.getOpenFilename(this,AppSettings::PATH_STARLIST,"File list (*.lst);;All files (*)");
+  if (!fn.isNull())
+  {
+    starlist->load(fn);
+  }
+}
+
+void StarListWidget::save()
+{
+  AppSettings settings;
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_STARLIST,"File list (*.lst);;All files (*)");
+  if (!fn.isNull())
+  {
+    starlist->save(fn);
+  }
 }
 
 void StarListWidget::on_starlistTable_customContextMenuRequested(const QPoint &pos)

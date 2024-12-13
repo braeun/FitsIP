@@ -99,6 +99,12 @@
       </item>
       <item>
        <widget class="QComboBox" name="projectBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select project for future logbook entries&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -123,6 +129,12 @@
       </item>
       <item>
        <widget class="QComboBox" name="stepBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select step for future logbook entries&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>

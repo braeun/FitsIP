@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the selected pixel list                           *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,7 @@
 
 #include "pixellistwidget.h"
 #include "ui_pixellistwidget.h"
+#include "appsettings.h"
 #include <fitsbase/pixellist.h>
 #include <QMenu>
 
@@ -33,6 +34,11 @@ PixelListWidget::PixelListWidget(QWidget *parent) :
   pixellist = PixelList::getGlobalInstance();
   ui->pixellistTable->setModel(pixellist);
   contextMenu = new QMenu();
+  QAction* load = contextMenu->addAction("Load...");
+  connect(load,&QAction::triggered,this,&PixelListWidget::load);
+  QAction* save = contextMenu->addAction("Save...");
+  connect(save,&QAction::triggered,this,&PixelListWidget::save);
+  contextMenu->addSeparator();
   QAction* removeAction = contextMenu->addAction("Remove Row(s)");
   connect(removeAction,&QAction::triggered,this,&PixelListWidget::removeRows);
   QAction* clearAction = contextMenu->addAction("Clear");
@@ -49,13 +55,34 @@ void PixelListWidget::on_pixellistTable_customContextMenuRequested(const QPoint 
   contextMenu->popup(ui->pixellistTable->mapToGlobal(pos));
 }
 
+void PixelListWidget::clear()
+{
+  pixellist->clear();
+}
+
+void PixelListWidget::load()
+{
+  AppSettings settings;
+  QString fn = settings.getOpenFilename(this,AppSettings::PATH_PIXELLIST,"File list (*.lst);;All files (*)");
+  if (!fn.isNull())
+  {
+    pixellist->load(fn);
+  }
+}
+
+void PixelListWidget::save()
+{
+  AppSettings settings;
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_PIXELLIST,"File list (*.lst);;All files (*)");
+  if (!fn.isNull())
+  {
+    pixellist->save(fn);
+  }
+}
+
 void PixelListWidget::removeRows()
 {
   QModelIndexList list = ui->pixellistTable->selectionModel()->selectedRows();
   pixellist->removePixels(list);
 }
 
-void PixelListWidget::clear()
-{
-  pixellist->clear();
-}

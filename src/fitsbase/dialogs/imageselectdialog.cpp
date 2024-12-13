@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to select an image from memory or filesystem                 *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,7 +24,6 @@
 #include "ui_imageselectdialog.h"
 #include "../imagecollection.h"
 #include "../fileobject.h"
-#include "../io/iofactory.h"
 #include <QSettings>
 #include <QFileDialog>
 #include <QDebug>
@@ -45,6 +44,11 @@ ImageSelectDialog::~ImageSelectDialog()
 void ImageSelectDialog::setTitle(QString title)
 {
   ui->titleLabel->setText(title);
+}
+
+void ImageSelectDialog::setPrompt(QString txt)
+{
+  ui->promptLabel->setText(txt);
 }
 
 void ImageSelectDialog::setImageCollection(ImageCollection* c)

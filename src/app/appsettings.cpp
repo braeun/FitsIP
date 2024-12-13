@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2022-12-04                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -30,6 +30,8 @@ const char* AppSettings::PATH_LOG = "fits/path/log";
 const char* AppSettings::PATH_ROOT = "fits/path/root";
 const char* AppSettings::PATH_PLUGIN = "fits/path/plugin";
 const char* AppSettings::PATH_FILELIST = "fits/path/filelist";
+const char* AppSettings::PATH_PIXELLIST = "fits/path/pixellist";
+const char* AppSettings::PATH_STARLIST = "fits/path/starlist";
 
 static const char* FILE_FILTER = "files/filter";
 

@@ -80,8 +80,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>875</width>
-             <height>477</height>
+             <width>856</width>
+             <height>474</height>
             </rect>
            </property>
           </widget>
@@ -365,13 +365,34 @@
      <x>0</x>
      <y>0</y>
      <width>1150</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuFile_List">
+     <property name="title">
+      <string>File List</string>
+     </property>
+     <addaction name="actionLoad_File_List"/>
+     <addaction name="actionSave_File_List"/>
+    </widget>
+    <widget class="QMenu" name="menuPixel_List">
+     <property name="title">
+      <string>Pixel List</string>
+     </property>
+     <addaction name="actionLoad_Pixel_List"/>
+     <addaction name="actionSave_Pixel_List"/>
+    </widget>
+    <widget class="QMenu" name="menuStar_List">
+     <property name="title">
+      <string>Star List</string>
+     </property>
+     <addaction name="actionLoad_Star_List"/>
+     <addaction name="actionSave_Star_List"/>
+    </widget>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
@@ -383,8 +404,9 @@
     <addaction name="actionClose_Image"/>
     <addaction name="actionClose_All_Images"/>
     <addaction name="separator"/>
-    <addaction name="actionLoad_File_List"/>
-    <addaction name="actionSave_File_List"/>
+    <addaction name="menuFile_List"/>
+    <addaction name="menuPixel_List"/>
+    <addaction name="menuStar_List"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -1050,7 +1072,8 @@
   </action>
   <action name="actionClose_Image">
    <property name="icon">
-    <iconset theme="document-close"/>
+    <iconset theme="document-close">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Close Image</string>
@@ -1140,7 +1163,8 @@
   </action>
   <action name="actionExport_Image">
    <property name="icon">
-    <iconset theme="document-export"/>
+    <iconset theme="document-export">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Export Image...</string>
@@ -1252,6 +1276,26 @@
    </property>
    <property name="text">
     <string>Tree By Project and Step</string>
+   </property>
+  </action>
+  <action name="actionLoad_Pixel_List">
+   <property name="text">
+    <string>Load Pixel List...</string>
+   </property>
+  </action>
+  <action name="actionSave_Pixel_List">
+   <property name="text">
+    <string>Save Pixel List...</string>
+   </property>
+  </action>
+  <action name="actionLoad_Star_List">
+   <property name="text">
+    <string>Load Star List...</string>
+   </property>
+  </action>
+  <action name="actionSave_Star_List">
+   <property name="text">
+    <string>Save Star List...</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

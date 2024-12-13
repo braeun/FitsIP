@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - divide two images                                                   *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -56,6 +56,7 @@ OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsImage> image, QRect /*se
     dlg->setTitle("Divide by Image");
     dlg->setImageCollection(&ImageCollection::getGlobal());
   }
+  dlg->setPrompt("Divide "+image->getName()+ "by:");
   if (dlg->exec())
   {
     std::shared_ptr<FileObject> file = dlg->getImage();

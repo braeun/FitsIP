@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -139,6 +139,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
   connect(ui->actionLoad_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::load);
   connect(ui->actionSave_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::save);
+  connect(ui->actionLoad_Pixel_List,&QAction::triggered,ui->pixellistWidget,&PixelListWidget::load);
+  connect(ui->actionSave_Pixel_List,&QAction::triggered,ui->pixellistWidget,&PixelListWidget::save);
+  connect(ui->actionLoad_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::load);
+  connect(ui->actionSave_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::save);
 
   connect(PluginFactory::instance(),&PluginFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
   connect(IOFactory::getInstance(),&IOFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
@@ -177,6 +181,8 @@ MainWindow::MainWindow(QWidget *parent) :
       ui->logbookWidget->setDisplay(LogbookWidget::TreeByProjectByStep);
       break;
   }
+  ui->actionShow_Selected_Pixels->setChecked(settings.isShowPixellist());
+  ui->actionShow_Detected_Stars->setChecked(settings.isShowStarlist());
 }
 
 MainWindow::~MainWindow()

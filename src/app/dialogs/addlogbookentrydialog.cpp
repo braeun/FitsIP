@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to add a logbook entry                                       *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,7 @@ AddLogbookEntryDialog::AddLogbookEntryDialog(QWidget *parent) :
   ui(new Ui::AddLogbookEntryDialog)
 {
   ui->setupUi(this);
+  ui->imageBox->addItem("generic");
   for (auto image : ImageCollection::getGlobal().getFiles())
   {
     ui->imageBox->addItem(image->getImage()->getName());

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2024-11-23                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -84,6 +84,8 @@ public:
   static const char* PATH_ROOT;
   static const char* PATH_PLUGIN;
   static const char* PATH_FILELIST;
+  static const char* PATH_PIXELLIST;
+  static const char* PATH_STARLIST;
 
 };
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to add two images                                            *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -56,6 +56,7 @@ OpPlugin::ResultType OpAdd::execute(std::shared_ptr<FitsImage> image, QRect /*se
     dlg->setTitle("Add Image");
     dlg->setImageCollection(&ImageCollection::getGlobal());
   }
+  dlg->setPrompt("Add to "+image->getName()+":");
   if (dlg->exec())
   {
     std::shared_ptr<FileObject> file = dlg->getImage();

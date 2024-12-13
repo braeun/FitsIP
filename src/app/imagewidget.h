@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the actual image                                  *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -65,7 +65,7 @@ protected:
   virtual void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-  void drawRectangle(QPainter& p, QPoint start, QPoint stop);
+//  void drawRectangle(QPainter& p, QPoint start, QPoint stop);
   void drawAOI(QPainter& p);
   void drawPixelList(QPainter& p);
   void drawStarList(QPainter& p);
@@ -78,7 +78,8 @@ private:
   QPoint dragStop;
   QRect aoi;
   /* <0 zoom out, 0 fit */
-  int32_t zoom;
+  int zoom;
+  double zoomFactor;
 };
 
 #endif // IMAGEWIDGET_H

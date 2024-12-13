@@ -14,7 +14,10 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="2" column="1" colspan="2">
+    <widget class="QListView" name="fileList"/>
+   </item>
+   <item row="1" column="0">
     <widget class="QRadioButton" name="fromFileButton">
      <property name="text">
       <string>From File:</string>
@@ -24,17 +27,17 @@
      </attribute>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="filenameField"/>
-   </item>
-   <item row="0" column="2">
+   <item row="1" column="2">
     <widget class="QPushButton" name="browseButton">
      <property name="text">
       <string>Browse</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" alignment="Qt::AlignTop">
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="filenameField"/>
+   </item>
+   <item row="2" column="0" alignment="Qt::AlignTop">
     <widget class="QRadioButton" name="fromMemoryButton">
      <property name="text">
       <string>From Memory:</string>
@@ -47,8 +50,15 @@
      </attribute>
     </widget>
    </item>
-   <item row="1" column="1" colspan="2">
-    <widget class="QListView" name="fileList"/>
+   <item row="0" column="0">
+    <widget class="QRadioButton" name="noneButton">
+     <property name="text">
+      <string>None</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
    </item>
   </layout>
  </widget>
