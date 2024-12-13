@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - DSLR raw image format reader                                        *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #define RAWIO_H
 
 #include "iohandler.h"
+#include <libraw/libraw.h>
 
 class RawIO: public IOHandler
 {
@@ -38,6 +39,10 @@ public:
   virtual bool write(QString filename, std::shared_ptr<FitsImage> img) override;
 
   static const char* FILENAME_FILTER;
+
+private:
+  template<typename T> void copyGray(FitsImage* img, libraw_processed_image_t* src);
+  template<typename T> void copyColor(FitsImage* img, libraw_processed_image_t* src);
 
 };
 

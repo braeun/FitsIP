@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - DSLR raw image format reader                                        *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,7 +22,6 @@
 
 #include "rawio.h"
 #include "../fitsimage.h"
-#include <libraw/libraw.h>
 #include <QFileInfo>
 
 const char* RawIO::FILENAME_FILTER = "Canon Raw Data (*.crw);;Other Raw Data (*)";
@@ -47,6 +46,10 @@ std::shared_ptr<FitsImage> RawIO::read(QString filename)
   QFileInfo info(filename);
   profiler.start();
   LibRaw ip;
+#ifdef USE_16BITRAW
+  ip.imgdata.params.output_bps = 16;
+#else
+#endif
   int32_t err = ip.open_file(filename.toStdString().c_str());
   if (err != LIBRAW_SUCCESS)
   {
@@ -62,28 +65,29 @@ std::shared_ptr<FitsImage> RawIO::read(QString filename)
   {
     if (image->type != LIBRAW_IMAGE_BITMAP) throw std::runtime_error("Failed to load image");
     if (image->colors != 3 && image->colors != 1) throw std::runtime_error("Only monochrome and 3-color images supported");
-    if (image->bits != 8) throw std::runtime_error("Only 8 bpp images supported");
+//    if (image->bits != 8) throw std::runtime_error("Only 8 bpp images supported");
     auto img = std::make_shared<FitsImage>(info.baseName(),image->width,image->height,image->colors);
     PixelIterator it = img->getPixelIterator();
     if (image->colors == 1)
     {
-      uint8_t* ptr = image->data;
-      for (uint32_t i=0;i<image->data_size;i++)
+      if (image->bits == 8)
       {
-        it[0] = *ptr;
-        ++it;
-        ++ptr;
+        copyGray<uint8_t>(img.get(),image);
+      }
+      else
+      {
+        copyGray<uint16_t>(img.get(),image);
       }
     }
     else
     {
-      uint8_t* ptr = image->data;
-      for (uint32_t i=0;i<image->data_size/3;i++)
+      if (image->bits == 8)
       {
-        it[0] = *ptr++;
-        it[1] = *ptr++;
-        it[2] = *ptr++;
-        ++it;
+        copyColor<uint8_t>(img.get(),image);
+      }
+      else
+      {
+        copyColor<uint16_t>(img.get(),image);
       }
     }
     LibRaw::dcraw_clear_mem(image);
@@ -104,4 +108,30 @@ std::shared_ptr<FitsImage> RawIO::read(QString filename)
 bool RawIO::write(QString /*filename*/, std::shared_ptr<FitsImage> /*img*/)
 {
   throw std::runtime_error("Writing to raw format not supported.");
+}
+
+
+template<typename T> void RawIO::copyGray(FitsImage* img, libraw_processed_image_t* src)
+{
+  PixelIterator it = img->getPixelIterator();
+  T* ptr = (T*)src->data;
+  for (uint32_t i=0;i<src->width*src->height;i++)
+  {
+    it[0] = *ptr;
+    ++it;
+    ++ptr;
+  }
+}
+
+template<typename T> void RawIO::copyColor(FitsImage* img, libraw_processed_image_t* src)
+{
+  PixelIterator it = img->getPixelIterator();
+  T* ptr = (T*)src->data;
+  for (uint32_t i=0;i<src->width*src->height;i++)
+  {
+    it[0] = *ptr++;
+    it[1] = *ptr++;
+    it[2] = *ptr++;
+    ++it;
+  }
 }

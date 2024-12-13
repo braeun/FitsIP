@@ -82,6 +82,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 option(USE_FLOAT "use float instead of double" ON)
+option(USE_16BITRAW "import raw image files as 16 bit" ON)
 
 #-----------------------------------------------------------------------------
 # COMPILE DEFINITIONS
@@ -106,6 +107,10 @@ endif()
 
 if (USE_FLOAT)
   list(APPEND FITS_DEF -DUSE_FLOAT)
+endif()
+
+if (USE_16BITRAW)
+  list(APPEND FITS_DEF -DUSE_16BITRAW)
 endif()
 
 if (USE_LUA)

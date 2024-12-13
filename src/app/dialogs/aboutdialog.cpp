@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - about dialog                                                        *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -32,9 +32,13 @@ AboutDialog::AboutDialog(QWidget *parent) :
   ui->releaseLabel->setText(QString("Release ")+__DATE__);
   QString options = "Build Options:\n";
 #ifdef USE_FLOAT
-  options += "  ValueType = float";
+  options += "  Value Type      = float\n";
 #else
-  options += "  ValueType = double";
+  options += "  ValueType = double\n";
+#endif
+#ifdef USE_16BITRAW
+  options += "  Raw Image Input = 16 bits\n";
+#else
 #endif
   ui->buildOptionLabel->setText(options);
 }
