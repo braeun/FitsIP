@@ -1103,6 +1103,9 @@
    <property name="text">
     <string>Open...</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+O</string>
+   </property>
   </action>
   <action name="actionShow_Selected_Pixels">
    <property name="checkable">

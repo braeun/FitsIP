@@ -20,7 +20,8 @@
   dialogs/logbookfilterdialog.h
   dialogs/logbookfilter1dialog.h
   dialogs/logbookpropertiesdialog.h
-  )
+  dialogs/logentryeditdialog.h
+)
 
 add_executable(fits
   appsettings.cpp
@@ -65,6 +66,7 @@ add_executable(fits
   dialogs/logbookfilter1dialog.ui
   dialogs/logbookpropertiesdialog.cpp
   dialogs/logbookpropertiesdialog.ui
+  dialogs/logentryeditdialog.cpp dialogs/logentryeditdialog.ui
   ${private_header_list}
   )
 

@@ -36,7 +36,11 @@ class LogbookStorage
 {
 public:
 
-  virtual bool add(LogbookEntry entry) = 0;
+  virtual bool add(LogbookEntry& entry) = 0;
+
+  virtual bool update(const LogbookEntry& entry) = 0;
+
+  virtual bool remove(int64_t id) = 0;
 
   virtual void setTitle(const QString& title) = 0;
 
@@ -62,9 +66,9 @@ public:
 
   virtual void getTimeRange(QDateTime* begin, QDateTime* end) const = 0;
 
-  virtual void assignProject(int64_t id, const QString& p) = 0;
+//  virtual void assignProject(int64_t id, const QString& p) = 0;
 
-  virtual void assignStep(int64_t id, const QString& s) = 0;
+//  virtual void assignStep(int64_t id, const QString& s) = 0;
 
 protected:
   LogbookStorage();

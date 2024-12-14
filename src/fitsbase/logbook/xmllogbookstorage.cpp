@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - xml file based logbook data storage                                 *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -47,26 +47,90 @@ XMLLogbookStorage::~XMLLogbookStorage()
   }
 }
 
-bool XMLLogbookStorage::add(LogbookEntry entry)
+bool XMLLogbookStorage::add(LogbookEntry& entry)
 {
   setId(entry,++idcounter);
   entries.push_back(entry);
-  if (!entry.image.isEmpty()) images.insert(entry.image);
+  if (!entry.getImage().isEmpty()) images.insert(entry.getImage());
   projects.insert(entry.getProject());
   steps[entry.getProject()].insert(entry.getStep());
   QDomElement element = doc.createElement("entry");
-  element.setAttribute("image",entry.image);
-  element.setAttribute("timestamp",entry.timestamp.toString(Qt::ISODateWithMs));
-  element.setAttribute("type",static_cast<int32_t>(entry.type));
+  element.setAttribute("image",entry.getImage());
+  element.setAttribute("timestamp",entry.getTimestamp().toString(Qt::ISODateWithMs));
+  element.setAttribute("type",static_cast<int32_t>(entry.getType()));
   element.setAttribute("project",entry.getProject());
   element.setAttribute("step",entry.getStep());
   element.setAttribute("id",QString::number(entry.getId()));
-  QDomText text = doc.createTextNode(entry.txt);
+  QDomText text = doc.createTextNode(entry.getText());
   element.appendChild(text);
   doc.documentElement().appendChild(element);
   write();
   return true;
 }
+
+bool XMLLogbookStorage::update(const LogbookEntry& entry)
+{
+  for (auto& e : entries)
+  {
+    if (e.getId() == entry.getId())
+    {
+      e = entry;
+      break;
+    }
+  }
+  for (QDomNode n=doc.documentElement().firstChild();!n.isNull();n=n.nextSibling())
+  {
+    QDomElement element = n.toElement(); // try to convert the node to an element.
+    if(!element.isNull())
+    {
+      if (element.tagName() == "entry")
+      {
+        if (element.attribute("id","-1").toLong() == entry.getId())
+        {
+          element.setAttribute("image",entry.getImage());
+          element.setAttribute("timestamp",entry.getTimestamp().toString(Qt::ISODateWithMs));
+          element.setAttribute("type",static_cast<int32_t>(entry.getType()));
+          element.setAttribute("project",entry.getProject());
+          element.setAttribute("step",entry.getStep());
+          break;
+        }
+      }
+    }
+  }
+  write();
+  return true;
+}
+
+bool XMLLogbookStorage::remove(int64_t id)
+{
+  for (size_t i=0;i<entries.size();++i)
+  {
+    if (entries[i].getId() == id)
+    {
+      entries.erase(entries.begin()+i);
+      break;
+    }
+  }
+  for (QDomNode n=doc.documentElement().firstChild();!n.isNull();n=n.nextSibling())
+  {
+    QDomElement element = n.toElement(); // try to convert the node to an element.
+    if(!element.isNull())
+    {
+      if (element.tagName() == "entry")
+      {
+        if (element.attribute("id","-1").toLong() == id)
+        {
+          doc.documentElement().removeChild(element);
+          break;
+        }
+      }
+    }
+  }
+  write();
+  return true;
+}
+
+
 
 void XMLLogbookStorage::setTitle(const QString &t)
 {
@@ -178,78 +242,18 @@ void XMLLogbookStorage::getTimeRange(QDateTime* begin, QDateTime* end) const
   }
   if (begin)
   {
-    QDateTime t = entries.front().timestamp;
+    QDateTime t = entries.front().getTimestamp();
     for (const auto& entry : entries)
     {
-      if (entry.timestamp < t) t = entry.timestamp;
+      if (entry.getTimestamp() < t) t = entry.getTimestamp();
     }
     *begin = t;
   }
   if (end)
   {
-    *end = getLastEntry().timestamp;
+    *end = getLastEntry().getTimestamp();
   }
 }
-
-
-void XMLLogbookStorage::assignProject(int64_t id, const QString &p)
-{
-  for (auto& e : entries)
-  {
-    if (e.getId() == id)
-    {
-      setProject(e,p);
-      break;
-    }
-  }
-  for (QDomNode n=doc.documentElement().firstChild();!n.isNull();n=n.nextSibling())
-  {
-    QDomElement e = n.toElement(); // try to convert the node to an element.
-    if(!e.isNull())
-    {
-      if (e.tagName() == "entry")
-      {
-        if (e.attribute("id","-1").toLong() == id)
-        {
-          e.setAttribute("project",p);
-          break;
-        }
-      }
-    }
-  }
-  write();
-}
-
-void XMLLogbookStorage::assignStep(int64_t id, const QString &s)
-{
-  for (auto& e : entries)
-  {
-    if (e.getId() == id)
-    {
-      setStep(e,s);
-      break;
-    }
-  }
-  for (QDomNode n=doc.documentElement().firstChild();!n.isNull();n=n.nextSibling())
-  {
-    QDomElement e = n.toElement(); // try to convert the node to an element.
-    if(!e.isNull())
-    {
-      if (e.tagName() == "entry")
-      {
-        if (e.attribute("id","-1").toLong() == id)
-        {
-          e.setAttribute("step",s);
-          break;
-        }
-      }
-    }
-  }
-  write();
-}
-
-
-
 
 
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the filesystem view and associated controls       *
  *                                                                              *
- * modified: 2022-12-04                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -68,6 +68,7 @@ private:
   void rename();
   void remove();
   void filterChanged(const QString& text);
+  void clearFilterlist();
 
   Ui::FileSystemView *ui;
   QFileSystemModel* filesystemModel;

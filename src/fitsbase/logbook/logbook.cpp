@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2022-12-02                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -85,7 +85,8 @@ void Logbook::add(LogbookEntry::Type type, QString image, QString txt)
 {
   if (store && active)
   {
-    store->add(LogbookEntry(type,project,step,image,txt));
+    LogbookEntry e(type,project,step,image,txt);
+    store->add(e);
     emit dataAdded();
   }
 }
@@ -95,6 +96,24 @@ void Logbook::addOp(QString image, QString op)
   if (store && active)
   {
     add(LogbookEntry::Op,image,op);
+  }
+}
+
+void Logbook::update(const LogbookEntry& entry)
+{
+  if (store)
+  {
+    store->update(entry);
+    emit dataChanged();
+  }
+}
+
+void Logbook::remove(int64_t id)
+{
+  if (store)
+  {
+    store->remove(id);
+    emit dataChanged();
   }
 }
 
@@ -113,6 +132,12 @@ std::vector<LogbookEntry> Logbook::getEntries(const LogbookFilter& filter) const
 const LogbookEntry& Logbook::getLastEntry() const
 {
   if (store) return store->getLastEntry();
+  return LogbookEntry::invalid;
+}
+
+LogbookEntry Logbook::getEntry(int64_t id) const
+{
+  if (store) return store->getEntry(id);
   return LogbookEntry::invalid;
 }
 
@@ -161,15 +186,15 @@ const QString& Logbook::getStep() const
   return step;
 }
 
-void Logbook::assignProject(int64_t id, const QString& p)
-{
-  if (store) store->assignProject(id,p);
-}
+//void Logbook::assignProject(int64_t id, const QString& p)
+//{
+//  if (store) store->assignProject(id,p);
+//}
 
-void Logbook::assignStep(int64_t id, const QString& s)
-{
-  if (store) store->assignStep(id,s);
-}
+//void Logbook::assignStep(int64_t id, const QString& s)
+//{
+//  if (store) store->assignStep(id,s);
+//}
 
 bool Logbook::exportToFile(const QString &file)
 {
@@ -205,18 +230,18 @@ bool Logbook::exportPlainText(const QString &file)
   QDate lastDate;
   for (const LogbookEntry& e : getEntries())
   {
-    if (e.timestamp.date() != lastDate)
+    if (e.getTimestamp().date() != lastDate)
     {
-      lastDate = e.timestamp.date();
+      lastDate = e.getTimestamp().date();
       os << Qt::endl;
       os << lastDate.toString(Qt::ISODate) << Qt::endl;
     }
     os << "  ";
-    os << e.timestamp.time().toString(Qt::ISODateWithMs) << ": ";
+    os << e.getTimestamp().time().toString(Qt::ISODateWithMs) << ": ";
     os << "Project " << e.getProject() << "; ";
     os << "Step " << e.getStep() << "; ";
-    os << e.getTag() << Qt::endl;
-    os << "    " << e.txt << Qt::endl;
+    os << e.getTypeString() << Qt::endl;
+    os << "    " << e.getText() << Qt::endl;
   }
   os.flush();
   f.close();

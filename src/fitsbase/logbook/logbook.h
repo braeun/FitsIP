@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2022-12-02                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -71,11 +71,17 @@ public:
 
   void addOp(QString image, QString op);
 
+  void update(const LogbookEntry& entry);
+
+  void remove(int64_t id);
+
   std::vector<LogbookEntry> getEntries() const;
 
   std::vector<LogbookEntry> getEntries(const LogbookFilter& filter) const;
 
   const LogbookEntry& getLastEntry() const;
+
+  LogbookEntry getEntry(int64_t id) const;
 
   std::set<QString> getImages() const;
 
@@ -93,9 +99,9 @@ public:
 
   const QString& getStep() const;
 
-  void assignProject(int64_t id, const QString& p);
+//  void assignProject(int64_t id, const QString& p);
 
-  void assignStep(int64_t id, const QString& s);
+//  void assignStep(int64_t id, const QString& s);
 
   bool exportToFile(const QString& file);
 

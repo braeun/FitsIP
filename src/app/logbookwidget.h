@@ -56,8 +56,6 @@ public slots:
 
 private slots:
 
-  void assignProjectStep();
-
   void on_logbookTreeWidget_customContextMenuRequested(const QPoint &pos);
 
   void on_addProjectButton_clicked();
@@ -69,6 +67,11 @@ private slots:
   void on_addNoteButton_clicked();
 
 private:
+  void assignProjectStep(QTreeWidgetItem* item, const QString& project, const QString& step);
+  void assignProjectStep();
+  void remove(QTreeWidgetItem* item);
+  void remove();
+  void editEntry();
   void dataChanged();
   void rebuildLists();
   void setProject(QString p);
@@ -92,11 +95,12 @@ private:
 
   Ui::LogbookWidget *ui;
   QMenu* contextMenu;
+  QAction* editEntryAction;
   Logbook* logbook;
   LogbookFilter filter;
   Display display;
   bool updatingLists;
-
+  bool batchUpdating;
 };
 
 #endif // LOGBOOKWIDGET_H

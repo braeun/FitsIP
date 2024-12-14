@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book filter to select entries by image                          *
  *                                                                              *
- * modified: 2022-11-30                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -39,11 +39,11 @@ bool LogbookFilter::check(const LogbookEntry &entry) const
   }
   if (from.isValid() && to.isValid())
   {
-    if (entry.timestamp < from || entry.timestamp > to) return false;
+    if (entry.getTimestamp() < from || entry.getTimestamp() > to) return false;
   }
   if (!images.empty())
   {
-    if (!images.contains(entry.image)) return false;
+    if (!images.contains(entry.getImage())) return false;
   }
   return true;
 }

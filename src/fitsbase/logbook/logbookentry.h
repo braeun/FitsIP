@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - single entry in the log book                                        *
  *                                                                              *
- * modified: 2022-11-27                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -38,24 +38,37 @@ public:
 
   LogbookEntry(const LogbookEntry&) = default;
   LogbookEntry(LogbookEntry&&) = default;
+  LogbookEntry& operator=(const LogbookEntry&) = default;
 
   bool isValid() const;
 
   int64_t getId() const;
 
-  const QString image;
+  const QString& getImage() const;
 
-  const QString txt;
+  void setImage(const QString& newImage);
 
-  const QDateTime timestamp;
+  const QString& getText() const;
 
-  const Type type;
+  void setText(const QString& newTxt);
+
+  const QDateTime& getTimestamp() const;
+
+  void setTimestamp(const QDateTime& newTimestamp);
+
+  Type getType() const;
+
+  void setType(Type newType);
 
   const QString& getProject() const;
 
+  void setProject(const QString& p);
+
   const QString& getStep() const;
 
-  QString getTag() const;
+  void setStep(const QString& s);
+
+  QString getTypeString() const;
 
   static const LogbookEntry invalid;
 
@@ -63,10 +76,12 @@ private:
   friend class LogbookStorage;
 
   void setId(int64_t v);
-  void setProject(const QString& p);
-  void setStep(const QString& s);
 
   int64_t id; //!< unique id
+  QString image;
+  QString txt;
+  QDateTime timestamp;
+  Type type;
   QString project;
   QString step;
 

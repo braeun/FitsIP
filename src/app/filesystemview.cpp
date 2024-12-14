@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the filesystem view and associated controls       *
  *                                                                              *
- * modified: 2024-11-23                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -81,6 +81,7 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   connect(ui->rootField,&QLineEdit::returnPressed,this,[this]{rootChanged();});
   connect(ui->openSelectionButton,&QAbstractButton::clicked,this,[this]{emit openSelection();});
   connect(ui->copySelectionToListButton,&QAbstractButton::clicked,this,[this]{emit copySelectionToFilelist();});
+  connect(ui->clearFilterButton,&QAbstractButton::clicked,this,[this]{clearFilterlist();});
 
   connect(ui->filterBox->lineEdit(),&QLineEdit::editingFinished,this,[this](){filterChanged(ui->filterBox->currentText());});
   connect(ui->filterBox,qOverload<int>(&QComboBox::currentIndexChanged),this,[this](int i){filterChanged(ui->filterBox->currentText());});
@@ -241,3 +242,10 @@ void FileSystemView::filterChanged(const QString& text)
   }
 }
 
+void FileSystemView::clearFilterlist()
+{
+  filterList.clear();
+  AppSettings().setFileFilters(filterList);
+  filesystemModel->setNameFilters(QStringList());
+  ui->filterBox->clear();
+}

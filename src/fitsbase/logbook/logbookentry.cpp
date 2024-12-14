@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - single entry in the log book                                        *
  *                                                                              *
- * modified: 2022-11-27                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,22 +25,22 @@
 const LogbookEntry LogbookEntry::invalid;
 
 LogbookEntry::LogbookEntry():
+  id(-1),
   image(""),
   txt(""),
   timestamp(QDateTime::fromMSecsSinceEpoch(0)),
   type(Op),
-  id(-1),
   project("generic"),
   step("generic")
 {
 }
 
 LogbookEntry::LogbookEntry(Type type, const QString& project, const QString& step, const QString& image, const QString& txt, QDateTime timestamp):
+  id(-1),
   image(image),
   txt(txt),
   timestamp(timestamp),
   type(type),
-  id(-1),
   project(project),
   step(step)
 {
@@ -76,12 +76,52 @@ void LogbookEntry::setStep(const QString& s)
   step = s;
 }
 
+const QString& LogbookEntry::getImage() const
+{
+  return image;
+}
+
+void LogbookEntry::setImage(const QString& newImage)
+{
+  image = newImage;
+}
+
+const QString& LogbookEntry::getText() const
+{
+  return txt;
+}
+
+void LogbookEntry::setText(const QString& newTxt)
+{
+  txt = newTxt;
+}
+
+const QDateTime& LogbookEntry::getTimestamp() const
+{
+  return timestamp;
+}
+
+void LogbookEntry::setTimestamp(const QDateTime& newTimestamp)
+{
+  timestamp = newTimestamp;
+}
+
+LogbookEntry::Type LogbookEntry::getType() const
+{
+  return type;
+}
+
+void LogbookEntry::setType(Type newType)
+{
+  type = newType;
+}
+
 const QString& LogbookEntry::getStep() const
 {
   return step;
 }
 
-QString LogbookEntry::getTag() const
+QString LogbookEntry::getTypeString() const
 {
   if (image.isEmpty())
   {

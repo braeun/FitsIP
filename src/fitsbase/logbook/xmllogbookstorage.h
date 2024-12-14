@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - xml file based logbook data storage                                 *
  *                                                                              *
- * modified: 2022-11-27                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -36,7 +36,11 @@ public:
   XMLLogbookStorage(const QString& filename);
   ~XMLLogbookStorage();
 
-  virtual bool add(LogbookEntry entry) override;
+  virtual bool add(LogbookEntry& entry) override;
+
+  virtual bool update(const LogbookEntry& entry) override;
+
+  virtual bool remove(int64_t id) override;
 
   virtual void setTitle(const QString& title) override;
 
@@ -61,10 +65,6 @@ public:
   virtual std::set<QString> getSteps(const QString& project) const override;
 
   virtual void getTimeRange(QDateTime* begin, QDateTime* end) const override;
-
-  virtual void assignProject(int64_t id, const QString& p) override;
-
-  virtual void assignStep(int64_t id, const QString& s) override;
 
 private:
   void read();
