@@ -433,6 +433,8 @@
     <addaction name="separator"/>
     <addaction name="actionShow_Selected_Pixels"/>
     <addaction name="actionShow_Detected_Stars"/>
+    <addaction name="separator"/>
+    <addaction name="actionClear_AOI"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -540,6 +542,9 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::CustomContextMenu</enum>
        </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
@@ -1299,6 +1304,11 @@
   <action name="actionSave_Star_List">
    <property name="text">
     <string>Save Star List...</string>
+   </property>
+  </action>
+  <action name="actionClear_AOI">
+   <property name="text">
+    <string>Clear AOI</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

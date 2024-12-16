@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,6 +34,7 @@
 #include <fitsbase/pixellist.h>
 #include <fitsbase/io/iofactory.h>
 #include <fitsbase/logbook/xmllogbookstorage.h>
+#include <fitsbase/widgets/previewoptions.h>
 #include <QActionGroup>
 #include <QCloseEvent>
 #include <QDir>
@@ -53,7 +54,11 @@ MainWindow::MainWindow(QWidget *parent) :
   editMetadataDialog(nullptr)
 {
   ui->setupUi(this);
+
   ui->openFileList->setModel(&ImageCollection::getGlobal());
+  openFileListMenu = new QMenu;
+  openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
+
   imageWidget = new ImageWidget();
   imageWidget->setBackgroundRole(QPalette::Base);
   imageWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -350,11 +355,13 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
     qDebug() << "Executing: " << op->getMenuEntry();
     activeFile->pushUndo();
     ui->actionUndo->setEnabled(activeFile->isUndoAvailable());
-    executeOpPlugin(op,activeFile->getImage(),imageWidget->getAOI());
+    PreviewOptions opt;
+    opt.scale = static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale());
+    executeOpPlugin(op,activeFile->getImage(),imageWidget->getAOI(),opt);
   }
   else if (!op->requiresImage())
   {
-    executeOpPlugin(op,std::shared_ptr<FitsImage>(),QRect());
+    executeOpPlugin(op,std::shared_ptr<FitsImage>(),QRect(),PreviewOptions());
   }
   else
   {
@@ -400,9 +407,9 @@ std::vector<QFileInfo> MainWindow::getFileList()
   return filelist;
 }
 
-void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsImage> img, QRect aoi)
+void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsImage> img, QRect aoi, const PreviewOptions& opt)
 {
-  OpPlugin::ResultType ret = op->execute(img,aoi);
+  OpPlugin::ResultType ret = op->execute(img,aoi,opt);
   if (ret == OpPlugin::OK)
   {
     if (op->createsNewImage())
@@ -805,6 +812,11 @@ void MainWindow::on_openFileList_clicked(const QModelIndex &index)
   display(file);
 }
 
+void MainWindow::on_openFileList_customContextMenuRequested(const QPoint &pos)
+{
+  openFileListMenu->popup(ui->openFileList->mapToGlobal(pos));
+}
+
 void MainWindow::on_actionClose_Image_triggered()
 {
   if (ImageCollection::getGlobal().getFiles().size() == 1)
@@ -935,5 +947,10 @@ void MainWindow::on_actionProperties_triggered()
     logbook.setTitle(d.getTitle());
     logbook.setDescription(d.getDescription());
   }
+}
+
+void MainWindow::on_actionClear_AOI_triggered()
+{
+  imageWidget->clearAOI();
 }
 

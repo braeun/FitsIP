@@ -27,7 +27,6 @@
 #include "imagemetadata.h"
 #include "pixel.h"
 #include "pixeliterator.h"
-#include "rgbvalue.h"
 #include <QImage>
 #include <stdint.h>
 #include <memory>

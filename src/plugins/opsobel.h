@@ -45,7 +45,7 @@ public:
 
   virtual QString getMenuEntry() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> img, QRect selection=QRect()) override;
+  virtual ResultType execute(std::shared_ptr<FitsImage> img, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 private:
   ValueType* convolve(std::shared_ptr<FitsImage> img, const Kernel& kernel);

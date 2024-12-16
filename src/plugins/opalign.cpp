@@ -55,7 +55,7 @@ bool OpAlign::requiresFileList() const
   return true;
 }
 
-OpPlugin::ResultType OpAlign::execute(const std::vector<QFileInfo>& list, QRect aoi)
+OpPlugin::ResultType OpAlign::execute(const std::vector<QFileInfo>& list, QRect aoi, const PreviewOptions& opt)
 {
   if (list.size() < 2) return CANCELLED;
   if (!dlg) dlg = new OpAlignDialog();

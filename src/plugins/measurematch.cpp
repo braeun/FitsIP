@@ -54,7 +54,7 @@ QString MeasureMatch::getMenuEntry() const
   return "Measure/Match...";
 }
 
-OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsImage> image, QRect aoi)
+OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsImage> image, QRect aoi, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {

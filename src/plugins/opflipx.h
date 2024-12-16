@@ -43,7 +43,7 @@ public:
 
   virtual QIcon getIcon() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect()) override;
+  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 };
 

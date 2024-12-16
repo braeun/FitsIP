@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - median filter dialog                                                *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,7 +23,8 @@
 #ifndef OPMEDIANDIALOG_H
 #define OPMEDIANDIALOG_H
 
-#include <fitsbase/dialogs/abstractpreviewdialog.h>
+#include <fitsbase/widgets/previewoptions.h>
+#include <QDialog>
 
 namespace Ui {
 class OpMedianDialog;
@@ -31,7 +32,7 @@ class OpMedianDialog;
 
 class FitsImage;
 
-class OpMedianDialog : public AbstractPreviewDialog
+class OpMedianDialog : public QDialog
 {
   Q_OBJECT
 
@@ -39,13 +40,14 @@ public:
   explicit OpMedianDialog(QWidget *parent = nullptr);
   ~OpMedianDialog();
 
+  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
+
   int getSize() const;
 
   double getThreshold() const;
 
 private:
   void textFieldChanged();
-  virtual std::shared_ptr<FitsImage> getPreviewImage();
 
   Ui::OpMedianDialog *ui;
 };

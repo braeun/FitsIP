@@ -46,7 +46,7 @@ QIcon OpCrop::getIcon() const
   return QIcon(":/pluginicons/resources/icons/transform-crop.png");
 }
 
-OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsImage> image, QRect r)
+OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsImage> image, QRect r, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new OpCropDialog();
   dlg->setSelection(r);

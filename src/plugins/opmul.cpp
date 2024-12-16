@@ -48,7 +48,7 @@ QIcon OpMul::getIcon() const
   return QIcon(":/pluginicons/resources/icons/mul.png");
 }
 
-OpPlugin::ResultType OpMul::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpMul::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {

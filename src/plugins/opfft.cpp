@@ -56,7 +56,7 @@ QString OpFFT::getMenuEntry() const
   return "Math/FFT";
 }
 
-OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsImage> image, QRect aoi)
+OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsImage> image, QRect aoi, const PreviewOptions& opt)
 {
   profiler.start();
   if (aoi.isNull())

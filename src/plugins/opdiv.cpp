@@ -48,7 +48,7 @@ QIcon OpDiv::getIcon() const
   return QIcon(":/pluginicons/resources/icons/div.png");
 }
 
-OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {

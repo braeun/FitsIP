@@ -55,7 +55,7 @@ QIcon VanCittertDeconvolution::getIcon() const
   return QIcon(":/pluginicons/resources/icons/vc.png");
 }
 
-OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsImage> image, QRect selection)
+OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& /*opt*/)
 {
   if (!dlg) dlg = new VanCittertDeconvolutionDialog();
   if (dlg->exec())

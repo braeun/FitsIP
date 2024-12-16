@@ -46,7 +46,7 @@ QString MeasureStatistics::getMenuEntry() const
   return "Measure/Image Statistics...";
 }
 
-OpPlugin::ResultType MeasureStatistics::execute(std::shared_ptr<FitsImage> image, QRect rect)
+OpPlugin::ResultType MeasureStatistics::execute(std::shared_ptr<FitsImage> image, QRect rect, const PreviewOptions& opt)
 {
   stat = ImageStatistics(*image,rect);
   logOperation(image->getName(),"Image Statistics:\n"+toString());

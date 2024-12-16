@@ -57,7 +57,7 @@ bool OpAverage::requiresFileList() const
   return true;
 }
 
-OpPlugin::ResultType OpAverage::execute(const std::vector<QFileInfo>& list, QRect /*aoi*/)
+OpPlugin::ResultType OpAverage::execute(const std::vector<QFileInfo>& list, QRect /*aoi*/, const PreviewOptions& opt)
 {
   if (list.empty()) return CANCELLED;
   ProgressDialog* prog = list.size() > 2 ? new ProgressDialog() : nullptr;

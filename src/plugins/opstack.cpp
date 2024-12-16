@@ -69,7 +69,7 @@ bool OpStack::requiresFileList() const
   return true;
 }
 
-OpPlugin::ResultType OpStack::execute(const std::vector<QFileInfo>& list, QRect aoi)
+OpPlugin::ResultType OpStack::execute(const std::vector<QFileInfo>& list, QRect aoi, const PreviewOptions& opt)
 {
   if (list.size() < 2)
   {

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - gaussian blur dialog                                                *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,17 +28,23 @@
 #include <fitsbase/settings.h>
 
 
-OpGaussBlurDialog::OpGaussBlurDialog(QWidget *parent):AbstractPreviewDialog(parent),
-  ui(new Ui::OpGaussBlurDialog)
+OpGaussBlurDialog::OpGaussBlurDialog(QWidget *parent):QDialog(parent),
+  ui(new Ui::OpGaussBlurDialog),
+  updating(false)
 {
   ui->setupUi(this);
-  setPreviewLabel(ui->previewLabel);
   connect(ui->sigmaField,&QLineEdit::editingFinished,this,&OpGaussBlurDialog::textFieldChanged);
 }
 
 OpGaussBlurDialog::~OpGaussBlurDialog()
 {
   delete ui;
+}
+
+void OpGaussBlurDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+{
+  ui->previewWidget->setOptions(opt);
+  ui->previewWidget->setSourceImage(img,selection);
 }
 
 double OpGaussBlurDialog::getSigma() const
@@ -53,16 +59,16 @@ void OpGaussBlurDialog::textFieldChanged()
   updating = true;
   int32_t v = static_cast<int32_t>(ui->sigmaField->text().toDouble()*10);
   ui->sigmaSlider->setValue(v);
-  updatePreview(ui->previewLabel);
+  updatePreview();
   updating = false;
 }
 
-std::shared_ptr<FitsImage> OpGaussBlurDialog::getPreviewImage()
+void OpGaussBlurDialog::updatePreview()
 {
-  auto img = std::make_shared<FitsImage>(*previewImage);
+  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
   OpGaussBlur op;
   op.blur(img,getSigma(),getSigma());
-  return img;
+  ui->previewWidget->updatePreview(img);
 }
 
 
@@ -71,7 +77,7 @@ void OpGaussBlurDialog::on_sigmaSlider_valueChanged(int value)
   if (!updating)
   {
     ui->sigmaField->setText(QString::number(value/10.0));
-    updatePreview(ui->previewLabel);
+    updatePreview();
   }
 }
 

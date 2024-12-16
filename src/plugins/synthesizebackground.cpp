@@ -53,7 +53,7 @@ std::vector<std::shared_ptr<FitsImage>> SynthesizeBackground::getCreatedImages()
   return std::vector<std::shared_ptr<FitsImage>>{img};
 }
 
-OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new SynthesizeBackgroundDialog();
   Histogram hist;

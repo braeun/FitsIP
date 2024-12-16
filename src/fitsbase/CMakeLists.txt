@@ -21,7 +21,6 @@ set(private_header_list
   star.h
   starlist.h
   undostack.h
-  dialogs/abstractpreviewdialog.h
   dialogs/imageselectdialog.h
   dialogs/imageselectwidget.h
   dialogs/progressdialog.h
@@ -58,6 +57,8 @@ set(private_header_list
 #  qxt/qxtnamespace.h
   qxt/qxtspanslider.h
   qxt/qxtspanslider_p.h
+  widgets/previewoptions.h
+  widgets/previewwidget.h
   widgets/psfwidget.h
   )
 
@@ -80,7 +81,6 @@ add_library(fitsbase
   settings.cpp
   starlist.cpp
   undostack.cpp
-  dialogs/abstractpreviewdialog.cpp
   dialogs/imageselectdialog.cpp
   dialogs/imageselectdialog.ui
   dialogs/imageselectwidget.cpp
@@ -121,8 +121,9 @@ add_library(fitsbase
   profiling/simpleprofiler.cpp
   qxt/qxtglobal.cpp
   qxt/qxtspanslider.cpp
-  widgets/psfwidget.cpp
-  widgets/psfwidget.ui
+  widgets/previewwidget.cpp widgets/previewwidget.ui
+  widgets/previewoptions.cpp
+  widgets/psfwidget.cpp widgets/psfwidget.ui
   ${private_header_list}
   )
 

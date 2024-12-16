@@ -48,7 +48,7 @@ QIcon OpRotate::getIcon() const
   return QIcon(":/pluginicons/resources/icons/transform-rotate.png");
 }
 
-OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {

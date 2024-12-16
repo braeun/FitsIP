@@ -62,7 +62,7 @@ public:
 
   virtual std::vector<std::shared_ptr<FitsImage>> getCreatedImages() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect()) override;
+  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 //  void unsharpmask(std::shared_ptr<FitsImage> image, double sigma, double strength);
 

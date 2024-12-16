@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - unsharp masking dialog                                              *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,11 +27,11 @@
 #include <fitsbase/histogram.h>
 #include <fitsbase/settings.h>
 
-OpUnsharpMaskDialog::OpUnsharpMaskDialog(QWidget *parent):AbstractPreviewDialog(parent),
-  ui(new Ui::OpUnsharpMaskDialog)
+OpUnsharpMaskDialog::OpUnsharpMaskDialog(QWidget *parent):QDialog(parent),
+  ui(new Ui::OpUnsharpMaskDialog),
+  updating(false)
 {
   ui->setupUi(this);
-  setPreviewLabel(ui->previewLabel);
   connect(ui->sigmaField,&QLineEdit::editingFinished,this,&OpUnsharpMaskDialog::textFieldChanged);
   connect(ui->strengthField,&QLineEdit::editingFinished,this,&OpUnsharpMaskDialog::textFieldChanged);
 }
@@ -39,6 +39,12 @@ OpUnsharpMaskDialog::OpUnsharpMaskDialog(QWidget *parent):AbstractPreviewDialog(
 OpUnsharpMaskDialog::~OpUnsharpMaskDialog()
 {
   delete ui;
+}
+
+void OpUnsharpMaskDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+{
+  ui->previewWidget->setOptions(opt);
+  ui->previewWidget->setSourceImage(img,selection);
 }
 
 double OpUnsharpMaskDialog::getSigma() const
@@ -60,16 +66,16 @@ void OpUnsharpMaskDialog::textFieldChanged()
   ui->sigmaSlider->setValue(v);
   v = static_cast<int32_t>(ui->strengthField->text().toDouble()*10);
   ui->strengthSlider->setValue(v);
-  updatePreview(ui->previewLabel);
+  updatePreview();
   updating = false;
 }
 
-std::shared_ptr<FitsImage> OpUnsharpMaskDialog::getPreviewImage()
+void OpUnsharpMaskDialog::updatePreview()
 {
-  auto img = std::make_shared<FitsImage>(*previewImage);
+  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
   OpUnsharpMask op;
   op.unsharpmask(img,getSigma(),getStrength());
-  return img;
+  ui->previewWidget->updatePreview(img);
 }
 
 
@@ -78,7 +84,7 @@ void OpUnsharpMaskDialog::on_sigmaSlider_valueChanged(int value)
   if (!updating)
   {
     ui->sigmaField->setText(QString::number(value/10.0));
-    updatePreview(ui->previewLabel);
+    updatePreview();
   }
 }
 
@@ -87,6 +93,6 @@ void OpUnsharpMaskDialog::on_strengthSlider_valueChanged(int value)
   if (!updating)
   {
     ui->strengthField->setText(QString::number(value/10.0));
-    updatePreview(ui->previewLabel);
+    updatePreview();
   }
 }

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2024-12-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,6 +27,7 @@
 #include <fitsbase/fileobject.h>
 #include <fitsbase/logbook/logbook.h>
 #include <QMainWindow>
+#include <QMenu>
 #include <vector>
 #include <map>
 #include <memory>
@@ -42,6 +43,8 @@ class OpPlugin;
 class EditMetadataDialog;
 class FileList;
 class LogWidget;
+
+class PreviewOptions;
 
 struct PluginMenuEntry
 {
@@ -101,6 +104,8 @@ private slots:
 
   void on_openFileList_clicked(const QModelIndex &index);
 
+  void on_openFileList_customContextMenuRequested(const QPoint &pos);
+
   void on_actionClose_Image_triggered();
 
   void on_actionClose_All_Images_triggered();
@@ -129,13 +134,15 @@ private slots:
 
   void on_actionProperties_triggered();
 
+  void on_actionClear_AOI_triggered();
+
 private:
 
   void loadPlugins();
   void addOpPlugin(OpPlugin* op);
   QAction* addMenuEntry(QString entry, QIcon icon);
   void executeOpPlugin(OpPlugin* op);
-  void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsImage> img, QRect roi);
+  void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsImage> img, QRect roi, const PreviewOptions& opt);
   std::vector<QFileInfo> getFileList();
   void display(std::shared_ptr<FileObject> obj);
   void updateDisplay();
@@ -148,6 +155,7 @@ private:
   void openLogbook(const QString& name);
 
   Ui::MainWindow *ui;
+  QMenu* openFileListMenu;
   std::vector<PluginMenuEntry> pluginMenus;
   std::map<QString,QToolBar*> pluginToolbars;
   ImageWidget* imageWidget;

@@ -1,8 +1,9 @@
+#include "previewwidget.h"
 /********************************************************************************
  *                                                                              *
- * FitsIP - virtual base class for dialogs with a preview                       *
+ * FitsIP - widgets for previews in dialogs                                     *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,22 +21,28 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "abstractpreviewdialog.h"
+#include "ui_previewwidget.h"
 #include <fitsimage.h>
 #include <histogram.h>
 #include <settings.h>
-#include <QLabel>
 
-AbstractPreviewDialog::AbstractPreviewDialog(QWidget* parent): QDialog(parent),
-  previewLabel(nullptr)
+PreviewWidget::PreviewWidget(QWidget *parent):QWidget(parent),
+  ui(new Ui::PreviewWidget)
 {
+  ui->setupUi(this);
 }
 
-AbstractPreviewDialog::~AbstractPreviewDialog()
+PreviewWidget::~PreviewWidget()
 {
+  delete ui;
 }
 
-void AbstractPreviewDialog::setPreview(std::shared_ptr<FitsImage> image, QRect selection)
+void PreviewWidget::setOptions(const PreviewOptions& opt)
+{
+  options = opt;
+}
+
+void PreviewWidget::setSourceImage(std::shared_ptr<FitsImage> image, QRect selection)
 {
   if (selection.isEmpty())
   {
@@ -44,28 +51,23 @@ void AbstractPreviewDialog::setPreview(std::shared_ptr<FitsImage> image, QRect s
     int h = s.getPreviewHeight();
     selection = QRect(image->getWidth()/2-w/2,image->getHeight()/2-h/2,w,h);
   }
-  previewImage = image->subImage(selection);
-  if (previewLabel) updatePreview(previewLabel);
+  sourceImage = image->subImage(selection);
+  updatePreview(sourceImage);
 }
 
-
-void AbstractPreviewDialog::updatePreview(QLabel *label)
+std::shared_ptr<FitsImage> PreviewWidget::getSourceImage() const
 {
-  label->setPixmap(QPixmap());
-  if (previewImage)
+  return sourceImage;
+}
+
+void PreviewWidget::updatePreview(std::shared_ptr<FitsImage> image)
+{
+  ui->previewLabel->setPixmap(QPixmap());
+  if (image)
   {
-    auto img = getPreviewImage();
-    if (img)
-    {
-      Histogram h;
-      h.build(img.get());
-      QImage i = img->toQImage(h.getMin(),h.getMax(),FitsImage::LINEAR);
-      label->setPixmap(QPixmap::fromImage(i));
-    }
+    Histogram h;
+    h.build(image.get());
+    QImage i = image->toQImage(h.getMin(),h.getMax(),options.scale);
+    ui->previewLabel->setPixmap(QPixmap::fromImage(i));
   }
-}
-
-void AbstractPreviewDialog::setPreviewLabel(QLabel *label)
-{
-  previewLabel = label;
 }

@@ -40,7 +40,7 @@ QString OpGrow::getMenuEntry() const
 return "Image/Grow...";
 }
 
-OpPlugin::ResultType OpGrow::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpGrow::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - gaussian blur dialog                                                *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,7 +23,10 @@
 #ifndef OPGAUSSBLURDIALOG_H
 #define OPGAUSSBLURDIALOG_H
 
-#include <fitsbase/dialogs/abstractpreviewdialog.h>
+#include <fitsbase/widgets/previewoptions.h>
+#include <QDialog>
+
+class FitsImage;
 
 namespace Ui {
 class OpGaussBlurDialog;
@@ -31,13 +34,15 @@ class OpGaussBlurDialog;
 
 class FitsImage;
 
-class OpGaussBlurDialog : public AbstractPreviewDialog
+class OpGaussBlurDialog : public QDialog
 {
   Q_OBJECT
 
 public:
   explicit OpGaussBlurDialog(QWidget *parent = nullptr);
   ~OpGaussBlurDialog();
+
+  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
 
   double getSigma() const;
 
@@ -46,9 +51,10 @@ private slots:
 
 private:
   void textFieldChanged();
-  virtual std::shared_ptr<FitsImage> getPreviewImage();
+  void updatePreview();
 
   Ui::OpGaussBlurDialog *ui;
+  bool updating;
 };
 
 #endif // OPGAUSSBLURDIALOG_H

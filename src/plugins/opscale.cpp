@@ -42,7 +42,7 @@ QString OpScale::getMenuEntry() const
   return "Math/Scale...";
 }
 
-OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg.exec())
   {

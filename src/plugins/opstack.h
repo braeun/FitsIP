@@ -56,7 +56,7 @@ public:
 
   virtual bool requiresFileList() const override;
 
-  virtual ResultType execute(const std::vector<QFileInfo>& list, QRect selection=QRect()) override;
+  virtual ResultType execute(const std::vector<QFileInfo>& list, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 private:
   ResultType prepare(const QFileInfo& file, bool subsky);

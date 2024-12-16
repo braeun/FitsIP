@@ -52,7 +52,7 @@ bool OpCalibration::requiresFileList() const
   return true;
 }
 
-OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, QRect /*selection*/)
+OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (list.empty()) return CANCELLED;
   if (!dlg)

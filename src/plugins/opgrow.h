@@ -43,7 +43,7 @@ public:
 
   virtual QString getMenuEntry() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect()) override;
+  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
   std::shared_ptr<FitsImage> grow(std::shared_ptr<FitsImage> image, uint32_t factor, bool bilinear);
 

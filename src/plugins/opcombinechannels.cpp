@@ -55,7 +55,7 @@ QString OpCombineChannels::getMenuEntry() const
   return "Color/Combine...";
 }
 
-OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsImage> /*image*/, QRect selection)
+OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsImage> /*image*/, QRect selection, const PreviewOptions& opt)
 {
   ImageCollection collection;
   for (const auto& img : ImageCollection::getGlobal().getFiles())

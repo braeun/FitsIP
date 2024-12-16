@@ -18,7 +18,6 @@
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -50,11 +49,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QLabel" name="previewLabel">
-           <property name="text">
-            <string>No Preview</string>
-           </property>
-          </widget>
+          <widget class="PreviewWidget" name="previewWidget" native="true"/>
          </item>
         </layout>
        </widget>
@@ -196,6 +191,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PreviewWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">fitsbase/widgets/previewwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>backgroundField</tabstop>
   <tabstop>sigmaField</tabstop>

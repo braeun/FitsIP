@@ -58,12 +58,12 @@ std::vector<std::shared_ptr<FitsImage>> OpPlugin::getCreatedImages() const
   return std::vector<std::shared_ptr<FitsImage>>();
 }
 
-OpPlugin::ResultType OpPlugin::execute(std::shared_ptr<FitsImage> /*image*/, QRect /*selection*/)
+OpPlugin::ResultType OpPlugin::execute(std::shared_ptr<FitsImage> /*image*/, QRect /*selection*/, const PreviewOptions& /*opt*/)
 {
   return CANCELLED;
 }
 
-OpPlugin::ResultType OpPlugin::execute(const std::vector<QFileInfo>& /*list*/, QRect /*selection*/)
+OpPlugin::ResultType OpPlugin::execute(const std::vector<QFileInfo>& /*list*/, QRect /*selection*/, const PreviewOptions& /*opt*/)
 {
   return CANCELLED;
 }

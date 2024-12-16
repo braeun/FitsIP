@@ -55,7 +55,7 @@ QIcon LucyRichardsonDeconvolution::getIcon() const
   return QIcon(":/pluginicons/resources/icons/lr.png");
 }
 
-OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsImage> image, QRect selection)
+OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new LucyRichardsonDeconvolutionDialog();
   if (dlg->exec())

@@ -37,7 +37,7 @@ QString OpSobel::getMenuEntry() const
   return "Filter/Edge";
 }
 
-OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsImage> image, QRect selection)
+OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
 {
   profiler.start();
   const Kernel& kx = KernelRepository::instance().getKernel(KernelRepository::SOBEL_X);

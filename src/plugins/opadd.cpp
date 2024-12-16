@@ -48,7 +48,7 @@ QIcon OpAdd::getIcon() const
   return QIcon(":/pluginicons/resources/icons/plus.png");
 }
 
-OpPlugin::ResultType OpAdd::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpAdd::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {

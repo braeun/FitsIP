@@ -56,7 +56,7 @@ QString OpInvFFT::getMenuEntry() const
   return "Math/Inverse FFT";
 }
 
-OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsImage> image, QRect aoi)
+OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsImage> image, QRect aoi, const PreviewOptions& opt)
 {
   profiler.start();
   if (aoi.isNull())

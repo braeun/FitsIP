@@ -45,7 +45,7 @@ QIcon OpSqrt::getIcon() const
   return QIcon(":/pluginicons/resources/icons/opsqrt.png");
 }
 
-OpPlugin::ResultType OpSqrt::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpSqrt::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   profiler.start();
   PixelIterator p = image->getPixelIterator();

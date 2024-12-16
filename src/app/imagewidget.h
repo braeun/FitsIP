@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the actual image                                  *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -44,6 +44,8 @@ public:
   void setZoom(int32_t z);
 
   void adjustSize();
+
+  void clearAOI();
 
   QRect getAOI() const;
 

@@ -44,7 +44,7 @@ QIcon OpLog::getIcon() const
   return QIcon(":/pluginicons/resources/icons/oplog.png");
 }
 
-OpPlugin::ResultType OpLog::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpLog::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   profiler.start();
   PixelIterator p = image->getPixelIterator();

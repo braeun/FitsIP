@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - kernel filter dialog                                                *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,11 +26,10 @@
 #include <fitsbase/fitsimage.h>
 #include <fitsbase/kernelrepository.h>
 
-OpKernelDialog::OpKernelDialog(QWidget *parent):AbstractPreviewDialog(parent),
+OpKernelDialog::OpKernelDialog(QWidget *parent):QDialog(parent),
   ui(new Ui::OpKernelDialog)
 {
   ui->setupUi(this);
-  setPreviewLabel(ui->previewLabel);
 }
 
 OpKernelDialog::~OpKernelDialog()
@@ -54,24 +53,25 @@ void OpKernelDialog::setKernelNames(const std::vector<QString> &list)
   }
 }
 
+void OpKernelDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+{
+  ui->previewWidget->setOptions(opt);
+  ui->previewWidget->setSourceImage(img,selection);
+}
+
 QString OpKernelDialog::getKernelName() const
 {
   return ui->kernelBox->currentText();
 }
 
 
-std::shared_ptr<FitsImage> OpKernelDialog::getPreviewImage()
-{
-  Kernel kernel = KernelRepository::instance().getKernel(getKernelName());
-  if (kernel.isEmpty()) return std::shared_ptr<FitsImage>();
-  auto img = std::make_shared<FitsImage>(*previewImage);
-  OpKernel op;
-  op.convolve(img,kernel);
-  return img;
-}
-
 
 void OpKernelDialog::on_kernelBox_currentTextChanged(const QString&)
 {
-  updatePreview(ui->previewLabel);
+  Kernel kernel = KernelRepository::instance().getKernel(getKernelName());
+  if (kernel.isEmpty()) return ;
+  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
+  OpKernel op;
+  op.convolve(img,kernel);
+  ui->previewWidget->updatePreview(img);
 }

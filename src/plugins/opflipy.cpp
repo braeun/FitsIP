@@ -43,7 +43,7 @@ QIcon OpFlipY::getIcon() const
   return QIcon(":/pluginicons/resources/icons/object-flip-vertical.png");
 }
 
-OpPlugin::ResultType OpFlipY::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpFlipY::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   profiler.start();
   for (uint32_t y=0;y<image->getHeight()/2;y++)

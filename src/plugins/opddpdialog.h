@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing dialog                               *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,7 +23,8 @@
 #ifndef OPDDPDIALOG_H
 #define OPDDPDIALOG_H
 
-#include <fitsbase/dialogs/abstractpreviewdialog.h>
+#include <fitsbase/widgets/previewoptions.h>
+#include <QDialog>
 
 namespace Ui {
 class OpDDPDialog;
@@ -31,13 +32,15 @@ class OpDDPDialog;
 
 class FitsImage;
 
-class OpDDPDialog : public AbstractPreviewDialog
+class OpDDPDialog : public QDialog
 {
   Q_OBJECT
 
 public:
   explicit OpDDPDialog(QWidget *parent = nullptr);
   ~OpDDPDialog();
+
+  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
 
   double getBackground() const;
 
@@ -49,7 +52,6 @@ public:
 
 private:
   void textFieldChanged();
-  virtual std::shared_ptr<FitsImage> getPreviewImage();
 
   Ui::OpDDPDialog *ui;
 };

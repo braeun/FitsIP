@@ -51,7 +51,7 @@ bool MeasureRank::requiresFileList() const
   return true;
 }
 
-OpPlugin::ResultType MeasureRank::execute(const std::vector<QFileInfo>& list, QRect selection)
+OpPlugin::ResultType MeasureRank::execute(const std::vector<QFileInfo>& list, QRect selection, const PreviewOptions& opt)
 {
   if (list.empty()) return CANCELLED;
   ProgressDialog* prog = list.size() > 2 ? new ProgressDialog() : nullptr;

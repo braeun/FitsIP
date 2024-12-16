@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing                                      *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,10 +41,10 @@ QString OpDDP::getMenuEntry() const
   return "Filter/DDP...";
 }
 
-OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsImage> image, QRect selection)
+OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new OpDDPDialog();
-  dlg->setPreview(image,selection);
+  dlg->setSourceImage(image,selection,opt);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();

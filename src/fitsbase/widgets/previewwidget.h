@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - virtual base class for dialogs with a preview                       *
+ * FitsIP - widgets for previews in dialogs                                     *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,31 +20,39 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef ABSTRACTPREVIEWDIALOG_H
-#define ABSTRACTPREVIEWDIALOG_H
+#ifndef PREVIEWWIDGET_H
+#define PREVIEWWIDGET_H
 
-#include <QDialog>
+#include "previewoptions.h"
+#include <memory>
+#include <QWidget>
 
 class FitsImage;
-class QLabel;
 
-class AbstractPreviewDialog: public QDialog
+namespace Ui {
+class PreviewWidget;
+}
+
+class PreviewWidget : public QWidget
 {
   Q_OBJECT
+
 public:
-  AbstractPreviewDialog(QWidget* parent=nullptr);
-  virtual ~AbstractPreviewDialog();
+  explicit PreviewWidget(QWidget *parent = nullptr);
+  ~PreviewWidget();
 
-  void setPreview(std::shared_ptr<FitsImage> image, QRect selection);
+  void setOptions(const PreviewOptions& opt);
 
-protected:
-  virtual std::shared_ptr<FitsImage> getPreviewImage() = 0;
-  void updatePreview(QLabel* label);
-  void setPreviewLabel(QLabel* label);
+  void setSourceImage(std::shared_ptr<FitsImage> image, QRect selection);
 
-  bool updating;
-  std::shared_ptr<FitsImage> previewImage;
-  QLabel* previewLabel;
+  std::shared_ptr<FitsImage> getSourceImage() const;
+
+  void updatePreview(std::shared_ptr<FitsImage> image);
+
+private:
+  Ui::PreviewWidget *ui;
+  std::shared_ptr<FitsImage> sourceImage;
+  PreviewOptions options;
 };
 
-#endif // ABSTRACTPREVIEWDIALOG_H
+#endif // PREVIEWWIDGET_H

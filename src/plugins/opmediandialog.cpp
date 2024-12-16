@@ -28,12 +28,10 @@
 #include <fitsbase/settings.h>
 
 
-OpMedianDialog::OpMedianDialog(QWidget *parent) :
-  AbstractPreviewDialog(parent),
+OpMedianDialog::OpMedianDialog(QWidget *parent):QDialog(parent),
   ui(new Ui::OpMedianDialog)
 {
   ui->setupUi(this);
-  setPreviewLabel(ui->previewLabel);
   connect(ui->thresholdField,&QLineEdit::editingFinished,this,&OpMedianDialog::textFieldChanged);
   connect(ui->kernelSizeBox,&QSpinBox::textChanged,this,&OpMedianDialog::textFieldChanged);
 }
@@ -41,6 +39,12 @@ OpMedianDialog::OpMedianDialog(QWidget *parent) :
 OpMedianDialog::~OpMedianDialog()
 {
   delete ui;
+}
+
+void OpMedianDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+{
+  ui->previewWidget->setOptions(opt);
+  ui->previewWidget->setSourceImage(img,selection);
 }
 
 int OpMedianDialog::getSize() const
@@ -57,16 +61,10 @@ double OpMedianDialog::getThreshold() const
 
 void OpMedianDialog::textFieldChanged()
 {
-  updating = true;
-  updatePreview(ui->previewLabel);
-  updating = false;
-}
-
-std::shared_ptr<FitsImage> OpMedianDialog::getPreviewImage()
-{
-  auto img = std::make_shared<FitsImage>(*previewImage);
+  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
   OpMedian op;
   op.filter(img,getThreshold(),getSize());
-  return img;
+  ui->previewWidget->updatePreview(img);
 }
+
 

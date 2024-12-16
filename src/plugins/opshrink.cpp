@@ -40,7 +40,7 @@ QString OpShrink::getMenuEntry() const
 return "Image/Shrink...";
 }
 
-OpPlugin::ResultType OpShrink::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpShrink::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - kernel filter dialog                                                *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,18 +23,23 @@
 #ifndef OPKERNELDIALOG_H
 #define OPKERNELDIALOG_H
 
-#include <fitsbase/dialogs/abstractpreviewdialog.h>
+#include <fitsbase/widgets/previewoptions.h>
+#include <QDialog>
+
+class FitsImage;
 
 namespace Ui {
 class OpKernelDialog;
 }
 
-class OpKernelDialog : public AbstractPreviewDialog
+class OpKernelDialog: public QDialog
 {
   Q_OBJECT
 public:
   explicit OpKernelDialog(QWidget *parent = nullptr);
   ~OpKernelDialog();
+
+  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
 
   void setKernelNames(const std::vector<QString>& list);
 
@@ -44,8 +49,6 @@ private slots:
   void on_kernelBox_currentTextChanged(const QString &arg1);
 
 private:
-  virtual std::shared_ptr<FitsImage> getPreviewImage();
-
   Ui::OpKernelDialog *ui;
 };
 

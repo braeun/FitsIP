@@ -50,7 +50,7 @@ QString MeasureCrossCorrelation::getMenuEntry() const
   return "Measure/Cross Correlation...";
 }
 
-OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsImage> image, QRect selection)
+OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {

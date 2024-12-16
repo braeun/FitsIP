@@ -96,7 +96,7 @@ QString FindStars::getMenuEntry() const
   return "Measure/Find Stars...";
 }
 
-OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsImage> image, QRect rect)
+OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsImage> image, QRect rect, const PreviewOptions& opt)
 {
   Histogram hist;
   hist.build(image.get());

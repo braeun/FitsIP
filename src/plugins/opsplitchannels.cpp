@@ -48,7 +48,7 @@ QString OpSplitChannels::getMenuEntry() const
   return "Color/Split";
 }
 
-OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsImage> image, QRect /*aoi*/)
+OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsImage> image, QRect /*aoi*/, const PreviewOptions& opt)
 {
   if (image->getDepth() != 3)
   {

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing dialog                               *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,11 +27,10 @@
 #include <fitsbase/histogram.h>
 #include <fitsbase/settings.h>
 
-OpDDPDialog::OpDDPDialog(QWidget *parent):AbstractPreviewDialog(parent),
+OpDDPDialog::OpDDPDialog(QWidget *parent):QDialog(parent),
   ui(new Ui::OpDDPDialog)
 {
   ui->setupUi(this);
-  setPreviewLabel(ui->previewLabel);
   connect(ui->sigmaField,&QLineEdit::editingFinished,this,&OpDDPDialog::textFieldChanged);
   connect(ui->backgroundField,&QLineEdit::editingFinished,this,&OpDDPDialog::textFieldChanged);
   connect(ui->aField,&QLineEdit::editingFinished,this,&OpDDPDialog::textFieldChanged);
@@ -41,6 +40,12 @@ OpDDPDialog::OpDDPDialog(QWidget *parent):AbstractPreviewDialog(parent),
 OpDDPDialog::~OpDDPDialog()
 {
   delete ui;
+}
+
+void OpDDPDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+{
+  ui->previewWidget->setOptions(opt);
+  ui->previewWidget->setSourceImage(img,selection);
 }
 
 double OpDDPDialog::getBackground() const
@@ -66,16 +71,9 @@ double OpDDPDialog::getB() const
 
 void OpDDPDialog::textFieldChanged()
 {
-  updatePreview(ui->previewLabel);
-}
-
-std::shared_ptr<FitsImage> OpDDPDialog::getPreviewImage()
-{
-  auto img = std::make_shared<FitsImage>(*previewImage);
+  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
   OpDDP op;
   op.ddp(img,getSigma(),getBackground(),getA(),getB());
-  return img;
+  ui->previewWidget->updatePreview(img);
 }
-
-
 

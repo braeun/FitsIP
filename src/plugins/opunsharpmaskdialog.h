@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - unsharp masking dialog                                              *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2024-12-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,7 +23,8 @@
 #ifndef OPUNSHARPMASKDIALOG_H
 #define OPUNSHARPMASKDIALOG_H
 
-#include <fitsbase/dialogs/abstractpreviewdialog.h>
+#include <fitsbase/widgets/previewoptions.h>
+#include <QDialog>
 
 namespace Ui {
 class OpUnsharpMaskDialog;
@@ -31,13 +32,15 @@ class OpUnsharpMaskDialog;
 
 class FitsImage;
 
-class OpUnsharpMaskDialog : public AbstractPreviewDialog
+class OpUnsharpMaskDialog : public QDialog
 {
   Q_OBJECT
 
 public:
   explicit OpUnsharpMaskDialog(QWidget *parent = nullptr);
   ~OpUnsharpMaskDialog();
+
+  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
 
   double getSigma() const;
 
@@ -50,9 +53,10 @@ private slots:
 
 private:
   void textFieldChanged();
-  virtual std::shared_ptr<FitsImage> getPreviewImage();
+  void updatePreview();
 
   Ui::OpUnsharpMaskDialog *ui;
+  bool updating;
 };
 
 #endif // OPUNSHARPMASKDIALOG_H

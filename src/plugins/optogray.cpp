@@ -37,7 +37,7 @@ QString OpToGray::getMenuEntry() const
   return "Color/To Gray";
 }
 
-OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (image->getDepth() != 3)
   {

@@ -47,7 +47,7 @@ QIcon OpShift::getIcon() const
   return QIcon(":/pluginicons/resources/icons/transform-move.png");
 }
 
-OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/)
+OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr) dlg = new OpShiftDialog();
   dlg->setImageSize(image->getWidth(),image->getHeight());
