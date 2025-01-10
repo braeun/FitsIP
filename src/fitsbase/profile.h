@@ -1,8 +1,8 @@
-﻿/********************************************************************************
+/********************************************************************************
  *                                                                              *
- * FitsIP - file object containing the image and other data                     *
+ * FitsIP - profile histogram                                                   *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,46 +20,31 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef FILEOBJECT_H
-#define FILEOBJECT_H
+#ifndef PROFILE_H
+#define PROFILE_H
 
-#include "fitsimage.h"
-#include "histogram.h"
-#include "undostack.h"
-#include <memory>
+#include <QPointF>
 #include <QString>
+#include <QVector>
 
-class FileObject
+class Profile: public QVector<QPointF>
 {
 public:
-  FileObject(QString filename, std::shared_ptr<FitsImage> img);
+  Profile();
 
-  int32_t getId() const;
+  void setCursorX(int v);
 
-  QString getFilename() const;
+  int getCursorX() const;
 
-  std::shared_ptr<FitsImage> getImage();
+  void setCursorY(int v);
 
-  std::shared_ptr<Histogram> getHistogram();
+  int getCursorY() const;
 
-  void updateHistogram();
-
-  bool save(QString filename);
-
-  void pushUndo();
-
-  void popUndo();
-
-  bool isUndoAvailable() const;
+  bool save(const QString& fn);
 
 private:
-  const int32_t id;
-  QString filename;
-  std::shared_ptr<FitsImage> image;
-  std::shared_ptr<Histogram> histogram;
-  UndoStack undostack;
-
-  static int32_t idCounter;
+  int cursorx;
+  int cursory;
 };
 
-#endif // FILEOBJECT_H
+#endif // PROFILE_H
