@@ -31,7 +31,7 @@ class ImageSelectWidget;
 }
 
 class ImageCollection;
-class FileObject;
+class FitsObject;
 
 class ImageSelectWidget : public QWidget
 {
@@ -45,7 +45,7 @@ public:
 
   void setImageCollection(ImageCollection* collection);
 
-  std::shared_ptr<FileObject> getImage();
+  std::shared_ptr<FitsObject> getImage();
 
 private slots:
   void on_browseButton_clicked();

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - file object containing the image and other data                     *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,91 +20,57 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "fileobject.h"
-#include "io/iofactory.h"
-#include <QFileInfo>
-#include <QFile>
-#include <QDebug>
+#ifndef FITSOBJECT_H
+#define FITSOBJECT_H
 
-int32_t FileObject::idCounter = 0;
+#include "fitsimage.h"
+#include "histogram.h"
+#include "profile.h"
+#include "undostack.h"
+#include <memory>
+#include <QString>
 
-FileObject::FileObject(QString fn, std::shared_ptr<FitsImage> img):
-  id(idCounter++),
-  filename(fn),
-  image(img)
+class FitsObject
 {
-//  QFileInfo info(filename);
-  histogram = std::make_shared<Histogram>();
-  histogram->build(image.get());
-}
+public:
+  FitsObject(QString filename, std::shared_ptr<FitsImage> img);
 
-int32_t FileObject::getId() const
-{
-  return id;
-}
+  int32_t getId() const;
 
-QString FileObject::getFilename() const
-{
-  return filename;
-}
+  QString getFilename() const;
 
-std::shared_ptr<FitsImage> FileObject::getImage()
-{
-  return image;
-}
+  std::shared_ptr<FitsImage> getImage();
 
-std::shared_ptr<Histogram> FileObject::getHistogram()
-{
-  return histogram;
-}
+  std::shared_ptr<Histogram> getHistogram();
 
-void FileObject::updateHistogram()
-{
-  histogram->build(image.get());
-}
+  void updateHistogram();
 
-bool FileObject::save(QString fn)
-{
-  IOHandler* handler = IOFactory::getInstance()->getHandler(fn);
-  if (!handler) return false;
-  QString tmpfile = "";
-  QFile file(fn);
-  if (file.exists())
-  {
-    tmpfile = fn + "~";
-    file.rename(tmpfile);
-  }
-  try
-  {
-    handler->write(fn,image);
-    filename = fn;
-  }
-  catch (std::exception& ex)
-  {
-    if (!tmpfile.isEmpty()) QFile(tmpfile).rename(fn);
-    throw ex;
-  }
-  if (!tmpfile.isEmpty()) QFile(tmpfile).remove();
-  return true;
-}
+  void setXProfile(const Profile& p);
 
-void FileObject::pushUndo()
-{
-  undostack.push(image);
-}
+  const Profile& getXProfile() const;
 
-void FileObject::popUndo()
-{
-  std::shared_ptr<FitsImage> img = undostack.pop();
-  if (img)
-  {
-    image = img;
-    updateHistogram();
-  }
-}
+  void setYProfile(const Profile& p);
 
-bool FileObject::isUndoAvailable() const
-{
-  return undostack.isUndoAvailable();
-}
+  const Profile& getYProfile() const;
 
+  bool save(QString filename);
+
+  void pushUndo();
+
+  void popUndo();
+
+  bool isUndoAvailable() const;
+
+private:
+  const int32_t id;
+  QString filename;
+  std::shared_ptr<FitsImage> image;
+  std::shared_ptr<Histogram> histogram;
+  Profile xprofile;
+  Profile yprofile;
+  UndoStack undostack;
+
+  static int32_t idCounter;
+};
+
+#endif // FILEOBJECT_H

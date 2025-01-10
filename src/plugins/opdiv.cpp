@@ -22,7 +22,7 @@
 
 #include "opdiv.h"
 #include <fitsbase/imagecollection.h>
-#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsobject.h>
 #include <cmath>
 #include <QDebug>
 
@@ -59,7 +59,7 @@ OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsImage> image, QRect /*se
   dlg->setPrompt("Divide "+image->getName()+ "by:");
   if (dlg->exec())
   {
-    std::shared_ptr<FileObject> file = dlg->getImage();
+    std::shared_ptr<FitsObject> file = dlg->getImage();
     profiler.start();
     try
     {

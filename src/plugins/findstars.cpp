@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - star detection class                                                *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-01-04                                                         *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.                                           *
  ********************************************************************************
@@ -101,10 +101,9 @@ OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsImage> image, QRect 
   Histogram hist;
   hist.build(image.get());
   AverageResult avg = hist.getAverage(0.75);
-  std::tie(std::ignore,sky,skysig,std::ignore) = avg;
   FindStarsDialog d;
-  d.setSkyMean(sky);
-  d.setSkySigma(skysig);
+  d.setSkyMean(avg.mean);
+  d.setSkySigma(avg.sigma);
   d.setSkyMinSigma(minsig);
   d.setFWHMMin(minfwhm);
   d.setFWHMMax(maxfwhm);

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2024-12-14                                                         *
+ * modified: 2025-01-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,7 +24,7 @@
 #define MAINWINDOW_H
 
 #include "imagewidget.h"
-#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsobject.h>
 #include <fitsbase/logbook/logbook.h>
 #include <QMainWindow>
 #include <QMenu>
@@ -136,7 +136,11 @@ private slots:
 
   void on_actionClear_AOI_triggered();
 
+  void on_actionSelect_Pixel_toggled(bool arg1);
+
 private:
+
+  enum SelectionMode { None, SelectPixel };
 
   void loadPlugins();
   void addOpPlugin(OpPlugin* op);
@@ -144,7 +148,7 @@ private:
   void executeOpPlugin(OpPlugin* op);
   void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsImage> img, QRect roi, const PreviewOptions& opt);
   std::vector<QFileInfo> getFileList();
-  void display(std::shared_ptr<FileObject> obj);
+  void display(std::shared_ptr<FitsObject> obj);
   void updateDisplay();
   void updateMetadata();
   void open(const QFileInfo& fileinfo);
@@ -161,6 +165,7 @@ private:
   ImageWidget* imageWidget;
   EditMetadataDialog* editMetadataDialog;
   Logbook logbook;
+  SelectionMode selectionMode;
 };
 
 #endif // MAINWINDOW_H

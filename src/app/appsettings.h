@@ -86,6 +86,7 @@ public:
   static const char* PATH_FILELIST;
   static const char* PATH_PIXELLIST;
   static const char* PATH_STARLIST;
+  static const char* PATH_PROFILE;
 
 };
 

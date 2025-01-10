@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - intensity histogram                                                 *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-01-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -175,11 +175,11 @@ AverageResult Histogram::getAverage(double p) const
   }
   if (n == 0)
   {
-    return AverageResult(0,0.0,0.0,0.0);
+    return AverageResult{0,0.0,0.0,0.0};
   }
   double mean = sum / n;
-  if (n == 1) return AverageResult(n,mean,0.0,0.0);
+  if (n == 1) return AverageResult{n,mean,0.0,0.0};
   double sigma = sqrt((n*sum2-sum*sum)/(n*(n-1)));
   double error = sigma / sqrt(n);
-  return AverageResult(n,mean,sigma,error);
+  return AverageResult{n,mean,sigma,error};
 }

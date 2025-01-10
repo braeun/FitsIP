@@ -22,7 +22,7 @@
 
 #include "measurecrosscorrelation.h"
 #include <fitsbase/imagecollection.h>
-#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsobject.h>
 #include <fftw3.h>
 
 MeasureCrossCorrelation::MeasureCrossCorrelation():
@@ -60,7 +60,7 @@ OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsImage>
   }
   if (dlg->exec())
   {
-    std::shared_ptr<FileObject> file = dlg->getImage();
+    std::shared_ptr<FitsObject> file = dlg->getImage();
     profiler.start();
     img = correlate(image,file->getImage(),selection);
     profiler.stop();

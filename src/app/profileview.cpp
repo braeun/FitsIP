@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the profiles and associated controls              *
  *                                                                              *
- * modified: 2024-11-23                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,11 +23,12 @@
 #include "profileview.h"
 #include "ui_profileview.h"
 #include "appsettings.h"
-#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsobject.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_grid.h>
 #include <qwt_scale_engine.h>
 #include <qwt_plot_picker.h>
+#include <QFileInfo>
 #include <QSettings>
 
 
@@ -82,6 +83,10 @@ ProfileView::ProfileView(QWidget *parent):QWidget(parent),
   connect(ui->rangeBox,&QCheckBox::toggled,this,[this](bool){settingsChanged();});
   connect(ui->rangeSpinBox,qOverload<int>(&QSpinBox::valueChanged),this,[this](int){settingsChanged();});
 
+  popupMenu = new QMenu();
+  popupMenu->addAction("Save Profiles...",this,[this](){save();});
+  ui->menuButton->setMenu(popupMenu);
+
   QSettings settings;
   ui->logYBox->setChecked(settings.value(PROFILEVIEW_LOGY,false).toBool());
   ui->trackingBox->setChecked(settings.value(PROFILEVIEW_TRACK,false).toBool());
@@ -104,15 +109,15 @@ void ProfileView::setClickEndsTracking(bool newClickEndsTracking)
   clickEndsTracking = newClickEndsTracking;
 }
 
-void ProfileView::setImage(std::shared_ptr<FileObject> obj)
+void ProfileView::setImage(std::shared_ptr<FitsObject> obj)
 {
   image = obj;
-  QVector<QPointF> h;
-  QVector<QPointF> v;
-  horizontalProfile->setSamples(h);
-  verticalProfile->setSamples(v);
-  horizontalMarker->setXValue(0);
-  verticalMarker->setXValue(0);
+  horizontal = image->getXProfile();
+  vertical = image->getYProfile();
+  horizontalProfile->setSamples(horizontal);
+  verticalProfile->setSamples(vertical);
+  horizontalMarker->setXValue(horizontal.getCursorX());
+  verticalMarker->setXValue(vertical.getCursorY());
   ui->horizontalProfileWidget->replot();
   ui->verticalProfileWidget->replot();
 }
@@ -151,8 +156,12 @@ void ProfileView::changeEvent(QEvent *event)
 
 void ProfileView::redraw()
 {
-  QVector<QPointF> h;
-  QVector<QPointF> v;
+  horizontal = Profile();
+  horizontal.setCursorX(cursor.x());
+  horizontal.setCursorY(cursor.y());
+  vertical = Profile();
+  vertical.setCursorX(cursor.x());
+  vertical.setCursorY(cursor.y());
   if (image)
   {
     if (ui->rangeBox->isChecked())
@@ -164,7 +173,7 @@ void ProfileView::redraw()
       it += left;
       for (int x=left;x<right;x++)
       {
-        h.push_back(QPointF(x,it.getAbs()));
+        horizontal.push_back(QPointF(x,it.getAbs()));
         ++it;
       }
       int top = std::max(cursor.y()-r,0);
@@ -173,7 +182,7 @@ void ProfileView::redraw()
       it += top * image->getImage()->getWidth();
       for (int y=top;y<bottom;y++)
       {
-        v.push_back(QPointF(y,it.getAbs()));
+        vertical.push_back(QPointF(y,it.getAbs()));
         it += image->getImage()->getWidth();
       }
     }
@@ -182,21 +191,23 @@ void ProfileView::redraw()
       ConstPixelIterator it = image->getImage()->getConstPixelIterator(0,cursor.y());
       for (uint32_t x=0;x<image->getImage()->getWidth();x++)
       {
-        h.push_back(QPointF(x,it.getAbs()));
+        horizontal.push_back(QPointF(x,it.getAbs()));
         ++it;
       }
       it = image->getImage()->getConstPixelIterator(cursor.x(),0);
       for (uint32_t y=0;y<image->getImage()->getHeight();y++)
       {
-        v.push_back(QPointF(y,it.getAbs()));
+        vertical.push_back(QPointF(y,it.getAbs()));
         it += image->getImage()->getWidth();
       }
     }
+    image->setXProfile(horizontal);
+    image->setYProfile(vertical);
   }
   horizontalMarker->setXValue(cursor.x());
   verticalMarker->setXValue(cursor.y());
-  horizontalProfile->setSamples(h);
-  verticalProfile->setSamples(v);
+  horizontalProfile->setSamples(horizontal);
+  verticalProfile->setSamples(vertical);
   ui->horizontalProfileWidget->replot();
   ui->verticalProfileWidget->replot();
 }
@@ -227,3 +238,17 @@ void ProfileView::settingsChanged()
   redraw();
 }
 
+void ProfileView::save()
+{
+  AppSettings settings;
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_PROFILE,"Profiles (*.csv);;All files (*)");
+  if (!fn.isNull())
+  {
+    QFileInfo info(fn);
+    QString fn = info.absolutePath() + "/" + info.completeBaseName() + "_hor." + info.suffix();
+    horizontal.save(fn);
+    fn = info.absolutePath() + "/" + info.completeBaseName() + "_ver." + info.suffix();
+    vertical.save(fn);
+  }
+
+}

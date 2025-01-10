@@ -23,7 +23,7 @@
 #ifndef IMAGECOLLECTION_H
 #define IMAGECOLLECTION_H
 
-#include "fileobject.h"
+#include "fitsobject.h"
 #include <QAbstractItemModel>
 #include <vector>
 #include <memory>
@@ -42,23 +42,23 @@ public:
 
   size_t size() const;
 
-  void setActiveFile(std::shared_ptr<FileObject> file);
+  void setActiveFile(std::shared_ptr<FitsObject> file);
 
-  std::shared_ptr<FileObject> setActiveFile(int index);
+  std::shared_ptr<FitsObject> setActiveFile(int index);
 
-  inline std::shared_ptr<FileObject> getActiveFile() const;
+  inline std::shared_ptr<FitsObject> getActiveFile() const;
 
-  std::shared_ptr<FileObject> getFile(int32_t id) const;
+  std::shared_ptr<FitsObject> getFile(int32_t id) const;
 
-  std::shared_ptr<FileObject> getFile(const QString& filename) const;
+  std::shared_ptr<FitsObject> getFile(const QString& filename) const;
 
   void removeActiveFile();
 
   void removeAll();
 
-  void addFile(std::shared_ptr<FileObject> file);
+  void addFile(std::shared_ptr<FitsObject> file);
 
-  inline const std::vector<std::shared_ptr<FileObject>>& getFiles() const;
+  inline const std::vector<std::shared_ptr<FitsObject>>& getFiles() const;
 
   inline static ImageCollection& getGlobal();
 
@@ -73,18 +73,18 @@ public:
   QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 private:
-  std::shared_ptr<FileObject> activeFile;
-  std::vector<std::shared_ptr<FileObject>> files;
+  std::shared_ptr<FitsObject> activeFile;
+  std::vector<std::shared_ptr<FitsObject>> files;
 
   static ImageCollection globalCollection;
 };
 
-inline std::shared_ptr<FileObject> ImageCollection::getActiveFile() const
+inline std::shared_ptr<FitsObject> ImageCollection::getActiveFile() const
 {
   return activeFile;
 }
 
-inline const std::vector<std::shared_ptr<FileObject>>& ImageCollection::getFiles() const
+inline const std::vector<std::shared_ptr<FitsObject>>& ImageCollection::getFiles() const
 {
   return files;
 }

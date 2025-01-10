@@ -39,33 +39,33 @@ size_t ImageCollection::size() const
   return files.size();
 }
 
-void ImageCollection::setActiveFile(std::shared_ptr<FileObject> file)
+void ImageCollection::setActiveFile(std::shared_ptr<FitsObject> file)
 {
   activeFile = file;
 }
 
-std::shared_ptr<FileObject> ImageCollection::setActiveFile(int index)
+std::shared_ptr<FitsObject> ImageCollection::setActiveFile(int index)
 {
   activeFile = files[index];
   return activeFile;
 }
 
-std::shared_ptr<FileObject> ImageCollection::getFile(int32_t id) const
+std::shared_ptr<FitsObject> ImageCollection::getFile(int32_t id) const
 {
   for (auto file : files)
   {
     if (file->getId() == id) return file;
   }
-  return std::shared_ptr<FileObject>();
+  return std::shared_ptr<FitsObject>();
 }
 
-std::shared_ptr<FileObject> ImageCollection::getFile(const QString& filename) const
+std::shared_ptr<FitsObject> ImageCollection::getFile(const QString& filename) const
 {
   for (auto file : files)
   {
     if (file->getFilename() == filename) return file;
   }
-  return std::shared_ptr<FileObject>();
+  return std::shared_ptr<FitsObject>();
 }
 
 void ImageCollection::removeActiveFile()
@@ -96,7 +96,7 @@ void ImageCollection::removeAll()
   }
 }
 
-void ImageCollection::addFile(std::shared_ptr<FileObject> file)
+void ImageCollection::addFile(std::shared_ptr<FitsObject> file)
 {
   QModelIndex parent;
   beginInsertRows(parent,files.size(),files.size());

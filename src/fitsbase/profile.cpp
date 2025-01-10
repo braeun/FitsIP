@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - dialog to synthesize background from image                          *
+ * FitsIP - profile histogram                                                   *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,44 +20,46 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "synthesizebackgrounddialog.h"
-#include "ui_synthesizebackgrounddialog.h"
+#include "profile.h"
+#include <QFile>
+#include <QTextStream>
 
-SynthesizeBackgroundDialog::SynthesizeBackgroundDialog(QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::SynthesizeBackgroundDialog)
+Profile::Profile()
 {
-  ui->setupUi(this);
 }
 
-SynthesizeBackgroundDialog::~SynthesizeBackgroundDialog()
+void Profile::setCursorX(int v)
 {
-  delete ui;
+  cursorx = v;
 }
 
-void SynthesizeBackgroundDialog::setSky(AverageResult avg)
+int Profile::getCursorX() const
 {
-  ui->skyMeanField->setText(QString::number(avg.mean));
-  ui->skySigmaField->setText(QString::number(avg.sigma));
+  return cursorx;
 }
 
-uint32_t SynthesizeBackgroundDialog::getSelectionMode() const
+void Profile::setCursorY(int v)
 {
-  return ui->selectionBox->currentIndex();
+  cursory = v;
 }
 
-uint32_t SynthesizeBackgroundDialog::getPointsCount() const
+int Profile::getCursorY() const
 {
-  return ui->pointSpinner->value();
+  return cursory;
 }
 
-uint32_t SynthesizeBackgroundDialog::getPolynomDegree() const
+bool Profile::save(const QString& fn)
 {
-  return ui->degreeSpinner->value();
-}
-
-double SynthesizeBackgroundDialog::getBackground() const
-{
-  return ui->skyMeanField->text().toDouble() +
-      ui->skySigmaField->text().toDouble() * ui->skyNSigmaField->text().toDouble();
+  QFile data(fn);
+  if (data.open(QFile::WriteOnly | QFile::Truncate))
+  {
+      QTextStream out(&data);
+      for (const QPointF& pt : *this)
+      {
+        out << pt.x() << ", " << pt.y() << Qt::endl;
+      }
+      data.close();
+      return true;
+  }
+  return false;
 }

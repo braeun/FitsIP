@@ -23,7 +23,7 @@
 #include "imageselectdialog.h"
 #include "ui_imageselectdialog.h"
 #include "../imagecollection.h"
-#include "../fileobject.h"
+#include "../fitsobject.h"
 #include <QSettings>
 #include <QFileDialog>
 #include <QDebug>
@@ -56,7 +56,7 @@ void ImageSelectDialog::setImageCollection(ImageCollection* c)
   ui->imageSelectWidget->setImageCollection(c);
 }
 
-std::shared_ptr<FileObject> ImageSelectDialog::getImage()
+std::shared_ptr<FitsObject> ImageSelectDialog::getImage()
 {
   return ui->imageSelectWidget->getImage();
 }

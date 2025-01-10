@@ -27,7 +27,7 @@
 #include <memory>
 
 class ImageCollection;
-class FileObject;
+class FitsObject;
 
 namespace Ui {
 class OpCalibrationDialog;
@@ -43,9 +43,9 @@ public:
 
   void setImageCollection(ImageCollection* collection);
 
-  std::shared_ptr<FileObject> getDarkFrame();
+  std::shared_ptr<FitsObject> getDarkFrame();
 
-  std::shared_ptr<FileObject> getFlatField();
+  std::shared_ptr<FitsObject> getFlatField();
 
   void setOutputPath(const QString& path);
 

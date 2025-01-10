@@ -22,7 +22,7 @@
 
 #include "opadd.h"
 #include <fitsbase/imagecollection.h>
-#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsobject.h>
 #include <fitsbase/fitsimage.h>
 #include <QDebug>
 
@@ -59,7 +59,7 @@ OpPlugin::ResultType OpAdd::execute(std::shared_ptr<FitsImage> image, QRect /*se
   dlg->setPrompt("Add to "+image->getName()+":");
   if (dlg->exec())
   {
-    std::shared_ptr<FileObject> file = dlg->getImage();
+    std::shared_ptr<FitsObject> file = dlg->getImage();
     profiler.start();
     try
     {

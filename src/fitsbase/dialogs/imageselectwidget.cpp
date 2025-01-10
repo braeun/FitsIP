@@ -23,7 +23,7 @@
 #include "imageselectwidget.h"
 #include "ui_imageselectwidget.h"
 #include "../imagecollection.h"
-#include "../fileobject.h"
+#include "../fitsobject.h"
 #include "../settings.h"
 #include "../io/iofactory.h"
 #include <QSettings>
@@ -54,7 +54,7 @@ void ImageSelectWidget::setImageCollection(ImageCollection* c)
   ui->fileList->setModel(collection);
 }
 
-std::shared_ptr<FileObject> ImageSelectWidget::getImage()
+std::shared_ptr<FitsObject> ImageSelectWidget::getImage()
 {
   if (ui->fromMemoryButton->isChecked())
   {
@@ -70,7 +70,7 @@ std::shared_ptr<FileObject> ImageSelectWidget::getImage()
       if (handler)
       {
         std::shared_ptr<FitsImage> image = handler->read(fn);
-        std::shared_ptr<FileObject> file = std::make_shared<FileObject>(fn,image);
+        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(fn,image);
         return file;
       }
       else
@@ -79,7 +79,7 @@ std::shared_ptr<FileObject> ImageSelectWidget::getImage()
       }
     }
   }
-  return std::shared_ptr<FileObject>();
+  return std::shared_ptr<FitsObject>();
 }
 
 

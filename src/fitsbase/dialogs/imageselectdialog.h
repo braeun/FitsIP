@@ -31,7 +31,7 @@ class ImageSelectDialog;
 }
 
 class ImageCollection;
-class FileObject;
+class FitsObject;
 
 class ImageSelectDialog : public QDialog
 {
@@ -47,7 +47,7 @@ public:
 
   void setImageCollection(ImageCollection* collection);
 
-  std::shared_ptr<FileObject> getImage();
+  std::shared_ptr<FitsObject> getImage();
 
 private:
   Ui::ImageSelectDialog *ui;

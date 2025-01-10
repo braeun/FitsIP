@@ -25,7 +25,7 @@
 #include <fitsbase/dialogs/progressdialog.h>
 #include <fitsbase/imagecollection.h>
 #include <fitsbase/imagestatistics.h>
-#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsobject.h>
 #include <fitsbase/fitsimage.h>
 #include <fitsbase/io/iofactory.h>
 #include <algorithm>
@@ -75,8 +75,8 @@ OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, 
     prog->setMaximum(list.size());
     prog->show();
   }
-  std::shared_ptr<FileObject> darkframe = dlg->getDarkFrame();
-  std::shared_ptr<FileObject> flatfield = dlg->getFlatField();
+  std::shared_ptr<FitsObject> darkframe = dlg->getDarkFrame();
+  std::shared_ptr<FitsObject> flatfield = dlg->getFlatField();
   double mean = 1.0;
   if (flatfield)
   {
@@ -116,7 +116,7 @@ OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, 
 
 
 
-std::shared_ptr<FitsImage> OpCalibration::calibrate(const QFileInfo& info, std::shared_ptr<FileObject> darkframe, std::shared_ptr<FileObject> flatfield, double mean)
+std::shared_ptr<FitsImage> OpCalibration::calibrate(const QFileInfo& info, std::shared_ptr<FitsObject> darkframe, std::shared_ptr<FitsObject> flatfield, double mean)
 {
   IOHandler* handler = IOFactory::getInstance()->getHandler(info.absoluteFilePath());
   if (!handler) return std::shared_ptr<FitsImage>();

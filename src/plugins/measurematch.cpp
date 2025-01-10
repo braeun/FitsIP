@@ -24,7 +24,7 @@
 #include "measurematchdialog.h"
 #include "opgrow.h"
 #include <fitsbase/imagecollection.h>
-#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsobject.h>
 #include <fitsbase/fitsimage.h>
 #include <cmath>
 #include <algorithm>
@@ -70,7 +70,7 @@ OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsImage> image, QRe
     factor = dlg->getScaleFactor();
     profiler.start();
     setTemplate(image,aoi);
-    std::shared_ptr<FileObject> file = dlg->getImage();
+    std::shared_ptr<FitsObject> file = dlg->getImage();
     computeMatch(file->getImage());
     profiler.stop();
     log(image,QString::asprintf("Maximum match with %s: %f at [%.1f,%.1f] shifted by [%.1f,%.1f]",file->getImage()->getName().toStdString().c_str(),max,getX(),getY(),getDx(),getDy()));

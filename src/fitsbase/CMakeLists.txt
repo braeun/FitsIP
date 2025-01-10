@@ -1,8 +1,8 @@
 ﻿
 set(private_header_list
   filelist.h
-  fileobject.h
   fitsimage.h
+  fitsobject.h
   fitstypes.h
   histogram.h
   imagecollection.h
@@ -16,6 +16,7 @@ set(private_header_list
   pixellist.h
   plugin.h
   pluginfactory.h
+  profile.h
   rgbvalue.h
   settings.h
   star.h
@@ -64,8 +65,8 @@ set(private_header_list
 
 add_library(fitsbase
   filelist.cpp
-  fileobject.cpp
   fitsimage.cpp
+  fitsobject.cpp
   histogram.cpp
   imagecollection.cpp
   imagemetadata.cpp
@@ -77,6 +78,7 @@ add_library(fitsbase
   pixellist.cpp
   plugin.cpp
   pluginfactory.cpp
+  profile.cpp
   rgbvalue.cpp
   settings.cpp
   starlist.cpp

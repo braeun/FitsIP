@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the profiles and associated controls              *
  *                                                                              *
- * modified: 2024-11-23                                                         *
+ * modified: 2025-01-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,12 +23,14 @@
 #ifndef PROFILEVIEW_H
 #define PROFILEVIEW_H
 
+#include <fitsbase/profile.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
+#include <QMenu>
 #include <QWidget>
 #include <memory>
 
-class FileObject;
+class FitsObject;
 class QwtPlotGrid;
 class QwtPlotPicker;
 class QwtPlotZoomer;
@@ -49,7 +51,7 @@ public:
 
   void setClickEndsTracking(bool newClickEndsTracking);
 
-  void setImage(std::shared_ptr<FileObject> obj);
+  void setImage(std::shared_ptr<FitsObject> obj);
 
 public slots:
   void updateCursor(QPoint p);
@@ -63,10 +65,13 @@ private:
   void redraw();
   void logYToggled(bool checked);
   void settingsChanged();
+  void save();
 
   Ui::ProfileView *ui;
-  std::shared_ptr<FileObject> image;
+  std::shared_ptr<FitsObject> image;
   QPoint cursor;
+  Profile horizontal;
+  Profile vertical;
   QwtPlotCurve* horizontalProfile;
   QwtPlotCurve* verticalProfile;
   QwtPlotMarker* horizontalMarker;
@@ -76,6 +81,7 @@ private:
   QwtPlotPicker* horizontalPicker;
   QwtPlotPicker* verticalPicker;
   bool clickEndsTracking;
+  QMenu* popupMenu;
 };
 
 #endif // PROFILEVIEW_H

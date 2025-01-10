@@ -435,6 +435,8 @@
     <addaction name="actionShow_Detected_Stars"/>
     <addaction name="separator"/>
     <addaction name="actionClear_AOI"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelect_Pixel"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -447,9 +449,19 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <widget class="QMenu" name="menuLists">
+     <property name="title">
+      <string>Lists</string>
+     </property>
+     <addaction name="actionClear_File_List"/>
+     <addaction name="actionClear_Pixel_List"/>
+     <addaction name="actionClear_Star_List"/>
+    </widget>
     <addaction name="actionUndo"/>
     <addaction name="separator"/>
     <addaction name="actionMetadata"/>
+    <addaction name="menuLists"/>
+    <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
    </widget>
@@ -1309,6 +1321,29 @@
   <action name="actionClear_AOI">
    <property name="text">
     <string>Clear AOI</string>
+   </property>
+  </action>
+  <action name="actionClear_File_List">
+   <property name="text">
+    <string>Clear File List</string>
+   </property>
+  </action>
+  <action name="actionClear_Pixel_List">
+   <property name="text">
+    <string>Clear Pixel List</string>
+   </property>
+  </action>
+  <action name="actionClear_Star_List">
+   <property name="text">
+    <string>Clear Star List</string>
+   </property>
+  </action>
+  <action name="actionSelect_Pixel">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Select Pixel</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

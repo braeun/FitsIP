@@ -30,7 +30,7 @@
 #define QT_STATICPLUGIN
 #include <QtPlugin>
 
-class FileObject;
+class FitsObject;
 class OpCalibrationDialog;
 
 class OpCalibration: public OpPlugin
@@ -50,7 +50,7 @@ public:
   virtual ResultType execute(const std::vector<QFileInfo>& list, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 private:
-  std::shared_ptr<FitsImage> calibrate(const QFileInfo& info, std::shared_ptr<FileObject> darkframe, std::shared_ptr<FileObject> flatfield, double mean);
+  std::shared_ptr<FitsImage> calibrate(const QFileInfo& info, std::shared_ptr<FitsObject> darkframe, std::shared_ptr<FitsObject> flatfield, double mean);
 
   OpCalibrationDialog* dlg;
 };

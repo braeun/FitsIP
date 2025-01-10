@@ -22,7 +22,7 @@
 
 #include "opmul.h"
 #include <fitsbase/imagecollection.h>
-#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsobject.h>
 #include <fitsbase/fitsimage.h>
 #include <QDebug>
 
@@ -59,7 +59,7 @@ OpPlugin::ResultType OpMul::execute(std::shared_ptr<FitsImage> image, QRect /*se
   dlg->setPrompt("Multiply "+image->getName()+" by:");
   if (dlg->exec())
   {
-    std::shared_ptr<FileObject> file = dlg->getImage();
+    std::shared_ptr<FitsObject> file = dlg->getImage();
     profiler.start();
     try
     {

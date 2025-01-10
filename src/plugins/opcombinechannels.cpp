@@ -23,7 +23,7 @@
 #include "opcombinechannels.h"
 #include "opcombinechannelsdialog.h"
 #include <fitsbase/imagecollection.h>
-#include <fitsbase/fileobject.h>
+#include <fitsbase/fitsobject.h>
 
 OpCombineChannels::OpCombineChannels():
   dlg(nullptr)

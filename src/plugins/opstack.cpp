@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - stack images                                                        *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-01-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -177,9 +177,7 @@ OpPlugin::ResultType OpStack::prepare(const QFileInfo& file, bool subsky)
       Histogram hist;
       hist.build(img.get());
       AverageResult avg = hist.getAverage(0.75);
-      double sky,skysig;
-      std::tie(std::ignore,sky,skysig,std::ignore) = avg;
-      *img -= sky;
+      *img -= avg.mean;
     }
   }
   catch (std::exception& ex)
@@ -257,9 +255,7 @@ OpPlugin::ResultType OpStack::stack(const QFileInfo &file)
       Histogram hist;
       hist.build(img1.get());
       AverageResult avg = hist.getAverage(0.75);
-      double sky,skysig;
-      std::tie(std::ignore,sky,skysig,std::ignore) = avg;
-      *img1 -= sky;
+      *img1 -= avg.mean;
     }
     *img += *img1;
     log(img,"stacked  "+img1->getName());
@@ -289,9 +285,7 @@ OpPlugin::ResultType OpStack::stackTemplate(const QFileInfo &file)
       Histogram hist;
       hist.build(img1.get());
       AverageResult avg = hist.getAverage(0.75);
-      double sky,skysig;
-      std::tie(std::ignore,sky,skysig,std::ignore) = avg;
-      *img1 -= sky;
+      *img1 -= avg.mean;
     }
     matcher.computeMatch(img1);
     OpShift shift;
@@ -324,9 +318,7 @@ OpPlugin::ResultType OpStack::stackStarMatch(const QFileInfo &file)
       Histogram hist;
       hist.build(img1.get());
       AverageResult avg = hist.getAverage(0.75);
-      double sky,skysig;
-      std::tie(std::ignore,sky,skysig,std::ignore) = avg;
-      *img1 -= sky;
+      *img1 -= avg.mean;
     }
     /* save starlist of last image */
     StarList last;
@@ -385,8 +377,7 @@ void OpStack::findStars(std::shared_ptr<FitsImage> image, StarList *starlist, in
     Histogram hist;
     hist.build(image.get());
     AverageResult avg = hist.getAverage(0.75);
-    double skysig;
-    std::tie(std::ignore,sky,skysig,std::ignore) = avg;
+    sky = avg.mean;
   }
   std::vector<Star> list;
   for (const Star& star : starlist->getStars())

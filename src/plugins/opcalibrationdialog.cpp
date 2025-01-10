@@ -47,12 +47,12 @@ void OpCalibrationDialog::setImageCollection(ImageCollection* c)
   ui->flatFieldSelectWidget->setImageCollection(c);
 }
 
-std::shared_ptr<FileObject> OpCalibrationDialog::getDarkFrame()
+std::shared_ptr<FitsObject> OpCalibrationDialog::getDarkFrame()
 {
   return ui->darkFrameSelectWidget->getImage();
 }
 
-std::shared_ptr<FileObject> OpCalibrationDialog::getFlatField()
+std::shared_ptr<FitsObject> OpCalibrationDialog::getFlatField()
 {
   return ui->flatFieldSelectWidget->getImage();
 }

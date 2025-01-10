@@ -39,7 +39,7 @@ void MeasureMatchDialog::setImageCollection(ImageCollection* c)
   ui->imageSelectWidget->setImageCollection(c);
 }
 
-std::shared_ptr<FileObject> MeasureMatchDialog::getImage()
+std::shared_ptr<FitsObject> MeasureMatchDialog::getImage()
 {
   return ui->imageSelectWidget->getImage();
 }

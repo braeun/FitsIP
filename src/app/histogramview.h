@@ -28,7 +28,7 @@
 #include <QWidget>
 #include <memory>
 
-class FileObject;
+class FitsObject;
 class QwtPlotGrid;
 class QwtPlotPicker;
 class QwtPlotZoomer;
@@ -45,7 +45,7 @@ public:
   explicit HistogramView(QWidget *parent = nullptr);
   ~HistogramView();
 
-  void setImage(std::shared_ptr<FileObject> obj);
+  void setImage(std::shared_ptr<FitsObject> obj);
 
   void redraw();
 
@@ -72,7 +72,7 @@ private slots:
 
 private:
   Ui::HistogramView *ui;
-  std::shared_ptr<FileObject> image;
+  std::shared_ptr<FitsObject> image;
   QwtPlotCurve* grayCurve;
   QwtPlotMarker* minMarker;
   QwtPlotMarker* maxMarker;
