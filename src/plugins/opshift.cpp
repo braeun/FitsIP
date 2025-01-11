@@ -47,16 +47,16 @@ QIcon OpShift::getIcon() const
   return QIcon(":/pluginicons/resources/icons/transform-move.png");
 }
 
-OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr) dlg = new OpShiftDialog();
-  dlg->setImageSize(image->getWidth(),image->getHeight());
+  dlg->setImageSize(image->getImage()->getWidth(),image->getImage()->getHeight());
   if (dlg->exec())
   {
     ValueType dx = dlg->getDeltaX();
     ValueType dy = dlg->getDeltaY();
     profiler.start();
-    shift(image,dx,dy);
+    shift(image->getImage(),dx,dy);
     profiler.stop();
     log(image,QString("OpShift: dx=%1  dy=%2").arg(dx).arg(dy));
     logProfiler(image);

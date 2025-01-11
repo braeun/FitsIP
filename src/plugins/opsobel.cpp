@@ -37,19 +37,19 @@ QString OpSobel::getMenuEntry() const
   return "Filter/Edge";
 }
 
-OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   profiler.start();
   const Kernel& kx = KernelRepository::instance().getKernel(KernelRepository::SOBEL_X);
-  ValueType* gx = convolve(image,kx);
+  ValueType* gx = convolve(image->getImage(),kx);
   const Kernel& ky = KernelRepository::instance().getKernel(KernelRepository::SOBEL_Y);
-  ValueType* gy = convolve(image,ky);
-  FitsImage img(image->getName(),image->getWidth(),image->getHeight(),1);
-  img.setMetadata(image->getMetadata());
-  PixelIterator it = img.getPixelIterator();
+  ValueType* gy = convolve(image->getImage(),ky);
+  auto img = std::make_shared<FitsImage>(image->getName(),image->getImage()->getWidth(),image->getImage()->getHeight(),1);
+  img->setMetadata(image->getImage()->getMetadata());
+  PixelIterator it = img->getPixelIterator();
   ValueType* ptrgx = gx;
   ValueType* ptrgy = gy;
-  uint32_t n = image->getWidth() * image->getHeight();
+  uint32_t n = image->getImage()->getWidth() * image->getImage()->getHeight();
   while (n-- > 0)
   {
     it[0] = sqrt(*ptrgx * *ptrgx + *ptrgy * *ptrgy);
@@ -57,7 +57,7 @@ OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsImage> image, QRect se
     ++ptrgx;
     ++ptrgy;
   }
-  *image = img;
+  image->setImage(img);
   profiler.stop();
   log(image,"Applied Edge (Sobel) filter");
   logProfiler(image);

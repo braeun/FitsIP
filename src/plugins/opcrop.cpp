@@ -46,19 +46,19 @@ QIcon OpCrop::getIcon() const
   return QIcon(":/pluginicons/resources/icons/transform-crop.png");
 }
 
-OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsImage> image, QRect r, const PreviewOptions& opt)
+OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, QRect r, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new OpCropDialog();
   dlg->setSelection(r);
   if (dlg->exec())
   {
-    r = image->getOverlap(dlg->getSelection());
+    r = image->getImage()->getOverlap(dlg->getSelection());
     if (r.isValid())
     {
       profiler.start();
-      auto img = image->subImage(r);
-      img->setMetadata(image->getMetadata());
-      *image = *img;
+      auto img = image->getImage()->subImage(r);
+      img->setMetadata(image->getImage()->getMetadata());
+      image->setImage(img);
       profiler.stop();
       log(image,QString("OpCrop: %1,%2 %3x%4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()));
       logProfiler(image);

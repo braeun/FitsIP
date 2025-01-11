@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing dialog                               *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -30,7 +30,7 @@ namespace Ui {
 class OpDDPDialog;
 }
 
-class FitsImage;
+class FitsObject;
 
 class OpDDPDialog : public QDialog
 {

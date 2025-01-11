@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - base class for operation plugins                                    *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -21,8 +21,7 @@
  ********************************************************************************/
 
 #include "opplugin.h"
-#include <fitsimage.h>
-#include <settings.h>
+#include "settings.h"
 #include <io/iofactory.h>
 #include <QDir>
 
@@ -53,12 +52,12 @@ bool OpPlugin::createsNewImage() const
   return false;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpPlugin::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> OpPlugin::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>();
+  return std::vector<std::shared_ptr<FitsObject>>();
 }
 
-OpPlugin::ResultType OpPlugin::execute(std::shared_ptr<FitsImage> /*image*/, QRect /*selection*/, const PreviewOptions& /*opt*/)
+OpPlugin::ResultType OpPlugin::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& /*opt*/)
 {
   return CANCELLED;
 }
@@ -86,6 +85,11 @@ void OpPlugin::setError(const QString &err)
 
 OpPlugin::ResultType OpPlugin::save(std::shared_ptr<FitsImage> image, const QString& outputpath, const QFileInfo &info, const QString& tag)
 {
+  return save(std::make_shared<FitsObject>(image),outputpath,info,tag);
+}
+
+OpPlugin::ResultType OpPlugin::save(std::shared_ptr<FitsObject> image, const QString& outputpath, const QFileInfo &info, const QString& tag)
+{
   QString fn = info.baseName();
   if (!tag.isEmpty()) fn+= "_" + tag;
   if (Settings().isAlwaysSaveFits())
@@ -95,9 +99,7 @@ OpPlugin::ResultType OpPlugin::save(std::shared_ptr<FitsImage> image, const QStr
   QDir dir(outputpath);
   if (!dir.exists()) dir.mkpath(outputpath);
   fn = dir.absoluteFilePath(fn);
-  IOHandler* handler = IOFactory::getInstance()->getHandler(fn);
-  if (!handler) return ERROR;
-  handler->write(fn,image);
+  if (!image->save(fn)) return ERROR;
   return OK;
 }
 
@@ -110,6 +112,11 @@ void OpPlugin::log(std::shared_ptr<FitsImage> image, const QString &msg)
   }
   else
     emit logOperation("",msg);
+}
+
+void OpPlugin::log(std::shared_ptr<FitsObject> image, const QString &msg)
+{
+  if (image) log(image->getImage(),msg);
 }
 
 void OpPlugin::logProfiler(const QString& image, const QString& msg)
@@ -129,6 +136,12 @@ void OpPlugin::logProfiler(std::shared_ptr<FitsImage> image, const QString& msg)
     emit logProfilerResult(name,image->getName(),image->getWidth(),image->getHeight(),profiler.getDuration(),msg);
 //    qInfo(LOG_PROFILER(),"%s",profiler.toString().c_str());
   }
+}
+
+
+void OpPlugin::logProfiler(std::shared_ptr<FitsObject> image, const QString& msg)
+{
+  logProfiler(image->getImage(),msg);
 }
 
 

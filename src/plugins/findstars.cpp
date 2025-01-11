@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - star detection class                                                *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2025-01-10                                                         *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.                                           *
  ********************************************************************************
@@ -86,9 +86,9 @@ bool FindStars::createsNewImage() const
   return false;
 }
 
-std::vector<std::shared_ptr<FitsImage>> FindStars::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> FindStars::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{conv_img};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(conv_img)};
 }
 
 QString FindStars::getMenuEntry() const
@@ -96,10 +96,10 @@ QString FindStars::getMenuEntry() const
   return "Measure/Find Stars...";
 }
 
-OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsImage> image, QRect rect, const PreviewOptions& opt)
+OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsObject> image, QRect rect, const PreviewOptions& opt)
 {
   Histogram hist;
-  hist.build(image.get());
+  hist.build(image->getImage().get());
   AverageResult avg = hist.getAverage(0.75);
   FindStarsDialog d;
   d.setSkyMean(avg.mean);
@@ -135,9 +135,10 @@ OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsImage> image, QRect 
     quickflag = !d.isBlur();
     maxiter = d.getIterations();
     profiler.start();
+    auto img = image->getImage();
     if (!rect.isEmpty())
     {
-      image = image->subImage(rect);
+      img = img->subImage(rect);
     }
 //    if (image->getDepth() > 1)
 //    {
@@ -153,7 +154,7 @@ OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsImage> image, QRect 
     c_sharp = 0;
     c_hot = 0;
     c_star = 0;
-    std::vector<Star> stars = findStars(image);
+    std::vector<Star> stars = findStars(img);
     StarList::getGlobalInstance()->setStars(stars);
     StarList::getGlobalInstance()->shift(rect.x(),rect.y());
     profiler.stop();

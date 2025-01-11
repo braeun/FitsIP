@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - perform cross carrelation                                           *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,9 +40,9 @@ bool MeasureCrossCorrelation::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> MeasureCrossCorrelation::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> MeasureCrossCorrelation::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{img};
+  return std::vector<std::shared_ptr<FitsObject>>{img};
 }
 
 QString MeasureCrossCorrelation::getMenuEntry() const
@@ -50,7 +50,7 @@ QString MeasureCrossCorrelation::getMenuEntry() const
   return "Measure/Cross Correlation...";
 }
 
-OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {
@@ -62,23 +62,25 @@ OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsImage>
   {
     std::shared_ptr<FitsObject> file = dlg->getImage();
     profiler.start();
-    img = correlate(image,file->getImage(),selection);
+    img = correlate(image,file,selection);
     profiler.stop();
-    log(img,"Cross correlation between: "+image->getName()+" and "+file->getImage()->getName());
+    log(img,"Cross correlation between: "+image->getImage()->getName()+" and "+file->getImage()->getName());
     logProfiler(img);
     return OK;
   }
   return CANCELLED;
 }
 
-std::shared_ptr<FitsImage> MeasureCrossCorrelation::correlate(std::shared_ptr<FitsImage> image1, std::shared_ptr<FitsImage> image2, QRect selection)
+std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<FitsObject> image1, std::shared_ptr<FitsObject> image2, QRect selection)
 {
-  QRect r1 = QRect(0,0,image1->getWidth(),image1->getHeight());
-  QRect r2 = QRect(0,0,image2->getWidth(),image2->getHeight());
+  auto i1 = image1->getImage();
+  auto i2 = image2->getImage();
+  QRect r1 = QRect(0,0,i1->getWidth(),i1->getHeight());
+  QRect r2 = QRect(0,0,i2->getWidth(),i2->getHeight());
   r1 = r1.intersected(r2);
   if (!selection.isNull()) r1 = r1.intersected(selection);
-  auto img1 = image1->subImage(r1);
-  auto img2 = image2->subImage(r1);
+  auto img1 = i1->subImage(r1);
+  auto img2 = i2->subImage(r1);
   fftw_complex *s2c = new fftw_complex[img1->getHeight()*(img1->getWidth()/2+1)];
   double *in = new double[img1->getHeight()*img1->getWidth()];
   fftw_plan f = fftw_plan_dft_r2c_2d(img1->getHeight(),img1->getWidth(),in,s2c,FFTW_ESTIMATE);
@@ -117,8 +119,8 @@ std::shared_ptr<FitsImage> MeasureCrossCorrelation::correlate(std::shared_ptr<Fi
   fftw_execute(b);
   double *sin = new double[img1->getHeight()*img1->getWidth()];
   sort(in,sin,img1->getWidth(),img1->getHeight());
-  auto result = std::make_shared<FitsImage>(img2->getName()+"_cc",img1->getWidth(),img1->getHeight());
-  PixelIterator it2 = result->getPixelIterator();
+  auto ccimg = std::make_shared<FitsImage>(img2->getName()+"_cc",img1->getWidth(),img1->getHeight());
+  PixelIterator it2 = ccimg->getPixelIterator();
   double *rptr = sin;
   for (uint32_t i=0;i<img1->getHeight()*img1->getWidth();i++)
   {
@@ -132,7 +134,7 @@ std::shared_ptr<FitsImage> MeasureCrossCorrelation::correlate(std::shared_ptr<Fi
   delete [] c1;
   delete [] sin;
   delete [] in;
-  return result;
+  return std::make_shared<FitsObject>(ccimg);
 }
 
 

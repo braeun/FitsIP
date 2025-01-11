@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - star detection class                                                *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-01-10                                                         *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.                                           *
  ********************************************************************************
@@ -53,11 +53,11 @@ public:
 
   virtual bool createsNewImage() const override;
 
-  virtual std::vector<std::shared_ptr<FitsImage>> getCreatedImages() const override;
+  virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 
   virtual QString getMenuEntry() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
   std::vector<Star> findStars(std::shared_ptr<FitsImage> image);
 

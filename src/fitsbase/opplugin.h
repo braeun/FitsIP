@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - base class for operation plugins                                    *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #define OPPLUGIN_H
 
 #include "plugin.h"
+#include "fitsobject.h"
 #include "profiling/simpleprofiler.h"
 #include "widgets/previewoptions.h"
 #include <QFileInfo>
@@ -33,8 +34,6 @@
 #include <memory>
 
 Q_DECLARE_LOGGING_CATEGORY(LOG_PROFILER)
-
-class FitsImage;
 
 class OpPlugin: public Plugin
 {
@@ -65,9 +64,9 @@ public:
    * here.
    * @return list of created images
    */
-  virtual std::vector<std::shared_ptr<FitsImage>> getCreatedImages() const;
+  virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions());
+  virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions());
 
   virtual ResultType execute(const std::vector<QFileInfo>& list, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions());
 
@@ -101,11 +100,25 @@ protected:
    */
   virtual ResultType save(std::shared_ptr<FitsImage> image, const QString& outputpath, const QFileInfo& info, const QString& tag="");
 
+  /**
+   * @brief Save the image to disk
+   * @param image the image to save
+   * @param outputpath the path where to save the image
+   * @param info the original file info (needed for filename)
+   * @param tag optional tag, which will be appended to the basename of the file
+   * @return result of the operation
+   */
+  virtual ResultType save(std::shared_ptr<FitsObject> image, const QString& outputpath, const QFileInfo& info, const QString& tag="");
+
   void log(std::shared_ptr<FitsImage> image, const QString& msg);
+
+  void log(std::shared_ptr<FitsObject> image, const QString& msg);
 
   void logProfiler(const QString& image, const QString& msg="");
 
   void logProfiler(std::shared_ptr<FitsImage> image, const QString& msg="");
+
+  void logProfiler(std::shared_ptr<FitsObject> image, const QString& msg="");
 
   bool interactive;
   std::vector<QFileInfo> filelist;

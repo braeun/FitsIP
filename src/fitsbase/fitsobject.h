@@ -30,18 +30,26 @@
 #include <memory>
 #include <QString>
 
+/**
+ * @brief The FitsObject class contains an object in the FitsIP application,
+ *        which encapsulates the image and additional data.
+ */
 class FitsObject
 {
 public:
-  FitsObject(QString filename, std::shared_ptr<FitsImage> img);
+  FitsObject(std::shared_ptr<FitsImage> img, QString filename="");
 
   int32_t getId() const;
+
+  QString getName() const;
 
   QString getFilename() const;
 
   std::shared_ptr<FitsImage> getImage();
 
-  std::shared_ptr<Histogram> getHistogram();
+  void setImage(const std::shared_ptr<FitsImage>& img);
+
+  const Histogram& getHistogram(bool update=false);
 
   void updateHistogram();
 
@@ -62,15 +70,15 @@ public:
   bool isUndoAvailable() const;
 
 private:
-  const int32_t id;
+  const int id;
   QString filename;
   std::shared_ptr<FitsImage> image;
-  std::shared_ptr<Histogram> histogram;
+  Histogram histogram;
   Profile xprofile;
   Profile yprofile;
   UndoStack undostack;
 
-  static int32_t idCounter;
+  static int idCounter;
 };
 
 #endif // FILEOBJECT_H

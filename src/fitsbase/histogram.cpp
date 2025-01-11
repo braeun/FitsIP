@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - intensity histogram                                                 *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,11 +34,6 @@ Histogram::Histogram():
   min(0.0),
   max(4096)
 {
-  for (uint32_t i=0;i<4;i++)
-  {
-    data[i] = new int32_t[bin];
-    memset(data[i],0,bin*sizeof(int));
-  }
 }
 
 Histogram::Histogram(ValueType min, ValueType max, int32_t bin):
@@ -46,11 +41,6 @@ Histogram::Histogram(ValueType min, ValueType max, int32_t bin):
   min(min),
   max(max)
 {
-  for (uint32_t i=0;i<4;i++)
-  {
-    data[i] = new int32_t[bin];
-    memset(data[i],0,bin*sizeof(int));
-  }
 }
 
 
@@ -59,7 +49,6 @@ Histogram::Histogram(ValueType min, ValueType max, int32_t bin):
  */
 Histogram::~Histogram(void)
 {
-  for (int32_t i=0;i<4;i++) delete [] data[i];
 }
 
 /*
@@ -84,15 +73,18 @@ void Histogram::clear(void)
 {
   for (uint32_t i=0;i<4;i++)
   {
-    memset(data[i],0,bin*sizeof(int));
+    data[i].clear();
   }
 }
 
 void Histogram::build(FitsImage* img)
 {
-  clear();
+  for (uint32_t i=0;i<4;i++)
+  {
+    data[i].assign(bin,0);
+  }
   sum = img->getWidth() * img->getHeight();
-  rgb = img->getDepth() == 3;
+  bool rgb = img->getDepth() == 3;
   ValueType ma = -std::numeric_limits<ValueType>::max();
   ValueType mi = std::numeric_limits<ValueType>::max();
   ConstPixelIterator p = img->getConstPixelIterator();
@@ -120,24 +112,29 @@ void Histogram::build(FitsImage* img)
   }
 }
 
-int32_t Histogram::getSum() const
+bool Histogram::isRGB() const
+{
+  return !data[1].empty();
+}
+
+int Histogram::getSum() const
 {
   return sum;
 }
 
-int32_t Histogram::getSum(int32_t maxbin) const
+int Histogram::getSum(int32_t maxbin) const
 {
   int64_t sum = 0;
-  int32_t *d = data[0];
-  for (int32_t i=0;i<std::min(bin,maxbin+1);i++) sum += *d++;
+  const int *d = data[0].data();
+  for (int i=0;i<std::min(bin,maxbin+1);i++) sum += *d++;
   return sum;
 }
 
 ValueType Histogram::getFillLevel(double p) const
 {
-  int32_t n = static_cast<int32_t>(p*sum);
-  int32_t b = 0;
-  int32_t *d = data[0];
+  int n = static_cast<int32_t>(p*sum);
+  int b = 0;
+  const int *d = data[0].data();
   while (b < bin && n > 0)
   {
     n -= *d++;
@@ -148,9 +145,9 @@ ValueType Histogram::getFillLevel(double p) const
 
 AverageResult Histogram::getAverage(double p) const
 {
-  int32_t cnt = static_cast<int32_t>(p*sum);
-  int32_t b = 0;
-  int32_t *d = data[0];
+  int cnt = static_cast<int>(p*sum);
+  int b = 0;
+  const int *d = data[0].data();
   int64_t n = 0;
   double sum = 0;
   double sum2 = 0;

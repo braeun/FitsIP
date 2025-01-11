@@ -40,7 +40,7 @@ QString OpShrink::getMenuEntry() const
 return "Image/Shrink...";
 }
 
-OpPlugin::ResultType OpShrink::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpShrink::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {
@@ -50,24 +50,24 @@ OpPlugin::ResultType OpShrink::execute(std::shared_ptr<FitsImage> image, QRect /
   {
     uint32_t factor = dlg->getFactor();
     profiler.start();
-    uint32_t w = image->getWidth() / factor;
-    uint32_t h = image->getHeight() / factor;
-    FitsImage img(image->getName(),w,h,image->getDepth());
-    img.setMetadata(image->getMetadata());
-    for (uint32_t d=0;d<image->getDepth();d++)
+    uint32_t w = image->getImage()->getWidth() / factor;
+    uint32_t h = image->getImage()->getHeight() / factor;
+    auto img = std::make_shared<FitsImage>(image->getName(),w,h,image->getImage()->getDepth());
+    img->setMetadata(image->getImage()->getMetadata());
+    for (uint32_t d=0;d<image->getImage()->getDepth();d++)
     {
-      ValueType* src = image->getLayer(d)->getData();
+      ValueType* src = image->getImage()->getLayer(d)->getData();
       for (uint32_t y=0;y<h*factor;y++)
       {
-        ValueType* dst = img.getLayer(d)->getData() + (y / factor * w);
+        ValueType* dst = img->getLayer(d)->getData() + (y / factor * w);
         for (uint32_t x=0;x<w*factor;x++)
         {
           dst[x/factor] += src[x];
         }
-        src += image->getWidth();
+        src += image->getImage()->getWidth();
       }
     }
-    *image = img;
+    image->setImage(img);
     profiler.stop();
     log(image,QString("OpShrink: factor=%1").arg(factor));
     logProfiler(image);

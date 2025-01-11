@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - gaussian blur                                                       *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -44,17 +44,17 @@ QString OpGaussBlur::getMenuEntry() const
   return "Filter/Gaussian Blur...";
 }
 
-OpPlugin::ResultType OpGaussBlur::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpGaussBlur::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new OpGaussBlurDialog();
-  dlg->setSourceImage(image,selection,opt);
+  dlg->setSourceImage(image->getImage(),selection,opt);
   if (dlg->exec())
   {
     ValueType sigmax = dlg->getSigma();
     ValueType sigmay = dlg->getSigma();
     ValueType accuracy = 0.1;
     profiler.start();
-    blur(image,sigmax,sigmay,accuracy);
+    blur(image->getImage(),sigmax,sigmay,accuracy);
     profiler.stop();
     log(image,QString::asprintf("Gaussian blur: sigmax=%f  sigmay=%f  accuracy=%f",sigmax,sigmay,accuracy));
     logProfiler(image);

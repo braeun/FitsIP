@@ -46,7 +46,7 @@ QIcon OpResize::getIcon() const
   return QIcon(":/pluginicons/resources/icons/transform-scale.png");
 }
 
-OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {
@@ -61,10 +61,10 @@ OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsImage> image, QRect /
     switch (mode)
     {
       case 0:
-        *image = *grow(image,factor,bilinear);
+        image->setImage(grow(image->getImage(),factor,bilinear));
         break;
       case 1:
-        *image = *shrink(image,factor);
+        image->setImage(shrink(image->getImage(),factor));
         break;
     }
     profiler.stop();

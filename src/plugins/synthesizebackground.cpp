@@ -48,16 +48,16 @@ bool SynthesizeBackground::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> SynthesizeBackground::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> SynthesizeBackground::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{img};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
-OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new SynthesizeBackgroundDialog();
   Histogram hist;
-  hist.build(image.get());
+  hist.build(image->getImage().get());
   dlg->setSky(hist.getAverage(0.75));
   if (dlg->exec())
   {
@@ -68,10 +68,10 @@ OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsImage> im
     switch (dlg->getSelectionMode())
     {
       case 0:
-        list = getGridPoints(image,n,bkg);
+        list = getGridPoints(image->getImage(),n,bkg);
         break;
       case 1:
-        list = getRandomPoints(image,n,bkg);
+        list = getRandomPoints(image->getImage(),n,bkg);
         break;
     }
     if (list.empty())
@@ -81,11 +81,11 @@ OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsImage> im
     }
     uint32_t deg = dlg->getPolynomDegree();
     std::vector<std::vector<double>> coeff;
-    for (u_int32_t l=0;l<image->getDepth();l++)
+    for (u_int32_t l=0;l<image->getImage()->getDepth();l++)
     {
       coeff.push_back(getCoefficients(list,deg,l));
     }
-    img = createImage(image->getWidth(),image->getHeight(),coeff,deg);
+    img = createImage(image->getImage()->getWidth(),image->getImage()->getHeight(),coeff,deg);
     profiler.stop();
     log(img,"Synthesized Background");
     logProfiler(img);

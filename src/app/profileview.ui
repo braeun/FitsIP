@@ -171,7 +171,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QwtPlot" name="horizontalProfileWidget">
+          <widget class="ProfileChart" name="horizontalProfileWidget">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -212,7 +212,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QwtPlot" name="verticalProfileWidget">
+          <widget class="ProfileChart" name="verticalProfileWidget">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -231,9 +231,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QwtPlot</class>
+   <class>ProfileChart</class>
    <extends>QFrame</extends>
-   <header>qwt_plot.h</header>
+   <header location="global">fitsbase/widgets/profilechart.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

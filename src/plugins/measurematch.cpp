@@ -54,7 +54,7 @@ QString MeasureMatch::getMenuEntry() const
   return "Measure/Match...";
 }
 
-OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsImage> image, QRect aoi, const PreviewOptions& opt)
+OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {
@@ -69,7 +69,7 @@ OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsImage> image, QRe
     subsample = dlg->getSubsample();
     factor = dlg->getScaleFactor();
     profiler.start();
-    setTemplate(image,aoi);
+    setTemplate(image->getImage(),aoi);
     std::shared_ptr<FitsObject> file = dlg->getImage();
     computeMatch(file->getImage());
     profiler.stop();

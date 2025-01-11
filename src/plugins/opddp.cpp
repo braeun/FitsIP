@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing                                      *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,10 +41,10 @@ QString OpDDP::getMenuEntry() const
   return "Filter/DDP...";
 }
 
-OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new OpDDPDialog();
-  dlg->setSourceImage(image,selection,opt);
+  dlg->setSourceImage(image->getImage(),selection,opt);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();
@@ -52,7 +52,7 @@ OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsImage> image, QRect sele
     ValueType a = dlg->getA();
     ValueType b = dlg->getB();
     profiler.start();
-    ddp(image,sigma,bkg,a,b);
+    ddp(image->getImage(),sigma,bkg,a,b);
 //    auto i1 = std::make_shared<FitsImage>(*image);
 //    *i1 -= bkg;
 //    OpGaussBlur blur;

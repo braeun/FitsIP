@@ -40,11 +40,11 @@ public:
 
   virtual bool createsNewImage() const override;
 
-  virtual std::vector<std::shared_ptr<FitsImage>> getCreatedImages() const override;
+  virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 
   virtual QString getMenuEntry() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
   std::shared_ptr<FitsImage> invfft(std::shared_ptr<FitsImage> image);
 

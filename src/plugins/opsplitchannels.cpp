@@ -37,9 +37,14 @@ bool OpSplitChannels::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpSplitChannels::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> OpSplitChannels::getCreatedImages() const
 {
-  return images;
+  std::vector<std::shared_ptr<FitsObject>> list;
+  for (auto i : images)
+  {
+    list.push_back(std::make_shared<FitsObject>(i));
+  }
+  return list;
 }
 
 
@@ -48,15 +53,15 @@ QString OpSplitChannels::getMenuEntry() const
   return "Color/Split";
 }
 
-OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsImage> image, QRect /*aoi*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsObject> image, QRect /*aoi*/, const PreviewOptions& opt)
 {
-  if (image->getDepth() != 3)
+  if (image->getImage()->getDepth() != 3)
   {
     setError("Not a color image");
     return ERROR;
   }
   profiler.start();
-  images = split(image);
+  images = split(image->getImage());
   profiler.stop();
   logProfiler(image);
   return OK;

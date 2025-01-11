@@ -118,6 +118,7 @@ qt5_wrap_cpp(plugin_mocs
   )
 
 set(private_header_list
+  analyseprofiledialog.h
   findstarsdialog.h
   lucyrichardsondeconvolutiondialog.h
   measurematchdialog.h
@@ -144,52 +145,31 @@ set(private_header_list
 )
 
 add_library(fitsplugins
-  findstarsdialog.cpp
-  findstarsdialog.ui
-  lucyrichardsondeconvolutiondialog.cpp
-  lucyrichardsondeconvolutiondialog.ui
-  measurematchdialog.cpp
-  measurematchdialog.ui
-  measurerankresultdialog.cpp
-  measurerankresultdialog.ui
-  opaligndialog.cpp
-  opaligndialog.ui
-  opcalibrationdialog.cpp
-  opcalibrationdialog.ui
+  analyseprofiledialog.cpp analyseprofiledialog.ui
+  findstarsdialog.cpp findstarsdialog.ui
+  lucyrichardsondeconvolutiondialog.cpp lucyrichardsondeconvolutiondialog.ui
+  measurematchdialog.cpp measurematchdialog.ui
+  measurerankresultdialog.cpp measurerankresultdialog.ui
+  opaligndialog.cpp opaligndialog.ui
+  opcalibrationdialog.cpp opcalibrationdialog.ui
   opcombinechannelsdialog.cpp opcombinechannelsdialog.ui
-  opcropdialog.cpp
-  opcropdialog.ui
-  opddpdialog.cpp
-  opddpdialog.ui
-  opgaussblurdialog.cpp
-  opgaussblurdialog.ui
-  opgrowdialog.cpp
-  opgrowdialog.ui
-  opkerneldialog.cpp
-  opkerneldialog.ui
-  opmediandialog.cpp
-  opmediandialog.ui
-  opresizedialog.cpp
-  opresizedialog.ui
-  oprotatedialog.cpp
-  oprotatedialog.ui
-  opshiftdialog.cpp
-  opshiftdialog.ui
-  opshrinkdialog.cpp
-  opshrinkdialog.ui
-  opstackdialog.cpp
-  opstackdialog.ui
-  opunsharpmaskdialog.cpp
-  opunsharpmaskdialog.ui
+  opcropdialog.cpp opcropdialog.ui
+  opddpdialog.cpp opddpdialog.ui
+  opgaussblurdialog.cpp opgaussblurdialog.ui
+  opgrowdialog.cpp opgrowdialog.ui
+  opkerneldialog.cpp opkerneldialog.ui
+  opmediandialog.cpp opmediandialog.ui
+  opresizedialog.cpp opresizedialog.ui
+  oprotatedialog.cpp oprotatedialog.ui
+  opshiftdialog.cpp opshiftdialog.ui
+  opshrinkdialog.cpp opshrinkdialog.ui
+  opstackdialog.cpp opstackdialog.ui
+  opunsharpmaskdialog.cpp opunsharpmaskdialog.ui
   pluginresources.qrc
-  synthesizebackgrounddialog.cpp
-  synthesizebackgrounddialog.ui
-  vancittertdeconvolutiondialog.cpp
-  vancittertdeconvolutiondialog.ui
-  test/gaussiantestimagedialog.cpp
-  test/gaussiantestimagedialog.ui
-  test/psftestimagedialog.cpp
-  test/psftestimagedialog.ui
+  synthesizebackgrounddialog.cpp synthesizebackgrounddialog.ui
+  vancittertdeconvolutiondialog.cpp vancittertdeconvolutiondialog.ui
+  test/gaussiantestimagedialog.cpp test/gaussiantestimagedialog.ui
+  test/psftestimagedialog.cpp test/psftestimagedialog.ui
   ${plugin_sources}
   ${plugin_mocs}
   ${private_header_list}
@@ -207,6 +187,7 @@ if (FFTW_FOUND)
 endif()
 
 target_link_libraries(fitsplugins
+  PUBLIC fitsbase
   PUBLIC Qt5::Widgets
   PUBLIC Qt5::Core
   )

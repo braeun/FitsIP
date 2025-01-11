@@ -54,9 +54,9 @@ bool OpStack::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpStack::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> OpStack::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{img};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
 QString OpStack::getMenuEntry() const

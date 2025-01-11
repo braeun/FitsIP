@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - unsharp masking                                                     *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,16 +40,16 @@ QString OpUnsharpMask::getMenuEntry() const
   return "Filter/Unsharp Mask...";
 }
 
-OpPlugin::ResultType OpUnsharpMask::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpUnsharpMask::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new OpUnsharpMaskDialog();
-  dlg->setSourceImage(image,selection,opt);
+  dlg->setSourceImage(image->getImage(),selection,opt);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();
     ValueType strength = dlg->getStrength();
     profiler.start();
-    unsharpmask(image,sigma,strength);
+    unsharpmask(image->getImage(),sigma,strength);
     profiler.stop();
     log(image,QString::asprintf("Unsharp mask: sigma=%f  strength=%f",sigma,strength));
     logProfiler(image);

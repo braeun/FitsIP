@@ -55,7 +55,7 @@ QIcon LucyRichardsonDeconvolution::getIcon() const
   return QIcon(":/pluginicons/resources/icons/lr.png");
 }
 
-OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new LucyRichardsonDeconvolutionDialog();
   if (dlg->exec())
@@ -71,7 +71,7 @@ OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsIm
       parameter = dlg->getParameter();
       auto psfpar = dlg->getParameters();
       profiler.start();
-      deconvolve(image,psf,psfpar,dlg->getIterationCount(),true);
+      deconvolve(image->getImage(),psf,psfpar,dlg->getIterationCount(),true);
       profiler.stop();
       QString msg = "Lucy Richardson deconvolution: ";
       msg += psf->getName() + " par=";

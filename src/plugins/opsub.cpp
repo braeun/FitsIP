@@ -48,7 +48,7 @@ QIcon OpSub::getIcon() const
   return QIcon(":/pluginicons/resources/icons/minus.png");
 }
 
-OpPlugin::ResultType OpSub::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpSub::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {
@@ -63,7 +63,7 @@ OpPlugin::ResultType OpSub::execute(std::shared_ptr<FitsImage> image, QRect /*se
     profiler.start();
     try
     {
-      *image -= *file->getImage();
+      *image->getImage() -= *file->getImage();
       profiler.stop();
       log(image,"Subtracted image "+file->getImage()->getName());
       logProfiler(image);

@@ -146,7 +146,7 @@ private:
   void addOpPlugin(OpPlugin* op);
   QAction* addMenuEntry(QString entry, QIcon icon);
   void executeOpPlugin(OpPlugin* op);
-  void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsImage> img, QRect roi, const PreviewOptions& opt);
+  void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, QRect roi, const PreviewOptions& opt);
   std::vector<QFileInfo> getFileList();
   void display(std::shared_ptr<FitsObject> obj);
   void updateDisplay();

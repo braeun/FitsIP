@@ -43,7 +43,7 @@ public:
 
   virtual QString getMenuEntry() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 private:
   OpShrinkDialog* dlg;

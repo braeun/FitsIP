@@ -20,6 +20,12 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 #set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_CXX_STANDARD 17)
 
+include(CheckTypeSize)
+check_type_size("int" SIZEOF_INT LANGUAGE CXX)
+if (${SIZEOF_INT} LESS "4")
+  message(FATAL_ERROR "int must be at least 32bit")
+endif()
+
 include(GNUInstallDirs)
 
 # keep rpath to actual Qt framework in executable

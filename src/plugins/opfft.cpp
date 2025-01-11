@@ -45,9 +45,9 @@ bool OpFFT::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpFFT::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> OpFFT::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{img};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
 
@@ -56,13 +56,13 @@ QString OpFFT::getMenuEntry() const
   return "Math/FFT";
 }
 
-OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsImage> image, QRect aoi, const PreviewOptions& opt)
+OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
 {
   profiler.start();
   if (aoi.isNull())
-    img = fft(*image);
+    img = fft(*image->getImage());
   else
-    img = fft(*image->subImage(aoi));
+    img = fft(*image->getImage()->subImage(aoi));
   profiler.stop();
   logProfiler(img);
   return OK;

@@ -41,17 +41,17 @@ QString OpMedian::getMenuEntry() const
   return "Filter/Median...";
 }
 
-OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new OpMedianDialog();
-  dlg->setSourceImage(image,selection,opt);
+  dlg->setSourceImage(image->getImage(),selection,opt);
   if (dlg->exec())
   {
     QApplication::setOverrideCursor(Qt::BusyCursor);
     ValueType threshold = dlg->getThreshold();
     int32_t size = dlg->getSize();
     profiler.start();
-    filter(image,threshold,size);
+    filter(image->getImage(),threshold,size);
     profiler.stop();
     log(image,QString::asprintf("Median filter: size=%d threshold=%f",size,threshold));
     logProfiler(image);

@@ -49,9 +49,9 @@ bool GaussianTestImage::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> GaussianTestImage::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> GaussianTestImage::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{img};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
 
@@ -60,7 +60,7 @@ QString GaussianTestImage::getMenuEntry() const
   return "Image/Test Images/Gaussian...";
 }
 
-OpPlugin::ResultType GaussianTestImage::execute(std::shared_ptr<FitsImage> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType GaussianTestImage::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (!dlg)
   {

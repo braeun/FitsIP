@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - intensity histogram                                                 *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,7 @@
 #include "rgbvalue.h"
 #include <iostream>
 #include <memory>
+#include <vector>
 
 class FitsImage;
 
@@ -39,16 +40,16 @@ public:
   Histogram(ValueType min, ValueType max, int32_t bin);
   ~Histogram(void);
 
-  bool isRGB(void) const                { return rgb; }
+  bool isEmpty() const                  { return data[0].empty(); }
   int32_t getBinCount(void) const       { return bin; }
   ValueType getMin(void) const          { return min; }
   ValueType getMax(void) const          { return max; }
-  ValueType getX(int32_t b) const       { return min + (max - min) / bin * b; }
-  int getGrayValue(int32_t n) const     { return ((n >= 0 && n < bin) ? (data[0])[n] : 0); }
-  int getRedValue(int32_t n) const      { return ((n >= 0 && n < bin) ? (data[1])[n] : 0); }
-  int getGreenValue(int32_t n) const    { return ((n >= 0 && n < bin) ? (data[2])[n] : 0); }
-  int getBlueValue(int32_t n) const     { return ((n >= 0 && n < bin) ? (data[3])[n] : 0); }
-  int getValue(int i, int32_t n) const  { return ((n >= 0 && n < bin) ? (data[i])[n] : 0); }
+  ValueType getX(int b) const       { return min + (max - min) / bin * b; }
+  int getGrayValue(int n) const     { return ((n >= 0 && n < bin) ? (data[0])[n] : 0); }
+  int getRedValue(int n) const      { return ((n >= 0 && n < bin) ? (data[1])[n] : 0); }
+  int getGreenValue(int n) const    { return ((n >= 0 && n < bin) ? (data[2])[n] : 0); }
+  int getBlueValue(int n) const     { return ((n >= 0 && n < bin) ? (data[3])[n] : 0); }
+  int getValue(int i, int n) const  { return ((n >= 0 && n < bin) ? (data[i])[n] : 0); }
 
   /**
    * @brief Clear histogram
@@ -67,13 +68,15 @@ public:
   /* Increment bins corresponding to RGBValue rgb */
   inline void inc(const RGBValue&);
 
+  bool isRGB(void) const;
+
   /**
    * @brief Get the sum of all entries, i.e. the number of pixels in the
    * image.
    *
    * @return sum of all entries
    */
-  int32_t getSum() const;
+  int getSum() const;
 
   /**
    * @brief Get the sum of all entries from bin 0 to maxbin inclusive.
@@ -82,7 +85,7 @@ public:
    * @param maxbin the maximum bin to sum up to
    * @return sum of entries
    */
-  int32_t getSum(int32_t maxbin) const;
+  int getSum(int maxbin) const;
 
   /**
    * @brief Get the intensity level below which a certain fraction of entries lies.
@@ -104,10 +107,9 @@ public:
   friend std::ostream &operator<<(std::ostream&, const Histogram&);
 
  private:
-  bool rgb;         /* true if histogram also contains RGB data */
-  int32_t sum;      /* # of entries = # of pixels in image */
-  int32_t bin;      /* number of bins */
-  int32_t *data[4]; /* 4 histograms: [0] = gray level; [1] = red; [2] = green; [3] = blue */
+  int sum;          /* # of entries = # of pixels in image */
+  int bin;          /* number of bins */
+  std::vector<int> data[4]; /* 4 histograms: [0] = gray level; [1] = red; [2] = green; [3] = blue */
   ValueType min;    /* minimum bin */
   ValueType max;    /* maximum bin */
 };
@@ -117,7 +119,7 @@ public:
  */
 inline void Histogram::inc(ValueType v)
 {
-  int n = static_cast<int32_t>((v - min) / (max - min) * bin);
+  int n = static_cast<int>((v - min) / (max - min) * bin);
   if (n >= 0 && n < bin) (data[0])[n]++;
 }
 
@@ -126,11 +128,11 @@ inline void Histogram::inc(ValueType v)
  */
 inline void Histogram::inc(const RGBValue &rgb)
 {
-  int n = static_cast<int32_t>((rgb.r - min) / (max - min) * bin);
+  int n = static_cast<int>((rgb.r - min) / (max - min) * bin);
   if (n >= 0 && n < bin) (data[1])[n]++;
-  n = static_cast<int32_t>((rgb.g - min) / (max - min) * bin);
+  n = static_cast<int>((rgb.g - min) / (max - min) * bin);
   if (n >= 0 && n < bin) (data[2])[n]++;
-  n = static_cast<int32_t>((rgb.b - min) / (max - min) * bin);
+  n = static_cast<int>((rgb.b - min) / (max - min) * bin);
   if (n >= 0 && n < bin) (data[3])[n]++;
 }
 

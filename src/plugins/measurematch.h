@@ -52,7 +52,7 @@ public:
 
   virtual QString getMenuEntry() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> list, QRect aoi=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(std::shared_ptr<FitsObject> list, QRect aoi=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
   void setTemplate(std::shared_ptr<FitsImage> image, QRect aoi=QRect());
 

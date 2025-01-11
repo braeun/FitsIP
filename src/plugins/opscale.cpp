@@ -42,17 +42,17 @@ QString OpScale::getMenuEntry() const
   return "Math/Scale...";
 }
 
-OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg.exec())
   {
     ValueType bias = dlg.getValue1().toDouble();
     ValueType scale = dlg.getValue2().toDouble();
     profiler.start();
-    uint32_t n = image->getWidth() * image->getHeight();
-    for (uint32_t i=0;i<image->getDepth();i++)
+    uint32_t n = image->getImage()->getWidth() * image->getImage()->getHeight();
+    for (uint32_t i=0;i<image->getImage()->getDepth();i++)
     {
-      ValueType* p = image->getLayer(i)->getData();
+      ValueType* p = image->getImage()->getLayer(i)->getData();
       for (uint32_t j=0;j<n;j++)
       {
         *p = *p * scale + bias;

@@ -48,7 +48,7 @@ QIcon OpDiv::getIcon() const
   return QIcon(":/pluginicons/resources/icons/div.png");
 }
 
-OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {
@@ -63,7 +63,7 @@ OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsImage> image, QRect /*se
     profiler.start();
     try
     {
-      *image /= *file->getImage();
+      *image->getImage() /= *file->getImage();
       profiler.stop();
       log(image,"Divided by image "+file->getImage()->getName());
       logProfiler(image);

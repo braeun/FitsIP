@@ -55,7 +55,7 @@ QIcon VanCittertDeconvolution::getIcon() const
   return QIcon(":/pluginicons/resources/icons/vc.png");
 }
 
-OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& /*opt*/)
+OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& /*opt*/)
 {
   if (!dlg) dlg = new VanCittertDeconvolutionDialog();
   if (dlg->exec())
@@ -71,7 +71,7 @@ OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsImage>
       parameter = dlg->getParameter();
       auto psfpar = dlg->getParameters();
       profiler.start();
-      deconvolve(image,psf,psfpar,dlg->getIterationCount(),true);
+      deconvolve(image->getImage(),psf,psfpar,dlg->getIterationCount(),true);
       profiler.stop();
       QString msg = "van Cittert deconvolution: ";
       msg += psf->getName() + " par=";

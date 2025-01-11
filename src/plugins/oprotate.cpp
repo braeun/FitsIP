@@ -48,7 +48,7 @@ QIcon OpRotate::getIcon() const
   return QIcon(":/pluginicons/resources/icons/transform-rotate.png");
 }
 
-OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {
@@ -59,19 +59,19 @@ OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsImage> image, QRect /
     profiler.start();
     if (dlg->isRotate90CW())
     {
-      rotate90cw(image);
+      rotate90cw(image->getImage());
       profiler.stop();
       log(image,"OpRotate: 90deg cw");
     }
     else if (dlg->isRotate90CCW())
     {
-      rotate90ccw(image);
+      rotate90ccw(image->getImage());
       profiler.stop();
       log(image,"OpRotate: 90deg ccw");
     }
     else
     {
-      rotate(image,dlg->getAngle(),false);
+      rotate(image->getImage(),dlg->getAngle(),false);
       profiler.stop();
       log(image,QString("OpRotate: %1deg").arg(static_cast<ValueType>(dlg->getAngle())));
     }

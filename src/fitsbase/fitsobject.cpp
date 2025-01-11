@@ -28,19 +28,23 @@
 
 int32_t FitsObject::idCounter = 0;
 
-FitsObject::FitsObject(QString fn, std::shared_ptr<FitsImage> img):
+FitsObject::FitsObject(std::shared_ptr<FitsImage> img, QString fn):
   id(idCounter++),
   filename(fn),
   image(img)
 {
 //  QFileInfo info(filename);
-  histogram = std::make_shared<Histogram>();
-  histogram->build(image.get());
+//  histogram.build(image.get());
 }
 
 int32_t FitsObject::getId() const
 {
   return id;
+}
+
+QString FitsObject::getName() const
+{
+  return image->getName();
 }
 
 QString FitsObject::getFilename() const
@@ -53,14 +57,23 @@ std::shared_ptr<FitsImage> FitsObject::getImage()
   return image;
 }
 
-std::shared_ptr<Histogram> FitsObject::getHistogram()
+void FitsObject::setImage(const std::shared_ptr<FitsImage>& img)
 {
+  image = img;
+}
+
+const Histogram& FitsObject::getHistogram(bool update)
+{
+  if (histogram.isEmpty() || update)
+  {
+    histogram.build(image.get());
+  }
   return histogram;
 }
 
 void FitsObject::updateHistogram()
 {
-  histogram->build(image.get());
+  histogram.build(image.get());
 }
 
 void FitsObject::setXProfile(const Profile& p)

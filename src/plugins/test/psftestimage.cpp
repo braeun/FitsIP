@@ -49,9 +49,9 @@ bool PSFTestImage::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> PSFTestImage::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> PSFTestImage::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{img};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
 
@@ -60,7 +60,7 @@ QString PSFTestImage::getMenuEntry() const
   return "Image/Test Images/PSF...";
 }
 
-OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsImage> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (!dlg)
   {

@@ -45,9 +45,9 @@ bool OpInvFFT::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpInvFFT::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> OpInvFFT::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{img};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
 
@@ -56,13 +56,13 @@ QString OpInvFFT::getMenuEntry() const
   return "Math/Inverse FFT";
 }
 
-OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsImage> image, QRect aoi, const PreviewOptions& opt)
+OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
 {
   profiler.start();
   if (aoi.isNull())
-    img = invfft(image);
+    img = invfft(image->getImage());
   else
-    img = invfft(image->subImage(aoi));
+    img = invfft(image->getImage()->subImage(aoi));
   profiler.stop();
   if (!img) return ERROR;
   logProfiler(img);

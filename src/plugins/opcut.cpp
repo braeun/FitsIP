@@ -48,14 +48,14 @@ QIcon OpCut::getIcon() const
   return QIcon(":/pluginicons/resources/icons/opcut.png");
 }
 
-OpPlugin::ResultType OpCut::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpCut::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg.exec())
   {
     ValueType lower = dlg.getValue1().toDouble();
     ValueType upper = dlg.getValue2().toDouble();
     profiler.start();
-    cut(image,lower,upper);
+    cut(image->getImage(),lower,upper);
     profiler.stop();
     log(image,QString("cut values ouside range: lower=%1 upper=%2").arg(lower).arg(upper));
     logProfiler(image);

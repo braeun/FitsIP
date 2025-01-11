@@ -42,9 +42,9 @@ bool OpAverage::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpAverage::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> OpAverage::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{img};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
 QString OpAverage::getMenuEntry() const

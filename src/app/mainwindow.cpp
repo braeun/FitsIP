@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -334,8 +334,8 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
         {
           for (auto img : op->getCreatedImages())
           {
-            std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
-            ImageCollection::getGlobal().addFile(file);
+//            std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
+            ImageCollection::getGlobal().addFile(img);
           }
           ui->openFileList->selectionModel()->clearSelection();
           ui->openFileList->selectionModel()->setCurrentIndex(ImageCollection::getGlobal().index(ImageCollection::getGlobal().rowCount()-1,0),QItemSelectionModel::SelectCurrent);
@@ -361,11 +361,11 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
     ui->actionUndo->setEnabled(activeFile->isUndoAvailable());
     PreviewOptions opt;
     opt.scale = static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale());
-    executeOpPlugin(op,activeFile->getImage(),imageWidget->getAOI(),opt);
+    executeOpPlugin(op,activeFile,imageWidget->getAOI(),opt);
   }
   else if (!op->requiresImage())
   {
-    executeOpPlugin(op,std::shared_ptr<FitsImage>(),QRect(),PreviewOptions());
+    executeOpPlugin(op,std::shared_ptr<FitsObject>(),QRect(),PreviewOptions());
   }
   else
   {
@@ -411,7 +411,7 @@ std::vector<QFileInfo> MainWindow::getFileList()
   return filelist;
 }
 
-void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsImage> img, QRect aoi, const PreviewOptions& opt)
+void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, QRect aoi, const PreviewOptions& opt)
 {
   OpPlugin::ResultType ret = op->execute(img,aoi,opt);
   if (ret == OpPlugin::OK)
@@ -420,8 +420,8 @@ void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsImage> img, Q
     {
       for (auto img : op->getCreatedImages())
       {
-        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
-        ImageCollection::getGlobal().addFile(file);
+//        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
+        ImageCollection::getGlobal().addFile(img);
       }
       ui->openFileList->selectionModel()->clearSelection();
       ui->openFileList->selectionModel()->setCurrentIndex(ImageCollection::getGlobal().index(ImageCollection::getGlobal().rowCount()-1,0),QItemSelectionModel::SelectCurrent);
@@ -470,7 +470,7 @@ void MainWindow::updateDisplay()
   ui->profileWidget->setImage(activeFile);
   if (activeFile)
   {
-    QImage tmp = activeFile->getImage()->toQImage(activeFile->getHistogram()->getMin(),activeFile->getHistogram()->getMax(),static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale()));
+    QImage tmp = activeFile->getImage()->toQImage(activeFile->getHistogram().getMin(),activeFile->getHistogram().getMax(),static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale()));
     imageWidget->setImage(tmp);
     if (!ui->scrollArea->widgetResizable()) imageWidget->adjustSize();
     ui->widthLabel->setText(QString::number(activeFile->getImage()->getWidth()));
@@ -554,7 +554,7 @@ void MainWindow::open(const QFileInfo &fileinfo)
     {
       QApplication::setOverrideCursor(Qt::BusyCursor);
       std::shared_ptr<FitsImage> image = handler->read(fileinfo.absoluteFilePath());
-      std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(fileinfo.absoluteFilePath(),image);
+      std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absoluteFilePath());
       ImageCollection::getGlobal().addFile(file);
       ui->openFileList->selectionModel()->clearSelection();
       ui->openFileList->selectionModel()->setCurrentIndex(ImageCollection::getGlobal().index(ImageCollection::getGlobal().rowCount()-1,0),QItemSelectionModel::SelectCurrent);

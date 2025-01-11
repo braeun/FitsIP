@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing dialog                               *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,7 +23,7 @@
 #include "opddpdialog.h"
 #include "ui_opddpdialog.h"
 #include "opddp.h"
-#include <fitsbase/fitsimage.h>
+#include <fitsbase/fitsobject.h>
 #include <fitsbase/histogram.h>
 #include <fitsbase/settings.h>
 

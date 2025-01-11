@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the histogram and associated controls             *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -76,14 +76,15 @@ void HistogramView::setImage(std::shared_ptr<FitsObject> obj)
   image = obj;
   if (image)
   {
-    minMarker->setXValue(static_cast<double>(image->getHistogram()->getMin()));
-    maxMarker->setXValue(static_cast<double>(image->getHistogram()->getMax()));
-    ui->imageMinIntensity->setText(QString::number(static_cast<double>(image->getHistogram()->getMin())));
-    ui->imageMaxIntensity->setText(QString::number(static_cast<double>(image->getHistogram()->getMax())));
-    ui->scalingSlider->setMinimum(image->getHistogram()->getMin());
-    ui->scalingSlider->setMaximum(image->getHistogram()->getMax());
-    ui->scalingSlider->setLowerValue(image->getHistogram()->getMin());
-    ui->scalingSlider->setUpperValue(image->getHistogram()->getMax());
+    auto hist = image->getHistogram();
+    minMarker->setXValue(static_cast<double>(hist.getMin()));
+    maxMarker->setXValue(static_cast<double>(hist.getMax()));
+    ui->imageMinIntensity->setText(QString::number(static_cast<double>(hist.getMin())));
+    ui->imageMaxIntensity->setText(QString::number(static_cast<double>(hist.getMax())));
+    ui->scalingSlider->setMinimum(hist.getMin());
+    ui->scalingSlider->setMaximum(hist.getMax());
+    ui->scalingSlider->setLowerValue(hist.getMin());
+    ui->scalingSlider->setUpperValue(hist.getMax());
   }
   ui->chartWidget->setAxisAutoScale(QwtPlot::yLeft,true);
   ui->chartWidget->setAxisAutoScale(QwtPlot::xBottom,true);
@@ -96,9 +97,10 @@ void HistogramView::redraw()
   QVector<QPointF> v;
   if (image)
   {
-    for (int32_t i=0;i<image->getHistogram()->getBinCount();i++)
+    auto hist = image->getHistogram();
+    for (int32_t i=0;i<hist.getBinCount();i++)
     {
-      v.push_back(QPointF(image->getHistogram()->getX(i),std::max(static_cast<double>(image->getHistogram()->getGrayValue(i)),0.1)));
+      v.push_back(QPointF(hist.getX(i),std::max(static_cast<double>(hist.getGrayValue(i)),0.1)));
     }
   }
   grayCurve->setSamples(v);

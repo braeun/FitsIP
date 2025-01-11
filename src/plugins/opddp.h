@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing                                      *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -66,7 +66,7 @@ public:
 
   virtual QString getMenuEntry() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
   void ddp(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType bkg, ValueType a, ValueType b);
 

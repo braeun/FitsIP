@@ -50,9 +50,9 @@ bool PSFImage::createsNewImage() const
   return true;
 }
 
-std::vector<std::shared_ptr<FitsImage>> PSFImage::getCreatedImages() const
+std::vector<std::shared_ptr<FitsObject>> PSFImage::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsImage>>{img};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
 
@@ -61,7 +61,7 @@ QString PSFImage::getMenuEntry() const
   return "Image/PSF...";
 }
 
-OpPlugin::ResultType PSFImage::execute(std::shared_ptr<FitsImage> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType PSFImage::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
 {
   PSFDialog d;
   if (d.exec())

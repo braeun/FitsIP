@@ -49,18 +49,18 @@ public:
 
   virtual bool createsNewImage() const override;
 
-  virtual std::vector<std::shared_ptr<FitsImage>> getCreatedImages() const override;
+  virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 
   virtual QString getMenuEntry() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  std::shared_ptr<FitsImage> correlate(std::shared_ptr<FitsImage> image1, std::shared_ptr<FitsImage> image2, QRect selection=QRect());
+  std::shared_ptr<FitsObject> correlate(std::shared_ptr<FitsObject> image1, std::shared_ptr<FitsObject> image2, QRect selection=QRect());
 
 private:
   void sort(double *s, double *d, int32_t w, int32_t h);
 
-  std::shared_ptr<FitsImage> img;
+  std::shared_ptr<FitsObject> img;
   ImageSelectDialog* dlg;
 };
 

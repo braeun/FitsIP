@@ -45,11 +45,11 @@ QIcon OpSqrt::getIcon() const
   return QIcon(":/pluginicons/resources/icons/opsqrt.png");
 }
 
-OpPlugin::ResultType OpSqrt::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpSqrt::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   profiler.start();
-  PixelIterator p = image->getPixelIterator();
-  if (image->getDepth() == 1)
+  PixelIterator p = image->getImage()->getPixelIterator();
+  if (image->getImage()->getDepth() == 1)
   {
     while (p.hasNext())
     {
@@ -66,7 +66,7 @@ OpPlugin::ResultType OpSqrt::execute(std::shared_ptr<FitsImage> image, QRect /*s
     {
       ValueType val = p.getAbs();
       ValueType nval = sqrt(val);
-      for (uint32_t d=0;d<image->getDepth();d++) p[d] = p[d] * nval / val;
+      for (uint32_t d=0;d<image->getImage()->getDepth();d++) p[d] = p[d] * nval / val;
       ++p;
     }
   }

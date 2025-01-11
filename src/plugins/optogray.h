@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - convert image to gray scale image                                   *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,9 +41,9 @@ public:
 
   virtual QString getMenuEntry() const override;
 
-  virtual ResultType execute(std::shared_ptr<FitsImage> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  std::shared_ptr<FitsImage> toGray(std::shared_ptr<FitsImage> image);
+  std::shared_ptr<FitsObject> toGray(std::shared_ptr<FitsObject> image);
 
 };
 

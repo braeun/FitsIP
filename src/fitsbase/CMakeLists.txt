@@ -60,6 +60,7 @@ set(private_header_list
   qxt/qxtspanslider_p.h
   widgets/previewoptions.h
   widgets/previewwidget.h
+  widgets/profilechart.h
   widgets/psfwidget.h
   )
 
@@ -125,6 +126,7 @@ add_library(fitsbase
   qxt/qxtspanslider.cpp
   widgets/previewwidget.cpp widgets/previewwidget.ui
   widgets/previewoptions.cpp
+  widgets/profilechart.cpp
   widgets/psfwidget.cpp widgets/psfwidget.ui
   ${private_header_list}
   )
@@ -147,6 +149,7 @@ target_link_libraries(fitsbase
   PUBLIC PkgConfig::cfitsio
 #  PUBLIC ${CCFITS_LIBRARY}
 #  PUBLIC ${CFITSIO_LIBRARY}
+  PUBLIC PkgConfig::QWT
   PUBLIC Qt5::Xml
   PUBLIC Qt5::Widgets
   PUBLIC Qt5::Core

@@ -42,16 +42,16 @@ QString OpKernel::getMenuEntry() const
   return "Filter/Kernel Convolution...";
 }
 
-OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsImage> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   if (!dlg) dlg = new OpKernelDialog();
-  dlg->setSourceImage(image,selection,opt);
+  dlg->setSourceImage(image->getImage(),selection,opt);
   dlg->setKernelNames(KernelRepository::instance().getKernelNames());
   if (!dlg->exec()) return CANCELLED;
   Kernel kernel = KernelRepository::instance().getKernel(dlg->getKernelName());
   if (kernel.isEmpty()) return ERROR;
   profiler.start();
-  convolve(image,kernel);
+  convolve(image->getImage(),kernel);
   profiler.stop();
   log(image,"Convolution with kernel "+kernel.getName());
   logProfiler(image);

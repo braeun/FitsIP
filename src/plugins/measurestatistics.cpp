@@ -23,7 +23,6 @@
  ********************************************************************************/
 
 #include "measurestatistics.h"
-#include <fitsbase/fitsimage.h>
 #include <fitsbase/dialogs/textinfodialog.h>
 #include <limits>
 #include <algorithm>
@@ -46,10 +45,10 @@ QString MeasureStatistics::getMenuEntry() const
   return "Measure/Image Statistics...";
 }
 
-OpPlugin::ResultType MeasureStatistics::execute(std::shared_ptr<FitsImage> image, QRect rect, const PreviewOptions& opt)
+OpPlugin::ResultType MeasureStatistics::execute(std::shared_ptr<FitsObject> image, QRect rect, const PreviewOptions& opt)
 {
-  stat = ImageStatistics(*image,rect);
-  logOperation(image->getName(),"Image Statistics:\n"+toString());
+  stat = ImageStatistics(*image->getImage(),rect);
+  logOperation(image->getImage()->getName(),"Image Statistics:\n"+toString());
   if (interactive)
   {
     TextInfoDialog d;

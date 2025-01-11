@@ -43,16 +43,16 @@ QIcon OpFlipX::getIcon() const
   return QIcon(":/pluginicons/resources/icons/object-flip-horizontal.png");
 }
 
-OpPlugin::ResultType OpFlipX::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpFlipX::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   profiler.start();
-  for (uint32_t y=0;y<image->getHeight();y++)
+  for (uint32_t y=0;y<image->getImage()->getHeight();y++)
   {
-    PixelIterator it1 = image->getPixelIterator(0,y);
-    PixelIterator it2 = image->getPixelIterator(image->getWidth()-1,y);
-    for (uint32_t x=0;x<=image->getWidth()/2;x++)
+    PixelIterator it1 = image->getImage()->getPixelIterator(0,y);
+    PixelIterator it2 = image->getImage()->getPixelIterator(image->getImage()->getWidth()-1,y);
+    for (uint32_t x=0;x<=image->getImage()->getWidth()/2;x++)
     {
-      for (uint32_t d=0;d<image->getDepth();d++)
+      for (uint32_t d=0;d<image->getImage()->getDepth();d++)
       {
         ValueType v = it1[d];
         it1[d] = it2[d];

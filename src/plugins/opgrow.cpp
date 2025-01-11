@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - enlarge image                                                       *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-01-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,7 +40,7 @@ QString OpGrow::getMenuEntry() const
 return "Image/Grow...";
 }
 
-OpPlugin::ResultType OpGrow::execute(std::shared_ptr<FitsImage> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpGrow::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
   {
@@ -51,7 +51,7 @@ OpPlugin::ResultType OpGrow::execute(std::shared_ptr<FitsImage> image, QRect /*s
     uint32_t factor = dlg->getFactor();
     bool bilinear = dlg->isBilinearInterpolation();
     profiler.start();
-    image = grow(image,factor,bilinear);
+    image->setImage(grow(image->getImage(),factor,bilinear));
     profiler.stop();
     log(image,QString("Grow: factor=%1 %2").arg(factor).arg(bilinear?"bilinear":"nearest neighbor"));
     logProfiler(image);
