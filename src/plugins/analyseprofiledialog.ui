@@ -60,7 +60,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QwtPlot" name="verticalProfileChart">
+       <widget class="ProfileChart" name="verticalProfileChart">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -70,11 +70,11 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QwtPlot" name="horizontalProfileChart">
+       <widget class="ProfileChart" name="horizontalProfileChart">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
-          <verstretch>1</verstretch>
+          <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="frameShape">
@@ -86,22 +86,32 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QTextBrowser" name="textBrowser">
+       <widget class="QTextBrowser" name="horizontalDataField">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>1</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <family>FreeMono</family>
+         </font>
+        </property>
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QTextBrowser" name="textBrowser_2">
+       <widget class="QTextBrowser" name="verticalDataField">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>1</verstretch>
          </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>FreeMono</family>
+         </font>
         </property>
        </widget>
       </item>
@@ -122,9 +132,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QwtPlot</class>
+   <class>ProfileChart</class>
    <extends>QFrame</extends>
-   <header>qwt_plot.h</header>
+   <header location="global">fitsbase/widgets/profilechart.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

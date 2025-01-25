@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - widget to display the profiles and associated controls              *
+ * FitsIP - moments of a distribution                                           *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2025-01-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,55 +20,38 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PROFILEVIEW_H
-#define PROFILEVIEW_H
+#ifndef MOMENTS_H
+#define MOMENTS_H
 
-#include <fitsbase/profile.h>
-#include <QMenu>
-#include <QWidget>
-#include <memory>
+#include <QPointF>
+#include <QVector>
 
-class FitsObject;
-
-namespace Ui {
-class ProfileView;
-}
-
-class ProfileView : public QWidget
+class Moments
 {
-  Q_OBJECT
-
 public:
-  explicit ProfileView(QWidget *parent = nullptr);
-  ~ProfileView();
+  Moments(const QVector<QPointF>& dist);
 
-  bool getClickEndsTracking() const;
+  double getIntegral() const;
 
-  void setClickEndsTracking(bool newClickEndsTracking);
+  double getCenter() const;
 
-  void setImage(std::shared_ptr<FitsObject> obj);
+  double getVariance() const;
 
-public slots:
-  void updateCursor(QPoint p);
+  double getStandardDeviation() const;
 
-  void setCursor(QPoint p);
+  double getSkewness() const;
+
+  double getKurtosis() const;
 
 protected:
-  void changeEvent(QEvent* event);
+  void calculate(const QVector<QPointF>& dist);
 
 private:
-  void redraw();
-  void logYToggled(bool checked);
-  void settingsChanged();
-  void save();
-
-  Ui::ProfileView *ui;
-  std::shared_ptr<FitsObject> image;
-  QPoint cursor;
-  Profile horizontal;
-  Profile vertical;
-  bool clickEndsTracking;
-  QMenu* popupMenu;
+  double integral;
+  double center;
+  double variance;
+  double skewness;
+  double kurtosis;
 };
 
-#endif // PROFILEVIEW_H
+#endif // MOMENTS_H

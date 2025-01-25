@@ -63,6 +63,8 @@ Q_IMPORT_PLUGIN(VanCittertDeconvolution)
 Q_IMPORT_PLUGIN(LucyRichardsonDeconvolution)
 #endif
 
+Q_IMPORT_PLUGIN(AnalyseProfile)
+
 Q_IMPORT_PLUGIN(MeasureStatistics)
 Q_IMPORT_PLUGIN(MeasureRank)
 Q_IMPORT_PLUGIN(MeasureCrossCorrelation)

@@ -12,6 +12,7 @@
   profilertablemodel.h
   profilerwidget.h
   profileview.h
+  scriptinterface.h
   starlistwidget.h
   dialogs/aboutdialog.h
   dialogs/addlogbookentrydialog.h
@@ -49,6 +50,7 @@ add_executable(fits
   profilerwidget.ui
   profileview.cpp
   profileview.ui
+  scriptinterface.cpp
   starlistwidget.cpp
   starlistwidget.ui
   staticplugins.cpp
@@ -78,7 +80,7 @@ target_include_directories(fits
 
 target_link_libraries(fits
   PRIVATE fitsplugins
-  PRIVATE fitsbase
+  PRIVATE fitsip::fitsbase
   PRIVATE PkgConfig::QWT
   PRIVATE Qt5::Xml
   PRIVATE Qt5::Widgets
@@ -108,3 +110,8 @@ if (EXIV2_FOUND)
   )
 endif()
 
+if (USE_PYTHON)
+  target_link_libraries(fits
+    PRIVATE pybind11::embed
+  )
+endif()

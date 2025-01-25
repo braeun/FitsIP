@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the profiles and associated controls              *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-01-11                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -43,41 +43,6 @@ ProfileView::ProfileView(QWidget *parent):QWidget(parent),
   clickEndsTracking(AppSettings().isProfileStopTracking())
 {
   ui->setupUi(this);
-  horizontalProfile = new QwtPlotCurve("X");
-  horizontalProfile->setPen(palette().color(QPalette::WindowText));
-  horizontalProfile->attach(ui->horizontalProfileWidget);
-  verticalProfile = new QwtPlotCurve("Y");
-  verticalProfile->setPen(palette().color(QPalette::WindowText));
-  verticalProfile->attach(ui->verticalProfileWidget);
-
-  horizontalMarker = new QwtPlotMarker();
-  horizontalMarker->setLineStyle(QwtPlotMarker::VLine);
-  horizontalMarker->setLinePen(Qt::blue,2.0,Qt::DashLine);
-  horizontalMarker->attach(ui->horizontalProfileWidget);
-  verticalMarker = new QwtPlotMarker();
-  verticalMarker->setLineStyle(QwtPlotMarker::VLine);
-  verticalMarker->setLinePen(Qt::blue,2.0,Qt::DashLine);
-  verticalMarker->attach(ui->verticalProfileWidget);
-  ui->horizontalProfileWidget->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating,true);
-  ui->verticalProfileWidget->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating,true);
-
-  horizontalGrid = new QwtPlotGrid();
-  horizontalGrid->setPen(Qt::gray,0.0,Qt::DotLine);
-  horizontalGrid->attach(ui->horizontalProfileWidget);
-  verticalGrid = new QwtPlotGrid();
-  verticalGrid->setPen(Qt::gray,0.0,Qt::DotLine);
-  verticalGrid->attach(ui->verticalProfileWidget);
-
-  horizontalPicker = new QwtPlotPicker(ui->horizontalProfileWidget->xBottom,ui->horizontalProfileWidget->yLeft,QwtPicker::NoRubberBand,QwtPicker::AlwaysOn,ui->horizontalProfileWidget->canvas());
-  horizontalPicker->setTrackerPen(palette().color(QPalette::WindowText));
-  horizontalPicker->setRubberBandPen(palette().color(QPalette::WindowText));
-  QwtPickerMachine* horizontalPickerMachine = new QwtPickerTrackerMachine();
-  horizontalPicker->setStateMachine(horizontalPickerMachine);
-  verticalPicker = new QwtPlotPicker(ui->verticalProfileWidget->xBottom,ui->verticalProfileWidget->yLeft,QwtPicker::NoRubberBand,QwtPicker::AlwaysOn,ui->verticalProfileWidget->canvas());
-  verticalPicker->setTrackerPen(palette().color(QPalette::WindowText));
-  verticalPicker->setRubberBandPen(palette().color(QPalette::WindowText));
-  QwtPickerMachine* verticalPickerMachine = new QwtPickerTrackerMachine();
-  verticalPicker->setStateMachine(verticalPickerMachine);
 
   connect(ui->logYBox,&QCheckBox::toggled,this,&ProfileView::logYToggled);
   connect(ui->rangeBox,&QCheckBox::toggled,this,[this](bool){settingsChanged();});
@@ -114,12 +79,8 @@ void ProfileView::setImage(std::shared_ptr<FitsObject> obj)
   image = obj;
   horizontal = image->getXProfile();
   vertical = image->getYProfile();
-  horizontalProfile->setSamples(horizontal);
-  verticalProfile->setSamples(vertical);
-  horizontalMarker->setXValue(horizontal.getCursorX());
-  verticalMarker->setXValue(vertical.getCursorY());
-  ui->horizontalProfileWidget->replot();
-  ui->verticalProfileWidget->replot();
+  ui->horizontalProfileWidget->plot(horizontal,false);
+  ui->verticalProfileWidget->plot(vertical,true);
 }
 
 void ProfileView::updateCursor(QPoint p)
@@ -142,13 +103,9 @@ void ProfileView::setCursor(QPoint p)
 void ProfileView::changeEvent(QEvent *event)
 {
   QWidget::changeEvent(event);
-  if (event->type() == QEvent::PaletteChange || event->type() == QEvent::StyleChange)
-  {
-    horizontalProfile->setPen(palette().color(QPalette::WindowText));
-    verticalProfile->setPen(palette().color(QPalette::WindowText));
-    ui->horizontalProfileWidget->replot();
-    ui->verticalProfileWidget->replot();
-  }
+//  if (event->type() == QEvent::PaletteChange || event->type() == QEvent::StyleChange)
+//  {
+//  }
 }
 
 
@@ -204,28 +161,14 @@ void ProfileView::redraw()
     image->setXProfile(horizontal);
     image->setYProfile(vertical);
   }
-  horizontalMarker->setXValue(cursor.x());
-  verticalMarker->setXValue(cursor.y());
-  horizontalProfile->setSamples(horizontal);
-  verticalProfile->setSamples(vertical);
-  ui->horizontalProfileWidget->replot();
-  ui->verticalProfileWidget->replot();
+  ui->horizontalProfileWidget->plot(horizontal,false);
+  ui->verticalProfileWidget->plot(vertical,true);
 }
 
 void ProfileView::logYToggled(bool checked)
 {
-  if (checked)
-  {
-    ui->verticalProfileWidget->setAxisScaleEngine(QwtPlot::yLeft,new QwtLogScaleEngine());
-    ui->horizontalProfileWidget->setAxisScaleEngine(QwtPlot::yLeft,new QwtLogScaleEngine());
-  }
-  else
-  {
-    ui->verticalProfileWidget->setAxisScaleEngine(QwtPlot::yLeft,new QwtLinearScaleEngine());
-    ui->horizontalProfileWidget->setAxisScaleEngine(QwtPlot::yLeft,new QwtLinearScaleEngine());
-  }
-  ui->horizontalProfileWidget->replot();
-  ui->verticalProfileWidget->replot();
+  ui->horizontalProfileWidget->setLogScale(checked);
+  ui->verticalProfileWidget->setLogScale(checked);
   QSettings().setValue(PROFILEVIEW_LOGY,checked);
 }
 

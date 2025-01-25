@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - widget to display the profiles and associated controls              *
+ * FitsIP - moments of a distribution                                           *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2025-01-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,55 +20,73 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PROFILEVIEW_H
-#define PROFILEVIEW_H
+#include "moments.h"
+#include <cmath>
 
-#include <fitsbase/profile.h>
-#include <QMenu>
-#include <QWidget>
-#include <memory>
-
-class FitsObject;
-
-namespace Ui {
-class ProfileView;
+Moments::Moments(const QVector<QPointF>& dist)
+{
+  calculate(dist);
 }
 
-class ProfileView : public QWidget
+double Moments::getIntegral() const
 {
-  Q_OBJECT
+  return integral;
+}
 
-public:
-  explicit ProfileView(QWidget *parent = nullptr);
-  ~ProfileView();
+double Moments::getCenter() const
+{
+  return center;
+}
 
-  bool getClickEndsTracking() const;
+double Moments::getVariance() const
+{
+  return variance;
+}
 
-  void setClickEndsTracking(bool newClickEndsTracking);
+double Moments::getStandardDeviation() const
+{
+  return std::sqrt(variance);
+}
 
-  void setImage(std::shared_ptr<FitsObject> obj);
+double Moments::getSkewness() const
+{
+  return skewness;
+}
 
-public slots:
-  void updateCursor(QPoint p);
+double Moments::getKurtosis() const
+{
+  return kurtosis;
+}
 
-  void setCursor(QPoint p);
 
-protected:
-  void changeEvent(QEvent* event);
 
-private:
-  void redraw();
-  void logYToggled(bool checked);
-  void settingsChanged();
-  void save();
 
-  Ui::ProfileView *ui;
-  std::shared_ptr<FitsObject> image;
-  QPoint cursor;
-  Profile horizontal;
-  Profile vertical;
-  bool clickEndsTracking;
-  QMenu* popupMenu;
-};
 
-#endif // PROFILEVIEW_H
+void Moments::calculate(const QVector<QPointF>& dist)
+{
+  integral = 0;
+  center = 0;
+  variance = 0;
+  skewness = 0;
+  kurtosis = 0;
+  for (QPointF p : dist)
+  {
+    integral += std::abs(p.y());
+    center += p.x() * std::abs(p.y());
+  }
+  if (integral > 0)
+  {
+    center /= integral;
+    for (QPointF p : dist)
+    {
+      double v = p.x() - center;
+      variance += v * v * std::abs(p.y());
+      skewness += v * v * v * std::abs(p.y());
+      kurtosis += v * v * v * v * std::abs(p.y());
+    }
+    variance /= integral;
+    double sigma = std::sqrt(variance);
+    skewness /= (variance * sigma);
+    kurtosis /= (variance * variance);
+  }
+}

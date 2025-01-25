@@ -28,7 +28,7 @@
 #include "pixel.h"
 #include "pixeliterator.h"
 #include <QImage>
-#include <stdint.h>
+#include <cstdint>
 #include <memory>
 #include <vector>
 #include <valarray>

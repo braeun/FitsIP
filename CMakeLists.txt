@@ -82,6 +82,21 @@ if (LUA_FOUND)
   set(USE_LUA ON)
 endif()
 
+find_package(Python3 COMPONENTS Interpreter Development)
+if (Python3_FOUND)
+#  set(PYBIND11_NOPYTHON ON)
+#set(PYBIND11_FINDPYTHON ON)
+  find_package(pybind11 CONFIG)
+  if (NOT pybind11_FOUND)
+    message("pybind11 not found - not building python bindings")
+  else()
+    message("site packages ${Python3_SITEARCH}")
+    set(USE_PYTHON ON)
+  endif()
+else()
+  message("python3 not found - not building python bindings")
+endif()
+
 
 #-----------------------------------------------------------------------------
 # OPTIONS
@@ -120,7 +135,11 @@ if (USE_16BITRAW)
 endif()
 
 if (USE_LUA)
-  list(APPEND FITS_DEF -DHAVE_LUA)
+  list(APPEND FITS_DEF -DUSE_LUA)
+endif()
+
+if (USE_PYTHON)
+  list(APPEND FITS_DEF -DUSE_PYTHON)
 endif()
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src)
@@ -131,6 +150,11 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src)
 
 add_subdirectory(src/fitsbase)
 add_subdirectory(src/plugins)
+
+if (USE_PYTHON)
+  add_subdirectory(src/fitspython)
+endif()
+
 add_subdirectory(src/app)
 
 

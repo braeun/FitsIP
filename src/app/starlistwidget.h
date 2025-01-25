@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the selected/detected star list                   *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2025-01-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -45,10 +45,9 @@ public:
 
   void load();
 
-private slots:
+private:
   void on_starlistTable_customContextMenuRequested(const QPoint &pos);
 
-private:
   Ui::StarListWidget *ui;
   StarList* starlist;
   QMenu* contextMenu;

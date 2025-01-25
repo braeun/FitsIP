@@ -42,6 +42,7 @@ set(private_header_list
   math/fitpar.h
   math/gaussfit.h
   math/mathfunctions.h
+  math/moments.h
   math/filter/chebyshevfilter.h
   math/filter/filter.h
   math/filter/iirfilter.h
@@ -110,6 +111,7 @@ add_library(fitsbase
   math/fitpar.cpp
   math/gaussfit.cpp
   math/mathfunctions.cpp
+  math/moments.cpp
   math/filter/chebyshevfilter.cpp
   math/filter/filter.cpp
   math/filter/iirfilter.cpp
@@ -130,6 +132,8 @@ add_library(fitsbase
   widgets/psfwidget.cpp widgets/psfwidget.ui
   ${private_header_list}
   )
+
+add_library(fitsip::fitsbase ALIAS fitsbase)
 
 if (LIBRAW_FOUND)
   target_sources(fitsbase

@@ -12,6 +12,7 @@
 #
 
 set(plugin_headers
+  analyseprofile.h
   findstars.h
   measurecrosscorrelation.h
   measurematch.h
@@ -53,6 +54,7 @@ set(plugin_headers
   )
 
 set(plugin_sources
+  analyseprofile.cpp
   findstars.cpp
   measurecrosscorrelation.cpp
   measurematch.cpp
