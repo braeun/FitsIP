@@ -98,6 +98,12 @@ FileSystemView::~FileSystemView()
   delete ui;
 }
 
+QString FileSystemView::getRoot() const
+{
+  QSettings settings;
+  return settings.value(AppSettings::PATH_ROOT,ui->rootField->text()).toString();
+}
+
 bool FileSystemView::hasSelectedRows() const
 {
   return !ui->filesystemView->selectionModel()->selectedRows().isEmpty();
@@ -144,6 +150,7 @@ void FileSystemView::setRoot(const QString &dir)
     ui->filesystemView->setRootIndex(filesystemModel->index(dir));
     QSettings settings;
     settings.setValue(AppSettings::PATH_ROOT,dir);
+    emit workingDirChanged(dir);
   }
 }
 

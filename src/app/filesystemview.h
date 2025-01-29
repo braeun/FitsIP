@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the filesystem view and associated controls       *
  *                                                                              *
- * modified: 2024-12-14                                                         *
+ * modified: 2025-01-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -42,6 +42,8 @@ public:
   explicit FileSystemView(QWidget *parent = nullptr);
   ~FileSystemView();
 
+  QString getRoot() const;
+
   bool hasSelectedRows() const;
 
   /**
@@ -57,6 +59,7 @@ signals:
   void openFile(QString file);
   void openSelection();
   void copySelectionToFilelist();
+  void workingDirChanged(const QString& dir);
 
 private:
   void selectRoot();

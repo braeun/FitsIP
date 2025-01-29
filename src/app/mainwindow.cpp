@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-01-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,9 +22,11 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <fitsbase/pluginfactory.h>
-#include "profilertablemodel.h"
 #include "appsettings.h"
+#include "consolewidget.h"
+#include "profilertablemodel.h"
+#include "pythonscript.h"
+#include "scriptinterface.h"
 #include "dialogs/aboutdialog.h"
 #include "dialogs/configurationdialog.h"
 #include "dialogs/editmetadatadialog.h"
@@ -34,6 +36,7 @@
 #include <fitsbase/pixellist.h>
 #include <fitsbase/io/iofactory.h>
 #include <fitsbase/logbook/xmllogbookstorage.h>
+#include <fitsbase/pluginfactory.h>
 #include <fitsbase/widgets/previewoptions.h>
 #include <QActionGroup>
 #include <QCloseEvent>
@@ -59,6 +62,12 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   openFileListMenu = new QMenu;
   openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
 
+  QDockWidget *consoleDockWidget = new QDockWidget(tr("Console"), this);
+  consoleDockWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
+  consoleWidget = new ConsoleWidget(consoleDockWidget);
+  addDockWidget(Qt::BottomDockWidgetArea,consoleDockWidget);
+  consoleDockWidget->setWidget(consoleWidget);
+
   imageWidget = new ImageWidget();
   imageWidget->setBackgroundRole(QPalette::Base);
   imageWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -77,6 +86,8 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->fileSystemView,&FileSystemView::openFile,this,[this](QString file){open(QFileInfo(file));});
   connect(ui->fileSystemView,&FileSystemView::openSelection,this,[this]{openSelection();});
   connect(ui->fileSystemView,&FileSystemView::copySelectionToFilelist,this,[this]{copySelectionToList();});
+  connect(ui->fileSystemView,&FileSystemView::workingDirChanged,ScriptInterface::getInterface(),&ScriptInterface::setWorkingDir);
+  ScriptInterface::getInterface()->setWorkingDir(ui->fileSystemView->getRoot());
 
   connect(ui->fileListWidget,&FileListWidget::openSelected,this,&MainWindow::fileListOpenSelected);
 
@@ -120,12 +131,15 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->consoleDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F11));
   ui->menuWindow->addAction(ui->profilerDockWidget->toggleViewAction());
   ui->profilerDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F12));
+  ui->menuWindow->addAction(consoleDockWidget->toggleViewAction());
+  consoleDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_Alt+Qt::Key_C));
 
   ui->fileListDockWidget->close();
   ui->profilesDockWidget->close();
   ui->starlistDockWidget->close();
   ui->pixellistDockWidget->close();
   ui->historyDockWidget->close();
+//  consoleDockWidget->close();
 
   {
     QSettings settings;
@@ -192,6 +206,10 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   }
   ui->actionShow_Selected_Pixels->setChecked(settings.isShowPixellist());
   ui->actionShow_Detected_Stars->setChecked(settings.isShowStarlist());
+
+  connect(consoleWidget,&ConsoleWidget::consoleCommand,this,&MainWindow::runScriptCmd);
+  connect(PythonScript::getInstance(),&PythonScript::stdoutAvailable,consoleWidget,&ConsoleWidget::writeStdOut);
+  connect(PythonScript::getInstance(),&PythonScript::stderrAvailable,consoleWidget,&ConsoleWidget::writeStdErr);
 }
 
 MainWindow::~MainWindow()
@@ -678,6 +696,20 @@ void MainWindow::updateCursor(QPoint p)
 void MainWindow::updateAOI(QRect r)
 {
   ui->aoiLabel->setText(QString("%1,%2 %3x%4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()));
+}
+
+void MainWindow::runScriptCmd(const QString& cmd)
+{
+  try
+  {
+    PythonScript::getInstance()->runCmd(cmd);
+  }
+  catch (std::exception &ex)
+  {
+    QMessageBox::warning(this,QApplication::applicationDisplayName(),ex.what());
+    qCritical() << ex.what();
+  }
+  consoleWidget->setMode(QConsoleWidget::Input);
 }
 
 void MainWindow::onImageScaleChanged(double min, double max, int32_t scale)

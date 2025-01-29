@@ -14,9 +14,18 @@ ScriptInterface::ScriptInterface():QObject()
 {
 }
 
+void ScriptInterface::setWorkingDir(const QString& dir)
+{
+  workingdir = dir;
+}
+
 std::shared_ptr<FitsObject> ScriptInterface::load(const std::string& filename)
 {
   QFileInfo fileinfo(QString::fromStdString(filename));
+  if (!fileinfo.isAbsolute())
+  {
+    fileinfo = QFileInfo(workingdir+"/"+QString::fromStdString(filename));
+  }
   std::shared_ptr<FitsObject> loaded = ImageCollection::getGlobal().getFile(fileinfo.absoluteFilePath());
   if (loaded)
   {
@@ -47,13 +56,11 @@ std::shared_ptr<FitsObject> ScriptInterface::load(const std::string& filename)
 
 #ifdef USE_PYTHON
 
-PYBIND11_EMBEDDED_MODULE(fitsip, m) {
-  ScriptInterface::bind(m);
-}
-
 void ScriptInterface::bind(py::module_& m)
 {
+  std::cout << "ScriptInterface::bind" << std::endl;
   m.def("load",[](const std::string& fn){return ScriptInterface::getInterface()->load(fn);});
+  m.attr("a") = 1;
 }
 
 #endif

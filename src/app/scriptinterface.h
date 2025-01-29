@@ -19,6 +19,8 @@ class ScriptInterface: public QObject
   Q_OBJECT
 public:
 
+  void setWorkingDir(const QString& dir);
+
   std::shared_ptr<FitsObject> load(const std::string& filename);
 
 #ifdef USE_PYTHON
@@ -29,6 +31,8 @@ public:
 
 private:
   ScriptInterface();
+
+  QString workingdir;
 
   static std::unique_ptr<ScriptInterface> interface;
 };

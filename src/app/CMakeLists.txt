@@ -1,5 +1,6 @@
 ﻿set(private_header_list
   appsettings.h
+  consolewidget.h
   filelistwidget.h
   filesystemview.h
   histogramview.h
@@ -26,48 +27,32 @@
 
 add_executable(fits
   appsettings.cpp
+  consolewidget.cpp consolewidget.ui
   cursors.qrc
-  filelistwidget.cpp
-  filelistwidget.ui
-  filesystemview.cpp
-  filesystemview.ui
-  histogramview.cpp
-  histogramview.ui
+  filelistwidget.cpp filelistwidget.ui
+  filesystemview.cpp filesystemview.ui
+  histogramview.cpp histogramview.ui
   icons.qrc
   imagewidget.cpp
-  logbookwidget.cpp
-  logbookwidget.ui
-  logwidget.cpp
-  logwidget.ui
+  logbookwidget.cpp logbookwidget.ui
+  logwidget.cpp logwidget.ui
   main.cpp
-  mainwindow.cpp
-  mainwindow.ui
+  mainwindow.cpp mainwindow.ui
   palettefactory.cpp
-  pixellistwidget.cpp
-  pixellistwidget.ui
+  pixellistwidget.cpp pixellistwidget.ui
   profilertablemodel.cpp
-  profilerwidget.cpp
-  profilerwidget.ui
-  profileview.cpp
-  profileview.ui
+  profilerwidget.cpp profilerwidget.ui
+  profileview.cpp profileview.ui
   scriptinterface.cpp
-  starlistwidget.cpp
-  starlistwidget.ui
+  starlistwidget.cpp starlistwidget.ui
   staticplugins.cpp
-  dialogs/aboutdialog.cpp
-  dialogs/aboutdialog.ui
-  dialogs/addlogbookentrydialog.cpp
-  dialogs/addlogbookentrydialog.ui
-  dialogs/configurationdialog.cpp
-  dialogs/configurationdialog.ui
-  dialogs/editmetadatadialog.cpp
-  dialogs/editmetadatadialog.ui
-  dialogs/logbookfilterdialog.cpp
-  dialogs/logbookfilterdialog.ui
-  dialogs/logbookfilter1dialog.cpp
-  dialogs/logbookfilter1dialog.ui
-  dialogs/logbookpropertiesdialog.cpp
-  dialogs/logbookpropertiesdialog.ui
+  dialogs/aboutdialog.cpp dialogs/aboutdialog.ui
+  dialogs/addlogbookentrydialog.cpp dialogs/addlogbookentrydialog.ui
+  dialogs/configurationdialog.cpp dialogs/configurationdialog.ui
+  dialogs/editmetadatadialog.cpp dialogs/editmetadatadialog.ui
+  dialogs/logbookfilterdialog.cpp dialogs/logbookfilterdialog.ui
+  dialogs/logbookfilter1dialog.cpp dialogs/logbookfilter1dialog.ui
+  dialogs/logbookpropertiesdialog.cpp dialogs/logbookpropertiesdialog.ui
   dialogs/logentryeditdialog.cpp dialogs/logentryeditdialog.ui
   ${private_header_list}
   )
@@ -77,6 +62,10 @@ target_compile_definitions(fits PRIVATE ${FITS_DEF})
 target_include_directories(fits
   PRIVATE ${QWT_INCLUDE_DIRS}
   )
+
+# required by pybind11
+# maybe just set the class with __attribute__ ((visibility("hidden")))
+set_target_properties(fits PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 target_link_libraries(fits
   PRIVATE fitsplugins
@@ -111,6 +100,9 @@ if (EXIV2_FOUND)
 endif()
 
 if (USE_PYTHON)
+  target_sources(fits
+    PRIVATE pythonscript.h pythonscript.cpp
+  )
   target_link_libraries(fits
     PRIVATE pybind11::embed
   )

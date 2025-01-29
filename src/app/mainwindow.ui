@@ -625,7 +625,7 @@
   </widget>
   <widget class="QDockWidget" name="consoleDockWidget">
    <property name="windowTitle">
-    <string>Console</string>
+    <string>Log</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>

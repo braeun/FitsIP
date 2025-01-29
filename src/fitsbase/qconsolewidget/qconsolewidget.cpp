@@ -1,5 +1,5 @@
-#include "QConsoleWidget.h"
-#include "QConsoleIODevice.h"
+#include "qconsolewidget.h"
+#include "qconsoleiodevice.h"
 
 #include <QMenu>
 #include <QMouseEvent>
@@ -523,7 +523,7 @@ QConsoleWidget::History::~History(void)
     if (f.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream os(&f);
         int n = strings_.size();
-        while(n>0) os << strings_.at(--n) << endl;
+        while(n>0) os << strings_.at(--n) << Qt::endl;
     }
 }
 

@@ -1,5 +1,5 @@
-#include "QConsoleIODevice.h"
-#include "QConsoleWidget.h"
+#include "qconsoleiodevice.h"
+#include "qconsolewidget.h"
 
 #include <QCoreApplication>
 #include <QElapsedTimer>

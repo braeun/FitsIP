@@ -55,6 +55,8 @@ set(private_header_list
   psf/psffactory.h
   profiling/profilerentry.h
   profiling/simpleprofiler.h
+  qconsolewidget/qconsoleiodevice.h
+  qconsolewidget/qconsolewidget.h
   qxt/qxtglobal.h
 #  qxt/qxtnamespace.h
   qxt/qxtspanslider.h
@@ -124,6 +126,8 @@ add_library(fitsbase
   psf/psffactory.cpp
   profiling/profilerentry.cpp
   profiling/simpleprofiler.cpp
+  qconsolewidget/qconsoleiodevice.cpp
+  qconsolewidget/qconsolewidget.cpp
   qxt/qxtglobal.cpp
   qxt/qxtspanslider.cpp
   widgets/previewwidget.cpp widgets/previewwidget.ui
@@ -159,3 +163,11 @@ target_link_libraries(fitsbase
   PUBLIC Qt5::Core
   )
 
+if (USE_PYTHON)
+  target_sources(fitsbase
+    PRIVATE pythonbase.h pythonbase.cpp
+  )
+  target_link_libraries(fitsbase
+    PRIVATE pybind11::embed
+  )
+endif()

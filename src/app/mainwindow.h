@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2025-01-25                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -36,6 +36,7 @@ namespace Ui {
 class MainWindow;
 }
 
+class ConsoleWidget;
 class QListWidgetItem;
 class QFileInfo;
 class Plugin;
@@ -157,12 +158,14 @@ private:
   void fileListDoubleClicked(int index);
   void fileListOpenSelected();
   void openLogbook(const QString& name);
+  void runScriptCmd(const QString& cmd);
 
   Ui::MainWindow *ui;
   QMenu* openFileListMenu;
   std::vector<PluginMenuEntry> pluginMenus;
   std::map<QString,QToolBar*> pluginToolbars;
   ImageWidget* imageWidget;
+  ConsoleWidget* consoleWidget;
   EditMetadataDialog* editMetadataDialog;
   Logbook logbook;
   SelectionMode selectionMode;

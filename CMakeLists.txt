@@ -152,7 +152,6 @@ add_subdirectory(src/fitsbase)
 add_subdirectory(src/plugins)
 
 if (USE_PYTHON)
-  add_subdirectory(src/fitspython)
 endif()
 
 add_subdirectory(src/app)
