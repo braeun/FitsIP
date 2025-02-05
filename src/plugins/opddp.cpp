@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing                                      *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,14 @@
 #include <fitsbase/fitsimage.h>
 #include <cmath>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpDDP::OpDDP():
   dlg(nullptr)
 {
@@ -40,6 +48,18 @@ QString OpDDP::getMenuEntry() const
 {
   return "Filter/DDP...";
 }
+
+#ifdef USE_PYTHON
+void OpDDP::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("ddp",[this](std::shared_ptr<FitsObject> obj, ValueType sigma, ValueType bkg, ValueType a, ValueType b){
+    ddp(obj->getImage(),sigma,bkg,a,b);
+    return OK;
+  },
+  "DDP processing",py::arg("obj"),py::arg("sigma"),py::arg("bkg"),py::arg("a"),py::arg("b"));
+}
+#endif
 
 OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
@@ -68,7 +88,7 @@ OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, QRect sel
   return CANCELLED;
 }
 
-void OpDDP::ddp(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType bkg, ValueType a, ValueType b)
+void OpDDP::ddp(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType bkg, ValueType a, ValueType b) const
 {
   auto i1 = std::make_shared<FitsImage>(*image);
   *i1 -= bkg;

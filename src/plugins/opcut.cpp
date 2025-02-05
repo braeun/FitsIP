@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - cut low and high values                                             *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-02-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,14 @@
 
 #include "opcut.h"
 #include <fitsbase/fitsimage.h>
+
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
 
 OpCut::OpCut()
 {
@@ -48,6 +56,18 @@ QIcon OpCut::getIcon() const
   return QIcon(":/pluginicons/resources/icons/opcut.png");
 }
 
+#ifdef USE_PYTHON
+void OpCut::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("cut",[this](std::shared_ptr<FitsObject> obj, ValueType lo, ValueType hi){
+    cut(obj->getImage(),lo,hi);
+    return OK;
+  },
+  "Cut values outside a given range",py::arg("obj"),py::arg("lo"),py::arg("hi"));
+}
+#endif
+
 OpPlugin::ResultType OpCut::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg.exec())
@@ -64,7 +84,7 @@ OpPlugin::ResultType OpCut::execute(std::shared_ptr<FitsObject> image, QRect /*s
   return CANCELLED;
 }
 
-void OpCut::cut(std::shared_ptr<FitsImage> image, ValueType lower, ValueType upper)
+void OpCut::cut(std::shared_ptr<FitsImage> image, ValueType lower, ValueType upper) const
 {
   PixelIterator p = image->getPixelIterator();
   while (p.hasNext())

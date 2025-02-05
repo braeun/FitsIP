@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - file object containing the image and other data                     *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,7 +28,7 @@
 #include "profile.h"
 #include "undostack.h"
 #include <memory>
-#include <QString>
+#include <string>
 
 /**
  * @brief The FitsObject class contains an object in the FitsIP application,
@@ -37,13 +37,19 @@
 class FitsObject
 {
 public:
-  FitsObject(std::shared_ptr<FitsImage> img, QString filename="");
+  FitsObject(std::shared_ptr<FitsImage> img, const QString& filename="");
 
-  int32_t getId() const;
+  FitsObject(std::shared_ptr<FitsImage> img, const std::string& filename);
+
+  int getId() const;
 
   QString getName() const;
 
+  std::string getNameStd() const;
+
   QString getFilename() const;
+
+  std::string getFilenameStd() const;
 
   std::shared_ptr<FitsImage> getImage();
 
@@ -61,7 +67,9 @@ public:
 
   const Profile& getYProfile() const;
 
-  bool save(QString filename);
+  bool save(const QString& filename);
+
+  bool save(const std::string& filename);
 
   void pushUndo();
 
@@ -69,9 +77,18 @@ public:
 
   bool isUndoAvailable() const;
 
+  /**
+   * @brief Create a clone of this fits object with a new id.
+   *
+   * Note: the undo stack is not cloned.
+   * @param filename the new filename
+   * @return shared pointer to the new cloned fits object
+   */
+  std::shared_ptr<FitsObject> clone(const std::string& filename) const;
+
 private:
   const int id;
-  QString filename;
+  QString  filename;
   std::shared_ptr<FitsImage> image;
   Histogram histogram;
   Profile xprofile;

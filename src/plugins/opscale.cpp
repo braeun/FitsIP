@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - linear scaling of image intensity                                   *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2023-01-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,14 @@
 #include "opscale.h"
 #include <fitsbase/fitsimage.h>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpScale::OpScale()
 {
   dlg.setTitle("Scale Image");
@@ -42,6 +50,18 @@ QString OpScale::getMenuEntry() const
   return "Math/Scale...";
 }
 
+#ifdef USE_PYTHON
+void OpScale::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("scale",[this](std::shared_ptr<FitsObject> obj, ValueType scale, ValueType bias){
+    scaleImage(obj->getImage(),scale,bias);
+    return OK;
+  },
+  "Scale an image",py::arg("obj"),py::arg("scale"),py::arg("bias"));
+}
+#endif
+
 OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg.exec())
@@ -49,16 +69,7 @@ OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsObject> image, QRect /
     ValueType bias = dlg.getValue1().toDouble();
     ValueType scale = dlg.getValue2().toDouble();
     profiler.start();
-    uint32_t n = image->getImage()->getWidth() * image->getImage()->getHeight();
-    for (uint32_t i=0;i<image->getImage()->getDepth();i++)
-    {
-      ValueType* p = image->getImage()->getLayer(i)->getData();
-      for (uint32_t j=0;j<n;j++)
-      {
-        *p = *p * scale + bias;
-        p++;
-      }
-    }
+    scaleImage(image->getImage(),scale,bias);
     profiler.stop();
     log(image,QString("scaled image: scale=%1 bias=%2").arg(scale).arg(bias));
     logProfiler(image);
@@ -66,3 +77,18 @@ OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsObject> image, QRect /
   }
   return CANCELLED;
 }
+
+void OpScale::scaleImage(std::shared_ptr<FitsImage> img, ValueType scale, ValueType bias) const
+{
+  uint32_t n = img->getWidth() * img->getHeight();
+  for (uint32_t i=0;i<img->getDepth();i++)
+  {
+    ValueType* p = img->getLayer(i)->getData();
+    for (uint32_t j=0;j<n;j++)
+    {
+      *p = *p * scale + bias;
+      p++;
+    }
+  }
+}
+

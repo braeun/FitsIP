@@ -24,6 +24,14 @@
 #include "opcropdialog.h"
 #include <fitsbase/fitsimage.h>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpCrop::OpCrop():
   dlg(nullptr)
 {
@@ -45,6 +53,21 @@ QIcon OpCrop::getIcon() const
 {
   return QIcon(":/pluginicons/resources/icons/transform-crop.png");
 }
+
+#ifdef USE_PYTHON
+void OpCrop::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("cut",[](std::shared_ptr<FitsObject> obj, int x, int y, int w, int h){
+    QRect r(x,y,w,h);
+    auto img = obj->getImage()->subImage(r);
+    img->setMetadata(obj->getImage()->getMetadata());
+    obj->setImage(img);
+    return OK;
+  },
+  "Crop the image",py::arg("obj"),py::arg("x"),py::arg("y"),py::arg("w"),py::arg("h"));
+}
+#endif
 
 OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, QRect r, const PreviewOptions& opt)
 {

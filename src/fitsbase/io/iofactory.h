@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - factory for I/O handlers                                            *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-02-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -32,6 +32,8 @@ class IOFactory: public QObject
   Q_OBJECT
 public:
   ~IOFactory();
+
+  bool isImage(QString filename);
 
   IOHandler* getHandler(QString filename);
 

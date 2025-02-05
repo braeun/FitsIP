@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - linear scaling of image intensity                                   *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-01-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -43,9 +43,15 @@ public:
 
   virtual QString getMenuEntry() const override;
 
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 private:
+  void scaleImage(std::shared_ptr<FitsImage> img, ValueType scale, ValueType bias) const;
+
   TwoValueDialog dlg;
 
 };

@@ -49,9 +49,15 @@ public:
 
   virtual QString getMenuEntry() const override;
 
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 private:
+  std::shared_ptr<FitsImage> combine(std::shared_ptr<FitsObject> rimg, std::shared_ptr<FitsObject> gimg, std::shared_ptr<FitsObject> bimg) const;
+
   OpCombineChannelsDialog* dlg;
   std::shared_ptr<FitsImage> img;
 

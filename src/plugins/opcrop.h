@@ -45,6 +45,10 @@ public:
 
   virtual QIcon getIcon() const override;
 
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 private:

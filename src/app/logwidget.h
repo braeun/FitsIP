@@ -41,6 +41,10 @@ public:
 
   void add(const QtMsgType type, const QMessageLogContext& context, const QString &message);
 
+  void writeStdOut(const QString& s);
+
+  void writeStdErr(const QString& s);
+
 public slots:
   void dockLocationChanged(Qt::DockWidgetArea area);
 
@@ -49,7 +53,6 @@ private slots:
   void on_logBrowser_customContextMenuRequested(const QPoint &pos);
 
   void on_actionSave_triggered();
-
 
 private:
   Ui::LogWidget *ui;

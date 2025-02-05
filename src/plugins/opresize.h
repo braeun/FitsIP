@@ -47,9 +47,13 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  std::shared_ptr<FitsImage> grow(std::shared_ptr<FitsImage> image, int factor, bool bilinear);
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
 
-  std::shared_ptr<FitsImage> shrink(std::shared_ptr<FitsImage> image, int factor);
+  std::shared_ptr<FitsImage> grow(std::shared_ptr<FitsImage> image, int factor, bool bilinear) const;
+
+  std::shared_ptr<FitsImage> shrink(std::shared_ptr<FitsImage> image, int factor) const;
 
 private:
   OpResizeDialog* dlg;

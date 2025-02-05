@@ -67,6 +67,16 @@ void LogWidget::add(const QtMsgType type, const QMessageLogContext &context, con
   }
 }
 
+void LogWidget::writeStdOut(const QString& s)
+{
+  ui->logBrowser->insertPlainText(s);
+}
+
+void LogWidget::writeStdErr(const QString& s)
+{
+  ui->logBrowser->insertHtml("<b><span style=\"color:red\">"+s+"</span></b>");
+}
+
 void LogWidget::dockLocationChanged(Qt::DockWidgetArea area)
 {
 }

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-01-25                                                         *
+ * modified: 2025-01-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -139,6 +139,8 @@ private slots:
 
   void on_actionSelect_Pixel_toggled(bool arg1);
 
+  void on_actionRun_Script_triggered();
+
 private:
 
   enum SelectionMode { None, SelectPixel };
@@ -150,15 +152,19 @@ private:
   void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, QRect roi, const PreviewOptions& opt);
   std::vector<QFileInfo> getFileList();
   void display(std::shared_ptr<FitsObject> obj);
+  void display(int id);
   void updateDisplay();
   void updateMetadata();
   void open(const QFileInfo& fileinfo);
+  void openImage(const QFileInfo& fileinfo);
   void openSelection();
   void copySelectionToList();
   void fileListDoubleClicked(int index);
   void fileListOpenSelected();
   void openLogbook(const QString& name);
   void runScriptCmd(const QString& cmd);
+  void runScriptFile(const QFileInfo& fileinfo);
+  void setScriptOutput();
 
   Ui::MainWindow *ui;
   QMenu* openFileListMenu;
@@ -169,6 +175,8 @@ private:
   EditMetadataDialog* editMetadataDialog;
   Logbook logbook;
   SelectionMode selectionMode;
+  QMetaObject::Connection scriptOutConnection;
+  QMetaObject::Connection scriptErrConnection;
 };
 
 #endif // MAINWINDOW_H

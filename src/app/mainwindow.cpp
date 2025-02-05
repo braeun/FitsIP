@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-01-29                                                         *
+ * modified: 2025-02-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
 
   QDockWidget *consoleDockWidget = new QDockWidget(tr("Console"), this);
+  consoleDockWidget->setObjectName("consle");
   consoleDockWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
   consoleWidget = new ConsoleWidget(consoleDockWidget);
   addDockWidget(Qt::BottomDockWidgetArea,consoleDockWidget);
@@ -208,8 +209,11 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->actionShow_Detected_Stars->setChecked(settings.isShowStarlist());
 
   connect(consoleWidget,&ConsoleWidget::consoleCommand,this,&MainWindow::runScriptCmd);
-  connect(PythonScript::getInstance(),&PythonScript::stdoutAvailable,consoleWidget,&ConsoleWidget::writeStdOut);
-  connect(PythonScript::getInstance(),&PythonScript::stderrAvailable,consoleWidget,&ConsoleWidget::writeStdErr);
+  connect(ScriptInterface::getInterface(),QOverload<int>::of(&ScriptInterface::display),this,QOverload<int>::of(&MainWindow::display));
+  setScriptOutput();
+#if !(defined(USE_PYTHON))
+  ui->actionRun_Script->setEnabled(false);
+#endif
 }
 
 MainWindow::~MainWindow()
@@ -479,6 +483,12 @@ void MainWindow::display(std::shared_ptr<FitsObject> file)
 //  updateOpenFileListSelection();
 }
 
+void MainWindow::display(int id)
+{
+  auto obj = ImageCollection::getGlobal().getFile(id);
+  if (obj) display(obj);
+}
+
 void MainWindow::updateDisplay()
 {
   SimpleProfiler profiler("UpdateDisplay");
@@ -554,6 +564,26 @@ void MainWindow::updateMetadata()
 
 void MainWindow::open(const QFileInfo &fileinfo)
 {
+  if (IOFactory::getInstance()->isImage(fileinfo.absoluteFilePath()))
+  {
+    openImage(fileinfo);
+  }
+#ifdef USE_PYTHON
+  else if (fileinfo.suffix() == "py")
+  {
+    QSettings settings;
+    settings.setValue(AppSettings::PATH_SCRIPT,fileinfo.absolutePath());
+    runScriptFile(fileinfo);
+  }
+#endif
+  else
+  {
+    QMessageBox::information(this,QApplication::applicationDisplayName(),"Don't know how tp open file '"+fileinfo.fileName()+"'");
+  }
+}
+
+void MainWindow::openImage(const QFileInfo &fileinfo)
+{
   std::shared_ptr<FitsObject> loaded = ImageCollection::getGlobal().getFile(fileinfo.absoluteFilePath());
   if (loaded)
   {
@@ -609,7 +639,10 @@ void MainWindow::copySelectionToList()
   std::vector<QFileInfo> filelist;
   for (const QString& file : ui->fileSystemView->getSelectedFiles())
   {
-    filelist.push_back(QFileInfo(file));
+    if (IOFactory::getInstance()->isImage(file))
+    {
+      filelist.push_back(QFileInfo(file));
+    }
   }
   if (!filelist.empty())
   {
@@ -623,13 +656,13 @@ void MainWindow::copySelectionToList()
 void MainWindow::fileListDoubleClicked(int index)
 {
   QFileInfo file = ui->fileListWidget->getFileList()->getFiles()[index];
-  open(file);
+  openImage(file);
 }
 
 void MainWindow::fileListOpenSelected()
 {
   std::vector<QFileInfo> list = ui->fileListWidget->getSelection();
-  for (const QFileInfo& file : list) open(file);
+  for (const QFileInfo& file : list) openImage(file);
 }
 
 void MainWindow::openLogbook(const QString &name)
@@ -710,6 +743,46 @@ void MainWindow::runScriptCmd(const QString& cmd)
     qCritical() << ex.what();
   }
   consoleWidget->setMode(QConsoleWidget::Input);
+  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  if (activeFile) activeFile->updateHistogram();
+  updateDisplay();
+}
+
+void MainWindow::runScriptFile(const QFileInfo& fileinfo)
+{
+  consoleWidget->setMode(QConsoleWidget::Output);
+  try
+  {
+    if (fileinfo.suffix() == "py")
+    {
+      PythonScript::getInstance()->runFile(fileinfo.absoluteFilePath());
+    }
+  }
+  catch (std::exception &ex)
+  {
+    QMessageBox::warning(this,QApplication::applicationDisplayName(),ex.what());
+    qCritical() << ex.what();
+  }
+  consoleWidget->setMode(QConsoleWidget::Input);
+  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  if (activeFile) activeFile->updateHistogram();
+  updateDisplay();
+}
+
+void MainWindow::setScriptOutput()
+{
+  if (scriptOutConnection) disconnect(scriptOutConnection);
+  if (scriptErrConnection) disconnect(scriptErrConnection);
+  if (AppSettings().isScriptOutputToLogwidget())
+  {
+    scriptOutConnection = connect(PythonScript::getInstance(),&PythonScript::stdoutAvailable,ui->logWidget,&LogWidget::writeStdOut);
+    scriptErrConnection = connect(PythonScript::getInstance(),&PythonScript::stderrAvailable,ui->logWidget,&LogWidget::writeStdErr);
+  }
+  else
+  {
+    scriptOutConnection = connect(PythonScript::getInstance(),&PythonScript::stdoutAvailable,consoleWidget,&ConsoleWidget::writeStdOut);
+    scriptErrConnection = connect(PythonScript::getInstance(),&PythonScript::stderrAvailable,consoleWidget,&ConsoleWidget::writeStdErr);
+  }
 }
 
 void MainWindow::onImageScaleChanged(double min, double max, int32_t scale)
@@ -729,7 +802,7 @@ void MainWindow::on_actionOpen_triggered()
   if (!fn.isNull())
   {
     QFileInfo info(fn);
-    open(info);
+    openImage(info);
   }
 }
 
@@ -887,6 +960,7 @@ void MainWindow::on_actionPreferences_triggered()
     dlg->commit();
     ui->logbookWidget->rebuild();
     ui->profileWidget->setClickEndsTracking(AppSettings().isProfileStopTracking());
+    setScriptOutput();
   }
   delete dlg;
 }
@@ -998,5 +1072,21 @@ void MainWindow::on_actionClear_AOI_triggered()
 void MainWindow::on_actionSelect_Pixel_toggled(bool flag)
 {
   selectionMode = flag ? SelectionMode::SelectPixel : SelectionMode::None;
+}
+
+
+void MainWindow::on_actionRun_Script_triggered()
+{
+  AppSettings settings;
+  QString filter = "";
+#ifdef USE_PYTHON
+  filter += "Python Script (*.py)";
+#endif
+  QString fn = settings.getOpenFilename(this,AppSettings::PATH_SCRIPT,filter);
+  if (!fn.isNull())
+  {
+    QFileInfo info(fn);
+    runScriptFile(info);
+  }
 }
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - factory for I/O handlers                                            *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-01-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,9 +28,11 @@
 #ifdef HAVE_LIBRAW
 #include "rawio.h"
 #endif
+#include <iostream>
 #include <QByteArray>
 #include <QDebug>
 #include <QFileInfo>
+#include <QImageReader>
 #include <QTextStream>
 
 IOFactory* IOFactory::instance = nullptr;
@@ -46,7 +48,17 @@ IOFactory::~IOFactory()
 IOFactory* IOFactory::getInstance()
 {
   if (!instance) instance = new IOFactory;
+  // auto list = QImageReader::supportedImageFormats();
+  // for (const auto& a : list)
+  // {
+  //   std::cout << a.data() << std::endl;
+  // }
   return instance;
+}
+
+bool IOFactory::isImage(QString filename)
+{
+  return getHandler(filename) != nullptr;
 }
 
 IOHandler* IOFactory::getHandler(QString filename)
@@ -116,21 +128,26 @@ QString IOFactory::assertSuffix(const QString &fn, QString filter)
 IOHandler* IOFactory::createHandler(QString filename)
 {
   QString suffix = QFileInfo(filename).suffix().toLower();
-  if (suffix == "gz")
+  if (suffix == "gz") /* support for zipped fits files */
   {
     QString s = QFileInfo(filename).completeSuffix().toLower();
     if (s == "fts.gz" || s == "fit.gz" || s == "fits.gz") return new FitsIO;
   }
   if (suffix == "fts" || suffix == "fit" || suffix == "fits") return new FitsIO;
-  if (suffix == "png") return new QtImageIO;
-  if (suffix == "jpg" || suffix == "jpeg") return new QtImageIO;
-  if (suffix == "bmp") return new QtImageIO;
+  // if (suffix == "png") return new QtImageIO;
+  // if (suffix == "jpg" || suffix == "jpeg") return new QtImageIO;
+  // if (suffix == "bmp") return new QtImageIO;
   if (suffix == "pa" || suffix == "p1") return new CookbookIO;
   if (suffix == "aimg") return new AstroImageIO;
 #ifdef HAVE_LIBRAW
   auto rawio = new RawIO;
   if (rawio->handlesFile(filename)) return rawio;
 #endif
+  auto list = QImageReader::supportedImageFormats();
+  for (const auto& a : list)
+  {
+    if (suffix == a) return new QtImageIO;
+  }
   return nullptr;
 }
 

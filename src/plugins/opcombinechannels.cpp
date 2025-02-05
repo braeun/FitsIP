@@ -25,6 +25,14 @@
 #include <fitsbase/imagecollection.h>
 #include <fitsbase/fitsobject.h>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpCombineChannels::OpCombineChannels():
   dlg(nullptr)
 {
@@ -55,6 +63,17 @@ QString OpCombineChannels::getMenuEntry() const
   return "Color/Combine...";
 }
 
+#ifdef USE_PYTHON
+void OpCombineChannels::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("combine",[this](std::shared_ptr<FitsObject> rimg, std::shared_ptr<FitsObject> gimg, std::shared_ptr<FitsObject> bimg){
+    return combine(rimg,gimg,bimg);
+  },
+  "Combine RGB channels",py::arg("rimg"),py::arg("gimg"),py::arg("bimg"));
+}
+#endif
+
 OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsObject> /*image*/, QRect selection, const PreviewOptions& opt)
 {
   ImageCollection collection;
@@ -76,29 +95,8 @@ OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsObject> /*im
   dlg->setCollection(collection);
   if (dlg->exec())
   {
-    auto r = collection.getFile(dlg->getRedImage())->getImage();
-    auto g = collection.getFile(dlg->getGreenImage())->getImage();
-    auto b = collection.getFile(dlg->getBlueImage())->getImage();
-    if (r->isCompatible(*g.get()) && r->isCompatible(*b.get()))
-    {
-      img = std::make_shared<FitsImage>(r->getName()+"_RGB",r->getWidth(),r->getHeight(),3);
-      img->setMetadata(r->getMetadata());
-      PixelIterator dest = img->getPixelIterator();
-      ConstPixelIterator ri = r->getConstPixelIterator();
-      ConstPixelIterator gi = g->getConstPixelIterator();
-      ConstPixelIterator bi = b->getConstPixelIterator();
-      while (ri.hasNext())
-      {
-        dest[0] = ri[0];
-        dest[1] = gi[0];
-        dest[2] = bi[0];
-        ++dest;
-        ++ri;
-        ++gi;
-        ++bi;
-      }
-    }
-    else
+    img = combine(collection.getFile(dlg->getRedImage()),collection.getFile(dlg->getGreenImage()),collection.getFile(dlg->getBlueImage()));
+    if (!img)
     {
       const char* msg = "Images are not compatible";
       setError(msg);
@@ -108,3 +106,33 @@ OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsObject> /*im
   }
   return OK;
 }
+
+std::shared_ptr<FitsImage> OpCombineChannels::combine(std::shared_ptr<FitsObject> rimg, std::shared_ptr<FitsObject> gimg, std::shared_ptr<FitsObject> bimg) const
+{
+  auto r = rimg->getImage();
+  auto g = gimg->getImage();
+  auto b = bimg->getImage();
+  if (r->isCompatible(*g.get()) && r->isCompatible(*b.get()))
+  {
+    auto img = std::make_shared<FitsImage>(r->getName()+"_RGB",r->getWidth(),r->getHeight(),3);
+    img->setMetadata(r->getMetadata());
+    PixelIterator dest = img->getPixelIterator();
+    ConstPixelIterator ri = r->getConstPixelIterator();
+    ConstPixelIterator gi = g->getConstPixelIterator();
+    ConstPixelIterator bi = b->getConstPixelIterator();
+    while (ri.hasNext())
+    {
+      dest[0] = ri[0];
+      dest[1] = gi[0];
+      dest[2] = bi[0];
+      ++dest;
+      ++ri;
+      ++gi;
+      ++bi;
+    }
+    return img;
+  }
+  return std::shared_ptr<FitsImage>();
+}
+
+

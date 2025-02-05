@@ -45,6 +45,21 @@ PluginFactory::~PluginFactory()
 {
 }
 
+#ifdef USE_PYTHON
+void PluginFactory::setBinding(py::module_* m)
+{
+  pymod = m;
+  for (const QObject* o : QPluginLoader::staticInstances())
+  {
+    const OpPlugin* p = dynamic_cast<const OpPlugin*>(o);
+    if (p)
+    {
+      p->bindPython(m);
+    }
+  }
+}
+#endif
+
 QObjectList PluginFactory::getPlugins()
 {
   QObjectList list = QPluginLoader::staticInstances();
@@ -71,6 +86,9 @@ Plugin* PluginFactory::loadPlugin(QString filename)
     const OpPlugin* op = dynamic_cast<const OpPlugin*>(p);
     if (op)
     {
+#ifdef USE_PYTHON
+      op->bindPython(pymod);
+#endif
       connect(op,&OpPlugin::logOperation,this,&PluginFactory::logOperation);
       connect(op,&OpPlugin::logProfilerResult,this,&PluginFactory::logProfilerResult);
     }

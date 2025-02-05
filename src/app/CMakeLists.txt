@@ -63,10 +63,6 @@ target_include_directories(fits
   PRIVATE ${QWT_INCLUDE_DIRS}
   )
 
-# required by pybind11
-# maybe just set the class with __attribute__ ((visibility("hidden")))
-set_target_properties(fits PROPERTIES CXX_VISIBILITY_PRESET hidden)
-
 target_link_libraries(fits
   PRIVATE fitsplugins
   PRIVATE fitsip::fitsbase
@@ -100,6 +96,9 @@ if (EXIV2_FOUND)
 endif()
 
 if (USE_PYTHON)
+  # required by pybind11
+  # maybe just set the class with __attribute__ ((visibility("hidden")))
+  set_target_properties(fits PROPERTIES CXX_VISIBILITY_PRESET hidden)
   target_sources(fits
     PRIVATE pythonscript.h pythonscript.cpp
   )

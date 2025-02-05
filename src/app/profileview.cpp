@@ -77,8 +77,16 @@ void ProfileView::setClickEndsTracking(bool newClickEndsTracking)
 void ProfileView::setImage(std::shared_ptr<FitsObject> obj)
 {
   image = obj;
-  horizontal = image->getXProfile();
-  vertical = image->getYProfile();
+  if (image)
+  {
+    horizontal = image->getXProfile();
+    vertical = image->getYProfile();
+  }
+  else
+  {
+    horizontal = Profile();
+    vertical = Profile();
+  }
   ui->horizontalProfileWidget->plot(horizontal,false);
   ui->verticalProfileWidget->plot(vertical,true);
 }

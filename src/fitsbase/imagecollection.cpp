@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - collection of file objects, i.e. opened images                      *
+ * FitsIP - collection of fits objects, i.e. opened images                      *
  *                                                                              *
- * modified: 2024-12-12                                                         *
+ * modified: 2025-01-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -50,7 +50,7 @@ std::shared_ptr<FitsObject> ImageCollection::setActiveFile(int index)
   return activeFile;
 }
 
-std::shared_ptr<FitsObject> ImageCollection::getFile(int32_t id) const
+std::shared_ptr<FitsObject> ImageCollection::getFile(int id) const
 {
   for (auto file : files)
   {
@@ -71,7 +71,7 @@ std::shared_ptr<FitsObject> ImageCollection::getFile(const QString& filename) co
 void ImageCollection::removeActiveFile()
 {
   if (!activeFile) return;
-  for (uint32_t i=0;i<files.size();i++)
+  for (uint i=0;i<files.size();i++)
   {
     if (files[i].get() == activeFile.get())
     {

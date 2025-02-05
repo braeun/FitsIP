@@ -77,6 +77,9 @@ QString OpPlugin::getError() const
   return error;
 }
 
+void OpPlugin::bindPython(void*) const
+{
+}
 
 void OpPlugin::setError(const QString &err)
 {

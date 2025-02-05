@@ -28,6 +28,14 @@
 #include <memory>
 #include <vector>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 class QPluginLoader;
 
 class PluginFactory: public QObject
@@ -36,6 +44,10 @@ class PluginFactory: public QObject
 public:
   PluginFactory();
   virtual ~PluginFactory();
+
+#ifdef USE_PYTHON
+  void setBinding(py::module_* m);
+#endif
 
   QObjectList getPlugins();
 
@@ -51,6 +63,9 @@ signals:
 private:
 
   std::vector<std::shared_ptr<QPluginLoader>> plugins;
+#ifdef USE_PYTHON
+  py::module_* pymod;
+#endif
 
   static std::unique_ptr<PluginFactory> factory;
 };

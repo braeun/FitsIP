@@ -8,6 +8,11 @@ ConsoleWidget::ConsoleWidget(QWidget *parent) :
 {
   ui->setupUi(this);
   ui->console->device()->close();
+  QTextDocument *doc = ui->console->document();
+  QFont font = doc->defaultFont();
+  font.setFamily("Courier");
+  doc->setDefaultFont(font);
+  ui->console->writeStdOut("> ");
   ui->console->setMode(QConsoleWidget::Input);
   connect(ui->console,&QConsoleWidget::consoleCommand,this,&ConsoleWidget::handleCommand);
 }
@@ -19,6 +24,7 @@ ConsoleWidget::~ConsoleWidget()
 
 void ConsoleWidget::setMode(QConsoleWidget::ConsoleMode mode)
 {
+  if (mode == QConsoleWidget::Input) ui->console->writeStdOut("> ");
   ui->console->setMode(mode);
 }
 

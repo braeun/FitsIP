@@ -194,3 +194,12 @@ target_link_libraries(fitsplugins
   PUBLIC Qt5::Core
   )
 
+if (USE_PYTHON)
+  # required by pybind11
+  # maybe just set the class with __attribute__ ((visibility("hidden")))
+  set_target_properties(fitsplugins PROPERTIES CXX_VISIBILITY_PRESET hidden)
+
+  target_link_libraries(fitsplugins
+    PRIVATE pybind11::embed
+  )
+endif()

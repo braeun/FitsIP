@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - base class for operation plugins                                    *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-01-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -81,6 +81,12 @@ public:
   const std::vector<QFileInfo> getFileList() const;
 
   virtual QString getError() const;
+
+  /**
+   * @brief Add bindigs for python
+   * @param m pointer to py::module_
+   */
+  virtual void bindPython(void* m) const;
 
 signals:
   void logOperation(QString image, QString op);

@@ -1,5 +1,28 @@
+/********************************************************************************
+ *                                                                              *
+ * FitsIP - python scripting                                                    *
+ *                                                                              *
+ * modified: 2025-01-31                                                         *
+ *                                                                              *
+ ********************************************************************************
+ * Copyright (C) Harald Braeuning                                               *
+ ********************************************************************************
+ * This file is part of FitsIP.                                                 *
+ * FitsIP is free software: you can redistribute it and/or modify it            *
+ * under the terms of the GNU General Public License as published by the Free   *
+ * Software Foundation, either version 3 of the License, or (at your option)    *
+ * any later version.                                                           *
+ * FitsIP is distributed in the hope that it will be useful, but                *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY   *
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                                *
+ * You should have received a copy of the GNU General Public License along with *
+ * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
+ ********************************************************************************/
+
 #include "pythonscript.h"
 #include "scriptinterface.h"
+#include <fitsbase/pluginfactory.h>
 #include <fitsbase/pythonbase.h>
 #include <iostream>
 #include <functional>
@@ -7,6 +30,7 @@
 PYBIND11_EMBEDDED_MODULE(fits, m) {
   pythonbase::bind(m);
   ScriptInterface::bind(m);
+  PluginFactory::instance()->setBinding(&m);
 }
 
 
@@ -22,6 +46,11 @@ void PythonScript::runCmd(const QString& cmd)
 {
 //  std::cout << "python: " << cmd.toStdString() << std::endl;
   py::exec(cmd.toStdString());
+}
+
+void PythonScript::runFile(const QString& filename)
+{
+  py::eval_file(filename.toStdString());
 }
 
 PythonScript* PythonScript::getInstance()
@@ -45,13 +74,11 @@ void PythonScript::init()
 void PythonScript::streamStdout(const char* s)
 {
   emit stdoutAvailable(s);
-  std::cout << ">" << s;
 }
 
 void PythonScript::streamStderr(const char* s)
 {
   emit stderrAvailable(s);
-  std::cerr << "!" << s;
 }
 
 

@@ -164,6 +164,9 @@ target_link_libraries(fitsbase
   )
 
 if (USE_PYTHON)
+  # required by pybind11
+  # maybe just set the class with __attribute__ ((visibility("hidden")))
+  set_target_properties(fitsbase PROPERTIES CXX_VISIBILITY_PRESET hidden)
   target_sources(fitsbase
     PRIVATE pythonbase.h pythonbase.cpp
   )

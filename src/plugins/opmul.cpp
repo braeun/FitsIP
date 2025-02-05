@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - multiply two images                                                 *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2025-01-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,14 @@
 #include <fitsbase/fitsimage.h>
 #include <QDebug>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpMul::OpMul():
   dlg(nullptr)
 {
@@ -47,6 +55,18 @@ QIcon OpMul::getIcon() const
 {
   return QIcon(":/pluginicons/resources/icons/mul.png");
 }
+
+#ifdef USE_PYTHON
+void OpMul::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("add",[](std::shared_ptr<FitsObject> obj1, std::shared_ptr<FitsObject> obj2){
+    *(obj1->getImage()) *= *(obj2->getImage());
+    return OK;
+  },
+  "Multiply two images",py::arg("obj1"),py::arg("obj2"));
+}
+#endif
 
 OpPlugin::ResultType OpMul::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {

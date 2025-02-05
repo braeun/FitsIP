@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2025-02-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -77,6 +77,10 @@ public:
   void setProfileStopTracking(bool flag);
 
   bool isProfileStopTracking() const;
+
+  void setScriptOutputToLogwidget(bool flag);
+
+  bool isScriptOutputToLogwidget() const;
 
   static const char* MAINWINDOW_STATE;
   static const char* MAINWINDOW_GEOMETRY;

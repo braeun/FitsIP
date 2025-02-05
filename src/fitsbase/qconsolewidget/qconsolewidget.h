@@ -57,7 +57,7 @@ public:
     // get the current command line
     QString getCommandLine();
 
-public slots:
+//public slots:
 
     // write to StandardOutput
     void writeStdOut(const QString& s);
@@ -90,7 +90,7 @@ protected:
     // replace the command line
     void replaceCommandLine(const QString& str);
 
-protected slots:
+  protected: // slots:
 
     // insert the completion from completer
     void insertCompletion(const QString& completion);

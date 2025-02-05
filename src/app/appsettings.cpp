@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2025-02-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -50,6 +50,8 @@ static const char* STYLE_STYLE = "style/style";
 static const char* STYLE_PALETTE = "style/palette";
 
 static const char* PROFILE_CLICK_STOPS_TRACK = "profile/clickstops";
+
+static const char* SCRIPT_OUTPUT_LOG_WIDGET = "script/outputlogwidget";
 
 
 AppSettings::AppSettings()
@@ -159,5 +161,15 @@ void AppSettings::setProfileStopTracking(bool flag)
 bool AppSettings::isProfileStopTracking() const
 {
   return settings.value(PROFILE_CLICK_STOPS_TRACK,true).toBool();
+}
+
+void AppSettings::setScriptOutputToLogwidget(bool flag)
+{
+  settings.setValue(SCRIPT_OUTPUT_LOG_WIDGET,flag);
+}
+
+bool AppSettings::isScriptOutputToLogwidget() const
+{
+  return settings.value(SCRIPT_OUTPUT_LOG_WIDGET,false).toBool();
 }
 

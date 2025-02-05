@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - flip image horizontally                                             *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,14 @@
 
 #include "opflipx.h"
 #include <fitsbase/fitsimage.h>
+
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
 
 OpFlipX::OpFlipX()
 {
@@ -43,16 +51,37 @@ QIcon OpFlipX::getIcon() const
   return QIcon(":/pluginicons/resources/icons/object-flip-horizontal.png");
 }
 
+#ifdef USE_PYTHON
+void OpFlipX::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("flipx",[this](std::shared_ptr<FitsObject> obj){
+    flip(obj->getImage());
+    return OK;
+  },
+  "Flip in x",py::arg("obj"));
+}
+#endif
+
 OpPlugin::ResultType OpFlipX::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   profiler.start();
-  for (uint32_t y=0;y<image->getImage()->getHeight();y++)
+  flip(image->getImage());
+  profiler.stop();
+  log(image,"flipped in X");
+  logProfiler(image);
+  return OK;
+}
+
+void OpFlipX::flip(std::shared_ptr<FitsImage> img) const
+{
+  for (uint32_t y=0;y<img->getHeight();y++)
   {
-    PixelIterator it1 = image->getImage()->getPixelIterator(0,y);
-    PixelIterator it2 = image->getImage()->getPixelIterator(image->getImage()->getWidth()-1,y);
-    for (uint32_t x=0;x<=image->getImage()->getWidth()/2;x++)
+    PixelIterator it1 = img->getPixelIterator(0,y);
+    PixelIterator it2 = img->getPixelIterator(img->getWidth()-1,y);
+    for (uint32_t x=0;x<=img->getWidth()/2;x++)
     {
-      for (uint32_t d=0;d<image->getImage()->getDepth();d++)
+      for (uint32_t d=0;d<img->getDepth();d++)
       {
         ValueType v = it1[d];
         it1[d] = it2[d];
@@ -62,8 +91,4 @@ OpPlugin::ResultType OpFlipX::execute(std::shared_ptr<FitsObject> image, QRect /
       --it2;
     }
   }
-  profiler.stop();
-  log(image,"flipped in X");
-  logProfiler(image);
-  return OK;
 }

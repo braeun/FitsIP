@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - fits object containing the image and other data                     *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,12 +26,21 @@
 #include <QFile>
 #include <QDebug>
 
-int32_t FitsObject::idCounter = 0;
+int FitsObject::idCounter = 0;
 
-FitsObject::FitsObject(std::shared_ptr<FitsImage> img, QString fn):
+FitsObject::FitsObject(std::shared_ptr<FitsImage> img, const QString&  fn):
   id(idCounter++),
   filename(fn),
   image(img)
+{
+//  QFileInfo info(filename);
+//  histogram.build(image.get());
+}
+
+FitsObject::FitsObject(std::shared_ptr<FitsImage> img, const std::string&  fn):
+ id(idCounter++),
+ filename(QString::fromStdString(fn)),
+ image(img)
 {
 //  QFileInfo info(filename);
 //  histogram.build(image.get());
@@ -47,9 +56,19 @@ QString FitsObject::getName() const
   return image->getName();
 }
 
-QString FitsObject::getFilename() const
+std::string FitsObject::getNameStd() const
+{
+  return image->getName().toStdString();
+}
+
+QString  FitsObject::getFilename() const
 {
   return filename;
+}
+
+std::string  FitsObject::getFilenameStd() const
+{
+  return filename.toStdString();
 }
 
 std::shared_ptr<FitsImage> FitsObject::getImage()
@@ -96,7 +115,7 @@ const Profile& FitsObject::getYProfile() const
   return yprofile;
 }
 
-bool FitsObject::save(QString fn)
+bool FitsObject::save(const QString& fn)
 {
   IOHandler* handler = IOFactory::getInstance()->getHandler(fn);
   if (!handler) return false;
@@ -110,7 +129,7 @@ bool FitsObject::save(QString fn)
   try
   {
     handler->write(fn,image);
-    filename = fn;
+    this->filename = fn;
   }
   catch (std::exception& ex)
   {
@@ -119,6 +138,11 @@ bool FitsObject::save(QString fn)
   }
   if (!tmpfile.isEmpty()) QFile(tmpfile).remove();
   return true;
+}
+
+bool FitsObject::save(const std::string& fn)
+{
+  return save(QString::fromStdString(fn));
 }
 
 void FitsObject::pushUndo()
@@ -141,3 +165,12 @@ bool FitsObject::isUndoAvailable() const
   return undostack.isUndoAvailable();
 }
 
+std::shared_ptr<FitsObject> FitsObject::clone(const std::string& filename) const
+{
+  auto img = std::make_shared<FitsImage>(*image.get());
+  auto obj = std::make_shared<FitsObject>(img,filename);
+  obj->histogram = histogram;
+  obj->xprofile = xprofile;
+  obj->yprofile = yprofile;
+  return obj;
+}

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - multiply two images                                                 *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-01-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -43,6 +43,10 @@ public:
   virtual QString getMenuEntry() const override;
 
   virtual QIcon getIcon() const override;
+
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 

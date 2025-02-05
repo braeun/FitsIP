@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - resize image                                                        *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-01-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,14 @@
 #include "opresize.h"
 #include "opresizedialog.h"
 #include <fitsbase/fitsimage.h>
+
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
 
 OpResize::OpResize():
   dlg(nullptr)
@@ -45,6 +53,25 @@ QIcon OpResize::getIcon() const
 {
   return QIcon(":/pluginicons/resources/icons/transform-scale.png");
 }
+
+#ifdef USE_PYTHON
+void OpResize::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("shrink",[this](std::shared_ptr<FitsObject> obj, int factor){
+    auto img = shrink(obj->getImage(),factor);
+    obj->setImage(img);
+    return OK;
+  },
+  "Shrink the image by a given factor",py::arg("obj"),py::arg("factor"));
+  m->def("grow",[this](std::shared_ptr<FitsObject> obj, int factor, bool bilinear){
+    auto img = grow(obj->getImage(),factor,bilinear);
+    obj->setImage(img);
+    return OK;
+  },
+  "Grow the image by a given factor with optional bilinear interpolation",py::arg("obj"),py::arg("factor"),py::arg("bilinear"));
+}
+#endif
 
 OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
@@ -83,7 +110,7 @@ OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, QRect 
   return CANCELLED;
 }
 
-std::shared_ptr<FitsImage> OpResize::grow(std::shared_ptr<FitsImage> image, int factor, bool bilinear)
+std::shared_ptr<FitsImage> OpResize::grow(std::shared_ptr<FitsImage> image, int factor, bool bilinear) const
 {
   uint32_t w = image->getWidth() * factor;
   uint32_t h = image->getHeight() * factor;
@@ -136,7 +163,7 @@ std::shared_ptr<FitsImage> OpResize::grow(std::shared_ptr<FitsImage> image, int 
   return img;
 }
 
-std::shared_ptr<FitsImage> OpResize::shrink(std::shared_ptr<FitsImage> image, int factor)
+std::shared_ptr<FitsImage> OpResize::shrink(std::shared_ptr<FitsImage> image, int factor) const
 {
   uint32_t w = image->getWidth() / factor;
   uint32_t h = image->getHeight() / factor;

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2022-12-03                                                         *
+ * modified: 2025-02-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -108,6 +108,8 @@ public:
   static const char* PATH_EXPORT;   //!< key for export image path
 
   static const char* PATH_LOGBOOK;  //!< key for logbook path
+
+  static const char* PATH_SCRIPT;    //!< key for script path
 
 protected:
   QSettings settings;

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2022-12-02                                                         *
+ * modified: 2025-02-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -21,7 +21,6 @@
  ********************************************************************************/
 
 #include "settings.h"
-#include "io/fitsio.h"
 #include <QApplication>
 #include <QFileDialog>
 #include <QSettings>
@@ -31,6 +30,8 @@ const char* Settings::PATH_IMAGE = "fits/path/image";
 const char* Settings::PATH_EXPORT = "fits/path/export";
 
 const char* Settings::PATH_LOGBOOK = "fits/path/logbook";
+
+const char* Settings::PATH_SCRIPT = "fits/path/script";
 
 static const char* PREVIEW_WIDTH = "fits/preview/width";
 static const char* PREVIEW_HEIGHT = "fits/preview/height";

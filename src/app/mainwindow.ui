@@ -399,6 +399,8 @@
     <addaction name="separator"/>
     <addaction name="actionExport_Image"/>
     <addaction name="separator"/>
+    <addaction name="actionRun_Script"/>
+    <addaction name="separator"/>
     <addaction name="actionLoad_Plugin"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Image"/>
@@ -517,6 +519,8 @@
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
    <addaction name="actionSave_As"/>
+   <addaction name="separator"/>
+   <addaction name="actionRun_Script"/>
    <addaction name="separator"/>
    <addaction name="actionUndo"/>
    <addaction name="separator"/>
@@ -1344,6 +1348,17 @@
    </property>
    <property name="text">
     <string>Select Pixel</string>
+   </property>
+  </action>
+  <action name="actionRun_Script">
+   <property name="icon">
+    <iconset theme="system-run"/>
+   </property>
+   <property name="text">
+    <string>Run Script...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>
