@@ -65,6 +65,11 @@ std::shared_ptr<FitsObject> ImageCollection::getFile(const QString& filename) co
   {
     if (file->getFilename() == filename) return file;
   }
+  QFileInfo info(filename);
+  for (auto file : files)
+  {
+    if (QFileInfo(file->getFilename()).fileName() == info.fileName()) return file;
+  }
   return std::shared_ptr<FitsObject>();
 }
 

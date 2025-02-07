@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - rotate images                                                       *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,11 +46,15 @@ public:
 
   virtual QIcon getIcon() const override;
 
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  void rotate90cw(std::shared_ptr<FitsImage> image);
+  void rotate90cw(std::shared_ptr<FitsImage> image) const;
 
-  void rotate90ccw(std::shared_ptr<FitsImage> image);
+  void rotate90ccw(std::shared_ptr<FitsImage> image) const;
 
   /**
    * @brief Rotate the image by an arbitrary angle
@@ -58,7 +62,7 @@ public:
    * @param angle the rotation angle in degrees
    * @param crop if true, crop the image to the original size
    */
-  void rotate(std::shared_ptr<FitsImage> image, ValueType angle, bool crop);
+  void rotate(std::shared_ptr<FitsImage> image, ValueType angle, bool crop) const;
 
 private:
 

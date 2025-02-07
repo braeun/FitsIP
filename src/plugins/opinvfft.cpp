@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - calculate the inverse FFT                                           *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,14 @@
 #include "opinvfft.h"
 #include <fitsbase/fitsimage.h>
 #include <fftw3.h>
+
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
 
 /**
  * @note: FFTW requires arrays in row-major (or C) format with the last
@@ -56,26 +64,41 @@ QString OpInvFFT::getMenuEntry() const
   return "Math/Inverse FFT";
 }
 
+#ifdef USE_PYTHON
+void OpInvFFT::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("invfft",[this](std::shared_ptr<FitsObject> obj){
+    auto img = invfft(obj->getImage());
+    return std::make_shared<FitsObject>(img);
+  },
+  "Calculate inverse FFT of the image",py::arg("obj"));
+}
+#endif
+
 OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
 {
-  profiler.start();
-  if (aoi.isNull())
-    img = invfft(image->getImage());
+  if (image->getImage()->getDepth() != 2 || image->getImage()->preFFTHeight == 0 || image->getImage()->preFFTWidth == 0)
+  {
+    setError("Input is not a complex image");
+    img = std::shared_ptr<FitsImage>();
+    return ERROR;
+  }
   else
-    img = invfft(image->getImage()->subImage(aoi));
-  profiler.stop();
-  if (!img) return ERROR;
+  {
+    profiler.start();
+    if (aoi.isNull())
+      img = invfft(image->getImage());
+    else
+      img = invfft(image->getImage()->subImage(aoi));
+    profiler.stop();
+  }
   logProfiler(img);
   return OK;
 }
 
-std::shared_ptr<FitsImage> OpInvFFT::invfft(std::shared_ptr<FitsImage> image)
+std::shared_ptr<FitsImage> OpInvFFT::invfft(std::shared_ptr<FitsImage> image) const
 {
-  if (image->getDepth() != 2 || image->preFFTHeight == 0 || image->preFFTWidth == 0)
-  {
-    setError("Input is not a complex image");
-    return std::shared_ptr<FitsImage>();
-  }
   fftw_complex* in = new fftw_complex[image->getHeight()*image->getWidth()];
   double *out = new double[image->preFFTHeight*image->preFFTWidth];
   fftw_plan f = fftw_plan_dft_c2r_2d(image->preFFTHeight,image->preFFTWidth,in,out,FFTW_ESTIMATE);

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - gaussian blur                                                       *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2025-02-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -52,9 +52,13 @@ public:
 
   virtual QString getMenuEntry() const override;
 
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  void blur(std::shared_ptr<FitsImage> image, ValueType sigmax, ValueType sigmay, ValueType accuracy=0.1);
+  void blur(std::shared_ptr<FitsImage> image, ValueType sigmax, ValueType sigmay, ValueType accuracy=0.1) const;
 
   /**
    * @brief Creates a 1-dimensional normalized Gaussian kernel with standard deviation sigma
@@ -85,27 +89,31 @@ public:
   static std::vector<std::vector<ValueType>> makeGaussianKernel(ValueType sigma, ValueType accuracy, int maxRadius);
 
 private:
-  void blur(std::shared_ptr<FitsImage> image);
+
+  struct Data
+  {
+    uint32_t reduceByX;
+    uint32_t reduceByY;
+    std::vector<std::vector<ValueType>> gaussKernelX;
+    std::vector<std::vector<ValueType>> gaussKernelY;
+    std::vector<ValueType> downscaleKernelX;
+    std::vector<ValueType> downscaleKernelY;
+    std::vector<ValueType> upscaleKernelX;
+    std::vector<ValueType> upscaleKernelY;
+  };
+
   /**
    * Blurs an image in X direction.
    */
-  void blurX(ValueType* pixel, int32_t width, int32_t height);
-  void blurY(ValueType* pixel, int32_t width, int32_t height);
-  void convolveLine(ValueType* input, int32_t length, ValueType* pixels, const std::vector<std::vector<ValueType>>& kernel);
+  void blurX(ValueType* pixel, int32_t width, int32_t height, const Data& data) const;
+  void blurY(ValueType* pixel, int32_t width, int32_t height, const Data& data) const;
+  void convolveLine(ValueType* input, int32_t length, ValueType* pixels, const std::vector<std::vector<ValueType>>& kernel) const;
 
-  void downscaleLine(ValueType* pixels, ValueType* cache, const std::vector<ValueType>& kernel, int reduceBy, int unscaled0, int length, int newLength);
-  std::vector<ValueType> makeDownscaleKernel(int unitLength);
-  void upscaleLine(ValueType* cache, ValueType* pixels, int npixels, const std::vector<ValueType>& kernel, int reduceBy, int unscaled0);
-  std::vector<ValueType> makeUpscaleKernel(int unitLength);
+  void downscaleLine(ValueType* pixels, ValueType* cache, const std::vector<ValueType>& kernel, int reduceBy, int unscaled0, int length, int newLength) const;
+  std::vector<ValueType> makeDownscaleKernel(int unitLength) const;
+  void upscaleLine(ValueType* cache, ValueType* pixels, int npixels, const std::vector<ValueType>& kernel, int reduceBy, int unscaled0) const;
+  std::vector<ValueType> makeUpscaleKernel(int unitLength) const;
 
-  uint32_t reduceByX;
-  uint32_t reduceByY;
-  std::vector<std::vector<ValueType>> gaussKernelX;
-  std::vector<std::vector<ValueType>> gaussKernelY;
-  std::vector<ValueType> downscaleKernelX;
-  std::vector<ValueType> downscaleKernelY;
-  std::vector<ValueType> upscaleKernelX;
-  std::vector<ValueType> upscaleKernelY;
   OpGaussBlurDialog* dlg;
 
   static const int UPSCALE_K_RADIUS;         // number of pixels to add for upscaling

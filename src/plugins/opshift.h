@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - shift image with subpixel accuracy                                  *
  *                                                                              *
- * modified: 2022-02-04                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,9 +46,13 @@ public:
 
   virtual QIcon getIcon() const override;
 
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  void shift(std::shared_ptr<FitsImage> image, ValueType dx, ValueType dy);
+  void shift(std::shared_ptr<FitsImage> image, ValueType dx, ValueType dy) const;
 
 private:
   OpShiftDialog* dlg;

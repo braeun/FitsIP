@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - unsharp masking                                                     *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,9 +46,13 @@ public:
 
   virtual QString getMenuEntry() const override;
 
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  void unsharpmask(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType strength);
+  void unsharpmask(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType strength) const;
 
 private:
   OpUnsharpMaskDialog* dlg;

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - calculate the FFT of an image                                       *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -31,6 +31,14 @@
  * in the order height, width.
  */
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpFFT::OpFFT()
 {
   profiler = SimpleProfiler("OpFFT");
@@ -56,6 +64,18 @@ QString OpFFT::getMenuEntry() const
   return "Math/FFT";
 }
 
+#ifdef USE_PYTHON
+void OpFFT::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("fft",[this](std::shared_ptr<FitsObject> obj){
+    auto img = fft(*obj->getImage());
+    return std::make_shared<FitsObject>(img);
+  },
+  "Calculate FFT of the image",py::arg("obj"));
+}
+#endif
+
 OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
 {
   profiler.start();
@@ -68,7 +88,7 @@ OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsObject> image, QRect aoi
   return OK;
 }
 
-std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage &image)
+std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage &image) const
 {
   fftw_complex *s2c = new fftw_complex[image.getHeight()*(image.getWidth()/2+1)];
   double *in = new double[image.getHeight()*image.getWidth()];

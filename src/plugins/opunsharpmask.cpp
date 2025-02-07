@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - unsharp masking                                                     *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,14 @@
 #include "opgaussblur.h"
 #include <fitsbase/fitsimage.h>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpUnsharpMask::OpUnsharpMask():
   dlg(nullptr)
 {
@@ -39,6 +47,18 @@ QString OpUnsharpMask::getMenuEntry() const
 {
   return "Filter/Unsharp Mask...";
 }
+
+#ifdef USE_PYTHON
+void OpUnsharpMask::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("unsharp_mask",[this](std::shared_ptr<FitsObject> obj, ValueType sigma, ValueType strength){
+    unsharpmask(obj->getImage(),sigma,strength);
+    return OK;
+  },
+  "Apply unsharp mask",py::arg("obj"),py::arg("sigma"),py::arg("strength"));
+}
+#endif
 
 OpPlugin::ResultType OpUnsharpMask::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
@@ -58,7 +78,7 @@ OpPlugin::ResultType OpUnsharpMask::execute(std::shared_ptr<FitsObject> image, Q
   return CANCELLED;
 }
 
-void OpUnsharpMask::unsharpmask(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType strength)
+void OpUnsharpMask::unsharpmask(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType strength) const
 {
   OpGaussBlur blur;
   auto blurred = std::make_shared<FitsImage>(*image);

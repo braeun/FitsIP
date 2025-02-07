@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - split channels of a multilayer image                                *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,15 @@
 
 #include "opsplitchannels.h"
 #include <fitsbase/fitsimage.h>
+
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+namespace py = pybind11;
+#endif
 
 OpSplitChannels::OpSplitChannels()
 {
@@ -53,6 +62,28 @@ QString OpSplitChannels::getMenuEntry() const
   return "Color/Split";
 }
 
+#ifdef USE_PYTHON
+void OpSplitChannels::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("split",[this](std::shared_ptr<FitsObject> obj){
+    if (obj->getImage()->getDepth() != 3)
+    {
+      return std::vector<std::shared_ptr<FitsObject>>();
+    }
+    auto images = split(obj->getImage());
+    std::vector<std::shared_ptr<FitsObject>> list;
+    for (auto i : images)
+    {
+      list.push_back(std::make_shared<FitsObject>(i));
+    }
+    return list;
+//    return std::make_tuple(list[0],list[1],list[2]);
+  },
+  "Shift image",py::arg("obj"));
+}
+#endif
+
 OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsObject> image, QRect /*aoi*/, const PreviewOptions& opt)
 {
   if (image->getImage()->getDepth() != 3)
@@ -67,7 +98,7 @@ OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsObject> image,
   return OK;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpSplitChannels::split(std::shared_ptr<FitsImage> image)
+std::vector<std::shared_ptr<FitsImage>> OpSplitChannels::split(std::shared_ptr<FitsImage> image) const
 {
   std::vector<std::shared_ptr<FitsImage>> list{
     std::make_shared<FitsImage>(image->getName()+"_R",image->getWidth(),image->getHeight(),1),

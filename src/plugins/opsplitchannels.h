@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - split channels of a multilayer image                                *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -47,7 +47,11 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  std::vector<std::shared_ptr<FitsImage>> split(std::shared_ptr<FitsImage> image);
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
+  std::vector<std::shared_ptr<FitsImage>> split(std::shared_ptr<FitsImage> image) const;
 
 private:
   std::vector<std::shared_ptr<FitsImage>> images;

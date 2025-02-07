@@ -68,7 +68,8 @@ void OpCombineChannels::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("combine",[this](std::shared_ptr<FitsObject> rimg, std::shared_ptr<FitsObject> gimg, std::shared_ptr<FitsObject> bimg){
-    return combine(rimg,gimg,bimg);
+    auto img = combine(rimg,gimg,bimg);
+    return std::make_shared<FitsObject>(img);
   },
   "Combine RGB channels",py::arg("rimg"),py::arg("gimg"),py::arg("bimg"));
 }

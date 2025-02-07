@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - gaussian blur                                                       *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,14 @@
 #include <cmath>
 #include <climits>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 const int OpGaussBlur::UPSCALE_K_RADIUS = 2;         // number of pixels to add for upscaling
 const ValueType OpGaussBlur::MIN_DOWNSCALED_SIGMA = 4.; // minimum standard deviation in the downscaled image
 
@@ -43,6 +51,18 @@ QString OpGaussBlur::getMenuEntry() const
 {
   return "Filter/Gaussian Blur...";
 }
+
+#ifdef USE_PYTHON
+void OpGaussBlur::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("gauss_blur",[this](std::shared_ptr<FitsObject> obj, ValueType sigmax, ValueType sigmay, ValueType accuracy){
+    blur(obj->getImage(),sigmax,sigmay,accuracy);
+    return OK;
+  },
+  "Blur an image by a gaussian",py::arg("obj"),py::arg("sigmax"),py::arg("sigmay"),py::arg("accuracy"));
+}
+#endif
 
 OpPlugin::ResultType OpGaussBlur::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
@@ -65,58 +85,59 @@ OpPlugin::ResultType OpGaussBlur::execute(std::shared_ptr<FitsObject> image, QRe
 
 
 
-void OpGaussBlur::blur(std::shared_ptr<FitsImage> image, ValueType sigmax, ValueType sigmay, ValueType accuracy)
+void OpGaussBlur::blur(std::shared_ptr<FitsImage> image, ValueType sigmax, ValueType sigmay, ValueType accuracy) const
 {
+  Data data;
   if (sigmax > 2 * MIN_DOWNSCALED_SIGMA + 0.5)
   {
     /* large radius (sigma): scale down, then convolve, then scale up */
-    reduceByX = static_cast<uint32_t>(floor(fabs(sigmax)/MIN_DOWNSCALED_SIGMA)); //downscale by this factor
-    if (reduceByX > image->getWidth()) reduceByX = image->getWidth();
+    data.reduceByX = static_cast<uint32_t>(floor(fabs(sigmax)/MIN_DOWNSCALED_SIGMA)); //downscale by this factor
+    if (data.reduceByX > image->getWidth()) data.reduceByX = image->getWidth();
     /*
      * Downscale gives std devation sigma = 1/sqrt(3); upscale gives sigma =
      * 1/2. (in downscaled pixels)
      */
     /* All sigma^2 values add to full sigma^2 */
-    ValueType sigmaGauss = sqrt(sigmax * sigmax / (reduceByX * reduceByX) - 1. / 3. - 1. / 4.);
-    int maxLength = (image->getWidth() + reduceByX - 1) / reduceByX + 2 * (UPSCALE_K_RADIUS + 1); //downscaled line can't be longer
-    gaussKernelX = makeGaussianKernel(sigmaGauss,accuracy,maxLength);
-    downscaleKernelX = makeDownscaleKernel(reduceByX);
-    upscaleKernelX = makeUpscaleKernel(reduceByX);
+    ValueType sigmaGauss = sqrt(sigmax * sigmax / (data.reduceByX * data.reduceByX) - 1. / 3. - 1. / 4.);
+    int maxLength = (image->getWidth() + data.reduceByX - 1) / data.reduceByX + 2 * (UPSCALE_K_RADIUS + 1); //downscaled line can't be longer
+    data.gaussKernelX = makeGaussianKernel(sigmaGauss,accuracy,maxLength);
+    data.downscaleKernelX = makeDownscaleKernel(data.reduceByX);
+    data.upscaleKernelX = makeUpscaleKernel(data.reduceByX);
   }
   else
   {
-    reduceByX = 1;
-    downscaleKernelX.clear();
-    upscaleKernelX.clear();
-    gaussKernelX = makeGaussianKernel(sigmax,accuracy,image->getWidth());
+    data.reduceByX = 1;
+    data.downscaleKernelX.clear();
+    data.upscaleKernelX.clear();
+    data.gaussKernelX = makeGaussianKernel(sigmax,accuracy,image->getWidth());
   }
   if (sigmay > 2 * MIN_DOWNSCALED_SIGMA + 0.5)
   {
     /* large radius (sigma): scale down, then convolve, then scale up */
-    reduceByY = static_cast<uint32_t>(floor(fabs(sigmay) / MIN_DOWNSCALED_SIGMA)); //downscale by this factor
-    if (reduceByY > image->getHeight()) reduceByY = image->getHeight();
+    data.reduceByY = static_cast<uint32_t>(floor(fabs(sigmay) / MIN_DOWNSCALED_SIGMA)); //downscale by this factor
+    if (data.reduceByY > image->getHeight()) data.reduceByY = image->getHeight();
     /*
      * Downscale gives std devation sigma = 1/sqrt(3); upscale gives sigma =
      * 1/2. (in downscaled pixels)
      */
     /* All sigma^2 values add to full sigma^2 */
-    ValueType sigmaGauss = sqrt(sigmay * sigmay / (reduceByY * reduceByY) - 1. / 3. - 1. / 4.);
-    int maxLength = (image->getHeight() + reduceByY - 1) / reduceByY + 2 * (UPSCALE_K_RADIUS + 1); //downscaled line can't be longer
-    gaussKernelY = makeGaussianKernel(sigmaGauss,accuracy,maxLength);
-    downscaleKernelY = makeDownscaleKernel(reduceByY);
-    upscaleKernelY = makeUpscaleKernel(reduceByY);
+    ValueType sigmaGauss = sqrt(sigmay * sigmay / (data.reduceByY * data.reduceByY) - 1. / 3. - 1. / 4.);
+    int maxLength = (image->getHeight() + data.reduceByY - 1) / data.reduceByY + 2 * (UPSCALE_K_RADIUS + 1); //downscaled line can't be longer
+    data.gaussKernelY = makeGaussianKernel(sigmaGauss,accuracy,maxLength);
+    data.downscaleKernelY = makeDownscaleKernel(data.reduceByY);
+    data.upscaleKernelY = makeUpscaleKernel(data.reduceByY);
   }
   else
   {
-    reduceByY = 1;
-    downscaleKernelY.clear();
-    upscaleKernelY.clear();
-    gaussKernelY = makeGaussianKernel(sigmax,accuracy,image->getHeight());
+    data.reduceByY = 1;
+    data.downscaleKernelY.clear();
+    data.upscaleKernelY.clear();
+    data.gaussKernelY = makeGaussianKernel(sigmax,accuracy,image->getHeight());
   }
   for (uint32_t d=0;d<image->getDepth();d++)
   {
-    blurX(image->getLayer(d)->getData(),image->getWidth(),image->getHeight());
-    blurY(image->getLayer(d)->getData(),image->getWidth(),image->getHeight());
+    blurX(image->getLayer(d)->getData(),image->getWidth(),image->getHeight(),data);
+    blurY(image->getLayer(d)->getData(),image->getWidth(),image->getHeight(),data);
   }
 }
 
@@ -182,21 +203,21 @@ std::vector<std::vector<ValueType>> OpGaussBlur::makeGaussianKernel(ValueType si
 /**
  * Blurs an image in X direction.
  */
-void OpGaussBlur::blurX(ValueType* pixel, int32_t width, int32_t height)
+void OpGaussBlur::blurX(ValueType* pixel, int32_t width, int32_t height, const Data& data) const
 {
   int length = width;   //number of points per line (line can be a row or column)
-  if (reduceByX > 1)
+  if (data.reduceByX > 1)
   {
-    int newLength = (length + reduceByX - 1) / reduceByX + 2 * (UPSCALE_K_RADIUS + 1);
-    int unscaled0 = -(UPSCALE_K_RADIUS + 1) * reduceByX; //input point corresponding to cache index 0
+    int newLength = (length + data.reduceByX - 1) / data.reduceByX + 2 * (UPSCALE_K_RADIUS + 1);
+    int unscaled0 = -(UPSCALE_K_RADIUS + 1) * data.reduceByX; //input point corresponding to cache index 0
     //IJ.log("reduce="+reduceBy+", newLength="+newLength+", unscaled0="+unscaled0+", sigmaG="+(ValueType)sigmaGauss+", kRadius="+gaussKernel[0].length);
     ValueType* cache1 = new ValueType[newLength];  //holds data after downscaling
     ValueType* cache2 = new ValueType[newLength];  //holds data after convolution
     for (int y=0;y<height;y++)
     {
-      downscaleLine(pixel+y*width,cache1,downscaleKernelX,reduceByX,unscaled0,length,newLength);
-      convolveLine(cache1,newLength,cache2,gaussKernelX);
-      upscaleLine(cache2,pixel+y*width,length,upscaleKernelX,reduceByX,unscaled0);
+      downscaleLine(pixel+y*width,cache1,data.downscaleKernelX,data.reduceByX,unscaled0,length,newLength);
+      convolveLine(cache1,newLength,cache2,data.gaussKernelX);
+      upscaleLine(cache2,pixel+y*width,length,data.upscaleKernelX,data.reduceByX,unscaled0);
     }
     delete [] cache1;
     delete [] cache2;
@@ -207,7 +228,7 @@ void OpGaussBlur::blurX(ValueType* pixel, int32_t width, int32_t height)
     for (int y=0;y<height;y++)
     {
       memcpy(cache,pixel+y*width,length*sizeof(ValueType));
-      convolveLine(cache,length,pixel+y*width,gaussKernelX);
+      convolveLine(cache,length,pixel+y*width,data.gaussKernelX);
     }
     delete [] cache;
   }
@@ -216,23 +237,23 @@ void OpGaussBlur::blurX(ValueType* pixel, int32_t width, int32_t height)
 /**
  * Blurs an image in Y direction.
  */
-void OpGaussBlur::blurY(ValueType* pixel, int32_t width, int32_t height)
+void OpGaussBlur::blurY(ValueType* pixel, int32_t width, int32_t height, const Data& data) const
 {
   int length = height;   //number of points per line (line can be a row or column)
   ValueType* tmp = new ValueType[length];
-  if (reduceByY > 1)
+  if (data.reduceByY > 1)
   {
-    int newLength = (length + reduceByY - 1) / reduceByY + 2 * (UPSCALE_K_RADIUS + 1);
-    int unscaled0 = -(UPSCALE_K_RADIUS + 1) * reduceByY; //input point corresponding to cache index 0
+    int newLength = (length + data.reduceByY - 1) / data.reduceByY + 2 * (UPSCALE_K_RADIUS + 1);
+    int unscaled0 = -(UPSCALE_K_RADIUS + 1) * data.reduceByY; //input point corresponding to cache index 0
     //IJ.log("reduce="+reduceBy+", newLength="+newLength+", unscaled0="+unscaled0+", sigmaG="+(ValueType)sigmaGauss+", kRadius="+gaussKernel[0].length);
     ValueType* cache1 = new ValueType[newLength];  //holds data after downscaling
     ValueType* cache2 = new ValueType[newLength];  //holds data after convolution
     for (int x=0;x<width;x++)
     {
       for (int y=0;y<length;y++) tmp[y] = pixel[y*width+x];
-      downscaleLine(tmp,cache1,downscaleKernelY,reduceByY,unscaled0,length,newLength);
-      convolveLine(cache1,newLength,cache2,gaussKernelY);
-      upscaleLine(cache2,tmp,length,upscaleKernelY,reduceByY,unscaled0);
+      downscaleLine(tmp,cache1,data.downscaleKernelY,data.reduceByY,unscaled0,length,newLength);
+      convolveLine(cache1,newLength,cache2,data.gaussKernelY);
+      upscaleLine(cache2,tmp,length,data.upscaleKernelY,data.reduceByY,unscaled0);
       for (int y=0;y<length;y++) pixel[y*width+x] = tmp[y];
     }
     delete [] cache1;
@@ -245,7 +266,7 @@ void OpGaussBlur::blurY(ValueType* pixel, int32_t width, int32_t height)
     {
       for (int y=0;y<length;y++) tmp[y] = pixel[y*width+x];
       memcpy(cache,tmp,length*sizeof(ValueType));
-      convolveLine(cache,length,tmp,gaussKernelX);
+      convolveLine(cache,length,tmp,data.gaussKernelY);
       for (int y=0;y<length;y++) pixel[y*width+x] = tmp[y];
     }
     delete [] cache;
@@ -268,7 +289,7 @@ void OpGaussBlur::blurY(ValueType* pixel, int32_t width, int32_t height)
  * periphery (last element) to 0 and back. Normalization should include all
  * kernel points, also these not calculated because they are not needed.
  */
-void OpGaussBlur::convolveLine(ValueType* input, int32_t length, ValueType* pixels, const std::vector<std::vector<ValueType>>& kernel)
+void OpGaussBlur::convolveLine(ValueType* input, int32_t length, ValueType* pixels, const std::vector<std::vector<ValueType>>& kernel) const
 {
   ValueType first = input[0];                 //out-of-edge pixels are replaced by nearest edge pixels
   ValueType last = input[length - 1];
@@ -328,7 +349,7 @@ void OpGaussBlur::convolveLine(ValueType* input, int32_t length, ValueType* pixe
  * <code>unscaled0</code> may be negative. Out-of-line pixels of the input are
  * replaced by the edge pixels.
  */
-void OpGaussBlur::downscaleLine(ValueType* pixels, ValueType* cache, const std::vector<ValueType>& kernel, int reduceBy, int unscaled0, int length, int newLength)
+void OpGaussBlur::downscaleLine(ValueType* pixels, ValueType* cache, const std::vector<ValueType>& kernel, int reduceBy, int unscaled0, int length, int newLength) const
 {
   ValueType first = pixels[0];
   ValueType last = pixels[length - 1];
@@ -354,7 +375,7 @@ void OpGaussBlur::downscaleLine(ValueType* pixels, ValueType* cache, const std::
  * +1.5, and the standard deviation is 1/2. Array index corresponding to the
  * kernel center is unitLength*3/2
  */
-std::vector<ValueType> OpGaussBlur::makeDownscaleKernel(int unitLength)
+std::vector<ValueType> OpGaussBlur::makeDownscaleKernel(int unitLength) const
 {
   int mid = unitLength * 3 / 2;
   std::vector<ValueType> kernel(3*unitLength,0);
@@ -380,7 +401,7 @@ std::vector<ValueType> OpGaussBlur::makeDownscaleKernel(int unitLength)
  * <code>reduceBy</code> and write as a row or column (or part thereof) to the
  * pixels array of a ValueTypeProcessor.
  */
-void OpGaussBlur::upscaleLine(ValueType* cache, ValueType* pixels, int npixels, const std::vector<ValueType>& kernel, int reduceBy, int unscaled0)
+void OpGaussBlur::upscaleLine(ValueType* cache, ValueType* pixels, int npixels, const std::vector<ValueType>& kernel, int reduceBy, int unscaled0) const
 {
   int p = 0;
   for (int xout=0;xout<npixels;xout++,p++)
@@ -402,7 +423,7 @@ void OpGaussBlur::upscaleLine(ValueType* cache, ValueType* pixels, int npixels, 
  * cordinates. The kernel runs from [-2 to +2[, corresponding to array index 0
  * ... 4*unitLength (whereby the last point is not in the array any more).
  */
-std::vector<ValueType> OpGaussBlur::makeUpscaleKernel(int unitLength)
+std::vector<ValueType> OpGaussBlur::makeUpscaleKernel(int unitLength) const
 {
   std::vector<ValueType> kernel(4*unitLength,0);
   int mid = 2 * unitLength;

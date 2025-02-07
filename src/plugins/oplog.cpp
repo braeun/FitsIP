@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - scale image by logarithm                                            *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,14 @@
 #include <fitsbase/fitsimage.h>
 #include <cmath>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpLog::OpLog()
 {
   Q_INIT_RESOURCE(pluginresources);
@@ -44,11 +52,32 @@ QIcon OpLog::getIcon() const
   return QIcon(":/pluginicons/resources/icons/oplog.png");
 }
 
+#ifdef USE_PYTHON
+void OpLog::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("log",[this](std::shared_ptr<FitsObject> obj){
+    calcLog(obj->getImage());
+    return OK;
+  },
+  "Take logarithm of image",py::arg("obj"));
+}
+#endif
+
 OpPlugin::ResultType OpLog::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   profiler.start();
-  PixelIterator p = image->getImage()->getPixelIterator();
-  if (image->getImage()->getDepth() == 1)
+  calcLog(image->getImage());
+  profiler.stop();
+  log(image,"Log of image");
+  logProfiler(image);
+  return OK;
+}
+
+void OpLog::calcLog(std::shared_ptr<FitsImage> img) const
+{
+  PixelIterator p = img->getPixelIterator();
+  if (img->getDepth() == 1)
   {
     while (p.hasNext())
     {
@@ -65,12 +94,10 @@ OpPlugin::ResultType OpLog::execute(std::shared_ptr<FitsObject> image, QRect /*s
     {
       ValueType val = p.getAbs();
       ValueType nval = log10(val);
-      for (uint32_t d=0;d<image->getImage()->getDepth();d++) p[d] = p[d] * nval / val;
+      for (uint32_t d=0;d<img->getDepth();d++) p[d] = p[d] * nval / val;
       ++p;
     }
   }
-  profiler.stop();
-  log(image,"Log of image");
-  logProfiler(image);
-  return OK;
 }
+
+

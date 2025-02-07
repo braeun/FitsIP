@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - rotate images                                                       *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,14 @@
 #include <cmath>
 #include <limits>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpRotate::OpRotate():
   dlg(nullptr)
 {
@@ -47,6 +55,28 @@ QIcon OpRotate::getIcon() const
 {
   return QIcon(":/pluginicons/resources/icons/transform-rotate.png");
 }
+
+#ifdef USE_PYTHON
+void OpRotate::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("rotate90cw",[this](std::shared_ptr<FitsObject> obj){
+    rotate90cw(obj->getImage());
+    return OK;
+  },
+  "Rotate image 90° clock wise",py::arg("obj"));
+  m->def("rotate90ccw",[this](std::shared_ptr<FitsObject> obj){
+    rotate90ccw(obj->getImage());
+    return OK;
+  },
+  "Rotate image 90° counter clock wise",py::arg("obj"));
+  m->def("rotate",[this](std::shared_ptr<FitsObject> obj, double angle, bool crop){
+    rotate(obj->getImage(),angle,crop);
+    return OK;
+  },
+  "Rotate image",py::arg("obj"),py::arg("angle"),py::arg("crop"));
+}
+#endif
 
 OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
@@ -81,7 +111,7 @@ OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsObject> image, QRect 
   return CANCELLED;
 }
 
-void OpRotate::rotate90cw(std::shared_ptr<FitsImage> image)
+void OpRotate::rotate90cw(std::shared_ptr<FitsImage> image) const
 {
   FitsImage img(image->getName(),image->getHeight(),image->getWidth(),image->getDepth());
   img.setMetadata(image->getMetadata());
@@ -100,7 +130,7 @@ void OpRotate::rotate90cw(std::shared_ptr<FitsImage> image)
   *image = img;
 }
 
-void OpRotate::rotate90ccw(std::shared_ptr<FitsImage> image)
+void OpRotate::rotate90ccw(std::shared_ptr<FitsImage> image) const
 {
   FitsImage img(image->getName(),image->getHeight(),image->getWidth(),image->getDepth());
   img.setMetadata(image->getMetadata());
@@ -119,7 +149,7 @@ void OpRotate::rotate90ccw(std::shared_ptr<FitsImage> image)
   *image = img;
 }
 
-void OpRotate::rotate(std::shared_ptr<FitsImage> image, ValueType angle, bool crop)
+void OpRotate::rotate(std::shared_ptr<FitsImage> image, ValueType angle, bool crop) const
 {
   if (fabs(angle) < 0.001f) return;
   int32_t wt = static_cast<int32_t>(image->getWidth());

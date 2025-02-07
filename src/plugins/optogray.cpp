@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - convert image to gray scale image                                   *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,14 @@
 #include "optogray.h"
 #include <fitsbase/fitsimage.h>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpToGray::OpToGray()
 {
   profiler = SimpleProfiler("OpToGray");
@@ -36,6 +44,22 @@ QString OpToGray::getMenuEntry() const
 {
   return "Color/To Gray";
 }
+
+#ifdef USE_PYTHON
+void OpToGray::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("to_gray",[this](std::shared_ptr<FitsObject> obj){
+    if (obj->getImage()->getDepth() != 3)
+    {
+      return ERROR;
+    }
+    obj->setImage(toGray(obj)->getImage());
+    return OK;
+  },
+  "Convert image to gray",py::arg("obj"));
+}
+#endif
 
 OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
@@ -52,7 +76,7 @@ OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsObject> image, QRect 
   return OK;
 }
 
-std::shared_ptr<FitsObject>  OpToGray::toGray(std::shared_ptr<FitsObject> image)
+std::shared_ptr<FitsObject>  OpToGray::toGray(std::shared_ptr<FitsObject> image) const
 {
   return std::make_shared<FitsObject>(image->getImage()->toGray());
 }

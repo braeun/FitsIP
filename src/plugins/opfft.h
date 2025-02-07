@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - calculate the FFT of an image                                       *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -44,9 +44,13 @@ public:
 
   virtual QString getMenuEntry() const override;
 
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  std::shared_ptr<FitsImage> fft(const FitsImage& image);
+  std::shared_ptr<FitsImage> fft(const FitsImage& image) const;
 
 private:
   std::shared_ptr<FitsImage> img;

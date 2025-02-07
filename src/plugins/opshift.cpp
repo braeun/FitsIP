@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - shift image with subpixel accuracy                                  *
  *                                                                              *
- * modified: 2023-02-03                                                         *
+ * modified: 2025-02-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,14 @@
 #include "opshiftdialog.h"
 #include <fitsbase/fitsimage.h>
 #include <algorithm>
+
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
 
 OpShift::OpShift():
   dlg(nullptr)
@@ -47,6 +55,18 @@ QIcon OpShift::getIcon() const
   return QIcon(":/pluginicons/resources/icons/transform-move.png");
 }
 
+#ifdef USE_PYTHON
+void OpShift::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("shift",[this](std::shared_ptr<FitsObject> obj, ValueType dx, ValueType dy){
+    shift(obj->getImage(),dx,dy);
+    return OK;
+  },
+  "Shift image",py::arg("obj"),py::arg("dx"),py::arg("dy"));
+}
+#endif
+
 OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
 {
   if (dlg == nullptr) dlg = new OpShiftDialog();
@@ -65,7 +85,7 @@ OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsObject> image, QRect /
   return CANCELLED;
 }
 
-void OpShift::shift(std::shared_ptr<FitsImage> image, ValueType dx, ValueType dy)
+void OpShift::shift(std::shared_ptr<FitsImage> image, ValueType dx, ValueType dy) const
 {
   FitsImage img(*image);
   PixelIterator it2 = image->getPixelIterator();
