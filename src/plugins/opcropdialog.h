@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to crop image                                                *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,7 @@
 #ifndef OPCROPDIALOG_H
 #define OPCROPDIALOG_H
 
+#include <fitsbase/fitstypes.h>
 #include <QDialog>
 
 namespace Ui {
@@ -37,9 +38,15 @@ public:
   explicit OpCropDialog(QWidget *parent = nullptr);
   ~OpCropDialog();
 
+  bool isManual() const;
+
   void setSelection(QRect r);
 
-  QRect getSelection();
+  QRect getSelection() const;
+
+  ValueType getThreshold() const;
+
+  int getBorder() const;
 
 private:
   Ui::OpCropDialog *ui;

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - python scripting                                                    *
  *                                                                              *
- * modified: 2025-01-31                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,7 @@
 #include <fitsbase/pythonbase.h>
 #include <iostream>
 #include <functional>
+#include <QApplication>
 #include <QFileInfo>
 
 PYBIND11_EMBEDDED_MODULE(fits, m) {
@@ -75,18 +76,19 @@ void PythonScript::init()
   terp.reset(new py::scoped_interpreter);
   redirect(pybind11::cpp_function([this](const char* s){streamStdout(s);}),"stdout");
   redirect(pybind11::cpp_function([this](const char* s){streamStderr(s);}),"stderr");
-//  auto fits_module = py::module_::import("fits");
   py::exec("import fits");
 }
 
 void PythonScript::streamStdout(const char* s)
 {
   emit stdoutAvailable(s);
+  QApplication::processEvents();
 }
 
 void PythonScript::streamStderr(const char* s)
 {
   emit stderrAvailable(s);
+  QApplication::processEvents();
 }
 
 

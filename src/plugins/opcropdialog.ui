@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>295</width>
-    <height>174</height>
+    <width>438</width>
+    <height>229</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,6 @@
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -37,52 +36,88 @@
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>x:</string>
-        </property>
-       </widget>
+      <item row="3" column="4">
+       <widget class="QLineEdit" name="heightField"/>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>From</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLineEdit" name="widthField"/>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLineEdit" name="xField"/>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>width:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
+      <item row="3" column="1">
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string>y:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="xField"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="manualButton">
+        <property name="text">
+         <string>Manual</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="3" column="2">
        <widget class="QLineEdit" name="yField"/>
       </item>
-      <item row="1" column="3">
+      <item row="2" column="4">
+       <widget class="QLineEdit" name="widthField"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>x:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>height:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="4">
-       <widget class="QLineEdit" name="heightField"/>
+      <item row="2" column="3">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>width:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="automaticButton">
+        <property name="text">
+         <string>Automatic</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="borderField"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>border:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>threshold:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLineEdit" name="thresholdField"/>
       </item>
      </layout>
     </widget>
@@ -153,4 +188,7 @@
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

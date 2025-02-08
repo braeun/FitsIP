@@ -123,6 +123,7 @@ bool FitsObject::save(const QString& fn)
   }
   catch (std::exception& ex)
   {
+    qCritical() << ex.what();
     if (!tmpfile.isEmpty()) QFile(tmpfile).rename(fn);
     throw ex;
   }

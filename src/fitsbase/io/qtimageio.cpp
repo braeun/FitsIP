@@ -235,18 +235,21 @@ void QtImageIO::readExif(QString filename, ImageMetadata* data)
 
 void QtImageIO::writeExif(QString filename, std::shared_ptr<FitsImage> img)
 {
-  Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filename.toStdString());
-  if (image.get() == nullptr) return;
-  image->readMetadata();
-  Exiv2::ExifData& exifData = image->exifData();
-  Exiv2::AsciiValue sv(img->getMetadata().observer.toStdString());
-  exifData.add(Exiv2::ExifKey("Exif.Photo.CameraOwnerName"),&sv);
-  sv = Exiv2::AsciiValue(img->getMetadata().instrument.toStdString());
-  exifData.add(Exiv2::ExifKey("Exif.Image.Model"),&sv);
-  Exiv2::FloatValue fv(static_cast<float>(img->getMetadata().exposure));
-  exifData.add(Exiv2::ExifKey("Exif.Photo.ExposureTime"),&fv);
-//  image->setExifData(exifData);
-  image->writeMetadata();
+  Exiv2::Image::AutoPtr image;
+  try {
+    image = Exiv2::ImageFactory::open(filename.toStdString());
+    image->readMetadata();
+    Exiv2::ExifData& exifData = image->exifData();
+    Exiv2::AsciiValue sv(img->getMetadata().observer.toStdString());
+    exifData.add(Exiv2::ExifKey("Exif.Photo.CameraOwnerName"),&sv);
+    sv = Exiv2::AsciiValue(img->getMetadata().instrument.toStdString());
+    exifData.add(Exiv2::ExifKey("Exif.Image.Model"),&sv);
+    Exiv2::FloatValue fv(static_cast<float>(img->getMetadata().exposure));
+    exifData.add(Exiv2::ExifKey("Exif.Photo.ExposureTime"),&fv);
+  //  image->setExifData(exifData);
+    image->writeMetadata();
+  } catch (...) {
+  }
 }
 
 #endif

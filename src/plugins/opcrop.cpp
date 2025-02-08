@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - crop image                                                          *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,8 @@
 #include "opcrop.h"
 #include "opcropdialog.h"
 #include <fitsbase/fitsimage.h>
+#include <algorithm>
+#include <limits>
 
 #ifdef USE_PYTHON
 #undef SLOT
@@ -58,15 +60,26 @@ QIcon OpCrop::getIcon() const
 void OpCrop::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
-  m->def("cut",[](std::shared_ptr<FitsObject> obj, int x, int y, int w, int h){
-    QRect r(x,y,w,h);
-    auto img = obj->getImage()->subImage(r);
-    img->setMetadata(obj->getImage()->getMetadata());
-    obj->setImage(img);
-    obj->getImage()->log(QString("OpCrop: %1,%2 %3x%4").arg(x).arg(y).arg(w).arg(h));
-    return OK;
-  },
-  "Crop the image",py::arg("obj"),py::arg("x"),py::arg("y"),py::arg("w"),py::arg("h"));
+  m->def("crop",[](std::shared_ptr<FitsObject> obj, int x, int y, int w, int h){
+      QRect r(x,y,w,h);
+      if (!r.isValid()) return ERROR;
+      auto img = obj->getImage()->subImage(r);
+      img->setMetadata(obj->getImage()->getMetadata());
+      obj->setImage(img);
+      obj->getImage()->log(QString("OpCrop: %1,%2 %3x%4").arg(x).arg(y).arg(w).arg(h));
+      return OK;
+    },
+    "Crop the image",py::arg("obj"),py::arg("x"),py::arg("y"),py::arg("w"),py::arg("h"));
+  m->def("autocrop",[this](std::shared_ptr<FitsObject> obj, ValueType threshold, int border){
+      QRect r = findArea(obj->getImage(),threshold,border);
+      if (!r.isValid()) return ERROR;
+      auto img = obj->getImage()->subImage(r);
+      img->setMetadata(obj->getImage()->getMetadata());
+      obj->setImage(img);
+      obj->getImage()->log(QString("OpCrop: %1,%2 %3x%4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()));
+      return OK;
+    },
+    "Automatically crop the image",py::arg("obj"),py::arg("threshold"),py::arg("border"));
 }
 #endif
 
@@ -76,7 +89,14 @@ OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, QRect r,
   dlg->setSelection(r);
   if (dlg->exec())
   {
-    r = image->getImage()->getOverlap(dlg->getSelection());
+    if (dlg->isManual())
+    {
+      r = image->getImage()->getOverlap(dlg->getSelection());
+    }
+    else
+    {
+      r = findArea(image->getImage(),dlg->getThreshold(),dlg->getBorder());
+    }
     if (r.isValid())
     {
       profiler.start();
@@ -90,4 +110,38 @@ OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, QRect r,
     }
   }
   return CANCELLED;
+}
+
+
+QRect OpCrop::findArea(std::shared_ptr<FitsImage> img, ValueType threshold, int border) const
+{
+  int xmin = std::numeric_limits<int>::max();
+  int xmax = std::numeric_limits<int>::min();
+  int ymin = std::numeric_limits<int>::max();
+  int ymax = std::numeric_limits<int>::min();
+  PixelIterator it = img->getPixelIterator();
+  for (int y=0;y<img->getHeight();++y)
+  {
+    for (int x=0;x<img->getWidth();++x)
+    {
+      if (it.getAbs() >= threshold)
+      {
+        xmin = std::min(xmin,x);
+        xmax = std::max(xmax,x);
+        ymin = std::min(ymin,y);
+        ymax = std::max(ymax,y);
+      }
+      ++it;
+    }
+  }
+  if (xmin >= xmax || ymin >= ymax) return QRect();
+  xmin -= border;
+  xmin = std::max(0,xmin);
+  xmax += border;
+  xmax = std::min(xmax,(int)img->getWidth()-1);
+  ymin -= border;
+  ymin = std::max(0,ymin);
+  ymax += border;
+  ymax = std::min(ymax,(int)img->getHeight()-1);
+  return QRect(xmin,ymin,xmax-xmin+1,ymax-ymin+1);
 }

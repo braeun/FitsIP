@@ -44,6 +44,8 @@ public:
 
   QString getRoot() const;
 
+  void setRoot(const QString& dir);
+
   bool hasSelectedRows() const;
 
   /**
@@ -65,7 +67,6 @@ private:
   void selectRoot();
   void rootChanged();
   void selectedAsRoot();
-  void setRoot(const QString& dir);
   void showContextMenu(const QPoint& pos);
   void newFolder();
   void rename();

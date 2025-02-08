@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - crop image                                                          *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -52,6 +52,9 @@ public:
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
 private:
+
+  QRect findArea(std::shared_ptr<FitsImage> img, ValueType threshold, int border) const;
+
   OpCropDialog* dlg;
 
 };

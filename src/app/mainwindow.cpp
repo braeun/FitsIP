@@ -177,11 +177,11 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->actionTree_By_Project->setActionGroup(grp);
   ui->actionTree_By_Project_and_Date->setActionGroup(grp);
   ui->actionTree_By_Project_and_Step->setActionGroup(grp);
-  connect(ui->actionTable,&QAction::triggered,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::Table);});
-  connect(ui->actionBy_Date,&QAction::triggered,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByDate);});
-  connect(ui->actionTree_By_Project,&QAction::triggered,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByProject);});
-  connect(ui->actionTree_By_Project_and_Date,&QAction::triggered,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByProjectByDate);});
-  connect(ui->actionTree_By_Project_and_Step,&QAction::triggered,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByProjectByStep);});
+  connect(ui->actionTable,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::Table);});
+  connect(ui->actionBy_Date,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByDate);});
+  connect(ui->actionTree_By_Project,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByProject);});
+  connect(ui->actionTree_By_Project_and_Date,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByProjectByDate);});
+  connect(ui->actionTree_By_Project_and_Step,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByProjectByStep);});
   switch (settings.getLogwidgetStyle())
   {
     case 0:
@@ -210,6 +210,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
 
   connect(consoleWidget,&ConsoleWidget::consoleCommand,this,&MainWindow::runScriptCmd);
   connect(ScriptInterface::getInterface(),QOverload<int>::of(&ScriptInterface::display),this,QOverload<int>::of(&MainWindow::display));
+  connect(ScriptInterface::getInterface(),&ScriptInterface::workingDirChanged,ui->fileSystemView,&FileSystemView::setRoot);
   setScriptOutput();
 #if !(defined(USE_PYTHON))
   ui->actionRun_Script->setEnabled(false);
