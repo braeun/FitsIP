@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - definition of a filter kernel                                       *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,9 +46,21 @@ public:
 
   void normalize();
 
-  inline const std::vector<ValueType>& operator[](uint32_t index) const;
+  const std::vector<std::vector<ValueType>>& getKernel() const;
 
-  inline std::vector<ValueType>& operator[](uint32_t index);
+  /**
+   * @brief Return the vector of columns in a given row.
+   * @param row the row index
+   * @return the vector of columns
+   */
+  inline const std::vector<ValueType>& operator[](uint32_t row) const;
+
+  /**
+   * @brief Return the vector of columns in a given row.
+   * @param row the row index
+   * @return the vector of columns
+   */
+  inline std::vector<ValueType>& operator[](uint32_t row);
 
 private:
   QString name;

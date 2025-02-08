@@ -61,12 +61,14 @@ void OpResize::bindPython(void* mod) const
   m->def("shrink",[this](std::shared_ptr<FitsObject> obj, int factor){
     auto img = shrink(obj->getImage(),factor);
     obj->setImage(img);
+    obj->getImage()->log(QString("Resize shrink: factor=%1").arg(factor));
     return OK;
   },
   "Shrink the image by a given factor",py::arg("obj"),py::arg("factor"));
   m->def("grow",[this](std::shared_ptr<FitsObject> obj, int factor, bool bilinear){
     auto img = grow(obj->getImage(),factor,bilinear);
     obj->setImage(img);
+    obj->getImage()->log(QString("Resize grow: factor=%1 %2").arg(factor).arg(bilinear?"bilinear":"nearest neighbor"));
     return OK;
   },
   "Grow the image by a given factor with optional bilinear interpolation",py::arg("obj"),py::arg("factor"),py::arg("bilinear"));

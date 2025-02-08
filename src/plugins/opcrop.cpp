@@ -63,6 +63,7 @@ void OpCrop::bindPython(void* mod) const
     auto img = obj->getImage()->subImage(r);
     img->setMetadata(obj->getImage()->getMetadata());
     obj->setImage(img);
+    obj->getImage()->log(QString("OpCrop: %1,%2 %3x%4").arg(x).arg(y).arg(w).arg(h));
     return OK;
   },
   "Crop the image",py::arg("obj"),py::arg("x"),py::arg("y"),py::arg("w"),py::arg("h"));

@@ -61,6 +61,7 @@ void OpShift::bindPython(void* mod) const
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("shift",[this](std::shared_ptr<FitsObject> obj, ValueType dx, ValueType dy){
     shift(obj->getImage(),dx,dy);
+    obj->getImage()->log(QString("OpShift: dx=%1  dy=%2").arg(dx).arg(dy));
     return OK;
   },
   "Shift image",py::arg("obj"),py::arg("dx"),py::arg("dy"));

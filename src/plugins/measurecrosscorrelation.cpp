@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - perform cross carrelation                                           *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,14 @@
 #include <fitsbase/imagecollection.h>
 #include <fitsbase/fitsobject.h>
 #include <fftw3.h>
+
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
 
 MeasureCrossCorrelation::MeasureCrossCorrelation():
   dlg(nullptr)
@@ -50,6 +58,18 @@ QString MeasureCrossCorrelation::getMenuEntry() const
   return "Measure/Cross Correlation...";
 }
 
+#ifdef USE_PYTHON
+void MeasureCrossCorrelation::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("crosscorrelation",[this](std::shared_ptr<FitsObject> obj1, std::shared_ptr<FitsObject> obj2){
+    return correlate(obj1,obj2);
+    obj1->getImage()->log("Cross correlation between: "+obj1->getImage()->getName()+" and "+obj2->getImage()->getName());
+  },
+  "Cross correlation between to images",py::arg("obj1"),py::arg("obj2"));
+}
+#endif
+
 OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   if (dlg == nullptr)
@@ -71,7 +91,7 @@ OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsObject
   return CANCELLED;
 }
 
-std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<FitsObject> image1, std::shared_ptr<FitsObject> image2, QRect selection)
+std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<FitsObject> image1, std::shared_ptr<FitsObject> image2, QRect selection) const
 {
   auto i1 = image1->getImage();
   auto i2 = image2->getImage();
@@ -141,7 +161,7 @@ std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<F
 /*
  * shift 0,0 into the center of the image
  */
-void MeasureCrossCorrelation::sort(double *s, double *d, int32_t w, int32_t h)
+void MeasureCrossCorrelation::sort(double *s, double *d, int32_t w, int32_t h) const
 {
   double *p;
   for (int y=0;y<h;y++)

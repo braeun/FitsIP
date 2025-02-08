@@ -55,6 +55,7 @@ void OpDDP::bindPython(void* mod) const
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("ddp",[this](std::shared_ptr<FitsObject> obj, ValueType sigma, ValueType bkg, ValueType a, ValueType b){
     ddp(obj->getImage(),sigma,bkg,a,b);
+    obj->getImage()->log(QString::asprintf("DDP: sigma=%f  bkg=%f  a=%f  b=%f",sigma,bkg,a,b));
     return OK;
   },
   "DDP processing",py::arg("obj"),py::arg("sigma"),py::arg("bkg"),py::arg("a"),py::arg("b"));

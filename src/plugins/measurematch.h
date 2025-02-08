@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to match two images                                          *
  *                                                                              *
- * modified: 2022-12-03                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -51,6 +51,10 @@ public:
   virtual ~MeasureMatch() override;
 
   virtual QString getMenuEntry() const override;
+
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
 
   virtual ResultType execute(std::shared_ptr<FitsObject> list, QRect aoi=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 

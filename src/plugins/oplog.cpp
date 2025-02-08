@@ -58,6 +58,7 @@ void OpLog::bindPython(void* mod) const
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("log",[this](std::shared_ptr<FitsObject> obj){
     calcLog(obj->getImage());
+    obj->getImage()->log("log10 of image");
     return OK;
   },
   "Take logarithm of image",py::arg("obj"));
@@ -69,7 +70,7 @@ OpPlugin::ResultType OpLog::execute(std::shared_ptr<FitsObject> image, QRect /*s
   profiler.start();
   calcLog(image->getImage());
   profiler.stop();
-  log(image,"Log of image");
+  log(image,"Log10 of image");
   logProfiler(image);
   return OK;
 }

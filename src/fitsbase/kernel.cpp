@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - definition of a filter kernel                                       *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -91,3 +91,9 @@ void Kernel::normalize()
     }
   }
 }
+
+const std::vector<std::vector<ValueType>>& Kernel::getKernel() const
+{
+  return kern;
+}
+

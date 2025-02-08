@@ -62,6 +62,7 @@ void OpCut::bindPython(void* mod) const
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("cut",[this](std::shared_ptr<FitsObject> obj, ValueType lo, ValueType hi){
     cut(obj->getImage(),lo,hi);
+    obj->getImage()->log(QString("cut values ouside range: lower=%1 upper=%2").arg(lo).arg(hi));
     return OK;
   },
   "Cut values outside a given range",py::arg("obj"),py::arg("lo"),py::arg("hi"));

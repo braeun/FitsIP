@@ -55,6 +55,7 @@ void OpToGray::bindPython(void* mod) const
       return ERROR;
     }
     obj->setImage(toGray(obj)->getImage());
+    obj->getImage()->log("Converted to gray image");
     return OK;
   },
   "Convert image to gray",py::arg("obj"));

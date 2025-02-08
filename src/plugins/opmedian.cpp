@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - median filter                                                       *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,14 @@
 #include <algorithm>
 #include <QApplication>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpMedian::OpMedian():
   dlg(nullptr)
 {
@@ -40,6 +48,19 @@ QString OpMedian::getMenuEntry() const
 {
   return "Filter/Median...";
 }
+
+#ifdef USE_PYTHON
+void OpMedian::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("median_filter",[this](std::shared_ptr<FitsObject> obj, int size, ValueType threshold){
+    filter(obj->getImage(),threshold,size);
+    obj->getImage()->log(QString::asprintf("Median filter: size=%d threshold=%f",size,threshold));
+    return OK;
+  },
+  "Apply median filter",py::arg("obj"),py::arg("size"),py::arg("threshold"));
+}
+#endif
 
 OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
@@ -61,7 +82,7 @@ OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, QRect 
   return CANCELLED;
 }
 
-void OpMedian::filter(std::shared_ptr<FitsImage> image, ValueType threshold, int32_t size)
+void OpMedian::filter(std::shared_ptr<FitsImage> image, ValueType threshold, int32_t size) const
 {
   FitsImage tmp(*image);
 //  PixelIterator it1 = img.getPixelIterator();

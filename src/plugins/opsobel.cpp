@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - apply Sobel filter                                                  *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,14 @@
 #include <fitsbase/fitsimage.h>
 #include <fitsbase/kernelrepository.h>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpSobel::OpSobel()
 {
 }
@@ -37,19 +45,44 @@ QString OpSobel::getMenuEntry() const
   return "Filter/Edge";
 }
 
+#ifdef USE_PYTHON
+void OpSobel::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("sobel",[this](std::shared_ptr<FitsObject> obj){
+    auto img = applyFilter(obj->getImage());
+    obj->setImage(img);
+    obj->getImage()->log("Applied edge (Sobel) filter");
+    return OK;
+  },
+  "Apply edge (Sobel) filter",py::arg("obj"));
+}
+#endif
+
 OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
   profiler.start();
+  auto img = applyFilter(image->getImage());
+  image->setImage(img);
+  profiler.stop();
+  log(image,"Applied edge (Sobel) filter");
+  logProfiler(image);
+  return ResultType::OK;
+}
+
+
+std::shared_ptr<FitsImage> OpSobel::applyFilter(std::shared_ptr<FitsImage>  img) const
+{
   const Kernel& kx = KernelRepository::instance().getKernel(KernelRepository::SOBEL_X);
-  ValueType* gx = convolve(image->getImage(),kx);
+  ValueType* gx = convolve(img,kx);
   const Kernel& ky = KernelRepository::instance().getKernel(KernelRepository::SOBEL_Y);
-  ValueType* gy = convolve(image->getImage(),ky);
-  auto img = std::make_shared<FitsImage>(image->getName(),image->getImage()->getWidth(),image->getImage()->getHeight(),1);
-  img->setMetadata(image->getImage()->getMetadata());
-  PixelIterator it = img->getPixelIterator();
+  ValueType* gy = convolve(img,ky);
+  auto img1 = std::make_shared<FitsImage>(img->getName(),img->getWidth(),img->getHeight(),1);
+  img1->setMetadata(img->getMetadata());
+  PixelIterator it = img1->getPixelIterator();
   ValueType* ptrgx = gx;
   ValueType* ptrgy = gy;
-  uint32_t n = image->getImage()->getWidth() * image->getImage()->getHeight();
+  uint32_t n = img->getWidth() * img->getHeight();
   while (n-- > 0)
   {
     it[0] = sqrt(*ptrgx * *ptrgx + *ptrgy * *ptrgy);
@@ -57,18 +90,12 @@ OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsObject> image, QRect s
     ++ptrgx;
     ++ptrgy;
   }
-  image->setImage(img);
-  profiler.stop();
-  log(image,"Applied Edge (Sobel) filter");
-  logProfiler(image);
   delete [] gx;
   delete [] gy;
-  return ResultType::OK;
+  return img1;
 }
 
-
-
-ValueType* OpSobel::convolve(std::shared_ptr<FitsImage> img, const Kernel &kernel)
+ValueType* OpSobel::convolve(std::shared_ptr<FitsImage> img, const Kernel &kernel) const
 {
   ValueType* g = new ValueType[img->getWidth()*img->getHeight()];
   memset(g,0,img->getWidth()*img->getHeight()*sizeof(ValueType));

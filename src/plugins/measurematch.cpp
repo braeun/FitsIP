@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to match two images                                          *
  *                                                                              *
- * modified: 2022-12-03                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,7 +22,7 @@
 
 #include "measurematch.h"
 #include "measurematchdialog.h"
-#include "opgrow.h"
+#include "opresize.h"
 #include <fitsbase/imagecollection.h>
 #include <fitsbase/fitsobject.h>
 #include <fitsbase/fitsimage.h>
@@ -31,6 +31,14 @@
 #include <limits>
 #include <iostream>
 #include <QDebug>
+
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
 
 MeasureMatch::MeasureMatch():
   matchFull(true),
@@ -53,6 +61,39 @@ QString MeasureMatch::getMenuEntry() const
 {
   return "Measure/Match...";
 }
+
+#ifdef USE_PYTHON
+void MeasureMatch::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  py::class_<MeasureMatch>(*m,"MeasureMatch","Match images to a template")
+      .def(py::init<>())
+      .def("set_template",[](MeasureMatch& op, std::shared_ptr<FitsObject> obj){
+          op.setTemplate(obj->getImage());
+        },
+        "Set the template for matching",py::arg("obj"))
+      .def("set_template",[](MeasureMatch& op, std::shared_ptr<FitsObject> obj, int x, int y, int w, int h){
+          op.setTemplate(obj->getImage(),QRect(x,y,w,h));
+        },
+        "Set the template for matching",py::arg("obj"),py::arg("x"),py::arg("y"),py::arg("w"),py::arg("h"))
+      .def("match",[](MeasureMatch& op, std::shared_ptr<FitsObject> obj){
+          op.computeMatch(obj->getImage());
+        },
+        "Compute the match of the image with the template",py::arg("obj"))
+      .def("shift_aoi",[](MeasureMatch& op, int dx, int dy){op.shiftAOI(dx,dy);},
+        "Shift the range of interest based on the original value",py::arg("dx"),py::arg("dy"))
+      .def_property_readonly("x",&MeasureMatch::getX,"x value of best match")
+      .def_property_readonly("y",&MeasureMatch::getX,"y value of best match")
+      .def_property_readonly("dx",&MeasureMatch::getX,"shift in x for best match")
+      .def_property_readonly("dy",&MeasureMatch::getX,"shift in y for best match")
+      .def_property("match_full",&MeasureMatch::isMatchFull,&MeasureMatch::setMatchFull)
+      .def_property("match_range",&MeasureMatch::getMatchRange,&MeasureMatch::setMatchRange)
+      .def_property("first_pass_delta",&MeasureMatch::getFirstPassDelta,&MeasureMatch::setFirstPassDelta)
+      .def_property("subsample",&MeasureMatch::getSubsample,&MeasureMatch::setSubsample)
+      .def_property("factor",&MeasureMatch::getFactor,&MeasureMatch::setFactor)
+      ;
+}
+#endif
 
 OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
 {
@@ -103,7 +144,7 @@ void MeasureMatch::setTemplate(std::shared_ptr<FitsImage> image, QRect a)
   std::shared_ptr<FitsImage> img;
   if (factor > 1)
   {
-    OpGrow op;
+    OpResize op;
     img = op.grow(image,factor,true);
     aoi = QRect(aoi.x()*factor,aoi.y()*factor,aoi.width()*factor,aoi.height()*factor);
   }
@@ -269,7 +310,7 @@ void MeasureMatch::createI(std::shared_ptr<FitsImage> image)
   std::shared_ptr<FitsImage> img;
   if (factor > 1)
   {
-    OpGrow op;
+    OpResize op;
     img = op.grow(image,factor,true);
   }
   else

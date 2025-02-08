@@ -45,13 +45,9 @@ public:
 
   QString getName() const;
 
-  std::string getNameStd() const;
-
   QString getFilename() const;
 
-  std::string getFilenameStd() const;
-
-  std::shared_ptr<FitsImage> getImage();
+  std::shared_ptr<FitsImage> getImage() const;
 
   void setImage(const std::shared_ptr<FitsImage>& img);
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - median filter                                                       *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -47,7 +47,11 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  void filter(std::shared_ptr<FitsImage> image, ValueType threshold, int32_t size);
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
+  void filter(std::shared_ptr<FitsImage> image, ValueType threshold, int32_t size) const;
 
 private:
   OpMedianDialog* dlg;

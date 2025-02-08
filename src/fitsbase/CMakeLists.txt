@@ -18,6 +18,7 @@ set(private_header_list
   pluginfactory.h
   profile.h
   rgbvalue.h
+  scriptutilities.h
   settings.h
   star.h
   starlist.h
@@ -84,6 +85,7 @@ add_library(fitsbase
   pluginfactory.cpp
   profile.cpp
   rgbvalue.cpp
+  scriptutilities.cpp
   settings.cpp
   starlist.cpp
   undostack.cpp

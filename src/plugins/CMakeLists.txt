@@ -30,7 +30,7 @@ set(plugin_headers
   opflipx.h
   opflipy.h
   opgaussblur.h
-  opgrow.h
+#  opgrow.h
   opkernel.h
   oplog.h
   opmedian.h
@@ -39,7 +39,7 @@ set(plugin_headers
   oprotate.h
   opscale.h
   opshift.h
-  opshrink.h
+#  opshrink.h
   opsobel.h
   opsplitchannels.h
   opsqrt.h
@@ -72,7 +72,7 @@ set(plugin_sources
   opflipx.cpp
   opflipy.cpp
   opgaussblur.cpp
-  opgrow.cpp
+#  opgrow.cpp
   opkernel.cpp
   oplog.cpp
   opmedian.cpp
@@ -81,7 +81,7 @@ set(plugin_sources
   oprotate.cpp
   opscale.cpp
   opshift.cpp
-  opshrink.cpp
+#  opshrink.cpp
   opsobel.cpp
   opsplitchannels.cpp
   opsqrt.cpp
@@ -131,13 +131,13 @@ set(private_header_list
   opcropdialog.h
   opddpdialog.h
   opgaussblurdialog.h
-  opgrowdialog.h
+#  opgrowdialog.h
   opkerneldialog.h
   opmediandialog.h
   opresizedialog.h
   oprotatedialog.h
   opshiftdialog.h
-  opshrinkdialog.h
+#  opshrinkdialog.h
   opstackdialog.h
   opunsharpmaskdialog.h
   synthesizebackgrounddialog.h
@@ -158,13 +158,13 @@ add_library(fitsplugins
   opcropdialog.cpp opcropdialog.ui
   opddpdialog.cpp opddpdialog.ui
   opgaussblurdialog.cpp opgaussblurdialog.ui
-  opgrowdialog.cpp opgrowdialog.ui
+#  opgrowdialog.cpp opgrowdialog.ui
   opkerneldialog.cpp opkerneldialog.ui
   opmediandialog.cpp opmediandialog.ui
   opresizedialog.cpp opresizedialog.ui
   oprotatedialog.cpp oprotatedialog.ui
   opshiftdialog.cpp opshiftdialog.ui
-  opshrinkdialog.cpp opshrinkdialog.ui
+#  opshrinkdialog.cpp opshrinkdialog.ui
   opstackdialog.cpp opstackdialog.ui
   opunsharpmaskdialog.cpp opunsharpmaskdialog.ui
   pluginresources.qrc

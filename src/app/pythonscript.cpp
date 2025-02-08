@@ -26,8 +26,10 @@
 #include <fitsbase/pythonbase.h>
 #include <iostream>
 #include <functional>
+#include <QFileInfo>
 
 PYBIND11_EMBEDDED_MODULE(fits, m) {
+  m.attr("scriptpath") = "";
   pythonbase::bind(m);
   ScriptInterface::bind(m);
   PluginFactory::instance()->setBinding(&m);
@@ -45,11 +47,16 @@ PythonScript::PythonScript()
 void PythonScript::runCmd(const QString& cmd)
 {
 //  std::cout << "python: " << cmd.toStdString() << std::endl;
+  auto fits_module = py::module_::import("fits");
+  fits_module.attr("scriptpath") = "";
   py::exec(cmd.toStdString());
 }
 
 void PythonScript::runFile(const QString& filename)
 {
+  QFileInfo info(filename);
+  auto fits_module = py::module_::import("fits");
+  fits_module.attr("scriptpath") = info.absolutePath().toStdString();
   py::eval_file(filename.toStdString());
 }
 
@@ -68,6 +75,7 @@ void PythonScript::init()
   terp.reset(new py::scoped_interpreter);
   redirect(pybind11::cpp_function([this](const char* s){streamStdout(s);}),"stdout");
   redirect(pybind11::cpp_function([this](const char* s){streamStderr(s);}),"stderr");
+//  auto fits_module = py::module_::import("fits");
   py::exec("import fits");
 }
 

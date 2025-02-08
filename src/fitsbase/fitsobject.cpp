@@ -56,22 +56,12 @@ QString FitsObject::getName() const
   return image->getName();
 }
 
-std::string FitsObject::getNameStd() const
-{
-  return image->getName().toStdString();
-}
-
 QString  FitsObject::getFilename() const
 {
   return filename;
 }
 
-std::string  FitsObject::getFilenameStd() const
-{
-  return filename.toStdString();
-}
-
-std::shared_ptr<FitsImage> FitsObject::getImage()
+std::shared_ptr<FitsImage> FitsObject::getImage() const
 {
   return image;
 }

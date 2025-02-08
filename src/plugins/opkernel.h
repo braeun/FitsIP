@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - kernel filter                                                       *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -44,9 +44,13 @@ public:
 
   virtual QString getMenuEntry() const override;
 
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
+
   virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-  void convolve(std::shared_ptr<FitsImage> image, const Kernel& kernel);
+  void convolve(std::shared_ptr<FitsImage> image, const Kernel& kernel) const;
 
 private:
   OpKernelDialog* dlg;

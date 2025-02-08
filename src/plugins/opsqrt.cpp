@@ -59,6 +59,7 @@ void OpSqrt::bindPython(void* mod) const
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("sqrt",[this](std::shared_ptr<FitsObject> obj){
     calcSqrt(obj->getImage());
+    obj->getImage()->log("Square Root of image");
     return OK;
   },
   "Take square root of image",py::arg("obj"));

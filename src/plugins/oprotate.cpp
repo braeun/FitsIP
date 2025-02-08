@@ -62,16 +62,19 @@ void OpRotate::bindPython(void* mod) const
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("rotate90cw",[this](std::shared_ptr<FitsObject> obj){
     rotate90cw(obj->getImage());
+    obj->getImage()->log("OpRotate: 90deg cw");
     return OK;
   },
   "Rotate image 90° clock wise",py::arg("obj"));
   m->def("rotate90ccw",[this](std::shared_ptr<FitsObject> obj){
     rotate90ccw(obj->getImage());
+    obj->getImage()->log("OpRotate: 90deg ccw");
     return OK;
   },
   "Rotate image 90° counter clock wise",py::arg("obj"));
   m->def("rotate",[this](std::shared_ptr<FitsObject> obj, double angle, bool crop){
     rotate(obj->getImage(),angle,crop);
+    obj->getImage()->log(QString("OpRotate: %1deg").arg(static_cast<ValueType>(dlg->getAngle())));
     return OK;
   },
   "Rotate image",py::arg("obj"),py::arg("angle"),py::arg("crop"));

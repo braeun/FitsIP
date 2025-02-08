@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - kernel filter                                                       *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,14 @@
 #include <fitsbase/kernelrepository.h>
 #include <iostream>
 
+#ifdef USE_PYTHON
+#undef SLOT
+#undef slot
+#undef slots
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+#endif
+
 OpKernel::OpKernel():
   dlg(nullptr)
 {
@@ -41,6 +49,19 @@ QString OpKernel::getMenuEntry() const
 {
   return "Filter/Kernel Convolution...";
 }
+
+#ifdef USE_PYTHON
+void OpKernel::bindPython(void* mod) const
+{
+  py::module_* m = reinterpret_cast<py::module_*>(mod);
+  m->def("convolve",[this](std::shared_ptr<FitsObject> obj, const Kernel& kernel){
+    convolve(obj->getImage(),kernel);
+    obj->getImage()->log("Convolution with kernel "+kernel.getName());
+    return OK;
+  },
+  "Convolution with kernel",py::arg("obj"),py::arg("kernel"));
+}
+#endif
 
 OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
 {
@@ -58,7 +79,7 @@ OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsObject> image, QRect 
   return OK;
 }
 
-void OpKernel::convolve(std::shared_ptr<FitsImage> image, const Kernel& kernel)
+void OpKernel::convolve(std::shared_ptr<FitsImage> image, const Kernel& kernel) const
 {
   FitsImage tmp(*image);
   PixelIterator it1 = image->getPixelIterator();

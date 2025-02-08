@@ -58,6 +58,7 @@ void OpGaussBlur::bindPython(void* mod) const
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("gauss_blur",[this](std::shared_ptr<FitsObject> obj, ValueType sigmax, ValueType sigmay, ValueType accuracy){
     blur(obj->getImage(),sigmax,sigmay,accuracy);
+    obj->getImage()->log(QString::asprintf("Gaussian blur: sigmax=%f  sigmay=%f  accuracy=%f",sigmax,sigmay,accuracy));
     return OK;
   },
   "Blur an image by a gaussian",py::arg("obj"),py::arg("sigmax"),py::arg("sigmay"),py::arg("accuracy"));

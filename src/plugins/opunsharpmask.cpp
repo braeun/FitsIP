@@ -54,6 +54,7 @@ void OpUnsharpMask::bindPython(void* mod) const
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("unsharp_mask",[this](std::shared_ptr<FitsObject> obj, ValueType sigma, ValueType strength){
     unsharpmask(obj->getImage(),sigma,strength);
+    obj->getImage()->log(QString::asprintf("Unsharp mask: sigma=%f  strength=%f",sigma,strength));
     return OK;
   },
   "Apply unsharp mask",py::arg("obj"),py::arg("sigma"),py::arg("strength"));
