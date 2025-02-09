@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - unsharp masking dialog                                              *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -72,10 +72,13 @@ void OpUnsharpMaskDialog::textFieldChanged()
 
 void OpUnsharpMaskDialog::updatePreview()
 {
-  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
-  OpUnsharpMask op;
-  op.unsharpmask(img,getSigma(),getStrength());
-  ui->previewWidget->updatePreview(img);
+  if (ui->previewWidget->getSourceImage())
+  {
+    auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
+    OpUnsharpMask op;
+    op.unsharpmask(img,getSigma(),getStrength());
+    ui->previewWidget->updatePreview(img);
+  }
 }
 
 

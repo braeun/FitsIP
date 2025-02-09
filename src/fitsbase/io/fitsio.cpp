@@ -50,14 +50,14 @@ std::shared_ptr<FitsImage> FitsIO::read(QString filename)
   {
     profiler.start();
     CCfits::FITS fits(filename.toStdString());
-    int64_t w = fits.pHDU().axis(0);
-    int64_t h = fits.pHDU().axis(1);
-    int64_t depth = 1;
+    long w = fits.pHDU().axis(0);
+    long h = fits.pHDU().axis(1);
+    long depth = 1;
     if (fits.pHDU().axes() > 2) depth = fits.pHDU().axis(2);
-    auto img = std::make_shared<FitsImage>(info.baseName(),static_cast<uint32_t>(w),static_cast<uint32_t>(h),static_cast<uint32_t>(depth));
+    auto img = std::make_shared<FitsImage>(info.baseName(),static_cast<int>(w),static_cast<int>(h),static_cast<int>(depth));
     int64_t first = 1;
     std::valarray<ValueType> a;
-    for (uint32_t i=0;i<static_cast<uint32_t>(depth);i++)
+    for (long i=0;i<depth;i++)
     {
       fits.pHDU().read(a,first,w*h);
       img->getLayer(i)->setData(a);
@@ -103,7 +103,7 @@ std::shared_ptr<FitsImage> FitsIO::read(QString filename)
       PixelIterator it = img->getPixelIterator();
       while (true)
       {
-        for (uint32_t i=0;i<static_cast<uint32_t>(depth);i++)
+        for (long i=0;i<depth;i++)
         {
           if (it[i] < 0) it[i] += 0x10000;
         }
@@ -154,7 +154,7 @@ bool FitsIO::write(QString filename, std::shared_ptr<FitsImage> img)
         break;
     }
     int64_t first = 1;
-    for (uint32_t i=0;i<img->getDepth();i++)
+    for (int i=0;i<img->getDepth();i++)
     {
       std::shared_ptr<Layer> layer = img->getLayer(i);
       std::valarray<ValueType> a(layer->getData(),static_cast<uint64_t>(axes[0]*axes[1]));

@@ -114,20 +114,20 @@ OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, QRect 
 
 std::shared_ptr<FitsImage> OpResize::grow(std::shared_ptr<FitsImage> image, int factor, bool bilinear) const
 {
-  uint32_t w = image->getWidth() * factor;
-  uint32_t h = image->getHeight() * factor;
+  int w = image->getWidth() * factor;
+  int h = image->getHeight() * factor;
   auto img = std::make_shared<FitsImage>(image->getName(),w,h,image->getDepth());
   img->setMetadata(image->getMetadata());
   PixelIterator it = img->getPixelIterator();
   if (bilinear)
   {
-    for (uint32_t y=0;y<h;y++)
+    for (int y=0;y<h;y++)
     {
-      for (uint32_t x=0;x<w;x++)
+      for (int x=0;x<w;x++)
       {
-        uint32_t xp = x / factor;
-        uint32_t yp = y / factor;
-        for (uint32_t d=0;d<image->getDepth();d++)
+        int xp = x / factor;
+        int yp = y / factor;
+        for (int d=0;d<image->getDepth();d++)
         {
           double A = image->getConstPixelIterator(xp,yp)[d];
           double B = A;
@@ -147,14 +147,14 @@ std::shared_ptr<FitsImage> OpResize::grow(std::shared_ptr<FitsImage> image, int 
   }
   else
   {
-    for (uint32_t y=0;y<h;y++)
+    for (int y=0;y<h;y++)
     {
-      for (uint32_t x=0;x<w;x++)
+      for (int x=0;x<w;x++)
       {
-        uint32_t xp = x / factor;
-        uint32_t yp = y / factor;
+        int xp = x / factor;
+        int yp = y / factor;
         ConstPixelIterator it2 = image->getConstPixelIterator(xp,yp);
-        for (uint32_t d=0;d<image->getDepth();d++)
+        for (int d=0;d<image->getDepth();d++)
         {
           it[d] = it2[d];
         }
@@ -167,17 +167,17 @@ std::shared_ptr<FitsImage> OpResize::grow(std::shared_ptr<FitsImage> image, int 
 
 std::shared_ptr<FitsImage> OpResize::shrink(std::shared_ptr<FitsImage> image, int factor) const
 {
-  uint32_t w = image->getWidth() / factor;
-  uint32_t h = image->getHeight() / factor;
+  int w = image->getWidth() / factor;
+  int h = image->getHeight() / factor;
   auto img = std::make_shared<FitsImage>(image->getName(),w,h,image->getDepth());
   img->setMetadata(image->getMetadata());
-  for (uint32_t d=0;d<image->getDepth();d++)
+  for (int d=0;d<image->getDepth();d++)
   {
     ValueType* src = image->getLayer(d)->getData();
-    for (uint32_t y=0;y<h*factor;y++)
+    for (int y=0;y<h*factor;y++)
     {
       ValueType* dst = img->getLayer(d)->getData() + (y / factor * w);
-      for (uint32_t x=0;x<w*factor;x++)
+      for (int x=0;x<w*factor;x++)
       {
         dst[x/factor] += src[x];
       }

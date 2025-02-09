@@ -94,11 +94,11 @@ void OpShift::shift(std::shared_ptr<FitsImage> image, ValueType dx, ValueType dy
   ValueType yf = -dy - yi;
   int32_t xi = static_cast<int32_t>(-dx);
   ValueType xf = -dx - xi;
-  for (uint32_t y0=0;y0<image->getHeight();y0++)
+  for (int y0=0;y0<image->getHeight();y0++)
   {
     if (yi < 0 || yi+1 >= image->getHeight())
     {
-      for (uint32_t x0=0;x0<image->getWidth();x0++)
+      for (int x0=0;x0<image->getWidth();x0++)
       {
         it2.clear();
         ++it2;
@@ -108,7 +108,7 @@ void OpShift::shift(std::shared_ptr<FitsImage> image, ValueType dx, ValueType dy
     {
       xi = static_cast<int32_t>(-dx);
       ConstPixelIterator it1 = img.getConstPixelIterator(std::max(0,xi),yi);
-      for (uint32_t x0=0;x0<image->getWidth();x0++)
+      for (int x0=0;x0<image->getWidth();x0++)
       {
         if (xi < 0 || xi+1 >= image->getWidth())
         {
@@ -116,7 +116,7 @@ void OpShift::shift(std::shared_ptr<FitsImage> image, ValueType dx, ValueType dy
         }
         else
         {
-          for (uint32_t l=0;l<image->getDepth();l++)
+          for (int l=0;l<image->getDepth();l++)
           {
             ValueType a = it1[l]; //pixel[yi][xi];
             ValueType b = (it1+image->getWidth())[l]; // pixel[yi+1][xi];

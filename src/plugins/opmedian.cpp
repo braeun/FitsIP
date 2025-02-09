@@ -70,7 +70,7 @@ OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, QRect 
   {
     QApplication::setOverrideCursor(Qt::BusyCursor);
     ValueType threshold = dlg->getThreshold();
-    int32_t size = dlg->getSize();
+    int size = dlg->getSize();
     profiler.start();
     filter(image->getImage(),threshold,size);
     profiler.stop();
@@ -82,25 +82,25 @@ OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, QRect 
   return CANCELLED;
 }
 
-void OpMedian::filter(std::shared_ptr<FitsImage> image, ValueType threshold, int32_t size) const
+void OpMedian::filter(std::shared_ptr<FitsImage> image, ValueType threshold, int size) const
 {
   FitsImage tmp(*image);
 //  PixelIterator it1 = img.getPixelIterator();
-  uint32_t s2 = size / 2;
+  int s2 = size / 2;
 //  it1 += hk2 * img.getWidth();
-  for (uint32_t y0=s2;y0<image->getHeight()-s2;y0++)
+  for (int y0=s2;y0<image->getHeight()-s2;y0++)
   {
 //    it1 += wk2;
-    for (uint32_t x0=s2;x0<image->getWidth()-s2;x0++)
+    for (int x0=s2;x0<image->getWidth()-s2;x0++)
     {
       std::vector<ValueType> neighbors[image->getDepth()];
-      uint32_t y = y0 - s2;
+      int y = y0 - s2;
       for (int32_t rk=0;rk<size;rk++)
       {
         ConstPixelIterator it2 = tmp.getConstPixelIterator(x0-s2,y);
         for (int32_t ck=0;ck<size;ck++)
         {
-          for (uint32_t d=0;d<image->getDepth();d++)
+          for (int d=0;d<image->getDepth();d++)
           {
             neighbors[d].push_back(it2[d]);
           }
@@ -109,7 +109,7 @@ void OpMedian::filter(std::shared_ptr<FitsImage> image, ValueType threshold, int
         y++;
       }
       PixelIterator it1 = image->getPixelIterator(x0,y0);
-      for (uint32_t d=0;d<image->getDepth();d++)
+      for (int d=0;d<image->getDepth();d++)
       {
         std::sort(neighbors[d].begin(),neighbors[d].end());
         ValueType sigma = (3*neighbors[d][neighbors->size()/4] - neighbors[d][neighbors->size()/4]) / 2;

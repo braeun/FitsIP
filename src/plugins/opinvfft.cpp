@@ -104,7 +104,7 @@ std::shared_ptr<FitsImage> OpInvFFT::invfft(std::shared_ptr<FitsImage> image) co
   fftw_plan f = fftw_plan_dft_c2r_2d(image->preFFTHeight,image->preFFTWidth,in,out,FFTW_ESTIMATE);
   ConstPixelIterator it = image->getConstPixelIterator();
   fftw_complex* cptr = in;
-  for (uint32_t i=0;i<image->getHeight()*image->getWidth();i++)
+  for (int i=0;i<image->getHeight()*image->getWidth();i++)
   {
     (*cptr)[0] = it[0];
     (*cptr)[1] = it[1];
@@ -115,7 +115,7 @@ std::shared_ptr<FitsImage> OpInvFFT::invfft(std::shared_ptr<FitsImage> image) co
   auto fftimg = std::make_shared<FitsImage>(image->getName()+"_INVFFT",image->preFFTWidth,image->preFFTHeight,1);
   PixelIterator it2 = fftimg->getPixelIterator();
   double* ptr = out;
-  for (uint32_t i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+  for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
   {
     it2[0] = *ptr;
     ++ptr;

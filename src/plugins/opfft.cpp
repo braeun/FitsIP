@@ -95,7 +95,7 @@ std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage &image) const
   fftw_plan f = fftw_plan_dft_r2c_2d(image.getHeight(),image.getWidth(),in,s2c,FFTW_ESTIMATE);
   ConstPixelIterator it = image.getConstPixelIterator();
   double* ptr = in;
-  for (uint32_t i=0;i<image.getHeight()*image.getWidth();i++)
+  for (int i=0;i<image.getHeight()*image.getWidth();i++)
   {
     *ptr++ = it.getAbs();
     ++it;
@@ -103,7 +103,7 @@ std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage &image) const
   fftw_execute(f);
 #if 0
   fftw_complex *tmp1 = new fftw_complex[image.getHeight()*image.getWidth()];
-  for (uint32_t y=0;y<image.getHeight();y++)
+  for (int y=0;y<image.getHeight();y++)
   {
     fftw_complex* ptr = tmp1 + y * image.getWidth();
     fftw_complex* sptr = s2c + y * (image.getWidth()/2+1);
@@ -111,7 +111,7 @@ std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage &image) const
     {
       memcpy(&ptr[image.getWidth()/2-1],sptr,(image.getWidth()/2+1)*sizeof(fftw_complex));
       sptr++;
-      for (uint32_t x=1;x<image.getWidth()/2;x++)
+      for (int x=1;x<image.getWidth()/2;x++)
       {
         memcpy(&ptr[image.getWidth()/2-1-x],sptr,sizeof(fftw_complex));
         sptr++;
@@ -121,7 +121,7 @@ std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage &image) const
     {
       memcpy(&ptr[image.getWidth()/2],sptr,(image.getWidth()/2+1)*sizeof(fftw_complex));
       sptr++;
-      for (uint32_t x=1;x<image.getWidth()/2+1;x++)
+      for (int x=1;x<image.getWidth()/2+1;x++)
       {
         memcpy(&ptr[image.getWidth()/2-x],sptr,sizeof(fftw_complex));
         sptr++;
@@ -131,24 +131,24 @@ std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage &image) const
   fftw_complex *tmp = new fftw_complex[image.getHeight()*image.getWidth()];
   if (image.getHeight()%2 == 0)
   {
-    uint32_t size = image.getHeight() / 2 * image.getWidth();
+    int size = image.getHeight() / 2 * image.getWidth();
     memcpy(tmp,tmp1+size,size*sizeof(fftw_complex));
     memcpy(tmp+size,tmp1,size*sizeof(fftw_complex));
   }
   else
   {
-    uint32_t size = (image.getHeight() / 2 + 1) * image.getWidth();
+    int size = (image.getHeight() / 2 + 1) * image.getWidth();
     memcpy(tmp,tmp1+(size-image.getWidth()),size*sizeof(fftw_complex));
     memcpy(tmp+size,tmp1,(size-image.getWidth())*sizeof(fftw_complex));
   }
 //  fftw_complex *tmp = new fftw_complex[image.getHeight()*(image.getWidth()/2+1)];
-//  uint32_t size = image.getHeight() / 2 * (image.getWidth()/2+1);
+//  int size = image.getHeight() / 2 * (image.getWidth()/2+1);
 //  memcpy(tmp,s2c+size,size*sizeof(fftw_complex));
 //  memcpy(tmp+size,s2c,size*sizeof(fftw_complex));
   auto fftimg = std::make_shared<FitsImage>(image.getName()+"_FFT",image.getWidth(),image.getHeight(),2);
   PixelIterator it2 = fftimg->getPixelIterator();
   fftw_complex* cptr = tmp;
-  for (uint32_t i=0;i<image.getHeight()*image.getWidth();i++)
+  for (int i=0;i<image.getHeight()*image.getWidth();i++)
   {
     it2[0] = (*cptr)[0];
     it2[1] = (*cptr)[1];
@@ -163,7 +163,7 @@ std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage &image) const
   fftimg->preFFTWidth = image.getWidth();
   PixelIterator it2 = fftimg->getPixelIterator();
   fftw_complex* cptr = s2c;
-  for (uint32_t i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+  for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
   {
     it2[0] = (*cptr)[0];
     it2[1] = (*cptr)[1];

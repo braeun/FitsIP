@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - median filter dialog                                                *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -61,10 +61,13 @@ double OpMedianDialog::getThreshold() const
 
 void OpMedianDialog::textFieldChanged()
 {
-  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
-  OpMedian op;
-  op.filter(img,getThreshold(),getSize());
-  ui->previewWidget->updatePreview(img);
+  if (ui->previewWidget->getSourceImage())
+  {
+    auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
+    OpMedian op;
+    op.filter(img,getThreshold(),getSize());
+    ui->previewWidget->updatePreview(img);
+  }
 }
 
 

@@ -75,9 +75,9 @@ OpPlugin::ResultType GaussianTestImage::execute(std::shared_ptr<FitsObject> /*im
     double cy = dlg->getCenterY();
     double sy = dlg->getSigmaY();
     PixelIterator it = img->getPixelIterator();
-    for (uint32_t y=0;y<img->getHeight();y++)
+    for (int y=0;y<img->getHeight();y++)
     {
-      for (uint32_t x=0;x<img->getWidth();x++)
+      for (int x=0;x<img->getWidth();x++)
       {
         it[0] = MathFunctions::gaussian(x,y,a,cx,sx,cy,sy);
         ++it;

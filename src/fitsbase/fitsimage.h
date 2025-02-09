@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2023-01-07                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,7 +40,7 @@
 class Layer
 {
 public:
-  Layer(uint32_t width, uint32_t height);
+  Layer(int width, int height);
   Layer(const Layer& l);
   ~Layer();
 
@@ -51,8 +51,8 @@ public:
   const ValueType* getData() const;
 
 private:
-  uint32_t width;
-  uint32_t height;
+  int width;
+  int height;
   ValueType* data;
 };
 
@@ -75,7 +75,7 @@ public:
   enum Scale { LINEAR=0, SINE, SQRT, LOG };
 
   FitsImage();
-  FitsImage(const QString& name, uint32_t width, uint32_t height, uint32_t depth=1);
+  FitsImage(const QString& name, int width, int height, int depth=1);
   FitsImage(const FitsImage& img);
   FitsImage(FitsImage&& img);
   FitsImage(const QString& name, const FitsImage& img);
@@ -94,27 +94,33 @@ public:
    */
 //  void setName(const QString& name);
 
-  uint32_t getWidth() const;
+  int getWidth() const;
 
-  uint32_t getHeight() const;
+  int getHeight() const;
 
-  uint32_t getDepth() const;
+  int getDepth() const;
 
-  Pixel getPixel(uint32_t x, uint32_t y) const;
+  /**
+   * @brief Get the pixel value at the given location.
+   * @param x the x position; if negative it is taken from the right
+   * @param y the y position; if negative it is taken from the bottom
+   * @return
+   */
+  Pixel getPixel(int x, int y) const;
 
   Pixel getPixel(const ConstPixelIterator& it) const;
 
   PixelIterator getPixelIterator();
 
-  PixelIterator getPixelIterator(uint32_t x, uint32_t y);
+  PixelIterator getPixelIterator(int x, int y);
 
   ConstPixelIterator getConstPixelIterator() const;
 
-  ConstPixelIterator getConstPixelIterator(uint32_t x, uint32_t y) const;
+  ConstPixelIterator getConstPixelIterator(int x, int y) const;
 
-  std::shared_ptr<Layer> getLayer(uint32_t index);
+  std::shared_ptr<Layer> getLayer(int index);
 
-  std::shared_ptr<Layer> getLayer(uint32_t index) const;
+  std::shared_ptr<Layer> getLayer(int index) const;
 
   /**
    * @brief Convert the image to a QImage suitable for display.
@@ -185,8 +191,8 @@ public:
 
   FitsImage& operator=(const FitsImage&);
 
-  uint32_t preFFTWidth;
-  uint32_t preFFTHeight;
+  int preFFTWidth;
+  int preFFTHeight;
 
 private:
   QImage toQImageLin(ValueType min, ValueType max) const;
@@ -195,34 +201,34 @@ private:
   QImage toQImageSine(ValueType min, ValueType max) const;
 
   QString name;
-  uint32_t width;
-  uint32_t height;
-  uint32_t depth;
+  int width;
+  int height;
+  int depth;
   std::vector<std::shared_ptr<Layer>> layers;
   ImageMetadata metadata;
 };
 
-inline uint32_t FitsImage::getWidth() const
+inline int FitsImage::getWidth() const
 {
   return width;
 }
 
-inline uint32_t FitsImage::getHeight() const
+inline int FitsImage::getHeight() const
 {
   return height;
 }
 
-inline uint32_t FitsImage::getDepth() const
+inline int FitsImage::getDepth() const
 {
   return depth;
 }
 
-inline std::shared_ptr<Layer> FitsImage::getLayer(uint32_t index)
+inline std::shared_ptr<Layer> FitsImage::getLayer(int index)
 {
   return layers[index];
 }
 
-inline std::shared_ptr<Layer> FitsImage::getLayer(uint32_t index) const
+inline std::shared_ptr<Layer> FitsImage::getLayer(int index) const
 {
   return layers[index];
 }

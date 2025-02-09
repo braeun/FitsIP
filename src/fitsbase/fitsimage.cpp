@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2023-01-07                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,7 +24,7 @@
 #include <algorithm>
 
 
-Layer::Layer(uint32_t w, uint32_t h):
+Layer::Layer(int w, int h):
   width(w),
   height(h)
 {
@@ -48,7 +48,7 @@ Layer::~Layer()
 void Layer::setData(std::valarray<ValueType> &d)
 {
   ValueType *p = data;
-  for (uint32_t i=0;i<std::min(static_cast<uint32_t>(width*height),static_cast<uint32_t>(d.size()));i++)
+  for (size_t i=0;i<std::min(static_cast<size_t>(width*height),static_cast<size_t>(d.size()));i++)
   {
     *p++ = d[i];
   }
@@ -66,7 +66,7 @@ FitsImage::FitsImage():
 {
 }
 
-FitsImage::FitsImage(const QString& name, uint32_t w, uint32_t h, uint32_t d):
+FitsImage::FitsImage(const QString& name, int w, int h, int d):
   preFFTWidth(0),
   preFFTHeight(0),
   name(name),
@@ -74,7 +74,7 @@ FitsImage::FitsImage(const QString& name, uint32_t w, uint32_t h, uint32_t d):
   height(h),
   depth(d)
 {
-  for (uint32_t i=0;i<d;i++)
+  for (int i=0;i<d;i++)
   {
     layers.push_back(std::make_shared<Layer>(w,h));
   }
@@ -89,7 +89,7 @@ FitsImage::FitsImage(const FitsImage& img):
   depth(img.depth),
   metadata(img.metadata)
 {
-  for (uint32_t i=0;i<depth;i++)
+  for (int i=0;i<depth;i++)
   {
     layers.push_back(std::make_shared<Layer>(*img.layers[i]));
   }
@@ -116,7 +116,7 @@ FitsImage::FitsImage(const QString& name, const FitsImage& img):
   depth(img.depth),
   metadata(img.metadata)
 {
-  for (uint32_t i=0;i<depth;i++)
+  for (int i=0;i<depth;i++)
   {
     layers.push_back(std::make_shared<Layer>(*img.layers[i]));
   }
@@ -132,13 +132,15 @@ QString FitsImage::getName() const
   return name;
 }
 
-Pixel FitsImage::getPixel(uint32_t x, uint32_t y) const
+Pixel FitsImage::getPixel(int x, int y) const
 {
+  if (x < 0) x += width;
+  if (y < 0) y += height;
   Pixel px;
   px.x = x;
   px.y = y;
   ConstPixelIterator it = getConstPixelIterator(x,y);
-  for (uint32_t d=0;d<getDepth();d++) px.i.push_back(it[d]);
+  for (int d=0;d<getDepth();d++) px.i.push_back(it[d]);
   px.v = it.getAbs();
   return px;
 }
@@ -148,21 +150,23 @@ Pixel FitsImage::getPixel(const ConstPixelIterator &it) const
   Pixel px;
   px.x = it.getPos() % width;
   px.y = it.getPos() / width;
-  for (uint32_t d=0;d<getDepth();d++) px.i.push_back(it[d]);
+  for (int d=0;d<getDepth();d++) px.i.push_back(it[d]);
   px.v = it.getAbs();
   return px;
 }
 
 PixelIterator FitsImage::getPixelIterator()
 {
-  uint32_t size = width * height;
+  int size = width * height;
   std::vector<ValueType*> l;
   for (const std::shared_ptr<Layer>& layer : layers) l.push_back(layer->getData());
   return PixelIterator(size,l);
 }
 
-PixelIterator FitsImage::getPixelIterator(uint32_t x, uint32_t y)
+PixelIterator FitsImage::getPixelIterator(int x, int y)
 {
+  if (x < 0) x += width;
+  if (y < 0) y += height;
   PixelIterator it = getPixelIterator();
   it += y * width + x;
   return it;
@@ -170,14 +174,16 @@ PixelIterator FitsImage::getPixelIterator(uint32_t x, uint32_t y)
 
 ConstPixelIterator FitsImage::getConstPixelIterator() const
 {
-  uint32_t size = width * height;
+  int size = width * height;
   std::vector<const ValueType*> l;
   for (const std::shared_ptr<Layer>& layer : layers) l.push_back(layer->getData());
   return ConstPixelIterator(size,l);
 }
 
-ConstPixelIterator FitsImage::getConstPixelIterator(uint32_t x, uint32_t y) const
+ConstPixelIterator FitsImage::getConstPixelIterator(int x, int y) const
 {
+  if (x < 0) x += width;
+  if (y < 0) y += height;
   ConstPixelIterator it = getConstPixelIterator();
   it += y * width + x;
   return it;
@@ -208,33 +214,35 @@ bool FitsImage::isCompatible(const FitsImage &img) const
 
 QRect FitsImage::getOverlap(const QRect& r) const
 {
-  int32_t x = r.x();
-  int32_t y = r.y();
-  int32_t w = r.width();
-  int32_t h = r.height();
-  if (static_cast<uint32_t>(x) >= width) return QRect();
-  if (static_cast<uint32_t>(y) >= height) return QRect();
-  if (x < 0) x = 0;
-  if (y < 0) y = 0;
-  if (static_cast<uint32_t>(x+w) >= width) w = static_cast<int32_t>(width) - x;
-  if (static_cast<uint32_t>(y+h) >= height) h = static_cast<int32_t>(height) - y;
-  return QRect(x,y,w,h);
+//  int32_t x = r.x();
+//  int32_t y = r.y();
+//  int32_t w = r.width();
+//  int32_t h = r.height();
+//  if (x >= width) return QRect();
+//  if (y >= height) return QRect();
+//  if (x < 0) x = 0;
+//  if (y < 0) y = 0;
+//  if (x+w >= width) w = static_cast<int32_t>(width) - x;
+//  if (y+h >= height) h = static_cast<int32_t>(height) - y;
+//  QRect r1 = QRect(x,y,w,h);
+  QRect r1 = QRect(0,0,width,height) & r;
+  return r1;
 }
 
 std::shared_ptr<FitsImage> FitsImage::subImage(const QRect &r) const
 {
   QRect a = getOverlap(r);
   if (a.isNull()) return std::shared_ptr<FitsImage>();
-  uint32_t x = static_cast<uint32_t>(a.x());
-  uint32_t y = static_cast<uint32_t>(a.y());
-  uint32_t w = static_cast<uint32_t>(a.width());
-  uint32_t h = static_cast<uint32_t>(a.height());
+  int x = a.x();
+  int y = a.y();
+  int w = a.width();
+  int h = a.height();
   auto img = std::make_shared<FitsImage>(name,w,h,getDepth());
-  for (uint32_t d=0;d<getDepth();d++)
+  for (int d=0;d<getDepth();d++)
   {
     ValueType* dst = img->getLayer(d)->getData();
     ValueType* src = getLayer(d)->getData() + y * getWidth() + x;
-    for (uint32_t y=0;y<h;y++)
+    for (int y=0;y<h;y++)
     {
       memcpy(dst,src,w*sizeof(ValueType));
       dst += w;
@@ -275,7 +283,7 @@ Pixel FitsImage::getBrightestPixel(const QRect &r) const
         pixel.v = val;
         pixel.x = x + r.x();
         pixel.y = y + r.y();
-        for (uint32_t d=0;d<getDepth();d++) pixel.i.push_back(it[d]);
+        for (int d=0;d<getDepth();d++) pixel.i.push_back(it[d]);
       }
       ++it;
     }
@@ -286,11 +294,11 @@ Pixel FitsImage::getBrightestPixel(const QRect &r) const
 FitsImage& FitsImage::operator+=(const FitsImage& img)
 {
   if (!isCompatible(img)) throw std::runtime_error("Incompatible fits image");
-  for (uint32_t d=0;d<getDepth();d++)
+  for (int d=0;d<getDepth();d++)
   {
     ValueType *p = getLayer(d)->getData();
     ValueType *p1 = img.getLayer(d)->getData();
-    uint32_t n = width * height;
+    int n = width * height;
     while (n-- > 0)
     {
       *p += *p1;
@@ -303,10 +311,10 @@ FitsImage& FitsImage::operator+=(const FitsImage& img)
 
 FitsImage& FitsImage::operator+=(ValueType v)
 {
-  for (uint32_t d=0;d<getDepth();d++)
+  for (int d=0;d<getDepth();d++)
   {
     ValueType *p = getLayer(d)->getData();
-    uint32_t n = width * height;
+    int n = width * height;
     while (n-- > 0)
     {
       *p += v;
@@ -319,11 +327,11 @@ FitsImage& FitsImage::operator+=(ValueType v)
 FitsImage& FitsImage::operator-=(const FitsImage& img)
 {
   if (!isCompatible(img)) throw std::runtime_error("Incompatible fits image");
-  for (uint32_t d=0;d<getDepth();d++)
+  for (int d=0;d<getDepth();d++)
   {
     ValueType *p = getLayer(d)->getData();
     ValueType *p1 = img.getLayer(d)->getData();
-    uint32_t n = width * height;
+    int n = width * height;
     while (n-- > 0)
     {
       *p -= *p1;
@@ -336,10 +344,10 @@ FitsImage& FitsImage::operator-=(const FitsImage& img)
 
 FitsImage& FitsImage::operator-=(ValueType v)
 {
-  for (uint32_t d=0;d<getDepth();d++)
+  for (int d=0;d<getDepth();d++)
   {
     ValueType *p = getLayer(d)->getData();
-    uint32_t n = width * height;
+    int n = width * height;
     while (n-- > 0)
     {
       *p -= v;
@@ -352,11 +360,11 @@ FitsImage& FitsImage::operator-=(ValueType v)
 FitsImage& FitsImage::operator*=(const FitsImage& img)
 {
   if (!isCompatible(img)) throw std::runtime_error("Incompatible fits image");
-  for (uint32_t d=0;d<getDepth();d++)
+  for (int d=0;d<getDepth();d++)
   {
     ValueType *p = getLayer(d)->getData();
     ValueType *p1 = img.getLayer(d)->getData();
-    uint32_t n = width * height;
+    int n = width * height;
     while (n-- > 0)
     {
       *p *= *p1;
@@ -369,10 +377,10 @@ FitsImage& FitsImage::operator*=(const FitsImage& img)
 
 FitsImage& FitsImage::operator*=(ValueType v)
 {
-  for (uint32_t d=0;d<getDepth();d++)
+  for (int d=0;d<getDepth();d++)
   {
     ValueType *p = getLayer(d)->getData();
-    uint32_t n = width * height;
+    int n = width * height;
     while (n-- > 0)
     {
       *p *= v;
@@ -385,11 +393,11 @@ FitsImage& FitsImage::operator*=(ValueType v)
 FitsImage& FitsImage::operator/=(const FitsImage& img)
 {
   if (!isCompatible(img)) throw std::runtime_error("Incompatible fits image");
-  for (uint32_t d=0;d<getDepth();d++)
+  for (int d=0;d<getDepth();d++)
   {
     ValueType *p = getLayer(d)->getData();
     ValueType *p1 = img.getLayer(d)->getData();
-    uint32_t n = width * height;
+    int n = width * height;
     while (n-- > 0)
     {
       if (fabs(*p1) > 1.0E-20) *p /= *p1;
@@ -402,10 +410,10 @@ FitsImage& FitsImage::operator/=(const FitsImage& img)
 
 FitsImage& FitsImage::operator/=(ValueType v)
 {
-  for (uint32_t d=0;d<getDepth();d++)
+  for (int d=0;d<getDepth();d++)
   {
     ValueType *p = getLayer(d)->getData();
-    uint32_t n = width * height;
+    int n = width * height;
     while (n-- > 0)
     {
       *p /= v;
@@ -423,7 +431,7 @@ FitsImage& FitsImage::operator=(const FitsImage& img)
   depth = img.depth;
   metadata = img.metadata;
   layers.clear();
-  for (uint32_t i=0;i<depth;i++)
+  for (int i=0;i<depth;i++)
   {
     layers.push_back(std::make_shared<Layer>(*img.layers[i]));
   }

@@ -81,11 +81,11 @@ OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsObject> image, QRect /
 
 void OpScale::scaleImage(std::shared_ptr<FitsImage> img, ValueType scale, ValueType bias) const
 {
-  uint32_t n = img->getWidth() * img->getHeight();
-  for (uint32_t i=0;i<img->getDepth();i++)
+  int n = img->getWidth() * img->getHeight();
+  for (int i=0;i<img->getDepth();i++)
   {
     ValueType* p = img->getLayer(i)->getData();
-    for (uint32_t j=0;j<n;j++)
+    for (int j=0;j<n;j++)
     {
       *p = *p * scale + bias;
       p++;

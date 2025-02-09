@@ -95,7 +95,7 @@ void OpLog::calcLog(std::shared_ptr<FitsImage> img) const
     {
       ValueType val = p.getAbs();
       ValueType nval = log10(val);
-      for (uint32_t d=0;d<img->getDepth();d++) p[d] = p[d] * nval / val;
+      for (int d=0;d<img->getDepth();d++) p[d] = p[d] * nval / val;
       ++p;
     }
   }

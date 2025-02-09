@@ -78,7 +78,7 @@ OpPlugin::ResultType OpAlign::execute(const std::vector<QFileInfo>& list, QRect 
       return ret;
     }
     if (prog) prog->appendMessage(list[0].fileName());
-    for (uint32_t i=1;i<list.size();i++)
+    for (size_t i=1;i<list.size();i++)
     {
       align(list[i]);
       if (prog)

@@ -127,9 +127,9 @@ void MeasureMatch::setTemplate(std::shared_ptr<FitsImage> image, QRect a)
   if (aoi.isEmpty()) /* if no AOI specified, use the center of the image as the template */
   {
     qWarning() << "No AOI set - using center of active image for template";
-    uint32_t w = 100;
+    int w = 100;
     if (w >= image->getWidth()/2) w = image->getWidth()/2;
-    uint32_t h = 100;
+    int h = 100;
     if (h >= image->getHeight()/2) h = image->getHeight()/2;
     aoi = QRect((image->getWidth()-w)/2,(image->getHeight()-h)/2,w,h);
   }

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to synthesize background from image                          *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,17 +41,17 @@ void SynthesizeBackgroundDialog::setSky(AverageResult avg)
   ui->skySigmaField->setText(QString::number(avg.sigma));
 }
 
-uint32_t SynthesizeBackgroundDialog::getSelectionMode() const
+int SynthesizeBackgroundDialog::getSelectionMode() const
 {
   return ui->selectionBox->currentIndex();
 }
 
-uint32_t SynthesizeBackgroundDialog::getPointsCount() const
+int SynthesizeBackgroundDialog::getPointsCount() const
 {
   return ui->pointSpinner->value();
 }
 
-uint32_t SynthesizeBackgroundDialog::getPolynomDegree() const
+int SynthesizeBackgroundDialog::getPolynomDegree() const
 {
   return ui->degreeSpinner->value();
 }

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the histogram and associated controls             *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -49,11 +49,15 @@ public:
 
   void redraw();
 
-  int32_t getImageScale() const;
+  int getImageScale() const;
+
+  double getScaleMin() const;
+
+  double getScaleMax() const;
 
 signals:
 
-  void imageScaleChanged(double min, double max, int32_t scale);
+  void imageScaleChanged(double min, double max, int scale);
 
 protected:
   void changeEvent(QEvent* event);

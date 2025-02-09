@@ -61,7 +61,7 @@ OpPlugin::ResultType MeasureRank::execute(const std::vector<QFileInfo>& list, QR
     prog->show();
   }
   results.clear();
-  int32_t n = 0;
+  int n = 0;
   for (const QFileInfo& info : list)
   {
     if (prog)

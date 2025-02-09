@@ -212,9 +212,9 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
   qDebug() << "signif" << signif;
   /* next, go through the image looking for peaks which haven't been marked yet */
   ConstPixelIterator it = conv_img->getConstPixelIterator();
-  for (uint32_t y=0;y<conv_img->getHeight();++y)
+  for (int y=0;y<conv_img->getHeight();++y)
   {
-    for (uint32_t x=0;x<conv_img->getWidth();++x,++it)
+    for (int x=0;x<conv_img->getWidth();++x,++it)
     {
 //      qDebug() << x << "," << y << ": " << it.getAbs();
       if (it.getAbs() < signif)
@@ -253,9 +253,9 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
          things down and threw out some good stars.  MWR */
       /* added checks on 'irow' and 'icol' to make sure they're
          inside the image.  MWR 12/13/92 */
-      uint32_t iy = (uint32_t)(yc + 0.5);
+      int iy = (int)(yc + 0.5);
       if (iy >= conv_img->getHeight()) iy = conv_img->getHeight() - 1;
-      uint32_t ix = (uint32_t)(xc + 0.5);
+      int ix = (int)(xc + 0.5);
       if (ix >= conv_img->getWidth()) ix = conv_img->getWidth() - 1;
 
       if (bitmap[iy*image->getWidth()+ix])
@@ -350,12 +350,12 @@ std::shared_ptr<FitsImage> FindStars::convolve(std::shared_ptr<FitsImage> image,
 {
   Gaussian gauss(fwhm);
   auto conv_img = std::make_shared<FitsImage>("tmp",image->getWidth(),image->getHeight(),1);
-  uint32_t offset = gauss.n / 2;
+  int offset = gauss.n / 2;
   /* now, write real numbers to all of the image that we can */
-  for (uint32_t y=offset;y<image->getHeight()-offset;y++)
+  for (int y=offset;y<image->getHeight()-offset;y++)
   {
     PixelIterator it = conv_img->getPixelIterator(offset,y);
-    for (uint32_t x=offset;x<image->getWidth()-offset;x++)
+    for (int x=offset;x<image->getWidth()-offset;x++)
     {
       double v = do_gauss(image,x,y,gauss);
       /*
@@ -429,7 +429,7 @@ double FindStars::find_skysig(std::shared_ptr<FitsImage> image, double rough_sig
   double minval = -CLIPSIG * rough_sig;
   double maxval = CLIPSIG * rough_sig;
   ConstPixelIterator it = image->getConstPixelIterator();
-  for (u_int32_t i=0;i<image->getWidth()*image->getHeight();i++)
+  for (int i=0;i<image->getWidth()*image->getHeight();i++)
   {
     double number = it.getAbs();
     if ((number >= minval) && (number <= maxval))
@@ -862,15 +862,15 @@ bool FindStars::validFWHM(double fwhm)
 void FindStars::markpix(std::shared_ptr<FitsImage> image, double xc, double yc, double fwhm)
 {
   /* here is the new version */
-  uint32_t msx = xc < peakrad ? 0 : static_cast<uint32_t>(xc-peakrad);
-  uint32_t msy = yc < peakrad ? 0 : static_cast<uint32_t>(yc-peakrad);
-  uint32_t mex = static_cast<int>(xc+peakrad);
+  int msx = xc < peakrad ? 0 : static_cast<int>(xc-peakrad);
+  int msy = yc < peakrad ? 0 : static_cast<int>(yc-peakrad);
+  int mex = static_cast<int>(xc+peakrad);
   if (mex < image->getWidth()-1)	mex = image->getWidth() - 1;
-  uint32_t mey = static_cast<int>(yc+peakrad);
+  int mey = static_cast<int>(yc+peakrad);
   if (mey < image->getHeight()-1)	mey = image->getHeight() - 1;
-  for (uint32_t i=msy;i<=mey;i++)
+  for (int i=msy;i<=mey;i++)
   {
-    for (uint32_t j=msx;j<=mex;j++)
+    for (int j=msx;j<=mex;j++)
     {
       bitmap[i*image->getWidth()+j] = 1;
     }

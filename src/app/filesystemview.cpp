@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the filesystem view and associated controls       *
  *                                                                              *
- * modified: 2024-12-14                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -86,11 +86,13 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   connect(ui->filterBox->lineEdit(),&QLineEdit::editingFinished,this,[this](){filterChanged(ui->filterBox->currentText());});
   connect(ui->filterBox,qOverload<int>(&QComboBox::currentIndexChanged),this,[this](int i){filterChanged(ui->filterBox->currentText());});
 
-  if (!filterList.isEmpty())
-  {
-    ui->filterBox->setCurrentIndex(0);
-    filterChanged(ui->filterBox->currentText());
-  }
+  ui->filterBox->setCurrentText(AppSettings().getCurrentFileFilter());
+  filterChanged(AppSettings().getCurrentFileFilter());
+//  if (!filterList.isEmpty())
+//  {
+//    ui->filterBox->setCurrentIndex(0);
+//    filterChanged(ui->filterBox->currentText());
+//  }
 }
 
 FileSystemView::~FileSystemView()
@@ -238,6 +240,7 @@ void FileSystemView::filterChanged(const QString& text)
   {
     list.append(text);
   }
+  AppSettings().setCurrentFileFilter(text);
   filesystemModel->setNameFilters(list);
   if (!text.isEmpty())
   {

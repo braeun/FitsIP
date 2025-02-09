@@ -31,7 +31,7 @@ const std::vector<ValueType>& IIRFilter::getB() const
 void IIRFilter::normalizeGain(bool center)
 {
   double sa = 0;
-  for (uint32_t i=0;i<a.size();i++)
+  for (size_t i=0;i<a.size();i++)
   {
     if (center)
     {
@@ -43,7 +43,7 @@ void IIRFilter::normalizeGain(bool center)
     }
   }
   double sb = 0;
-  for (uint32_t i=0;i<b.size();i++)
+  for (size_t i=0;i<b.size();i++)
   {
     if (center)
     {
@@ -55,7 +55,7 @@ void IIRFilter::normalizeGain(bool center)
     }
   }
   double gain = sa / (1 - sb);
-  for (uint32_t i=0;i<a.size();i++)
+  for (size_t i=0;i<a.size();i++)
   {
     a[i] /= gain;
   }

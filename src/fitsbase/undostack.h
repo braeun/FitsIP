@@ -34,9 +34,9 @@ class UndoStack: public QObject
 public:
   UndoStack();
 
-  uint32_t getMaxDepth() const;
+  size_t getMaxDepth() const;
 
-  void setMaxDepth(uint32_t d);
+  void setMaxDepth(size_t d);
 
   bool isUndoAvailable() const;
 
@@ -48,7 +48,7 @@ signals:
   void undoAvailable(bool flag);
 
 private:
-  uint32_t maxdepth;
+  size_t maxdepth;
   std::deque<std::shared_ptr<FitsImage>> stack;
 };
 

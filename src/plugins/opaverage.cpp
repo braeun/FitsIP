@@ -70,8 +70,8 @@ OpPlugin::ResultType OpAverage::execute(const std::vector<QFileInfo>& list, QRec
   else
     QApplication::setOverrideCursor(Qt::BusyCursor);
   profiler.start();
-  int32_t n = 0;
-  for (uint32_t i=0;i<list.size();i++)
+  int n = 0;
+  for (size_t i=0;i<list.size();i++)
   {
     if (add(list[i]) == OK) n++;
     if (prog)

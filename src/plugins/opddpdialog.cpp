@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing dialog                               *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -71,9 +71,12 @@ double OpDDPDialog::getB() const
 
 void OpDDPDialog::textFieldChanged()
 {
-  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
-  OpDDP op;
-  op.ddp(img,getSigma(),getBackground(),getA(),getB());
-  ui->previewWidget->updatePreview(img);
+  if (ui->previewWidget->getSourceImage())
+  {
+    auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
+    OpDDP op;
+    op.ddp(img,getSigma(),getBackground(),getA(),getB());
+    ui->previewWidget->updatePreview(img);
+  }
 }
 

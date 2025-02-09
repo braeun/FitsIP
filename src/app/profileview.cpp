@@ -154,13 +154,13 @@ void ProfileView::redraw()
     else
     {
       ConstPixelIterator it = image->getImage()->getConstPixelIterator(0,cursor.y());
-      for (uint32_t x=0;x<image->getImage()->getWidth();x++)
+      for (int x=0;x<image->getImage()->getWidth();x++)
       {
         horizontal.push_back(QPointF(x,it.getAbs()));
         ++it;
       }
       it = image->getImage()->getConstPixelIterator(cursor.x(),0);
-      for (uint32_t y=0;y<image->getImage()->getHeight();y++)
+      for (int y=0;y<image->getImage()->getHeight();y++)
       {
         vertical.push_back(QPointF(y,it.getAbs()));
         it += image->getImage()->getWidth();

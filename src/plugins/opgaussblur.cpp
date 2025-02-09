@@ -92,7 +92,7 @@ void OpGaussBlur::blur(std::shared_ptr<FitsImage> image, ValueType sigmax, Value
   if (sigmax > 2 * MIN_DOWNSCALED_SIGMA + 0.5)
   {
     /* large radius (sigma): scale down, then convolve, then scale up */
-    data.reduceByX = static_cast<uint32_t>(floor(fabs(sigmax)/MIN_DOWNSCALED_SIGMA)); //downscale by this factor
+    data.reduceByX = static_cast<int>(floor(fabs(sigmax)/MIN_DOWNSCALED_SIGMA)); //downscale by this factor
     if (data.reduceByX > image->getWidth()) data.reduceByX = image->getWidth();
     /*
      * Downscale gives std devation sigma = 1/sqrt(3); upscale gives sigma =
@@ -115,7 +115,7 @@ void OpGaussBlur::blur(std::shared_ptr<FitsImage> image, ValueType sigmax, Value
   if (sigmay > 2 * MIN_DOWNSCALED_SIGMA + 0.5)
   {
     /* large radius (sigma): scale down, then convolve, then scale up */
-    data.reduceByY = static_cast<uint32_t>(floor(fabs(sigmay) / MIN_DOWNSCALED_SIGMA)); //downscale by this factor
+    data.reduceByY = static_cast<int>(floor(fabs(sigmay) / MIN_DOWNSCALED_SIGMA)); //downscale by this factor
     if (data.reduceByY > image->getHeight()) data.reduceByY = image->getHeight();
     /*
      * Downscale gives std devation sigma = 1/sqrt(3); upscale gives sigma =
@@ -135,7 +135,7 @@ void OpGaussBlur::blur(std::shared_ptr<FitsImage> image, ValueType sigmax, Value
     data.upscaleKernelY.clear();
     data.gaussKernelY = makeGaussianKernel(sigmax,accuracy,image->getHeight());
   }
-  for (uint32_t d=0;d<image->getDepth();d++)
+  for (int d=0;d<image->getDepth();d++)
   {
     blurX(image->getLayer(d)->getData(),image->getWidth(),image->getHeight(),data);
     blurY(image->getLayer(d)->getData(),image->getWidth(),image->getHeight(),data);

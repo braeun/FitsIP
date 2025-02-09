@@ -499,7 +499,10 @@ void MainWindow::updateDisplay()
   ui->profileWidget->setImage(activeFile);
   if (activeFile)
   {
-    QImage tmp = activeFile->getImage()->toQImage(activeFile->getHistogram().getMin(),activeFile->getHistogram().getMax(),static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale()));
+    double scaleMin = ui->histogramWidget->getScaleMin();
+    double scaleMax = ui->histogramWidget->getScaleMax();
+    FitsImage::Scale scale = static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale());
+    QImage tmp = activeFile->getImage()->toQImage(scaleMin,scaleMax,scale);
     imageWidget->setImage(tmp);
     if (!ui->scrollArea->widgetResizable()) imageWidget->adjustSize();
     ui->widthLabel->setText(QString::number(activeFile->getImage()->getWidth()));
@@ -940,7 +943,7 @@ void MainWindow::on_actionClose_Image_triggered()
   {
     int32_t row = ui->openFileList->currentIndex().row();
     ImageCollection::getGlobal().removeActiveFile();
-    if (static_cast<uint32_t>(row) >= ImageCollection::getGlobal().getFiles().size()) row = ImageCollection::getGlobal().getFiles().size() - 1;
+    if (static_cast<size_t>(row) >= ImageCollection::getGlobal().getFiles().size()) row = ImageCollection::getGlobal().getFiles().size() - 1;
     ImageCollection::getGlobal().setActiveFile(row);
     ui->openFileList->setCurrentIndex(ImageCollection::getGlobal().index(row,0,QModelIndex()));
     display(ImageCollection::getGlobal().getActiveFile());

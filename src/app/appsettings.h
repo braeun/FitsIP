@@ -40,6 +40,10 @@ public:
 
   QStringList getFileFilters() const;
 
+  void setCurrentFileFilter(const QString& filter);
+
+  QString getCurrentFileFilter() const;
+
   bool isFilelistAddOnCopy() const;
 
   void setLogbook(const QString& name);
@@ -65,6 +69,10 @@ public:
   void setShowStarlist(bool flag);
 
   bool isShowStarlist() const;
+
+  void setImageScaleForAll(bool flag);
+
+  bool isImageScaleForAll() const;
 
   void setStyle(const QString& style);
 

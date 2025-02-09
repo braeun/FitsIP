@@ -92,8 +92,8 @@ private:
 
   struct Data
   {
-    uint32_t reduceByX;
-    uint32_t reduceByY;
+    int reduceByX;
+    int reduceByY;
     std::vector<std::vector<ValueType>> gaussKernelX;
     std::vector<std::vector<ValueType>> gaussKernelY;
     std::vector<ValueType> downscaleKernelX;

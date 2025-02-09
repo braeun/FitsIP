@@ -77,9 +77,9 @@ OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsObject> /*image*/
     if (psf)
     {
       PixelIterator it = img->getPixelIterator();
-      for (uint32_t y=0;y<img->getHeight();y++)
+      for (int y=0;y<img->getHeight();y++)
       {
-        for (uint32_t x=0;x<img->getWidth();x++)
+        for (int x=0;x<img->getWidth();x++)
         {
           it[0] = a * psf->value(x-cx,y-cy,par);
           ++it;

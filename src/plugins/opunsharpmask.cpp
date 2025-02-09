@@ -84,11 +84,11 @@ void OpUnsharpMask::unsharpmask(std::shared_ptr<FitsImage> image, ValueType sigm
   OpGaussBlur blur;
   auto blurred = std::make_shared<FitsImage>(*image);
   blur.blur(blurred,sigma,sigma);
-  for (uint32_t d=0;d<image->getDepth();d++)
+  for (int d=0;d<image->getDepth();d++)
   {
     ValueType *p1 = image->getLayer(d)->getData();
     ValueType *p2 = blurred->getLayer(d)->getData();
-    uint32_t n = image->getWidth() * image->getHeight();
+    int n = image->getWidth() * image->getHeight();
     while (n-- > 0)
     {
       *p1 = (1 + strength) * *p1 - strength * *p2;

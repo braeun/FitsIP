@@ -27,12 +27,12 @@ UndoStack::UndoStack():
 {
 }
 
-uint32_t UndoStack::getMaxDepth() const
+size_t UndoStack::getMaxDepth() const
 {
   return maxdepth;
 }
 
-void UndoStack::setMaxDepth(uint32_t d)
+void UndoStack::setMaxDepth(size_t d)
 {
   maxdepth = d;
 }

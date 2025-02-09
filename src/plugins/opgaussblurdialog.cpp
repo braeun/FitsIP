@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - gaussian blur dialog                                                *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -65,10 +65,13 @@ void OpGaussBlurDialog::textFieldChanged()
 
 void OpGaussBlurDialog::updatePreview()
 {
-  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
-  OpGaussBlur op;
-  op.blur(img,getSigma(),getSigma());
-  ui->previewWidget->updatePreview(img);
+  if (ui->previewWidget->getSourceImage())
+  {
+    auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
+    OpGaussBlur op;
+    op.blur(img,getSigma(),getSigma());
+    ui->previewWidget->updatePreview(img);
+  }
 }
 
 

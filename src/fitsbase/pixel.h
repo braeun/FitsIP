@@ -11,8 +11,8 @@
 class Pixel
 {
 public:
-  uint32_t x = 0;   /*!< x position */
-  uint32_t y = 0;   /*!< y position */
+  int x = 0;   /*!< x position */
+  int y = 0;   /*!< y position */
   ValueType v = 0;  /*!< integral value */
   std::vector<ValueType> i; /*!< layer values */
 };

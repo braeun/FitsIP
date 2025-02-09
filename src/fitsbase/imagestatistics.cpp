@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image statistics                                                    *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -72,7 +72,7 @@ void ImageStatistics::calculate(const FitsImage &img, QRect rect)
   std::vector<ValueType> sum2;
   int32_t n = 0;
   layers.clear();
-  for (uint32_t d=0;d<img.getDepth();d++)
+  for (int d=0;d<img.getDepth();d++)
   {
     layers.push_back(LayerStatistics());
     sum.push_back(0);
@@ -85,7 +85,7 @@ void ImageStatistics::calculate(const FitsImage &img, QRect rect)
     ConstPixelIterator p = img.getConstPixelIterator(rect.x(),y);
     for (int32_t x=0;x<rect.width();x++)
     {
-      for (uint32_t d=0;d<img.getDepth();d++)
+      for (int d=0;d<img.getDepth();d++)
       {
         global.maxValue = std::max(global.maxValue,p[d]);
         global.minValue = std::min(global.minValue,p[d]);
@@ -103,7 +103,7 @@ void ImageStatistics::calculate(const FitsImage &img, QRect rect)
       ++p;
     }
   }
-  for (uint32_t d=0;d<layers.size();d++)
+  for (size_t d=0;d<layers.size();d++)
   {
     layers[d].meanValue = sum[d] / n;
     layers[d].stddev = sqrt((n*sum2[d]-sum[d]*sum[d])/(n*static_cast<ValueType>(n-1)));

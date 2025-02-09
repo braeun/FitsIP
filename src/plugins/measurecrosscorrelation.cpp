@@ -107,7 +107,7 @@ std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<F
   fftw_plan b = fftw_plan_dft_c2r_2d(img1->getHeight(),img1->getWidth(),s2c,in,FFTW_ESTIMATE);
   ConstPixelIterator it = img1->getConstPixelIterator();
   double* ptr = in;
-  for (uint32_t i=0;i<img1->getHeight()*img1->getWidth();i++)
+  for (int i=0;i<img1->getHeight()*img1->getWidth();i++)
   {
     *ptr++ = it.getAbs();
     ++it;
@@ -117,7 +117,7 @@ std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<F
   memcpy(c1,s2c,img1->getHeight()*(img1->getWidth()/2+1)*sizeof(fftw_complex));
   it = img2->getConstPixelIterator();
   ptr = in;
-  for (uint32_t i=0;i<img2->getHeight()*img2->getWidth();i++)
+  for (int i=0;i<img2->getHeight()*img2->getWidth();i++)
   {
     *ptr++ = it.getAbs();
     ++it;
@@ -126,7 +126,7 @@ std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<F
   fftw_complex* pc1 = c1;
   fftw_complex* pc2 = s2c;
   double norm = img1->getHeight() * img1->getWidth();
-  for (uint32_t i=0;i<img1->getHeight()*(img1->getWidth()/2+1);i++)
+  for (int i=0;i<img1->getHeight()*(img1->getWidth()/2+1);i++)
   {
     double re = (*pc1)[0] * (*pc2[0]) + (*pc1)[1] * (*pc2)[1];
     double im = -(*pc1)[0] * (*pc2[1]) + (*pc1)[1] * (*pc2)[0];
@@ -142,7 +142,7 @@ std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<F
   auto ccimg = std::make_shared<FitsImage>(img2->getName()+"_cc",img1->getWidth(),img1->getHeight());
   PixelIterator it2 = ccimg->getPixelIterator();
   double *rptr = sin;
-  for (uint32_t i=0;i<img1->getHeight()*img1->getWidth();i++)
+  for (int i=0;i<img1->getHeight()*img1->getWidth();i++)
   {
     it2[0] = *rptr / norm;
     ++rptr;

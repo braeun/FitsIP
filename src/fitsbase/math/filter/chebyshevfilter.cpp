@@ -16,7 +16,7 @@ ChebyshevFilter::ChebyshevFilter(ValueType fc, ValueType pr, int np, bool lh)
     s(fc,pr,np,p,lh);
     std::vector<ValueType> ta = da;
     std::vector<ValueType> tb = db;
-    for (uint32_t i=2;i<23;i++)
+    for (size_t i=2;i<23;i++)
     {
       da[i] = a0 * ta[i] + a1 * ta[i-1] + a2 * ta[i-2];
       db[i] = tb[i] - b1 * tb[i-1] - b2 * tb[i-2];
@@ -34,7 +34,7 @@ ChebyshevFilter::ChebyshevFilter(ValueType fc, ValueType pr, int np, bool lh)
   /* normalize the gain */
   ValueType sa = 0;
   ValueType sb = 0;
-  for (uint32_t i=0;i<21;i++)
+  for (size_t i=0;i<21;i++)
   {
     if (lh)
     {
@@ -48,7 +48,7 @@ ChebyshevFilter::ChebyshevFilter(ValueType fc, ValueType pr, int np, bool lh)
     }
   }
   ValueType gain = sa / (1 - sb);
-  for (uint32_t i=0;i<21;i++)
+  for (size_t i=0;i<21;i++)
   {
     a[i] /= gain;
   }

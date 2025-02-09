@@ -185,7 +185,7 @@ fftw_complex* VanCittertDeconvolution::fft(const FitsImage &image, int channel)
   fftw_plan f = fftw_plan_dft_r2c_2d(image.getHeight(),image.getWidth(),in,s2c,FFTW_ESTIMATE);
   ConstPixelIterator it = image.getConstPixelIterator();
   double* ptr = in;
-  for (uint32_t i=0;i<image.getHeight()*image.getWidth();i++)
+  for (int i=0;i<image.getHeight()*image.getWidth();i++)
   {
     *ptr++ = it[channel];
     ++it;
@@ -205,7 +205,7 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c, int 
   auto fftimg = std::make_shared<FitsImage>("tmp",w,h,1);
   PixelIterator it2 = fftimg->getPixelIterator();
   double* ptr = out;
-  for (uint32_t i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+  for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
   {
     it2[0] = *ptr;
     ++ptr;
@@ -226,7 +226,7 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c1, fft
     fftw_execute(f);
     PixelIterator it2 = fftimg->getPixelIterator();
     double* ptr = out;
-    for (uint32_t i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[0] = *ptr;
       ++ptr;
@@ -239,7 +239,7 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c1, fft
     fftw_execute(f);
     PixelIterator it2 = fftimg->getPixelIterator();
     double* ptr = out;
-    for (uint32_t i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[1] = *ptr;
       ++ptr;
@@ -252,7 +252,7 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c1, fft
     fftw_execute(f);
     PixelIterator it2 = fftimg->getPixelIterator();
     double* ptr = out;
-    for (uint32_t i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[2] = *ptr;
       ++ptr;
@@ -287,7 +287,7 @@ void VanCittertDeconvolution::applySineRelaxation(std::shared_ptr<FitsImage> ima
   PixelIterator c = corr->getPixelIterator();
   while (p.hasNext())
   {
-    for (uint32_t i=0;i<image->getDepth();i++)
+    for (int i=0;i<image->getDepth();i++)
     {
       ValueType w;
       if (p[i] <= s.getLayerStatistics()[i].minValue)

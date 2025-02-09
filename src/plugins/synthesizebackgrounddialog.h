@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to synthesize background from image                          *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,11 +40,11 @@ public:
 
   void setSky(AverageResult avg);
 
-  uint32_t getSelectionMode() const;
+  int getSelectionMode() const;
 
-  uint32_t getPointsCount() const;
+  int getPointsCount() const;
 
-  uint32_t getPolynomDegree() const;
+  int getPolynomDegree() const;
 
   double getBackground() const;
 

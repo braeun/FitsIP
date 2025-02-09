@@ -62,7 +62,7 @@ public:
   void deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf, const std::vector<ValueType>& par, int niter, bool progress=false);
 
 private:
-//  std::shared_ptr<FitsImage> createPSF(uint32_t w, uint32_t h, const PSF* psf, const std::vector<ValueType>& par) const;
+//  std::shared_ptr<FitsImage> createPSF(int w, int h, const PSF* psf, const std::vector<ValueType>& par) const;
   fftw_complex* fft(const FitsImage &image, int channel);
   std::shared_ptr<FitsImage> invfft(fftw_complex* c, int w, int h);
   std::shared_ptr<FitsImage> invfft(fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h);

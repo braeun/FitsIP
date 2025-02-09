@@ -76,13 +76,13 @@ OpPlugin::ResultType OpFlipX::execute(std::shared_ptr<FitsObject> image, QRect /
 
 void OpFlipX::flip(std::shared_ptr<FitsImage> img) const
 {
-  for (uint32_t y=0;y<img->getHeight();y++)
+  for (int y=0;y<img->getHeight();y++)
   {
     PixelIterator it1 = img->getPixelIterator(0,y);
     PixelIterator it2 = img->getPixelIterator(img->getWidth()-1,y);
-    for (uint32_t x=0;x<=img->getWidth()/2;x++)
+    for (int x=0;x<=img->getWidth()/2;x++)
     {
-      for (uint32_t d=0;d<img->getDepth();d++)
+      for (int d=0;d<img->getDepth();d++)
       {
         ValueType v = it1[d];
         it1[d] = it2[d];

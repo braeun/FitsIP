@@ -51,6 +51,7 @@ void PreviewWidget::setSourceImage(std::shared_ptr<FitsImage> image, QRect selec
     int h = s.getPreviewHeight();
     selection = QRect(image->getWidth()/2-w/2,image->getHeight()/2-h/2,w,h);
   }
+  selection = image->getOverlap(selection);
   sourceImage = image->subImage(selection);
   updatePreview(sourceImage);
 }

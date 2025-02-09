@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the histogram and associated controls             *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,7 @@
 
 #include "histogramview.h"
 #include "ui_histogramview.h"
+#include "appsettings.h"
 #include <fitsbase/fitsobject.h>
 #include <qwt_scale_engine.h>
 #include <qwt_picker_machine.h>
@@ -37,6 +38,9 @@ HistogramView::HistogramView(QWidget *parent):QWidget(parent),
   ui->setupUi(this);
   ui->scalingSlider->setHandleMovementMode(QxtSpanSlider::NoCrossing);
   connect(ui->scalingSlider,&QxtSpanSlider::spanChanged,this,&HistogramView::spanChanged);
+
+  ui->forAllButton->setChecked(AppSettings().isImageScaleForAll());
+  connect(ui->forAllButton,&QCheckBox::clicked,this,[](bool flag){AppSettings().setImageScaleForAll(flag);});
 
   grayCurve = new QwtPlotCurve("Gray");
   grayCurve->setPen(palette().color(QPalette::WindowText));
@@ -73,18 +77,28 @@ HistogramView::~HistogramView()
 
 void HistogramView::setImage(std::shared_ptr<FitsObject> obj)
 {
+  bool keepscaling = ui->forAllButton->isChecked();
+  if (!image) // fits image
+    keepscaling = false;
   image = obj;
   if (image)
   {
     auto hist = image->getHistogram();
-    minMarker->setXValue(static_cast<double>(hist.getMin()));
-    maxMarker->setXValue(static_cast<double>(hist.getMax()));
-    ui->imageMinIntensity->setText(QString::number(static_cast<double>(hist.getMin())));
-    ui->imageMaxIntensity->setText(QString::number(static_cast<double>(hist.getMax())));
+    double min = hist.getMin();
+    double max = hist.getMax();
+    if (keepscaling)
+    {
+      min = std::max(min,minMarker->xValue());
+      max = std::min(max,maxMarker->xValue());
+    }
+    minMarker->setXValue(min);
+    maxMarker->setXValue(max);
+    ui->imageMinIntensity->setText(QString::number(min));
+    ui->imageMaxIntensity->setText(QString::number(max));
     ui->scalingSlider->setMinimum(hist.getMin());
     ui->scalingSlider->setMaximum(hist.getMax());
-    ui->scalingSlider->setLowerValue(hist.getMin());
-    ui->scalingSlider->setUpperValue(hist.getMax());
+    ui->scalingSlider->setLowerValue(min);
+    ui->scalingSlider->setUpperValue(max);
   }
   ui->chartWidget->setAxisAutoScale(QwtPlot::yLeft,true);
   ui->chartWidget->setAxisAutoScale(QwtPlot::xBottom,true);
@@ -98,7 +112,7 @@ void HistogramView::redraw()
   if (image)
   {
     auto hist = image->getHistogram();
-    for (int32_t i=0;i<hist.getBinCount();i++)
+    for (int i=0;i<hist.getBinCount();i++)
     {
       v.push_back(QPointF(hist.getX(i),std::max(static_cast<double>(hist.getGrayValue(i)),0.1)));
     }
@@ -107,10 +121,23 @@ void HistogramView::redraw()
   ui->chartWidget->replot();
 }
 
-int32_t HistogramView::getImageScale() const
+int HistogramView::getImageScale() const
 {
   return ui->imageScaleBox->currentIndex();
 }
+
+double HistogramView::getScaleMin() const
+{
+  return minMarker->xValue();
+}
+
+double HistogramView::getScaleMax() const
+{
+  return maxMarker->xValue();
+}
+
+
+
 
 void HistogramView::changeEvent(QEvent *event)
 {
@@ -146,11 +173,11 @@ void HistogramView::on_imageMinIntensity_returnPressed()
   double max = ui->imageMaxIntensity->text().toDouble();
   ui->scalingSlider->setLowerValue(min);
   ui->scalingSlider->setUpperValue(max);
-  minMarker->setXValue(static_cast<double>(min));
-  maxMarker->setXValue(static_cast<double>(max));
+  minMarker->setXValue(min);
+  maxMarker->setXValue(max);
   ui->chartWidget->replot();
   updating = false;
-  int32_t scale = ui->imageScaleBox->currentIndex();
+  int scale = ui->imageScaleBox->currentIndex();
   emit imageScaleChanged(min,max,scale);
 }
 

@@ -119,12 +119,12 @@ void OpRotate::rotate90cw(std::shared_ptr<FitsImage> image) const
   FitsImage img(image->getName(),image->getHeight(),image->getWidth(),image->getDepth());
   img.setMetadata(image->getMetadata());
   ConstPixelIterator it = image->getConstPixelIterator();
-  for (uint32_t y=0;y<image->getHeight();y++)
+  for (int y=0;y<image->getHeight();y++)
   {
     PixelIterator it2 = img.getPixelIterator(image->getHeight()-y-1,0);
-    for (uint32_t x=0;x<image->getWidth();x++)
+    for (int x=0;x<image->getWidth();x++)
     {
-      for (uint32_t d=0;d<image->getDepth();d++) it2[d] = it[d];
+      for (int d=0;d<image->getDepth();d++) it2[d] = it[d];
 //      img.getPixelIterator(image->getHeight()-y-1,x).setRGB(it.getRGB());
       it2 += img.getWidth();
       ++it;
@@ -138,12 +138,12 @@ void OpRotate::rotate90ccw(std::shared_ptr<FitsImage> image) const
   FitsImage img(image->getName(),image->getHeight(),image->getWidth(),image->getDepth());
   img.setMetadata(image->getMetadata());
   ConstPixelIterator it = image->getConstPixelIterator();
-  for (uint32_t y=0;y<image->getHeight();y++)
+  for (int y=0;y<image->getHeight();y++)
   {
     PixelIterator it2 = img.getPixelIterator(y,image->getWidth()-1);
-    for (uint32_t x=0;x<image->getWidth();x++)
+    for (int x=0;x<image->getWidth();x++)
     {
-      for (uint32_t d=0;d<image->getDepth();d++) it2[d] = it[d];
+      for (int d=0;d<image->getDepth();d++) it2[d] = it[d];
 //      img.getPixelIterator(y,image->getWidth()-x-1).setRGB(it.getRGB());
       it2 -= img.getWidth();
       ++it;
@@ -155,10 +155,10 @@ void OpRotate::rotate90ccw(std::shared_ptr<FitsImage> image) const
 void OpRotate::rotate(std::shared_ptr<FitsImage> image, ValueType angle, bool crop) const
 {
   if (fabs(angle) < 0.001f) return;
-  int32_t wt = static_cast<int32_t>(image->getWidth());
-  int32_t ht = static_cast<int32_t>(image->getHeight());
-  int32_t xc = wt / 2;
-  int32_t yc = ht / 2;
+  int wt = image->getWidth();
+  int ht = image->getHeight();
+  int xc = wt / 2;
+  int yc = ht / 2;
   ValueType ca = cos(angle*M_PI/180.0);
   ValueType sa = sin(angle*M_PI/180.0);
   ValueType xcorner[4];
@@ -175,15 +175,15 @@ void OpRotate::rotate(std::shared_ptr<FitsImage> image, ValueType angle, bool cr
   ValueType xmax = -std::numeric_limits<ValueType>::max();
   ValueType ymin = std::numeric_limits<ValueType>::max();
   ValueType ymax = -std::numeric_limits<ValueType>::max();
-  for (uint32_t i=0;i<4;i++)
+  for (int i=0;i<4;i++)
   {
     if (xcorner[i] < xmin) xmin = xcorner[i];
     if (xcorner[i] > xmax) xmax = xcorner[i];
     if (ycorner[i] < ymin) ymin = ycorner[i];
     if (ycorner[i] > ymax) ymax = ycorner[i];
   }
-  uint32_t wnew = static_cast<uint32_t>(xmax - xmin) + 1;
-  uint32_t hnew = static_cast<uint32_t>(ymax - ymin) + 1;
+  int wnew = static_cast<int>(xmax - xmin) + 1;
+  int hnew = static_cast<int>(ymax - ymin) + 1;
   auto img = std::make_shared<FitsImage>(image->getName(),wnew,hnew,image->getDepth());
   img->setMetadata(image->getMetadata());
   ConstPixelIterator it = image->getConstPixelIterator();
@@ -193,13 +193,13 @@ void OpRotate::rotate(std::shared_ptr<FitsImage> image, ValueType angle, bool cr
     {
       ValueType xr = (x - xc) * ca - (y - yc) * sa - xmin;
       ValueType yr = (x - xc) * sa + (y - yc) * ca - ymin;
-      uint32_t xi = static_cast<uint32_t>(xr);
-      uint32_t yi = static_cast<uint32_t>(yr);
+      int xi = static_cast<int>(xr);
+      int yi = static_cast<int>(yr);
       if (xr >= 0 && xi < img->getWidth() && yr >= 0 && yi < img->getHeight())
       {
         ValueType fx = xr - xi;
         ValueType fy = yr - yi;
-        for (uint32_t d=0;d<image->getDepth();d++)
+        for (int d=0;d<image->getDepth();d++)
         {
           ValueType v = it[d];
           img->getPixelIterator(xi,yi)[d] += v * (1 - fx) * (1 - fy);

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - stack images                                                        *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -128,25 +128,26 @@ OpPlugin::ResultType OpStack::execute(const std::vector<QFileInfo>& list, QRect 
       return ret;
     }
     log(img,list[0].baseName()+" loaded as base for stacking");
-    for (uint32_t i=1;i<list.size();i++)
+    int i = 0;
+    for (const QFileInfo& file : list)
     {
       switch (mode)
       {
         case Align::NoAlignment:
         default:
-          ret = stack(list[i]);
+          ret = stack(file);
           break;
         case Align::TemplateMatch:
-          ret = stackTemplate(list[i]);
+          ret = stackTemplate(file);
           break;
         case Align::StarMatch:
-          ret = stackStarMatch(list[i]);
+          ret = stackStarMatch(file);
           break;
       }
       if (prog)
       {
-        prog->setProgress(i);
-        prog->appendMessage(list[i].fileName()+(ret==OK?" - Success":" - Error"));
+        prog->setProgress(i++);
+        prog->appendMessage(file.fileName()+(ret==OK?" - Success":" - Error"));
         QApplication::processEvents();
         if (prog->isCancelled()) break;
       }

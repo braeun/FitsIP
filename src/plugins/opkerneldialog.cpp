@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - kernel filter dialog                                                *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-02-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -68,10 +68,13 @@ QString OpKernelDialog::getKernelName() const
 
 void OpKernelDialog::on_kernelBox_currentTextChanged(const QString&)
 {
-  Kernel kernel = KernelRepository::instance().getKernel(getKernelName());
-  if (kernel.isEmpty()) return ;
-  auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
-  OpKernel op;
-  op.convolve(img,kernel);
-  ui->previewWidget->updatePreview(img);
+  if (ui->previewWidget->getSourceImage())
+  {
+    Kernel kernel = KernelRepository::instance().getKernel(getKernelName());
+    if (kernel.isEmpty()) return ;
+    auto img = std::make_shared<FitsImage>(*ui->previewWidget->getSourceImage());
+    OpKernel op;
+    op.convolve(img,kernel);
+    ui->previewWidget->updatePreview(img);
+  }
 }

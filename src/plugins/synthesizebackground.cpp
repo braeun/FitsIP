@@ -115,15 +115,15 @@ std::vector<Pixel> SynthesizeBackground::getRandomPoints(std::shared_ptr<FitsIma
 std::vector<Pixel> SynthesizeBackground::getGridPoints(std::shared_ptr<FitsImage> image, uint32_t n, double bkg)
 {
   std::vector<Pixel> list;
-  uint32_t nx = static_cast<u_int32_t>(sqrt(n));
+  uint32_t nx = static_cast<uint32_t>(sqrt(n));
   uint32_t ny = n / nx;
-  u_int32_t dy = image->getHeight() / ny;
-  u_int32_t dx = image->getWidth() / nx;
-  u_int32_t yi = dy / 2;
-  for (u_int32_t j=0;j<ny;j++)
+  uint32_t dy = image->getHeight() / ny;
+  uint32_t dx = image->getWidth() / nx;
+  uint32_t yi = dy / 2;
+  for (uint32_t j=0;j<ny;j++)
   {
     ConstPixelIterator it = image->getConstPixelIterator(dx/2,yi);
-    for (u_int32_t i=0;i<nx;i++)
+    for (uint32_t i=0;i<nx;i++)
     {
       if (it.getRGB().gray() <= bkg)
       {
@@ -260,11 +260,11 @@ std::shared_ptr<FitsImage> SynthesizeBackground::createImage(u_int32_t w, uint32
 {
   std::shared_ptr<FitsImage> img = std::make_shared<FitsImage>("Background",w,h,coeff.size());
   PixelIterator it = img->getPixelIterator();
-  for (uint32_t y=0;y<img->getHeight();y++)
+  for (int y=0;y<img->getHeight();y++)
   {
-    for (uint32_t x=0;x<img->getWidth();x++)
+    for (int x=0;x<img->getWidth();x++)
     {
-      for (uint32_t l=0;l<coeff.size();l++)
+      for (size_t l=0;l<coeff.size();l++)
       {
         const std::vector<double>& xg = coeff[l];
         double s = xg[0];

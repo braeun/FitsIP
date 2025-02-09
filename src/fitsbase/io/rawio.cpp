@@ -115,7 +115,7 @@ template<typename T> void RawIO::copyGray(FitsImage* img, libraw_processed_image
 {
   PixelIterator it = img->getPixelIterator();
   T* ptr = (T*)src->data;
-  for (uint32_t i=0;i<src->width*src->height;i++)
+  for (uint32_t i=0;i<static_cast<uint32_t>(src->width)*static_cast<uint32_t>(src->height);i++)
   {
     it[0] = *ptr;
     ++it;
@@ -127,7 +127,7 @@ template<typename T> void RawIO::copyColor(FitsImage* img, libraw_processed_imag
 {
   PixelIterator it = img->getPixelIterator();
   T* ptr = (T*)src->data;
-  for (uint32_t i=0;i<src->width*src->height;i++)
+  for (uint32_t i=0;i<static_cast<uint32_t>(src->width)*static_cast<uint32_t>(src->height);i++)
   {
     it[0] = *ptr++;
     it[1] = *ptr++;

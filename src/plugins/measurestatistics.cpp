@@ -79,7 +79,7 @@ QString MeasureStatistics::toString() const
   s << "  standard dev.: " << lstat.stddev << "\n\n";
   if (stat.getLayerStatistics().size() > 1)
   {
-    for (uint32_t index=0;index<stat.getLayerStatistics().size();index++)
+    for (size_t index=0;index<stat.getLayerStatistics().size();index++)
     {
       const LayerStatistics& lstat = stat.getLayerStatistics()[index];
       s << "Layer: " << (index+1) << "\n";

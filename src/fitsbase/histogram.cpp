@@ -71,7 +71,7 @@ std::ostream &operator<<(std::ostream &s, const Histogram &h)
  */
 void Histogram::clear(void)
 {
-  for (uint32_t i=0;i<4;i++)
+  for (size_t i=0;i<4;i++)
   {
     data[i].clear();
   }
@@ -79,7 +79,7 @@ void Histogram::clear(void)
 
 void Histogram::build(FitsImage* img)
 {
-  for (uint32_t i=0;i<4;i++)
+  for (size_t i=0;i<4;i++)
   {
     data[i].assign(bin,0);
   }

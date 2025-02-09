@@ -50,12 +50,12 @@ std::shared_ptr<FitsImage> QtImageIO::read(QString filename)
   std::shared_ptr<FitsImage> img;
   if (i.depth() == 8)
   {
-    img = std::make_shared<FitsImage>(info.baseName(),static_cast<uint32_t>(i.width()),static_cast<uint32_t>(i.height()),1);
+    img = std::make_shared<FitsImage>(info.baseName(),i.width(),i.height(),1);
     PixelIterator pixel = img->getPixelIterator();
-    for (int32_t y=0;y<i.height();y++)
+    for (int y=0;y<i.height();y++)
     {
       const uchar* ptr = i.scanLine(y);
-      for (int32_t x=0;x<i.width();x++)
+      for (int x=0;x<i.width();x++)
       {
         pixel[0] = *ptr;
         ++ptr;
@@ -65,12 +65,12 @@ std::shared_ptr<FitsImage> QtImageIO::read(QString filename)
   }
   else
   {
-    img = std::make_shared<FitsImage>(info.baseName(),static_cast<uint32_t>(i.width()),static_cast<uint32_t>(i.height()),3);
+    img = std::make_shared<FitsImage>(info.baseName(),i.width(),i.height(),3);
     PixelIterator pixel = img->getPixelIterator();
-    for (int32_t y=0;y<i.height();y++)
+    for (int y=0;y<i.height();y++)
     {
       const QRgb* rgb = reinterpret_cast<QRgb*>(i.scanLine(y));
-      for (int32_t x=0;x<i.width();x++)
+      for (int x=0;x<i.width();x++)
       {
         RGBValue v(*rgb);
         pixel[0] = v.red();

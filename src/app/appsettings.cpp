@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2025-02-01                                                         *
+ * modified: 2025-02-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,7 +34,8 @@ const char* AppSettings::PATH_PIXELLIST = "fits/path/pixellist";
 const char* AppSettings::PATH_STARLIST = "fits/path/starlist";
 const char* AppSettings::PATH_PROFILE = "fits/path/profile";
 
-static const char* FILE_FILTER = "files/filter";
+static const char* FILE_FILTERS = "files/filter";
+static const char* FILE_CURRENT_FILTER = "files/currentfilter";
 
 static const char* FILELIST_ADD_ON_COPY = "files/addoncopy";
 
@@ -45,6 +46,7 @@ static const char* LOGBOOK_OPENLAST = "logbook/openlast";
 
 static const char* DISPLAY_SHOWPIXELLIST = "display/showpixellist";
 static const char* DISPLAY_SHOWSTARLIST = "display/showstarlist";
+static const char* DISPLAY_IMAGE_SCALE_FORALL = "display/scaleforall";
 
 static const char* STYLE_STYLE = "style/style";
 static const char* STYLE_PALETTE = "style/palette";
@@ -60,12 +62,22 @@ AppSettings::AppSettings()
 
 void AppSettings::setFileFilters(const QStringList& filters)
 {
-  settings.setValue(FILE_FILTER,filters);
+  settings.setValue(FILE_FILTERS,filters);
 }
 
 QStringList AppSettings::getFileFilters() const
 {
-  return settings.value(FILE_FILTER,QStringList()).toStringList();
+  return settings.value(FILE_FILTERS,QStringList()).toStringList();
+}
+
+void AppSettings::setCurrentFileFilter(const QString& filter)
+{
+  settings.setValue(FILE_CURRENT_FILTER,filter);
+}
+
+QString AppSettings::getCurrentFileFilter() const
+{
+  return settings.value(FILE_CURRENT_FILTER,"*").toString();
 }
 
 bool AppSettings::isFilelistAddOnCopy() const
@@ -131,6 +143,16 @@ void AppSettings::setShowStarlist(bool flag)
 bool AppSettings::isShowStarlist() const
 {
   return settings.value(DISPLAY_SHOWSTARLIST).toBool();
+}
+
+void AppSettings::setImageScaleForAll(bool flag)
+{
+  settings.setValue(DISPLAY_IMAGE_SCALE_FORALL,flag);
+}
+
+bool AppSettings::isImageScaleForAll() const
+{
+  return settings.value(DISPLAY_IMAGE_SCALE_FORALL).toBool();
 }
 
 void AppSettings::setStyle(const QString &style)

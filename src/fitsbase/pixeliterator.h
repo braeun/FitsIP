@@ -35,34 +35,34 @@
  */
 class ConstPixelIterator {
  public:
-  inline ConstPixelIterator(uint32_t size, const std::vector<const ValueType*>& layers);
+  inline ConstPixelIterator(int size, const std::vector<const ValueType*>& layers);
 //  inline ConstPixelIterator(const ConstPixelIterator&);
 
   inline bool hasNext() const;
   inline bool hasPrevious() const;
-  inline uint32_t getPos() const;
+  inline int getPos() const;
   inline ValueType getAbs() const;
   inline RGBValue getRGB() const;
   inline ValueType min() const;
   inline ValueType max() const;
-  inline ValueType operator[](uint32_t layer) const;
+  inline ValueType operator[](int layer) const;
   inline ConstPixelIterator operator++(void);
   inline ConstPixelIterator operator++(int);
   inline ConstPixelIterator operator--(void);
   inline ConstPixelIterator operator--(int);
-  inline ConstPixelIterator operator+(uint32_t d);
-  inline ConstPixelIterator operator-(uint32_t d);
-  inline ConstPixelIterator& operator+=(uint32_t d);
-  inline ConstPixelIterator& operator-=(uint32_t d);
+  inline ConstPixelIterator operator+(int d);
+  inline ConstPixelIterator operator-(int d);
+  inline ConstPixelIterator& operator+=(int d);
+  inline ConstPixelIterator& operator-=(int d);
 
 private:
   bool color;
-  uint32_t size;
-  uint32_t index;
+  int size;
+  int index;
   std::vector<const ValueType*> layers;
 };
 
-inline ConstPixelIterator::ConstPixelIterator(uint32_t size, const std::vector<const ValueType*>& layers):
+inline ConstPixelIterator::ConstPixelIterator(int size, const std::vector<const ValueType*>& layers):
   color(false),
   size(size),
   index(0),
@@ -78,7 +78,7 @@ inline ConstPixelIterator::ConstPixelIterator(uint32_t size, const std::vector<c
 //{
 //}
 
-inline ValueType ConstPixelIterator::operator[](uint32_t layer) const
+inline ValueType ConstPixelIterator::operator[](int layer) const
 {
   if (layer >= layers.size()) throw std::invalid_argument("no such layer");
   return *layers[layer];
@@ -126,21 +126,21 @@ inline ConstPixelIterator ConstPixelIterator::operator--(int)
   return it;
 }
 
-inline ConstPixelIterator ConstPixelIterator::operator+(uint32_t d)
+inline ConstPixelIterator ConstPixelIterator::operator+(int d)
 {
   ConstPixelIterator it = *this;
   it += d;
   return it;
 }
 
-inline ConstPixelIterator ConstPixelIterator::operator-(uint32_t d)
+inline ConstPixelIterator ConstPixelIterator::operator-(int d)
 {
   ConstPixelIterator it = *this;
   it -= d;
   return it;
 }
 
-inline ConstPixelIterator& ConstPixelIterator::operator+=(uint32_t d)
+inline ConstPixelIterator& ConstPixelIterator::operator+=(int d)
 {
   if (index + d >= size) d = size - index - 1;
   for (const ValueType*& p : layers) p += d;
@@ -148,7 +148,7 @@ inline ConstPixelIterator& ConstPixelIterator::operator+=(uint32_t d)
   return *this;
 }
 
-inline ConstPixelIterator& ConstPixelIterator::operator-=(uint32_t d)
+inline ConstPixelIterator& ConstPixelIterator::operator-=(int d)
 {
   if (d > index) d = index;
   for (const ValueType*& p : layers) p -= d;
@@ -166,7 +166,7 @@ inline bool ConstPixelIterator::hasPrevious() const
   return index > 0;
 }
 
-inline uint32_t ConstPixelIterator::getPos() const
+inline int ConstPixelIterator::getPos() const
 {
   return index;
 }
@@ -207,7 +207,7 @@ inline ValueType ConstPixelIterator::min() const
 {
   if (layers.size() == 1) return *layers[0];
   ValueType v = std::min(*layers[0],*layers[1]);
-  for (uint32_t i=2;i<layers.size();i++) v = std::min(v,*layers[i]);
+  for (size_t i=2;i<layers.size();i++) v = std::min(v,*layers[i]);
   return v;
 }
 
@@ -215,7 +215,7 @@ inline ValueType ConstPixelIterator::max() const
 {
   if (layers.size() == 1) return *layers[0];
   ValueType v = std::max(*layers[0],*layers[1]);
-  for (uint32_t i=2;i<layers.size();i++) v = std::max(v,*layers[i]);
+  for (size_t i=2;i<layers.size();i++) v = std::max(v,*layers[i]);
   return v;
 }
 
@@ -229,12 +229,12 @@ inline ValueType ConstPixelIterator::max() const
  */
 class PixelIterator {
  public:
-  inline PixelIterator(uint32_t size, const std::vector<ValueType*>& layers);
+  inline PixelIterator(int size, const std::vector<ValueType*>& layers);
 //  inline PixelIterator(const PixelIterator&);
 
   inline bool hasNext() const;
   inline bool hasPrevious() const;
-  inline uint32_t getPos() const;
+  inline int getPos() const;
   inline ValueType getAbs() const;
   inline RGBValue getRGB() const;
   inline ValueType min() const;
@@ -242,25 +242,25 @@ class PixelIterator {
   inline void clear();
   inline void scale(ValueType v);
   inline void set(ValueType v);
-  inline ValueType operator[](uint32_t layer) const;
-  inline ValueType& operator[](uint32_t layer);
+  inline ValueType operator[](int layer) const;
+  inline ValueType& operator[](int layer);
   inline PixelIterator operator++(void);
   inline PixelIterator operator++(int);
   inline PixelIterator operator--(void);
   inline PixelIterator operator--(int);
-  inline PixelIterator operator+(uint32_t d);
-  inline PixelIterator operator-(uint32_t d);
-  inline PixelIterator& operator+=(uint32_t d);
-  inline PixelIterator& operator-=(uint32_t d);
+  inline PixelIterator operator+(int d);
+  inline PixelIterator operator-(int d);
+  inline PixelIterator& operator+=(int d);
+  inline PixelIterator& operator-=(int d);
 
  private:
   bool color;
-  uint32_t size;
-  uint32_t index;
+  int size;
+  int index;
   std::vector<ValueType*> layers;
 };
 
-inline PixelIterator::PixelIterator(uint32_t size, const std::vector<ValueType*>& layers):
+inline PixelIterator::PixelIterator(int size, const std::vector<ValueType*>& layers):
   color(false),
   size(size),
   index(0),
@@ -276,15 +276,15 @@ inline PixelIterator::PixelIterator(uint32_t size, const std::vector<ValueType*>
 //{
 //}
 
-inline ValueType PixelIterator::operator[](uint32_t layer) const
+inline ValueType PixelIterator::operator[](int layer) const
 {
-  if (layer >= layers.size()) throw std::invalid_argument("no such layer");
+  if (static_cast<size_t>(layer) >= layers.size()) throw std::invalid_argument("no such layer");
   return *layers[layer];
 }
 
-inline ValueType& PixelIterator::operator[](uint32_t layer)
+inline ValueType& PixelIterator::operator[](int layer)
 {
-  if (layer >= layers.size()) throw std::invalid_argument("no such layer");
+  if (static_cast<size_t>(layer) >= layers.size()) throw std::invalid_argument("no such layer");
   return *layers[layer];
 }
 
@@ -330,21 +330,21 @@ inline PixelIterator PixelIterator::operator--(int)
   return it;
 }
 
-inline PixelIterator PixelIterator::operator+(uint32_t d)
+inline PixelIterator PixelIterator::operator+(int d)
 {
   PixelIterator it = *this;
   it += d;
   return it;
 }
 
-inline PixelIterator PixelIterator::operator-(uint32_t d)
+inline PixelIterator PixelIterator::operator-(int d)
 {
   PixelIterator it = *this;
   it -= d;
   return it;
 }
 
-inline PixelIterator& PixelIterator::operator+=(uint32_t d)
+inline PixelIterator& PixelIterator::operator+=(int d)
 {
   if (index + d >= size) d = size - index - 1;
   for (ValueType*& p : layers) p += d;
@@ -352,7 +352,7 @@ inline PixelIterator& PixelIterator::operator+=(uint32_t d)
   return *this;
 }
 
-inline PixelIterator& PixelIterator::operator-=(uint32_t d)
+inline PixelIterator& PixelIterator::operator-=(int d)
 {
   if (d > index) d = index;
   for (ValueType*& p : layers) p -= d;
@@ -370,7 +370,7 @@ inline bool PixelIterator::hasPrevious() const
   return index > 0;
 }
 
-inline uint32_t PixelIterator::getPos() const
+inline int PixelIterator::getPos() const
 {
   return index;
 }
@@ -402,7 +402,7 @@ inline ValueType PixelIterator::min() const
 {
   if (layers.size() == 1) return *layers[0];
   ValueType v = std::min(*layers[0],*layers[1]);
-  for (uint32_t i=2;i<layers.size();i++) v = std::min(v,*layers[i]);
+  for (int i=2;i<layers.size();i++) v = std::min(v,*layers[i]);
   return v;
 }
 
@@ -410,7 +410,7 @@ inline ValueType PixelIterator::max() const
 {
   if (layers.size() == 1) return *layers[0];
   ValueType v = std::max(*layers[0],*layers[1]);
-  for (uint32_t i=2;i<layers.size();i++) v = std::max(v,*layers[i]);
+  for (int i=2;i<layers.size();i++) v = std::max(v,*layers[i]);
   return v;
 }
 
