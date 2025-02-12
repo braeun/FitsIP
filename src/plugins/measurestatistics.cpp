@@ -2,10 +2,10 @@
  *                                                                              *
  * Fits - image statistics plugin                                               *
  *                                                                              *
- * modified: 2021-12-28                                                         *
+ * modified: 2025-02-11                                                         *
  *                                                                              *
  ********************************************************************************
- * Copyright (C) 2019-2021 by Harald Braeuning.   All Rights Reserved.          *
+ * Copyright (C) by Harald Braeuning.   All Rights Reserved.                    *
  ********************************************************************************
  * This program is free software; you can redistribute it and/or                *
  * modify it under the terms of the GNU General Public License                  *
@@ -31,7 +31,7 @@
 #include <QByteArray>
 #include <QTextStream>
 
-MeasureStatistics::MeasureStatistics(bool inter):OpPlugin(inter)
+MeasureStatistics::MeasureStatistics():OpPlugin()
 {
   profiler = SimpleProfiler("MeasureStatistics");
 }
@@ -49,13 +49,10 @@ OpPlugin::ResultType MeasureStatistics::execute(std::shared_ptr<FitsObject> imag
 {
   stat = ImageStatistics(*image->getImage(),rect);
   logOperation(image->getImage()->getName(),"Image Statistics:\n"+toString());
-  if (interactive)
-  {
-    TextInfoDialog d;
-    d.setTitle("Image Statistics");
-    d.setText(toString());
-    d.exec();
-  }
+  TextInfoDialog d;
+  d.setTitle("Image Statistics");
+  d.setText(toString());
+  d.exec();
   return OK;
 }
 

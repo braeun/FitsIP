@@ -1,7 +1,7 @@
 #include "analyseprofile.h"
 #include "analyseprofiledialog.h"
 
-AnalyseProfile::AnalyseProfile():OpPlugin(true),
+AnalyseProfile::AnalyseProfile():OpPlugin(),
   dlg(nullptr)
 {
 }

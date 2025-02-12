@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - star detection class                                                *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-11                                                         *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.                                           *
  ********************************************************************************
@@ -43,7 +43,7 @@
 
 #define DEBUG
 
-FindStars::FindStars(bool interactive):OpPlugin(interactive),
+FindStars::FindStars():OpPlugin(),
   c_biton(0),
   c_abovesig(0),
   c_peak(0),

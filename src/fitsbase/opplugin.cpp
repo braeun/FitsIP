@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - base class for operation plugins                                    *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-11                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,8 +27,7 @@
 
 Q_LOGGING_CATEGORY(LOG_PROFILER,"profiler");
 
-OpPlugin::OpPlugin(bool interact):
-  interactive(interact),
+OpPlugin::OpPlugin():
   error("")
 {
 }
@@ -65,6 +64,16 @@ OpPlugin::ResultType OpPlugin::execute(std::shared_ptr<FitsObject> /*image*/, QR
 OpPlugin::ResultType OpPlugin::execute(const std::vector<QFileInfo>& /*list*/, QRect /*selection*/, const PreviewOptions& /*opt*/)
 {
   return CANCELLED;
+}
+
+OpPlugin::ResultType OpPlugin::execute(const std::vector<std::shared_ptr<FitsObject>>& list, QRect selection, const PreviewOptions& opt)
+{
+  std::vector<QFileInfo> filelist;
+  for (const std::shared_ptr<FitsObject>& file : list)
+  {
+    filelist.push_back(QFileInfo(file->getFilename()));
+  }
+  return execute(filelist,selection,opt);
 }
 
 const std::vector<QFileInfo> OpPlugin::getFileList() const

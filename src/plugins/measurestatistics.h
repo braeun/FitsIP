@@ -2,10 +2,10 @@
  *                                                                              *
  * Fits - image statistics plugin                                               *
  *                                                                              *
- * modified: 2021-12-27                                                         *
+ * modified: 2025-02-11                                                         *
  *                                                                              *
  ********************************************************************************
- * Copyright (C) 2019-2021 by Harald Braeuning.   All Rights Reserved.          *
+ * Copyright (C) by Harald Braeuning.   All Rights Reserved.                    *
  ********************************************************************************
  * This program is free software; you can redistribute it and/or                *
  * modify it under the terms of the GNU General Public License                  *
@@ -40,7 +40,7 @@ class MeasureStatistics: public OpPlugin
   Q_INTERFACES(OpPlugin)
 
 public:
-  MeasureStatistics(bool interactive=true);
+  MeasureStatistics();
   virtual ~MeasureStatistics();
 
   virtual QString getMenuEntry() const override;

@@ -16,7 +16,8 @@ set(plugin_headers
   findstars.h
   measurecrosscorrelation.h
   measurematch.h
-  measurerank.h
+#  measurerank.h
+  measuresharpness.h
   measurestatistics.h
   opadd.h
   opalign.h
@@ -58,7 +59,8 @@ set(plugin_sources
   findstars.cpp
   measurecrosscorrelation.cpp
   measurematch.cpp
-  measurerank.cpp
+#  measurerank.cpp
+  measuresharpness.cpp
   measurestatistics.cpp
   opadd.cpp
   opalign.cpp
@@ -124,7 +126,8 @@ set(private_header_list
   findstarsdialog.h
   lucyrichardsondeconvolutiondialog.h
   measurematchdialog.h
-  measurerankresultdialog.h
+#  measurerankresultdialog.h
+  measuresharpnessresultdialog.h
   opaligndialog.h
   opcalibrationdialog.h
   opcombinechannelsdialog.h
@@ -151,7 +154,8 @@ add_library(fitsplugins
   findstarsdialog.cpp findstarsdialog.ui
   lucyrichardsondeconvolutiondialog.cpp lucyrichardsondeconvolutiondialog.ui
   measurematchdialog.cpp measurematchdialog.ui
-  measurerankresultdialog.cpp measurerankresultdialog.ui
+#  measurerankresultdialog.cpp measurerankresultdialog.ui
+  measuresharpnessresultdialog.cpp measuresharpnessresultdialog.ui
   opaligndialog.cpp opaligndialog.ui
   opcalibrationdialog.cpp opcalibrationdialog.ui
   opcombinechannelsdialog.cpp opcombinechannelsdialog.ui

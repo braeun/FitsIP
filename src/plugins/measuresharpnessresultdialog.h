@@ -1,6 +1,6 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - declaration of static plugins                                       *
+ * FitsIP - measure the sharpness of images - result dialog                     *
  *                                                                              *
  * modified: 2025-02-10                                                         *
  *                                                                              *
@@ -20,58 +20,48 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include <QtPlugin>
+#ifndef MEASURESHARPNESSRESULTDIALOG_H
+#define MEASURESHARPNESSRESULTDIALOG_H
 
-Q_IMPORT_PLUGIN(OpCrop)
-Q_IMPORT_PLUGIN(OpResize)
-//Q_IMPORT_PLUGIN(OpShrink)
-//Q_IMPORT_PLUGIN(OpGrow)
-Q_IMPORT_PLUGIN(OpFlipX)
-Q_IMPORT_PLUGIN(OpFlipY)
-Q_IMPORT_PLUGIN(OpRotate)
-Q_IMPORT_PLUGIN(OpShift)
+#include <QDialog>
+#include <vector>
 
-Q_IMPORT_PLUGIN(OpToGray)
-Q_IMPORT_PLUGIN(OpSplitChannels)
-Q_IMPORT_PLUGIN(OpCombineChannels)
+class QFileInfo;
+class SharpnessData;
 
-Q_IMPORT_PLUGIN(OpAdd)
-Q_IMPORT_PLUGIN(OpSub)
-Q_IMPORT_PLUGIN(OpMul)
-Q_IMPORT_PLUGIN(OpDiv)
-Q_IMPORT_PLUGIN(OpScale)
-Q_IMPORT_PLUGIN(OpSqrt)
-Q_IMPORT_PLUGIN(OpLog)
-Q_IMPORT_PLUGIN(OpCut)
-#ifdef HAVE_FFTW
-Q_IMPORT_PLUGIN(OpFFT)
-Q_IMPORT_PLUGIN(OpInvFFT)
-#endif
-Q_IMPORT_PLUGIN(OpAverage)
-Q_IMPORT_PLUGIN(OpCalibration)
-Q_IMPORT_PLUGIN(OpAlign)
-Q_IMPORT_PLUGIN(OpStack)
 
-Q_IMPORT_PLUGIN(OpKernel)
-Q_IMPORT_PLUGIN(OpMedian)
-Q_IMPORT_PLUGIN(OpSobel)
-Q_IMPORT_PLUGIN(OpGaussBlur)
-Q_IMPORT_PLUGIN(OpUnsharpMask)
-Q_IMPORT_PLUGIN(OpDDP)
-#ifdef HAVE_FFTW
-Q_IMPORT_PLUGIN(VanCittertDeconvolution)
-Q_IMPORT_PLUGIN(LucyRichardsonDeconvolution)
-#endif
+namespace Ui {
+class MeasureSharpnessResultDialog;
+}
 
-Q_IMPORT_PLUGIN(AnalyseProfile)
+class MeasureSharpnessResultDialog : public QDialog
+{
+  Q_OBJECT
 
-Q_IMPORT_PLUGIN(MeasureStatistics)
-Q_IMPORT_PLUGIN(MeasureSharpness)
-Q_IMPORT_PLUGIN(MeasureCrossCorrelation)
-Q_IMPORT_PLUGIN(MeasureMatch)
-Q_IMPORT_PLUGIN(SynthesizeBackground)
-Q_IMPORT_PLUGIN(FindStars)
+public:
+  explicit MeasureSharpnessResultDialog(QWidget *parent = nullptr);
+  ~MeasureSharpnessResultDialog();
 
-Q_IMPORT_PLUGIN(GaussianTestImage)
-Q_IMPORT_PLUGIN(PSFTestImage)
+  void setResult(const std::vector<SharpnessData>& entries);
 
+  const std::vector<QFileInfo>& getFileList() const;
+
+signals:
+  void writeToLogbook();
+
+private slots:
+  void on_copyButton_clicked();
+
+  void on_removeRowsButton_clicked();
+
+  void on_saveButton_clicked();
+
+  void on_logButton_clicked();
+
+private:
+  Ui::MeasureSharpnessResultDialog *ui;
+  std::vector<SharpnessData> entries;
+  std::vector<QFileInfo> filelist;
+};
+
+#endif // MEASURESHARPNESSRESULTDIALOG_H

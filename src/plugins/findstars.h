@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - star detection class                                                *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-02-11                                                         *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.                                           *
  ********************************************************************************
@@ -48,7 +48,7 @@ class FindStars: public OpPlugin
   Q_PLUGIN_METADATA(IID OpPlugin_iid)
   Q_INTERFACES(OpPlugin)
 public:
-  FindStars(bool interactive=true);
+  FindStars();
   ~FindStars();
 
   virtual bool createsNewImage() const override;

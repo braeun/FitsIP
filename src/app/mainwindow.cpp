@@ -346,35 +346,45 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
   std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
   if (op->requiresFileList())
   {
-    std::vector<QFileInfo> filelist = getFileList();
-    if (!filelist.empty())
+    std::vector<std::shared_ptr<FitsObject>> imglist;
+    for (const std::shared_ptr<FitsObject>& obj : ImageCollection::getGlobal().getFiles())
     {
-      OpPlugin::ResultType ret = op->execute(filelist,imageWidget->getAOI());
-      if (ret == OpPlugin::OK)
-      {
-        if (!op->getFileList().empty()) ui->fileListWidget->getFileList()->setFiles(op->getFileList());
-        if (op->createsNewImage())
-        {
-          for (auto img : op->getCreatedImages())
-          {
-//            std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
-            ImageCollection::getGlobal().addFile(img);
-          }
-          ui->openFileList->selectionModel()->clearSelection();
-          ui->openFileList->selectionModel()->setCurrentIndex(ImageCollection::getGlobal().index(ImageCollection::getGlobal().rowCount()-1,0),QItemSelectionModel::SelectCurrent);
-    //      ui->scrollArea->setWidgetResizable(false);
-          ImageCollection::getGlobal().setActiveFile(ImageCollection::getGlobal().rowCount()-1);
-          display(ImageCollection::getGlobal().getActiveFile());
-        }
-      }
-      else if (ret == OpPlugin::ERROR)
-      {
-        QMessageBox::warning(this,QApplication::applicationDisplayName(),"Plugin execution error!\n"+op->getError());
-      }
+      imglist.push_back(obj);
+    }
+    std::vector<QFileInfo> filelist = getFileList();
+    OpPlugin::ResultType ret;
+    if (imglist.empty() && filelist.empty())
+    {
+      QMessageBox::warning(this,QApplication::applicationDisplayName(),"Plugin requires a list of files!");
+    }
+    else if (filelist.empty())
+    {
+      ret = op->execute(imglist,imageWidget->getAOI());
     }
     else
     {
-      QMessageBox::warning(this,QApplication::applicationDisplayName(),"Plugin requires a list of files!");
+      ret = op->execute(filelist,imageWidget->getAOI());
+    }
+    if (ret == OpPlugin::OK)
+    {
+      if (!op->getFileList().empty()) ui->fileListWidget->getFileList()->setFiles(op->getFileList());
+      if (op->createsNewImage())
+      {
+        for (auto img : op->getCreatedImages())
+        {
+//            std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
+          ImageCollection::getGlobal().addFile(img);
+        }
+        ui->openFileList->selectionModel()->clearSelection();
+        ui->openFileList->selectionModel()->setCurrentIndex(ImageCollection::getGlobal().index(ImageCollection::getGlobal().rowCount()-1,0),QItemSelectionModel::SelectCurrent);
+  //      ui->scrollArea->setWidgetResizable(false);
+        ImageCollection::getGlobal().setActiveFile(ImageCollection::getGlobal().rowCount()-1);
+        display(ImageCollection::getGlobal().getActiveFile());
+      }
+    }
+    else if (ret == OpPlugin::ERROR)
+    {
+      QMessageBox::warning(this,QApplication::applicationDisplayName(),"Plugin execution error!\n"+op->getError());
     }
   }
   else if (activeFile != nullptr)
@@ -399,18 +409,18 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
 std::vector<QFileInfo> MainWindow::getFileList()
 {
   int32_t src = -1;
-  QStringList files = ui->fileSystemView->getSelectedFiles();
-  if (!ui->fileListWidget->getFileList()->getFiles().empty())
+  QStringList files;
+  if (ui->fileSystemView->isVisible())
+  {
+    files = ui->fileSystemView->getSelectedFiles();
+  }
+  if (ui->fileListWidget->isVisible() && !ui->fileListWidget->getFileList()->getFiles().empty())
   {
     src = 0;
   }
   else if (!files.isEmpty())
   {
     src = 1;
-  }
-  else
-  {
-    src = 2;
   }
   std::vector<QFileInfo> filelist;
   switch (src)
@@ -422,12 +432,6 @@ std::vector<QFileInfo> MainWindow::getFileList()
       for (const QString& file : files)
       {
         filelist.push_back(QFileInfo(file));
-      }
-      break;
-    case 2:
-      for (const std::shared_ptr<FitsObject>& file : ImageCollection::getGlobal().getFiles())
-      {
-        filelist.push_back(QFileInfo(file->getFilename()));
       }
       break;
   }

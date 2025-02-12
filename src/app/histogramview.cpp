@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the histogram and associated controls             *
  *                                                                              *
- * modified: 2025-02-09                                                         *
+ * modified: 2025-02-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -88,15 +88,15 @@ void HistogramView::setImage(std::shared_ptr<FitsObject> obj)
     double max = hist.getMax();
     if (keepscaling)
     {
-      min = std::max(min,minMarker->xValue());
-      max = std::min(max,maxMarker->xValue());
+      min = minMarker->xValue(); //std::max(min,minMarker->xValue());
+      max = maxMarker->xValue(); //std::min(max,maxMarker->xValue());
     }
     minMarker->setXValue(min);
     maxMarker->setXValue(max);
     ui->imageMinIntensity->setText(QString::number(min));
     ui->imageMaxIntensity->setText(QString::number(max));
-    ui->scalingSlider->setMinimum(hist.getMin());
-    ui->scalingSlider->setMaximum(hist.getMax());
+    ui->scalingSlider->setMinimum(std::min((double)hist.getMin(),min));
+    ui->scalingSlider->setMaximum(std::max((double)hist.getMax(),max));
     ui->scalingSlider->setLowerValue(min);
     ui->scalingSlider->setUpperValue(max);
   }

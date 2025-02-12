@@ -77,15 +77,12 @@ OpPlugin::ResultType MeasureRank::execute(const std::vector<QFileInfo>& list, QR
   if (prog) prog->deleteLater();
   if (results.empty()) return CANCELLED;
   std::sort(results.begin(),results.end(),[](const RankEntry& e1, const RankEntry& e2){return e1.result>e2.result;});
-  if (interactive)
-  {
-    MeasureRankResultDialog d;
-    d.setResult(results);
-    connect(&d,&MeasureRankResultDialog::writeToLogbook,this,&MeasureRank::copyToLog);
-    d.exec();
-    disconnect(&d);
-    filelist = d.getFileList();
-  }
+  MeasureRankResultDialog d;
+  d.setResult(results);
+  connect(&d,&MeasureRankResultDialog::writeToLogbook,this,&MeasureRank::copyToLog);
+  d.exec();
+  disconnect(&d);
+  filelist = d.getFileList();
   return OK;
 }
 
