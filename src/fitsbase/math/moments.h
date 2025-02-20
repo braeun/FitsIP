@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - moments of a distribution                                           *
  *                                                                              *
- * modified: 2025-01-12                                                         *
+ * modified: 2025-02-15                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *

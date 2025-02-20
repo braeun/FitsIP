@@ -75,7 +75,7 @@ OpPlugin::ResultType OpSub::execute(std::shared_ptr<FitsObject> image, QRect /*s
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Subtract by Image");
-    dlg->setImageCollection(&ImageCollection::getGlobal());
+    dlg->setImageCollection(getImageCollection());
   }
   dlg->setPrompt("Subtract from "+image->getName()+":");
   if (dlg->exec())

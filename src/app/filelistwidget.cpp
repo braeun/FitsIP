@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing a file list                                       *
  *                                                                              *
- * modified: 2022-11-21                                                         *
+ * modified: 2025-02-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -31,8 +31,8 @@ FileListWidget::FileListWidget(QWidget *parent) :
   ui(new Ui::FileListWidget)
 {
   ui->setupUi(this);
-  fileList = new FileList(this);
-  ui->fileList->setModel(fileList);
+  // fileList = new FileList(this);
+  // ui->fileList->setModel(fileList);
   contextMenu = new QMenu();
   QAction* open = contextMenu->addAction("Open Selected");
   connect(open,&QAction::triggered,[=](){emit openSelected();});
@@ -54,40 +54,52 @@ FileListWidget::~FileListWidget()
   delete ui;
 }
 
-FileList* FileListWidget::getFileList()
+std::shared_ptr<FileList> FileListWidget::getFileList()
 {
   return fileList;
 }
 
+void FileListWidget::setFileList(std::shared_ptr<FileList>& list)
+{
+  fileList = list;
+  ui->fileList->setModel(list.get());
+}
+
 void FileListWidget::clear()
 {
-  fileList->clear();
+  if (fileList) fileList->clear();
 }
 
 void FileListWidget::load()
 {
-  AppSettings settings;
-  QString fn = settings.getOpenFilename(this,AppSettings::PATH_FILELIST,"File list (*.lst);;All files (*)");
-  if (!fn.isNull())
+  if (fileList)
   {
-    fileList->load(fn);
+    AppSettings settings;
+    QString fn = settings.getOpenFilename(this,AppSettings::PATH_FILELIST,"File list (*.lst);;All files (*)");
+    if (!fn.isNull())
+    {
+      fileList->load(fn);
+    }
   }
 }
 
 void FileListWidget::save()
 {
-  AppSettings settings;
-  QString fn = settings.getSaveFilename(this,AppSettings::PATH_FILELIST,"File list (*.lst);;All files (*)");
-  if (!fn.isNull())
+  if (fileList)
   {
-    fileList->save(fn);
+    AppSettings settings;
+    QString fn = settings.getSaveFilename(this,AppSettings::PATH_FILELIST,"File list (*.lst);;All files (*)");
+    if (!fn.isNull())
+    {
+      fileList->save(fn);
+    }
   }
 }
 
 int FileListWidget::next()
 {
   int n = (ui->fileList->currentIndex().row() + 1) % fileList->rowCount();
-  ui->fileList->setCurrentIndex(fileList->index(n,0,QModelIndex()));
+  ui->fileList->setCurrentIndex(ui->fileList->model()->index(n,0,QModelIndex()));
   return n;
 }
 
@@ -95,7 +107,7 @@ int FileListWidget::previous()
 {
   int n = ui->fileList->currentIndex().row() - 1;
   if (n < 0) n += fileList->rowCount();
-  ui->fileList->setCurrentIndex(fileList->index(n,0,QModelIndex()));
+  ui->fileList->setCurrentIndex(ui->fileList->model()->index(n,0,QModelIndex()));
   return n;
 }
 

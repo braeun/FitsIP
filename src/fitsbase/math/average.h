@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - dialog to add a logbook entry                                       *
+ * FitsIP - average of a list of values                                         *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2025-02-15                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,55 +20,38 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "addlogbookentrydialog.h"
-#include "ui_addlogbookentrydialog.h"
-#include <fitsbase/logbook/logbook.h>
+#ifndef AVERAGE_H
+#define AVERAGE_H
 
-AddLogbookEntryDialog::AddLogbookEntryDialog(const Logbook* logbook, QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::AddLogbookEntryDialog)
+#include <vector>
+
+class Average
 {
-  ui->setupUi(this);
-  for (const QString& s : logbook->getProjects())
-  {
-    ui->projectBox->addItem(s);
-  }
-  ui->projectBox->setCurrentText(logbook->getProject());
-  ui->imageBox->addItem("generic");
-  for (auto& image : logbook->getImages())
-  {
-    ui->imageBox->addItem(image);
-  }
+public:
+  Average();
+  Average(const std::vector<double>& list);
+
+  inline void add(double d);
+
+  int getN() const;
+
+  double getMean() const;
+
+  double getVariance() const;
+
+private:
+  int n;
+  double sum;
+  double sum2;
+};
+
+void Average::add(double d)
+{
+  ++n;
+  sum += d;
+  sum2 += d * d;
 }
 
-AddLogbookEntryDialog::~AddLogbookEntryDialog()
-{
-  delete ui;
-}
 
-QString AddLogbookEntryDialog::getProject() const
-{
-  return ui->projectBox->currentText();
-}
 
-LogbookEntry::Type AddLogbookEntryDialog::getType() const
-{
-  switch (ui->typeBox->currentIndex())
-  {
-    case 0:
-    default:
-      return LogbookEntry::Note;
-      break;
-  }
-}
-
-QString AddLogbookEntryDialog::getImage() const
-{
-  return ui->imageBox->currentText();
-}
-
-QString AddLogbookEntryDialog::getText() const
-{
-  return ui->textField->toPlainText();
-}
-
+#endif // AVERAGE_H

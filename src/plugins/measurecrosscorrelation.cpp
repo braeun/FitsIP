@@ -76,7 +76,7 @@ OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsObject
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Cross Correlation");
-    dlg->setImageCollection(&ImageCollection::getGlobal());
+    dlg->setImageCollection(getImageCollection());
   }
   if (dlg->exec())
   {

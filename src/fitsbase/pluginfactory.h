@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin factory                                                      *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2025-02-20                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,14 +28,7 @@
 #include <memory>
 #include <vector>
 
-#ifdef USE_PYTHON
-#undef SLOT
-#undef slot
-#undef slots
-#include <pybind11/pybind11.h>
-namespace py = pybind11;
-#endif
-
+class ImageCollection;
 class QPluginLoader;
 
 class PluginFactory: public QObject
@@ -46,14 +39,14 @@ public:
   virtual ~PluginFactory();
 
 #ifdef USE_PYTHON
-  void setBinding(py::module_* m);
+  void setPythonBinding(void* m);
 #endif
 
   QObjectList getPlugins();
 
   Plugin* loadPlugin(QString filename);
 
-  static PluginFactory* instance();
+  void setImageCollection(ImageCollection* col);
 
 signals:
   void logOperation(QString image, QString op);
@@ -63,11 +56,10 @@ signals:
 private:
 
   std::vector<std::shared_ptr<QPluginLoader>> plugins;
+  ImageCollection* imageCollection;
 #ifdef USE_PYTHON
-  py::module_* pymod;
+  void* pymod;
 #endif
-
-  static std::unique_ptr<PluginFactory> factory;
 };
 
 #endif // PLUGINFACTORY_H

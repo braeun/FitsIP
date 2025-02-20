@@ -35,6 +35,8 @@ public:
 
   bool isImage(QString filename);
 
+  bool isScript(QString filename);
+
   IOHandler* getHandler(QString filename);
 
   QString getReadFilters() const;

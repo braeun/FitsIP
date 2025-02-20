@@ -75,7 +75,7 @@ OpPlugin::ResultType OpAdd::execute(std::shared_ptr<FitsObject> image, QRect /*s
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Add Image");
-    dlg->setImageCollection(&ImageCollection::getGlobal());
+    dlg->setImageCollection(getImageCollection());
   }
   dlg->setPrompt("Add to "+image->getName()+":");
   if (dlg->exec())

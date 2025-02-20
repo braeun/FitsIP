@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-02-01                                                         *
+ * modified: 2025-02-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,14 +25,15 @@
 #include "appsettings.h"
 #include "consolewidget.h"
 #include "profilertablemodel.h"
-#include "pythonscript.h"
-#include "scriptinterface.h"
+#ifdef USE_PYTHON
+#include <pythonscript.h>
+#endif
+#include "script.h"
 #include "dialogs/aboutdialog.h"
 #include "dialogs/configurationdialog.h"
 #include "dialogs/editmetadatadialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
 #include <fitsbase/filelist.h>
-#include <fitsbase/imagecollection.h>
 #include <fitsbase/pixellist.h>
 #include <fitsbase/io/iofactory.h>
 #include <fitsbase/logbook/xmllogbookstorage.h>
@@ -58,7 +59,16 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
 {
   ui->setupUi(this);
 
-  ui->openFileList->setModel(&ImageCollection::getGlobal());
+  pluginFactory = std::make_unique<PluginFactory>();
+  imageCollection = std::make_unique<ImageCollection>();
+//  scriptInterface = std::make_unique<ScriptInterface>();
+  selectedFileList = std::make_shared<FileList>();
+
+  pluginFactory->setImageCollection(imageCollection.get());
+
+  ui->fileListWidget->setFileList(selectedFileList);
+
+  ui->openFileList->setModel(imageCollection.get());
   openFileListMenu = new QMenu;
   openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
 
@@ -87,8 +97,6 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->fileSystemView,&FileSystemView::openFile,this,[this](QString file){open(QFileInfo(file));});
   connect(ui->fileSystemView,&FileSystemView::openSelection,this,[this]{openSelection();});
   connect(ui->fileSystemView,&FileSystemView::copySelectionToFilelist,this,[this]{copySelectionToList();});
-  connect(ui->fileSystemView,&FileSystemView::workingDirChanged,ScriptInterface::getInterface(),&ScriptInterface::setWorkingDir);
-  ScriptInterface::getInterface()->setWorkingDir(ui->fileSystemView->getRoot());
 
   connect(ui->fileListWidget,&FileListWidget::openSelected,this,&MainWindow::fileListOpenSelected);
 
@@ -158,7 +166,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   if (!settings.getLogbook().isEmpty() && settings.isLogbookOpenLast()) openLogbook(settings.getLogbook());
   ui->logbookWidget->setLogbook(&logbook);
 
-  connect(PluginFactory::instance(),&PluginFactory::logOperation,this,&MainWindow::logPluginOperation);
+  connect(pluginFactory.get(),&PluginFactory::logOperation,this,&MainWindow::logPluginOperation);
   connect(ui->actionActive,&QAction::toggled,&logbook,&Logbook::activate);
 
   connect(ui->actionLoad_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::load);
@@ -168,7 +176,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->actionLoad_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::load);
   connect(ui->actionSave_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::save);
 
-  connect(PluginFactory::instance(),&PluginFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
+  connect(pluginFactory.get(),&PluginFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
   connect(IOFactory::getInstance(),&IOFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
 
   QActionGroup* grp = new QActionGroup(this);
@@ -208,13 +216,15 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->actionShow_Selected_Pixels->setChecked(settings.isShowPixellist());
   ui->actionShow_Detected_Stars->setChecked(settings.isShowStarlist());
 
-  connect(consoleWidget,&ConsoleWidget::consoleCommand,this,&MainWindow::runScriptCmd);
-  connect(ScriptInterface::getInterface(),QOverload<int>::of(&ScriptInterface::display),this,QOverload<int>::of(&MainWindow::display));
-  connect(ScriptInterface::getInterface(),&ScriptInterface::workingDirChanged,ui->fileSystemView,&FileSystemView::setRoot);
-  setScriptOutput();
-#if !(defined(USE_PYTHON))
   ui->actionRun_Script->setEnabled(false);
+#ifdef USE_PYTHON
+  script = std::make_unique<PythonScript>(this,pluginFactory.get());
 #endif
+  if (script)
+  {
+    connect(consoleWidget,&ConsoleWidget::consoleCommand,this,&MainWindow::runScriptCmd);
+    setScriptOutput();
+  }
 }
 
 MainWindow::~MainWindow()
@@ -236,7 +246,7 @@ LogWidget* MainWindow::getLogWidget()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-  if (!ImageCollection::getGlobal().isEmpty())
+  if (!imageCollection->isEmpty())
   {
     if (QMessageBox::question(this,QApplication::applicationDisplayName(),
                               "Really quit?\nUnsaved data will be lost!") != QMessageBox::Yes)
@@ -250,7 +260,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::loadPlugins()
 {
-  QObjectList list = PluginFactory::instance()->getPlugins();
+  QObjectList list = pluginFactory->getPlugins();
   for (QObject* o : list)
   {
     OpPlugin* op = dynamic_cast<OpPlugin*>(o);
@@ -343,11 +353,11 @@ QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
 
 void MainWindow::executeOpPlugin(OpPlugin *op)
 {
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (op->requiresFileList())
   {
     std::vector<std::shared_ptr<FitsObject>> imglist;
-    for (const std::shared_ptr<FitsObject>& obj : ImageCollection::getGlobal().getFiles())
+    for (const std::shared_ptr<FitsObject>& obj : imageCollection->getFiles())
     {
       imglist.push_back(obj);
     }
@@ -367,19 +377,19 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
     }
     if (ret == OpPlugin::OK)
     {
-      if (!op->getFileList().empty()) ui->fileListWidget->getFileList()->setFiles(op->getFileList());
+      if (!op->getFileList().empty() && selectedFileList) selectedFileList->setFiles(op->getFileList());
       if (op->createsNewImage())
       {
         for (auto img : op->getCreatedImages())
         {
 //            std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
-          ImageCollection::getGlobal().addFile(img);
+          imageCollection->addFile(img);
         }
         ui->openFileList->selectionModel()->clearSelection();
-        ui->openFileList->selectionModel()->setCurrentIndex(ImageCollection::getGlobal().index(ImageCollection::getGlobal().rowCount()-1,0),QItemSelectionModel::SelectCurrent);
+        ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
   //      ui->scrollArea->setWidgetResizable(false);
-        ImageCollection::getGlobal().setActiveFile(ImageCollection::getGlobal().rowCount()-1);
-        display(ImageCollection::getGlobal().getActiveFile());
+        imageCollection->setActiveFile(imageCollection->rowCount()-1);
+        display(imageCollection->getActiveFile());
       }
     }
     else if (ret == OpPlugin::ERROR)
@@ -414,7 +424,7 @@ std::vector<QFileInfo> MainWindow::getFileList()
   {
     files = ui->fileSystemView->getSelectedFiles();
   }
-  if (ui->fileListWidget->isVisible() && !ui->fileListWidget->getFileList()->getFiles().empty())
+  if (ui->fileListWidget->isVisible() && selectedFileList && !selectedFileList->getFiles().empty())
   {
     src = 0;
   }
@@ -426,7 +436,7 @@ std::vector<QFileInfo> MainWindow::getFileList()
   switch (src)
   {
     case 0:
-      filelist = ui->fileListWidget->getFileList()->getFiles();
+      filelist = selectedFileList->getFiles();
       break;
     case 1:
       for (const QString& file : files)
@@ -448,21 +458,21 @@ void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, 
       for (auto img : op->getCreatedImages())
       {
 //        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
-        ImageCollection::getGlobal().addFile(img);
+        imageCollection->addFile(img);
       }
       ui->openFileList->selectionModel()->clearSelection();
-      ui->openFileList->selectionModel()->setCurrentIndex(ImageCollection::getGlobal().index(ImageCollection::getGlobal().rowCount()-1,0),QItemSelectionModel::SelectCurrent);
+      ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
 //      ui->scrollArea->setWidgetResizable(false);
-      ImageCollection::getGlobal().setActiveFile(ImageCollection::getGlobal().rowCount()-1);
-      display(ImageCollection::getGlobal().getActiveFile());
+      imageCollection->setActiveFile(imageCollection->rowCount()-1);
+      display(imageCollection->getActiveFile());
     }
     else
     {
-      std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+      std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
       if (activeFile) activeFile->updateHistogram();
       updateDisplay();
     }
-    if (!op->getFileList().empty()) ui->fileListWidget->getFileList()->setFiles(op->getFileList());
+    if (!op->getFileList().empty() && selectedFileList) selectedFileList->setFiles(op->getFileList());
   }
   else if (ret == OpPlugin::ERROR)
   {
@@ -472,7 +482,7 @@ void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, 
 
 void MainWindow::display(std::shared_ptr<FitsObject> file)
 {
-  ImageCollection::getGlobal().setActiveFile(file);
+  imageCollection->setActiveFile(file);
   ui->historyTable->clearContents();
   ui->historyTable->setRowCount(0);
   if (file)
@@ -488,17 +498,17 @@ void MainWindow::display(std::shared_ptr<FitsObject> file)
 //  updateOpenFileListSelection();
 }
 
-void MainWindow::display(int id)
-{
-  auto obj = ImageCollection::getGlobal().getFile(id);
-  if (obj) display(obj);
-}
+// void MainWindow::display(int id)
+// {
+//   auto obj = ImageCollection::getGlobal().getFile(id);
+//   if (obj) display(obj);
+// }
 
 void MainWindow::updateDisplay()
 {
   SimpleProfiler profiler("UpdateDisplay");
   profiler.start();
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   ui->histogramWidget->setImage(activeFile);
   ui->profileWidget->setImage(activeFile);
   if (activeFile)
@@ -546,7 +556,7 @@ void MainWindow::updateDisplay()
 
 void MainWindow::updateMetadata()
 {
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
     const ImageMetadata& metadata = activeFile->getImage()->getMetadata();
@@ -576,23 +586,24 @@ void MainWindow::open(const QFileInfo &fileinfo)
   {
     openImage(fileinfo);
   }
-#ifdef USE_PYTHON
-  else if (fileinfo.suffix() == "py")
+  else if (IOFactory::getInstance()->isScript(fileinfo.absoluteFilePath()))
   {
-    QSettings settings;
-    settings.setValue(AppSettings::PATH_SCRIPT,fileinfo.absolutePath());
-    runScriptFile(fileinfo);
+    if (QMessageBox::question(this,"Execute Script","Really execute the script '"+fileinfo.fileName()+"'") == QMessageBox::Yes)
+    {
+      QSettings settings;
+      settings.setValue(AppSettings::PATH_SCRIPT,fileinfo.absolutePath());
+      runScriptFile(fileinfo);
+    }
   }
-#endif
   else
   {
-    QMessageBox::information(this,QApplication::applicationDisplayName(),"Don't know how tp open file '"+fileinfo.fileName()+"'");
+    QMessageBox::information(this,QApplication::applicationDisplayName(),"Don't know how to open file '"+fileinfo.fileName()+"'");
   }
 }
 
 void MainWindow::openImage(const QFileInfo &fileinfo)
 {
-  std::shared_ptr<FitsObject> loaded = ImageCollection::getGlobal().getFile(fileinfo.absoluteFilePath());
+  std::shared_ptr<FitsObject> loaded = imageCollection->getFile(fileinfo.absoluteFilePath());
   if (loaded)
   {
     if (QMessageBox::question(this,QApplication::applicationDisplayName(),"Image is already open!\nLoad it again?") != QMessageBox::Yes)
@@ -611,9 +622,9 @@ void MainWindow::openImage(const QFileInfo &fileinfo)
       QApplication::setOverrideCursor(Qt::BusyCursor);
       std::shared_ptr<FitsImage> image = handler->read(fileinfo.absoluteFilePath());
       std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absoluteFilePath());
-      ImageCollection::getGlobal().addFile(file);
+      imageCollection->addFile(file);
       ui->openFileList->selectionModel()->clearSelection();
-      ui->openFileList->selectionModel()->setCurrentIndex(ImageCollection::getGlobal().index(ImageCollection::getGlobal().rowCount()-1,0),QItemSelectionModel::SelectCurrent);
+      ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
 //      ui->scrollArea->setWidgetResizable(false);
       display(file);
       if (AppSettings().isLogbookLogOpen())
@@ -652,19 +663,22 @@ void MainWindow::copySelectionToList()
       filelist.push_back(QFileInfo(file));
     }
   }
-  if (!filelist.empty())
+  if (selectedFileList && !filelist.empty())
   {
     if (AppSettings().isFilelistAddOnCopy())
-      ui->fileListWidget->getFileList()->addFiles(filelist);
+      selectedFileList->addFiles(filelist);
     else
-      ui->fileListWidget->getFileList()->setFiles(filelist);
+      selectedFileList->setFiles(filelist);
   }
 }
 
 void MainWindow::fileListDoubleClicked(int index)
 {
-  QFileInfo file = ui->fileListWidget->getFileList()->getFiles()[index];
-  openImage(file);
+  if (selectedFileList && index >= 0)
+  {
+    QFileInfo file = selectedFileList->getFiles()[index];
+    openImage(file);
+  }
 }
 
 void MainWindow::fileListOpenSelected()
@@ -714,7 +728,7 @@ void MainWindow::addPixel(QPoint p)
 {
   if (selectionMode == SelectPixel)
   {
-    std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+    std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
     if (activeFile)
     {
       Pixel pixel = activeFile->getImage()->getPixel(p.x(),p.y());
@@ -727,7 +741,7 @@ void MainWindow::updateCursor(QPoint p)
 {
   ui->xLabel->setText(QString::number(p.x()));
   ui->yLabel->setText(QString::number(p.y()));
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
     ui->valueLabel->setText(QString::number(activeFile->getImage()->getConstPixelIterator(p.x(),p.y()).getRGB().gray()));
@@ -743,7 +757,7 @@ void MainWindow::runScriptCmd(const QString& cmd)
 {
   try
   {
-    PythonScript::getInstance()->runCmd(cmd);
+    script->runCmd(cmd);
   }
   catch (std::exception &ex)
   {
@@ -751,7 +765,7 @@ void MainWindow::runScriptCmd(const QString& cmd)
     qCritical() << ex.what();
   }
   consoleWidget->setMode(QConsoleWidget::Input);
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile) activeFile->updateHistogram();
   updateDisplay();
 }
@@ -763,7 +777,7 @@ void MainWindow::runScriptFile(const QFileInfo& fileinfo)
   {
     if (fileinfo.suffix() == "py")
     {
-      PythonScript::getInstance()->runFile(fileinfo.absoluteFilePath());
+      script->runFile(fileinfo.absoluteFilePath());
     }
   }
   catch (std::exception &ex)
@@ -772,7 +786,7 @@ void MainWindow::runScriptFile(const QFileInfo& fileinfo)
     qCritical() << ex.what();
   }
   consoleWidget->setMode(QConsoleWidget::Input);
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile) activeFile->updateHistogram();
   updateDisplay();
 }
@@ -781,21 +795,105 @@ void MainWindow::setScriptOutput()
 {
   if (scriptOutConnection) disconnect(scriptOutConnection);
   if (scriptErrConnection) disconnect(scriptErrConnection);
-  if (AppSettings().isScriptOutputToLogwidget())
+  if (script)
   {
-    scriptOutConnection = connect(PythonScript::getInstance(),&PythonScript::stdoutAvailable,ui->logWidget,&LogWidget::writeStdOut);
-    scriptErrConnection = connect(PythonScript::getInstance(),&PythonScript::stderrAvailable,ui->logWidget,&LogWidget::writeStdErr);
-  }
-  else
-  {
-    scriptOutConnection = connect(PythonScript::getInstance(),&PythonScript::stdoutAvailable,consoleWidget,&ConsoleWidget::writeStdOut);
-    scriptErrConnection = connect(PythonScript::getInstance(),&PythonScript::stderrAvailable,consoleWidget,&ConsoleWidget::writeStdErr);
+    if (AppSettings().isScriptOutputToLogwidget())
+    {
+      scriptOutConnection = connect(script.get(),&Script::stdoutAvailable,ui->logWidget,&LogWidget::writeStdOut);
+      scriptErrConnection = connect(script.get(),&Script::stderrAvailable,ui->logWidget,&LogWidget::writeStdErr);
+    }
+    else
+    {
+      scriptOutConnection = connect(script.get(),&Script::stdoutAvailable,consoleWidget,&ConsoleWidget::writeStdOut);
+      scriptErrConnection = connect(script.get(),&Script::stderrAvailable,consoleWidget,&ConsoleWidget::writeStdErr);
+    }
   }
 }
 
+std::string MainWindow::getWorkingDir() const
+{
+  return ui->fileSystemView->getRoot().toStdString();
+}
+
+void MainWindow::setWorkingDir(const std::string& dir)
+{
+  ui->fileSystemView->setRoot(QString::fromStdString(dir));
+}
+
+std::shared_ptr<FitsObject> MainWindow::get(const std::string& filename)
+{
+  QFileInfo fileinfo(QString::fromStdString(filename));
+  if (!fileinfo.isAbsolute())
+  {
+    fileinfo = QFileInfo(ui->fileSystemView->getRoot()+"/"+QString::fromStdString(filename));
+  }
+  return imageCollection->getFile(fileinfo.absoluteFilePath());
+}
+
+const std::vector<std::shared_ptr<FitsObject>>& MainWindow::getOpen() const
+{
+  return imageCollection->getFiles();
+}
+
+std::shared_ptr<FitsObject> MainWindow::load(const std::string& filename)
+{
+  QFileInfo fileinfo(QString::fromStdString(filename));
+  if (!fileinfo.isAbsolute())
+  {
+    fileinfo = QFileInfo(ui->fileSystemView->getRoot()+"/"+QString::fromStdString(filename));
+  }
+  IOHandler* handler = IOFactory::getInstance()->getHandler(fileinfo.absoluteFilePath());
+  if (handler)
+  {
+    try
+    {
+      std::shared_ptr<FitsImage> image = handler->read(fileinfo.absoluteFilePath());
+      std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absoluteFilePath());
+      return file;
+    }
+    catch (std::exception& ex)
+    {
+      qCritical() << ex.what();
+    }
+  }
+  else
+  {
+    qWarning() << "No IOHandler for " << fileinfo.absoluteFilePath();
+  }
+  return std::shared_ptr<FitsObject>();
+}
+
+bool MainWindow::save(std::shared_ptr<FitsObject> obj, const std::string& filename)
+{
+  QFileInfo fileinfo(QString::fromStdString(filename));
+  if (!fileinfo.isAbsolute())
+  {
+    fileinfo = QFileInfo(ui->fileSystemView->getRoot()+"/"+QString::fromStdString(filename));
+  }
+  try
+  {
+    obj->save(fileinfo.absoluteFilePath());
+    //    logbook.add(LogbookEntry::Op,activeFile->getImage()->getName(),"Saved to file "+fn);
+  }
+  catch (std::exception& ex)
+  {
+    qCritical() << ex.what();
+    return false;
+  }
+  return true;
+}
+
+
+std::shared_ptr<FileList> MainWindow::getSelectedFileList() const
+{
+  return selectedFileList;
+}
+
+
+
 void MainWindow::onImageScaleChanged(double min, double max, int32_t scale)
 {
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
     QImage tmp = activeFile->getImage()->toQImage(min,max,static_cast<FitsImage::Scale>(scale));
@@ -832,7 +930,7 @@ void MainWindow::on_actionAbout_Qt_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (!activeFile) return;
   QString fn = activeFile->getFilename();
   if (fn.isEmpty())
@@ -856,7 +954,7 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_actionSave_As_triggered()
 {
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile == nullptr) return;
   AppSettings settings;
   QString filter;
@@ -883,7 +981,7 @@ void MainWindow::on_actionLoad_Plugin_triggered()
   QString fn = settings.getOpenFilename(this,AppSettings::PATH_PLUGIN);
   if (!fn.isNull())
   {
-    Plugin* plugin = PluginFactory::instance()->loadPlugin(fn);
+    Plugin* plugin = pluginFactory->loadPlugin(fn);
     if (plugin)
     {
       OpPlugin* op = dynamic_cast<OpPlugin*>(plugin);
@@ -898,7 +996,7 @@ void MainWindow::on_actionLoad_Plugin_triggered()
 
 void MainWindow::on_actionUndo_triggered()
 {
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
     activeFile->popUndo();
@@ -910,7 +1008,7 @@ void MainWindow::on_actionUndo_triggered()
 
 void MainWindow::on_actionMetadata_triggered()
 {
-  std::shared_ptr<FitsObject> activeFile = ImageCollection::getGlobal().getActiveFile();
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
     if (!editMetadataDialog) editMetadataDialog = new EditMetadataDialog(this);
@@ -928,7 +1026,7 @@ void MainWindow::on_actionMetadata_triggered()
 void MainWindow::on_openFileList_clicked(const QModelIndex &index)
 {
 //  qDebug() << "clicked: " << index.row();
-  std::shared_ptr<FitsObject> file = ImageCollection::getGlobal().setActiveFile(index.row());
+  std::shared_ptr<FitsObject> file = imageCollection->setActiveFile(index.row());
   display(file);
 }
 
@@ -939,24 +1037,24 @@ void MainWindow::on_openFileList_customContextMenuRequested(const QPoint &pos)
 
 void MainWindow::on_actionClose_Image_triggered()
 {
-  if (ImageCollection::getGlobal().getFiles().size() == 1)
+  if (imageCollection->getFiles().size() == 1)
   {
     on_actionClose_All_Images_triggered();
   }
   else
   {
     int32_t row = ui->openFileList->currentIndex().row();
-    ImageCollection::getGlobal().removeActiveFile();
-    if (static_cast<size_t>(row) >= ImageCollection::getGlobal().getFiles().size()) row = ImageCollection::getGlobal().getFiles().size() - 1;
-    ImageCollection::getGlobal().setActiveFile(row);
-    ui->openFileList->setCurrentIndex(ImageCollection::getGlobal().index(row,0,QModelIndex()));
-    display(ImageCollection::getGlobal().getActiveFile());
+    imageCollection->removeActiveFile();
+    if (static_cast<size_t>(row) >= imageCollection->getFiles().size()) row = imageCollection->getFiles().size() - 1;
+    imageCollection->setActiveFile(row);
+    ui->openFileList->setCurrentIndex(imageCollection->index(row,0,QModelIndex()));
+    display(imageCollection->getActiveFile());
   }
 }
 
 void MainWindow::on_actionClose_All_Images_triggered()
 {
-  ImageCollection::getGlobal().removeAll();
+  imageCollection->removeAll();
   display(std::shared_ptr<FitsObject>());
 }
 
@@ -1021,25 +1119,28 @@ void MainWindow::on_actionExport_Image_triggered()
 
 void MainWindow::on_actionNext_Image_triggered()
 {
-  int n = (ui->openFileList->currentIndex().row() + 1) % ImageCollection::getGlobal().rowCount();
-  ui->openFileList->setCurrentIndex(ImageCollection::getGlobal().index(n,0,QModelIndex()));
-  std::shared_ptr<FitsObject> file = ImageCollection::getGlobal().setActiveFile(n);
+  int n = (ui->openFileList->currentIndex().row() + 1) % imageCollection->rowCount();
+  ui->openFileList->setCurrentIndex(imageCollection->index(n,0,QModelIndex()));
+  std::shared_ptr<FitsObject> file = imageCollection->setActiveFile(n);
   display(file);
 }
 
 void MainWindow::on_actionPrevious_Image_triggered()
 {
   int n = ui->openFileList->currentIndex().row() - 1;
-  if (n < 0) n += ImageCollection::getGlobal().rowCount();
-  ui->openFileList->setCurrentIndex(ImageCollection::getGlobal().index(n,0,QModelIndex()));
-  std::shared_ptr<FitsObject> file = ImageCollection::getGlobal().setActiveFile(n);
+  if (n < 0) n += imageCollection->rowCount();
+  ui->openFileList->setCurrentIndex(imageCollection->index(n,0,QModelIndex()));
+  std::shared_ptr<FitsObject> file = imageCollection->setActiveFile(n);
   display(file);
 }
 
 void MainWindow::on_actionAdd_Current_Image_to_List_triggered()
 {
-  QFileInfo info(ImageCollection::getGlobal().getActiveFile()->getFilename());
-  ui->fileListWidget->getFileList()->addFile(info);
+  if (selectedFileList)
+  {
+    QFileInfo info(imageCollection->getActiveFile()->getFilename());
+    selectedFileList->addFile(info);
+  }
 }
 
 void MainWindow::on_actionExport_Logbook_triggered()
@@ -1075,13 +1176,10 @@ void MainWindow::on_actionClear_AOI_triggered()
   imageWidget->clearAOI();
 }
 
-
-
 void MainWindow::on_actionSelect_Pixel_toggled(bool flag)
 {
   selectionMode = flag ? SelectionMode::SelectPixel : SelectionMode::None;
 }
-
 
 void MainWindow::on_actionRun_Script_triggered()
 {

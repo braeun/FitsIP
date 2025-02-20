@@ -78,7 +78,7 @@ void OpCombineChannels::bindPython(void* mod) const
 OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsObject> /*image*/, QRect selection, const PreviewOptions& opt)
 {
   ImageCollection collection;
-  for (const auto& img : ImageCollection::getGlobal().getFiles())
+  for (const auto& img : getImageCollection()->getFiles())
   {
     if (img->getImage()->getDepth() == 1)
     {

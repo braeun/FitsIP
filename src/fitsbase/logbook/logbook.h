@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2024-12-14                                                         *
+ * modified: 2025-02-15                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -68,6 +68,8 @@ public:
   QString getDescription() const;
 
   void add(LogbookEntry::Type type, QString image, QString txt);
+
+  void add(QString project, LogbookEntry::Type type, QString image, QString txt);
 
   void addOp(QString image, QString op);
 

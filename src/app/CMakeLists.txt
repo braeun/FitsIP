@@ -13,6 +13,7 @@
   profilertablemodel.h
   profilerwidget.h
   profileview.h
+  script.h
   scriptinterface.h
   starlistwidget.h
   dialogs/aboutdialog.h
@@ -43,6 +44,7 @@ add_executable(fits
   profilertablemodel.cpp
   profilerwidget.cpp profilerwidget.ui
   profileview.cpp profileview.ui
+  script.cpp
   scriptinterface.cpp
   starlistwidget.cpp starlistwidget.ui
   staticplugins.cpp

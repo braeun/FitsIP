@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-01-30                                                         *
+ * modified: 2025-02-20                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,8 +24,12 @@
 #define MAINWINDOW_H
 
 #include "imagewidget.h"
+#include "script.h"
+#include "scriptinterface.h"
 #include <fitsbase/fitsobject.h>
+#include <fitsbase/imagecollection.h>
 #include <fitsbase/logbook/logbook.h>
+#include <fitsbase/pluginfactory.h>
 #include <QMainWindow>
 #include <QMenu>
 #include <vector>
@@ -53,7 +57,7 @@ struct PluginMenuEntry
   OpPlugin* plugin;
 };
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, public ScriptInterface
 {
   Q_OBJECT
 
@@ -67,6 +71,22 @@ public:
   void initialize();
 
   LogWidget* getLogWidget();
+
+  virtual void setWorkingDir(const std::string& dir) override;
+
+  virtual std::string getWorkingDir() const override;
+
+  virtual std::shared_ptr<FitsObject> get(const std::string& filename) override;
+
+  virtual const std::vector<std::shared_ptr<FitsObject>>& getOpen() const override;
+
+  virtual std::shared_ptr<FitsObject> load(const std::string& filename) override;
+
+  virtual bool save(std::shared_ptr<FitsObject> obj, const std::string& filename) override;
+
+  virtual void display(std::shared_ptr<FitsObject> obj) override;
+
+  virtual std::shared_ptr<FileList> getSelectedFileList() const override;
 
 protected:
 
@@ -151,8 +171,7 @@ private:
   void executeOpPlugin(OpPlugin* op);
   void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, QRect roi, const PreviewOptions& opt);
   std::vector<QFileInfo> getFileList();
-  void display(std::shared_ptr<FitsObject> obj);
-  void display(int id);
+//  void display(int id);
   void updateDisplay();
   void updateMetadata();
   void open(const QFileInfo& fileinfo);
@@ -168,6 +187,9 @@ private:
 
   Ui::MainWindow *ui;
   QMenu* openFileListMenu;
+  std::shared_ptr<FileList> selectedFileList;
+  std::unique_ptr<ImageCollection> imageCollection;
+  std::unique_ptr<PluginFactory> pluginFactory;
   std::vector<PluginMenuEntry> pluginMenus;
   std::map<QString,QToolBar*> pluginToolbars;
   ImageWidget* imageWidget;
@@ -175,6 +197,7 @@ private:
   EditMetadataDialog* editMetadataDialog;
   Logbook logbook;
   SelectionMode selectionMode;
+  std::unique_ptr<Script> script;
   QMetaObject::Connection scriptOutConnection;
   QMetaObject::Connection scriptErrConnection;
 };

@@ -25,6 +25,7 @@
 #include "measuresharpness.h"
 #include <fitsbase/settings.h>
 #include <fitsbase/io/iofactory.h>
+#include <fitsbase/math/average.h>
 #include <QTextStream>
 
 MeasureSharpnessResultDialog::MeasureSharpnessResultDialog(QWidget *parent):QDialog(parent),
@@ -45,6 +46,7 @@ void MeasureSharpnessResultDialog::setResult(const std::vector<SharpnessData> &l
   filelist.clear();
   ui->resultTable->clearContents();
   ui->resultTable->setRowCount(entries.size());
+  Average normvaravg;
   int32_t row = 0;
   for (const SharpnessData& entry : entries)
   {
@@ -57,7 +59,10 @@ void MeasureSharpnessResultDialog::setResult(const std::vector<SharpnessData> &l
     ui->resultTable->setItem(row,6,new QTableWidgetItem(QString::number(entry.maxPixel)));
     ui->resultTable->setItem(row,7,new QTableWidgetItem(QString::number(entry.normalizedVariance)));
     row++;
+    normvaravg.add(entry.normalizedVariance);
   }
+  ui->normVarianceMeanLabel->setText(QString::number(normvaravg.getMean()));
+  ui->normVarianceStddevLabel->setText(QString::number(sqrt(normvaravg.getVariance())));
 }
 
 const std::vector<QFileInfo>& MeasureSharpnessResultDialog::getFileList() const
@@ -103,7 +108,7 @@ void MeasureSharpnessResultDialog::on_saveButton_clicked()
       QTextStream s(&file);
       for (const SharpnessData& entry : entries)
       {
-        s << entry.info.absoluteFilePath() << "," << entry.min << "," << entry.max << "," << entry.mean << "," << entry.variance << Qt::endl;
+        s << entry.info.absoluteFilePath() << "," << entry.min << "," << entry.max << "," << entry.mean << "," << entry.variance << "," << entry.minPixel << "," << entry.maxPixel << "," << entry.normalizedVariance << Qt::endl;
       }
       s.flush();
       file.close();

@@ -60,7 +60,7 @@ public:
 
   inline const std::vector<std::shared_ptr<FitsObject>>& getFiles() const;
 
-  inline static ImageCollection& getGlobal();
+//  inline static ImageCollection& getGlobal();
 
   QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
 
@@ -89,9 +89,9 @@ inline const std::vector<std::shared_ptr<FitsObject>>& ImageCollection::getFiles
   return files;
 }
 
-inline ImageCollection& ImageCollection::getGlobal()
-{
-  return globalCollection;
-}
+// inline ImageCollection& ImageCollection::getGlobal()
+// {
+//   return globalCollection;
+// }
 
 #endif // IMAGECOLLECTION_H

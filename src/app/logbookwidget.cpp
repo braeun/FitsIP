@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the log book                                      *
  *                                                                              *
- * modified: 2024-12-14                                                         *
+ * modified: 2025-02-20                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -607,9 +607,9 @@ void LogbookWidget::on_filterButton_clicked()
 
 void LogbookWidget::on_addNoteButton_clicked()
 {
-  AddLogbookEntryDialog d(this);
+  AddLogbookEntryDialog d(logbook,this);
   if (d.exec())
   {
-    logbook->add(d.getType(),d.getImage(),d.getText());
+    logbook->add(d.getProject(),d.getType(),d.getImage(),d.getText());
   }
 }

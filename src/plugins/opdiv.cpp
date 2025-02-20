@@ -75,7 +75,7 @@ OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsObject> image, QRect /*s
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Divide by Image");
-    dlg->setImageCollection(&ImageCollection::getGlobal());
+    dlg->setImageCollection(getImageCollection());
   }
   dlg->setPrompt("Divide "+image->getName()+ "by:");
   if (dlg->exec())

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - base class for operation plugins                                    *
  *                                                                              *
- * modified: 2025-02-11                                                         *
+ * modified: 2025-02-20                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,7 +28,8 @@
 Q_LOGGING_CATEGORY(LOG_PROFILER,"profiler");
 
 OpPlugin::OpPlugin():
-  error("")
+  error(""),
+  imageCollection(nullptr)
 {
 }
 
@@ -90,6 +91,17 @@ void OpPlugin::bindPython(void*) const
 {
 }
 
+void OpPlugin::setImageCollection(ImageCollection* col)
+{
+  imageCollection = col;
+}
+
+
+ImageCollection* OpPlugin::getImageCollection() const
+{
+  return imageCollection;
+}
+
 void OpPlugin::setError(const QString &err)
 {
   error = err;
@@ -113,6 +125,11 @@ OpPlugin::ResultType OpPlugin::save(std::shared_ptr<FitsObject> image, const QSt
   fn = dir.absoluteFilePath(fn);
   if (!image->save(fn)) return ERROR;
   return OK;
+}
+
+void OpPlugin::log(const QString &msg)
+{
+  emit logOperation("",msg);
 }
 
 void OpPlugin::log(std::shared_ptr<FitsImage> image, const QString &msg)

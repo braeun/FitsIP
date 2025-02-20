@@ -77,6 +77,8 @@ private:
   Ui::FileSystemView *ui;
   QFileSystemModel* filesystemModel;
   QMenu* folderContextMenu;
+  QMenu* imageContextMenu;
+  QMenu* scriptContextMenu;
   QMenu* fileContextMenu;
   QModelIndex contextIndex;
   QStringList filterList;

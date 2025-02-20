@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - general purpose file list                                          *
  *                                                                              *
- * modified: 2022-11-21                                                         *
+ * modified: 2025-02-20                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -96,6 +96,10 @@ QVariant FileList::data(const QModelIndex &index, int role) const
   if (role == Qt::DisplayRole)
   {
     return QVariant(files[index.row()].fileName());
+  }
+  else if (role == Qt::ToolTipRole)
+  {
+    return QVariant(files[index.row()].absoluteFilePath());
   }
   return QVariant();
 }

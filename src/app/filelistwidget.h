@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing a file list                                       *
  *                                                                              *
- * modified: 2022-11-21                                                         *
+ * modified: 2025-02-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #define FILELISTWIDGET_H
 
 #include <QWidget>
+#include <memory>
 
 class FileList;
 class QFileInfo;
@@ -40,7 +41,9 @@ public:
   explicit FileListWidget(QWidget *parent = nullptr);
   ~FileListWidget();
 
-  FileList* getFileList();
+  std::shared_ptr<FileList> getFileList();
+
+  void setFileList(std::shared_ptr<FileList>& list);
 
   void clear();
 
@@ -66,7 +69,7 @@ private:
   void removeFiles();
 
   Ui::FileListWidget *ui;
-  FileList* fileList;
+  std::shared_ptr<FileList> fileList;
   QMenu* contextMenu;
 };
 

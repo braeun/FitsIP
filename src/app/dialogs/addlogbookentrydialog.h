@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to add a logbook entry                                       *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-02-20                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,9 @@
 
 #include <fitsbase/logbook/logbookentry.h>
 #include <QDialog>
+#include <set>
+
+class Logbook;
 
 namespace Ui {
 class AddLogbookEntryDialog;
@@ -34,8 +37,10 @@ class AddLogbookEntryDialog : public QDialog
 {
   Q_OBJECT
 public:
-  explicit AddLogbookEntryDialog(QWidget *parent = nullptr);
+  explicit AddLogbookEntryDialog(const Logbook* logbook, QWidget *parent=nullptr);
   ~AddLogbookEntryDialog();
+
+  QString getProject() const;
 
   LogbookEntry::Type getType() const;
 

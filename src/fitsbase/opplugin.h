@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - base class for operation plugins                                    *
  *                                                                              *
- * modified: 2025-02-11                                                         *
+ * modified: 2025-02-20                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,6 +34,8 @@
 #include <memory>
 
 Q_DECLARE_LOGGING_CATEGORY(LOG_PROFILER)
+
+class ImageCollection;
 
 class OpPlugin: public Plugin
 {
@@ -90,12 +92,16 @@ public:
    */
   virtual void bindPython(void* m) const;
 
+  void setImageCollection(ImageCollection* col);
+
 signals:
   void logOperation(QString image, QString op);
 
   void logProfilerResult(QString profiler, QString image, int w, int h, int64_t t, QString notes);
 
 protected:
+  ImageCollection* getImageCollection() const;
+
   void setError(const QString& err);
 
   /**
@@ -118,6 +124,8 @@ protected:
    */
   virtual ResultType save(std::shared_ptr<FitsObject> image, const QString& outputpath, const QFileInfo& info, const QString& tag="");
 
+  void log(const QString& msg);
+
   void log(std::shared_ptr<FitsImage> image, const QString& msg);
 
   void log(std::shared_ptr<FitsObject> image, const QString& msg);
@@ -131,6 +139,7 @@ protected:
   std::vector<QFileInfo> filelist;
   QString error;
   SimpleProfiler profiler;
+  ImageCollection* imageCollection;
 
 };
 

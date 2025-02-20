@@ -100,7 +100,7 @@ OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsObject> image, QR
   if (dlg == nullptr)
   {
     dlg = new MeasureMatchDialog();
-    dlg->setImageCollection(&ImageCollection::getGlobal());
+    dlg->setImageCollection(getImageCollection());
   }
   if (dlg->exec())
   {

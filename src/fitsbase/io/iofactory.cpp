@@ -61,6 +61,15 @@ bool IOFactory::isImage(QString filename)
   return getHandler(filename) != nullptr;
 }
 
+bool IOFactory::isScript(QString filename)
+{
+  QString suffix = QFileInfo(filename).suffix().toLower();
+  if (suffix == "py") return true;
+  return false;
+}
+
+
+
 IOHandler* IOFactory::getHandler(QString filename)
 {
   QString suffix = QFileInfo(filename).suffix().toLower();

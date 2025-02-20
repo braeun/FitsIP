@@ -23,58 +23,31 @@
 #ifndef SCRIPTINTERFACE_H
 #define SCRIPTINTERFACE_H
 
+#include <fitsbase/filelist.h>
 #include <fitsbase/fitsobject.h>
 #include <memory>
 
-#ifdef USE_PYTHON
-#undef SLOT
-#undef slot
-#undef slots
-#include <pybind11/pybind11.h>
-namespace py = pybind11;
-#endif
-
-
-class ScriptInterface: public QObject
+class ScriptInterface
 {
-  Q_OBJECT
 public:
-
-  void setWorkingDir(const QString& dir);
-
-  /**
-   * @brief Change the working directory and emit the correspondign signal.
-   *
-   * This method ist used by scripts to change the working directory.
-   * @param dir the new owrking directory.
-   */
-  void changeWorkingDir(const std::string& dir);
-
-  std::shared_ptr<FitsObject> get(const std::string& filename);
-
-  std::shared_ptr<FitsObject> load(const std::string& filename);
-
-  bool save(std::shared_ptr<FitsObject> obj, const std::string& filename);
-
-  void display(std::shared_ptr<FitsObject> obj);
-
-#ifdef USE_PYTHON
-  static void bind(py::module_& m);
-#endif
-
-  static ScriptInterface* getInterface();
-
-signals:
-  void display(int id);
-
-  void workingDirChanged(const QString& dir);
-
-private:
   ScriptInterface();
 
-  QString workingdir;
+  virtual void setWorkingDir(const std::string& dir) = 0;
 
-  static std::unique_ptr<ScriptInterface> interface;
+  virtual std::string getWorkingDir() const = 0;
+
+  virtual std::shared_ptr<FitsObject> get(const std::string& filename) = 0;
+
+  virtual const std::vector<std::shared_ptr<FitsObject>>& getOpen() const = 0;
+
+  virtual std::shared_ptr<FitsObject> load(const std::string& filename) = 0;
+
+  virtual bool save(std::shared_ptr<FitsObject> obj, const std::string& filename) = 0;
+
+  virtual void display(std::shared_ptr<FitsObject> obj) = 0;
+
+  virtual std::shared_ptr<FileList> getSelectedFileList() const = 0;
+
 };
 
 #endif // SCRIPTINTERFACE_H

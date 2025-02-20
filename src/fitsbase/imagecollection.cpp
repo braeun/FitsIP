@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - collection of fits objects, i.e. opened images                      *
  *                                                                              *
- * modified: 2025-01-30                                                         *
+ * modified: 2025-02-20                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -146,6 +146,22 @@ QVariant ImageCollection::data(const QModelIndex &index, int role) const
     {
       QFileInfo info(file->getFilename());
       return QVariant(info.fileName());
+    }
+  }
+  else if (role == Qt::ToolTipRole)
+  {
+    auto file = files[index.row()];
+    if (file->getFilename().isEmpty())
+    {
+      if (file->getImage()->getName().isEmpty())
+      {
+        return QVariant(QString("image %1").arg(files[index.row()]->getId()));
+      }
+      return file->getImage()->getName();
+    }
+    else
+    {
+      return file->getFilename();
     }
   }
   return QVariant();

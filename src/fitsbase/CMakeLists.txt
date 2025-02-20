@@ -40,6 +40,7 @@ set(private_header_list
   logbook/logbookfilter.h
   logbook/logbookstorage.h
   logbook/xmllogbookstorage.h
+  math/average.h
   math/fitpar.h
   math/gaussfit.h
   math/mathfunctions.h
@@ -112,6 +113,7 @@ add_library(fitsbase
   logbook/logbookfilter.cpp
   logbook/logbookstorage.cpp
   logbook/xmllogbookstorage.cpp
+  math/average.cpp
   math/fitpar.cpp
   math/gaussfit.cpp
   math/mathfunctions.cpp
@@ -157,8 +159,6 @@ target_compile_options(fitsbase PRIVATE -fPIC)
 target_link_libraries(fitsbase
   PUBLIC PkgConfig::CCfits
   PUBLIC PkgConfig::cfitsio
-#  PUBLIC ${CCFITS_LIBRARY}
-#  PUBLIC ${CFITSIO_LIBRARY}
   PUBLIC PkgConfig::QWT
   PUBLIC Qt5::Xml
   PUBLIC Qt5::Widgets
@@ -166,13 +166,13 @@ target_link_libraries(fitsbase
   )
 
 if (USE_PYTHON)
-  # required by pybind11
-  # maybe just set the class with __attribute__ ((visibility("hidden")))
-  set_target_properties(fitsbase PROPERTIES CXX_VISIBILITY_PRESET hidden)
-  target_sources(fitsbase
-    PRIVATE pythonbase.h pythonbase.cpp
-  )
-  target_link_libraries(fitsbase
-    PRIVATE pybind11::embed
-  )
+#   # required by pybind11
+#   # maybe just set the class with __attribute__ ((visibility("hidden")))
+#   set_target_properties(fitsbase PROPERTIES CXX_VISIBILITY_PRESET hidden)
+#   target_sources(fitsbase
+#     PRIVATE pythonbase.h pythonbase.cpp
+#   )
+  # target_link_libraries(fitsbase
+  #   PRIVATE pybind11::embed
+  # )
 endif()

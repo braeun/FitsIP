@@ -23,6 +23,7 @@
 #include "filesystemview.h"
 #include "ui_filesystemview.h"
 #include "appsettings.h"
+#include <fitsbase/io/iofactory.h>
 #include <QSettings>
 #include <QDir>
 #include <QFileDialog>
@@ -67,10 +68,22 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   folderContextMenu->addSeparator();
   connect(folderContextMenu->addAction("Remove Folder(s)..."),&QAction::triggered,this,[this]{remove();});
 
+  imageContextMenu = new QMenu(this);
+  connect(imageContextMenu->addAction("Open Image(s)"),&QAction::triggered,this,[this]{emit openSelection();});
+  connect(imageContextMenu->addAction("Copy Filename(s) to List"),&QAction::triggered,this,[this]{emit copySelectionToFilelist();});
+  imageContextMenu->addSeparator();
+  connect(imageContextMenu->addAction("Rename File..."),&QAction::triggered,this,[this]{rename();});
+  imageContextMenu->addSeparator();
+  connect(imageContextMenu->addAction("Remove File(s)..."),&QAction::triggered,this,[this]{remove();});
+
+  scriptContextMenu = new QMenu(this);
+  connect(scriptContextMenu->addAction("Execute Script"),&QAction::triggered,this,[this]{if (QFileInfo(filesystemModel->filePath(contextIndex)).isFile()) emit openFile(filesystemModel->filePath(contextIndex));});
+  scriptContextMenu->addSeparator();
+  connect(scriptContextMenu->addAction("Rename File..."),&QAction::triggered,this,[this]{rename();});
+  scriptContextMenu->addSeparator();
+  connect(scriptContextMenu->addAction("Remove File(s)..."),&QAction::triggered,this,[this]{remove();});
+
   fileContextMenu = new QMenu(this);
-  connect(fileContextMenu->addAction("Open File(s)"),&QAction::triggered,this,[this]{emit openSelection();});
-  connect(fileContextMenu->addAction("Copy Filename(s) to List"),&QAction::triggered,this,[this]{emit copySelectionToFilelist();});
-  fileContextMenu->addSeparator();
   connect(fileContextMenu->addAction("Rename File..."),&QAction::triggered,this,[this]{rename();});
   fileContextMenu->addSeparator();
   connect(fileContextMenu->addAction("Remove File(s)..."),&QAction::triggered,this,[this]{remove();});
@@ -163,7 +176,14 @@ void FileSystemView::showContextMenu(const QPoint &pos)
   if (info.isDir())
     folderContextMenu->popup(ui->filesystemView->mapToGlobal(pos));
   else
-    fileContextMenu->popup(ui->filesystemView->mapToGlobal(pos));
+  {
+    if (IOFactory::getInstance()->isImage(info.fileName()))
+      imageContextMenu->popup(ui->filesystemView->mapToGlobal(pos));
+    else if (IOFactory::getInstance()->isScript(info.fileName()))
+      scriptContextMenu->popup(ui->filesystemView->mapToGlobal(pos));
+    else
+      fileContextMenu->popup(ui->filesystemView->mapToGlobal(pos));
+  }
 }
 
 void FileSystemView::newFolder()

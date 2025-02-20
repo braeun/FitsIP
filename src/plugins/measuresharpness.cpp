@@ -1,3 +1,25 @@
+/********************************************************************************
+ *                                                                              *
+ * FitsIP - measure the sharpness of images                                     *
+ *                                                                              *
+ * modified: 2025-02-20                                                         *
+ *                                                                              *
+ ********************************************************************************
+ * Copyright (C) Harald Braeuning                                               *
+ ********************************************************************************
+ * This file is part of FitsIP.                                                 *
+ * FitsIP is free software: you can redistribute it and/or modify it            *
+ * under the terms of the GNU General Public License as published by the Free   *
+ * Software Foundation, either version 3 of the License, or (at your option)    *
+ * any later version.                                                           *
+ * FitsIP is distributed in the hope that it will be useful, but                *
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY   *
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for  *
+ * more details.                                                                *
+ * You should have received a copy of the GNU General Public License along with *
+ * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
+ ********************************************************************************/
+
 #include "measuresharpness.h"
 #include "measuresharpnessresultdialog.h"
 #include "opkernel.h"
@@ -6,6 +28,7 @@
 #include <fitsbase/imagestatistics.h>
 #include <fitsbase/dialogs/progressdialog.h>
 #include <fitsbase/io/iofactory.h>
+#include <fitsbase/math/average.h>
 #include <algorithm>
 #include <QApplication>
 
@@ -72,6 +95,7 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<QFileInfo>& lis
     prog->show();
   }
   results.clear();
+  Average normvaravg;
   int n = 0;
   for (const QFileInfo& info : list)
   {
@@ -83,10 +107,15 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<QFileInfo>& lis
       if (prog->isCancelled()) break;
     }
     SharpnessData entry = evaluate(info,selection);
-    if (entry.info.exists()) results.push_back(entry);
+    if (entry.info.exists())
+    {
+      results.push_back(entry);
+      normvaravg.add(entry.normalizedVariance);
+    }
   }
   if (prog) prog->deleteLater();
   if (results.empty()) return CANCELLED;
+  log(QString::asprintf("Average sharpness: %g +- %g",normvaravg.getMean(),sqrt(normvaravg.getVariance())));
   std::sort(results.begin(),results.end(),[](const SharpnessData& e1, const SharpnessData& e2){return e1.normalizedVariance>e2.normalizedVariance;});
   MeasureSharpnessResultDialog d;
   d.setResult(results);
@@ -107,6 +136,7 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<std::shared_ptr
     prog->show();
   }
   results.clear();
+  Average normvaravg;
   int n = 0;
   for (const auto& obj : list)
   {
@@ -122,9 +152,11 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<std::shared_ptr
     data.info = info;
     data.filename = info.absoluteFilePath().toStdString();
     results.push_back(data);
+    normvaravg.add(data.normalizedVariance);
   }
   if (prog) prog->deleteLater();
   if (results.empty()) return CANCELLED;
+  log(QString::asprintf("Average sharpness: %g +- %g",normvaravg.getMean(),sqrt(normvaravg.getVariance())));
   std::sort(results.begin(),results.end(),[](const SharpnessData& e1, const SharpnessData& e2){return e1.normalizedVariance>e2.normalizedVariance;});
   QApplication::processEvents();
   MeasureSharpnessResultDialog d;
@@ -175,37 +207,27 @@ SharpnessData MeasureSharpness::calculateSharpness(std::shared_ptr<FitsImage> im
   QRect r(5,5,img->getWidth()-10,img->getHeight()-10);
   copy = copy->subImage(r);
   /* calculate statistics */
-  int n = 0;
-  double gsum = 0;
-  double gsum2 = 0;
+  Average avg;
   ConstPixelIterator p = copy->getConstPixelIterator();
   while (p.hasNext())
   {
     double v = std::fabs(p.getAbs());
     data.max = std::max(data.max,v);
     data.min = std::min(data.min,v);
-    gsum += v;
-    gsum2 += v * v;
-    n++;
+    avg.add(v);
     ++p;
   }
-  if (n > 0)
-  {
-    data.mean = gsum / n;
-    if (n > 1)
-    {
-      data.variance = (n*gsum2-gsum*gsum)/(n*static_cast<double>(n-1));
-      double delta = data.maxPixel - data.minPixel;
-      /*
-       * The absolute value of the variance also depends on the image
-       * brightness. The same image with half the brightness has only
-       * a quarter of the variance. Thus we normalize with the square
-       * of the maximum brightness difference to account for different
-       * brightness.
-       */
-      if (delta >= 0) data.normalizedVariance = data.variance / (delta * delta);
-    }
-  }
+  data.mean = avg.getMean();
+  data.variance = avg.getVariance();
+  double delta = data.maxPixel - data.minPixel;
+  /*
+   * The absolute value of the variance also depends on the image
+   * brightness. The same image with half the brightness has only
+   * a quarter of the variance. Thus we normalize with the square
+   * of the maximum brightness difference to account for different
+   * brightness.
+   */
+  if (delta >= 0) data.normalizedVariance = data.variance / (delta * delta);
   return data;
 }
 

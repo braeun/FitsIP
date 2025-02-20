@@ -59,7 +59,7 @@ OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, 
   {
     dlg = new OpCalibrationDialog();
   }
-  dlg->setImageCollection(&ImageCollection::getGlobal());
+  dlg->setImageCollection(getImageCollection());
   dlg->setOutputPath(list[0].absolutePath());
   if (!dlg->exec()) return CANCELLED;
   QDir dir(dlg->getOutputPath());

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - python scripting                                                    *
  *                                                                              *
- * modified: 2025-01-31                                                         *
+ * modified: 2025-02-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,9 +23,11 @@
 #ifndef PYTHONSCRIPT_H
 #define PYTHONSCRIPT_H
 
+#include "script.h"
 #include <memory>
-#include <QObject>
-#include <QString>
+
+class PluginFactory;
+class ScriptInterface;
 
 #undef SLOT
 #undef slot
@@ -34,31 +36,29 @@
 #include <pybind11/embed.h>
 namespace py = pybind11;
 
-class PythonScript: public QObject
+class PythonScript: public Script
 {
   Q_OBJECT
 public:
-  PythonScript();
+  PythonScript(ScriptInterface* intf, PluginFactory* plugins);
 
   void runCmd(const QString& cmd);
 
   void runFile(const QString& filename);
 
-  static PythonScript* getInstance();
-
-signals:
-  void stdoutAvailable(QString s);
-  void stderrAvailable(QString s);
-
 private:
-  void init();
+  void init(ScriptInterface* intf, PluginFactory* plugins);
   void streamStdout(const char* s);
   void streamStderr(const char* s);
   void redirect(py::object, const char* pipe);
+  void bind(py::module_& m, ScriptInterface* intf);
+  void bindFitsObject(py::module_& m);
+  void bindLists(py::module_& m, ScriptInterface* intf);
+  void bindKernel(py::module_& m);
+  void bindStatistics(py::module_& m);
 
   std::unique_ptr<py::scoped_interpreter> terp;
 
-  static std::unique_ptr<PythonScript> instance;
 };
 
 #endif // PYTHONSCRIPT_H

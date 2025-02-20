@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin factory                                                      *
  *                                                                              *
- * modified: 2022-11-20                                                         *
+ * modified: 2025-02-20                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,9 +26,8 @@
 #include <QDebug>
 #include <utility>
 
-std::unique_ptr<PluginFactory> PluginFactory::factory;
-
-PluginFactory::PluginFactory()
+PluginFactory::PluginFactory():
+  imageCollection(nullptr)
 {
   for (const QObject* o : QPluginLoader::staticInstances())
   {
@@ -46,7 +45,7 @@ PluginFactory::~PluginFactory()
 }
 
 #ifdef USE_PYTHON
-void PluginFactory::setBinding(py::module_* m)
+void PluginFactory::setPythonBinding(void* m)
 {
   pymod = m;
   for (const QObject* o : QPluginLoader::staticInstances())
@@ -55,6 +54,18 @@ void PluginFactory::setBinding(py::module_* m)
     if (p)
     {
       p->bindPython(m);
+    }
+  }
+  for (std::shared_ptr<QPluginLoader> plugin : plugins)
+  {
+    Plugin* p = dynamic_cast<Plugin*>(plugin->instance());
+    if (p)
+    {
+      const OpPlugin* op = dynamic_cast<const OpPlugin*>(p);
+      if (op)
+      {
+        op->bindPython(m);
+      }
     }
   }
 }
@@ -83,9 +94,10 @@ Plugin* PluginFactory::loadPlugin(QString filename)
   if (p)
   {
     plugins.push_back(plugin);
-    const OpPlugin* op = dynamic_cast<const OpPlugin*>(p);
+    OpPlugin* op = dynamic_cast<OpPlugin*>(p);
     if (op)
     {
+      op->setImageCollection(imageCollection);
 #ifdef USE_PYTHON
       op->bindPython(pymod);
 #endif
@@ -96,8 +108,28 @@ Plugin* PluginFactory::loadPlugin(QString filename)
   return p;
 }
 
-PluginFactory* PluginFactory::instance()
+void PluginFactory::setImageCollection(ImageCollection *col)
 {
-  if (!factory) factory = std::make_unique<PluginFactory>();
-  return factory.get();
+  imageCollection = col;
+  for (QObject* o : QPluginLoader::staticInstances())
+  {
+    OpPlugin* op = dynamic_cast<OpPlugin*>(o);
+    if (op)
+    {
+      op->setImageCollection(col);
+    }
+  }
+  for (auto& plugin : plugins)
+  {
+    Plugin* p = dynamic_cast<Plugin*>(plugin->instance());
+    if (p)
+    {
+      OpPlugin* op = dynamic_cast<OpPlugin*>(p);
+      if (op)
+      {
+        op->setImageCollection(col);
+      }
+    }
+  }
 }
+

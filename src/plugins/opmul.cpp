@@ -75,7 +75,7 @@ OpPlugin::ResultType OpMul::execute(std::shared_ptr<FitsObject> image, QRect /*s
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Multiply by Image");
-    dlg->setImageCollection(&ImageCollection::getGlobal());
+    dlg->setImageCollection(getImageCollection());
   }
   dlg->setPrompt("Multiply "+image->getName()+" by:");
   if (dlg->exec())
