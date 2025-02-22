@@ -44,10 +44,13 @@ namespace py = pybind11;
 MeasureSharpness::MeasureSharpness()
 {
   profiler = SimpleProfiler("MeasureSharpness");
+  resultDialog = new MeasureSharpnessResultDialog();
+  connect(resultDialog,&MeasureSharpnessResultDialog::writeToLogbook,this,&MeasureSharpness::copyToLog);
 }
 
 MeasureSharpness::~MeasureSharpness()
 {
+  resultDialog->deleteLater();
 }
 
 QString MeasureSharpness::getMenuEntry() const
@@ -117,12 +120,9 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<QFileInfo>& lis
   if (results.empty()) return CANCELLED;
   log(QString::asprintf("Average sharpness: %g +- %g",normvaravg.getMean(),sqrt(normvaravg.getVariance())));
   std::sort(results.begin(),results.end(),[](const SharpnessData& e1, const SharpnessData& e2){return e1.normalizedVariance>e2.normalizedVariance;});
-  MeasureSharpnessResultDialog d;
-  d.setResult(results);
-  connect(&d,&MeasureSharpnessResultDialog::writeToLogbook,this,&MeasureSharpness::copyToLog);
-  d.exec();
-  disconnect(&d);
-  filelist = d.getFileList();
+  resultDialog->setResult(results);
+  resultDialog->exec();
+  filelist = resultDialog->getFileList();
   return OK;
 }
 
@@ -159,12 +159,9 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<std::shared_ptr
   log(QString::asprintf("Average sharpness: %g +- %g",normvaravg.getMean(),sqrt(normvaravg.getVariance())));
   std::sort(results.begin(),results.end(),[](const SharpnessData& e1, const SharpnessData& e2){return e1.normalizedVariance>e2.normalizedVariance;});
   QApplication::processEvents();
-  MeasureSharpnessResultDialog d;
-  d.setResult(results);
-  connect(&d,&MeasureSharpnessResultDialog::writeToLogbook,this,&MeasureSharpness::copyToLog);
-  d.exec();
-  disconnect(&d);
-  filelist = d.getFileList();
+  resultDialog->setResult(results);
+  resultDialog->exec();
+  filelist = resultDialog->getFileList();
   return OK;
 }
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-02-05                                                         *
+ * modified: 2025-02-22                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,6 +37,10 @@ class QWidget;
 class Settings
 {
 public:
+
+  enum Tools {
+    FileManager, ScriptEditor, TextEditor, OfficeEditor
+  };
 
   Settings();
 
@@ -101,6 +105,14 @@ public:
   void setFitsImageFormat(int fmt);
 
   int getFitsImageFormat() const;
+
+  void setTool(Tools tool, QString cmd);
+
+  QString getTool(Tools tool) const;
+
+  void setLogbookLatestFirst(bool flag);
+
+  bool isLogbookLatestFirst() const;
 
 
   static const char* PATH_IMAGE;    //!< key for fits image path

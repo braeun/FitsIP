@@ -43,7 +43,6 @@ MeasureSharpnessResultDialog::~MeasureSharpnessResultDialog()
 void MeasureSharpnessResultDialog::setResult(const std::vector<SharpnessData> &list)
 {
   entries = list;
-  filelist.clear();
   ui->resultTable->clearContents();
   ui->resultTable->setRowCount(entries.size());
   Average normvaravg;
@@ -65,22 +64,19 @@ void MeasureSharpnessResultDialog::setResult(const std::vector<SharpnessData> &l
   ui->normVarianceStddevLabel->setText(QString::number(sqrt(normvaravg.getVariance())));
 }
 
-const std::vector<QFileInfo>& MeasureSharpnessResultDialog::getFileList() const
+std::vector<QFileInfo> MeasureSharpnessResultDialog::getFileList() const
 {
-  return filelist;
-}
-
-
-
-
-void MeasureSharpnessResultDialog::on_copyButton_clicked()
-{
+  std::vector<QFileInfo> filelist;
   filelist.clear();
   for (const SharpnessData& e : entries)
   {
     filelist.push_back(e.info);
   }
+  return filelist;
 }
+
+
+
 
 void MeasureSharpnessResultDialog::on_removeRowsButton_clicked()
 {
@@ -93,6 +89,7 @@ void MeasureSharpnessResultDialog::on_removeRowsButton_clicked()
     }
   }
   setResult(list);
+  emit fileListChanged();
 }
 
 void MeasureSharpnessResultDialog::on_saveButton_clicked()

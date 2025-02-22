@@ -42,9 +42,10 @@ public:
 
   std::vector<ValueType> getParameters() const;
 
-private:
+private slots:
   void on_functionBox_currentTextChanged(const QString &text);
 
+private:
   Ui::PSFWidget *ui;
 };
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-02-05                                                         *
+ * modified: 2025-02-22                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -39,6 +39,13 @@ static const char* PREVIEW_HEIGHT = "fits/preview/height";
 static const char* IO_ALWAYS_FITS = "fits/io/alwaysfits";
 static const char* IO_METADATA_FILE = "fits/io/metadatafile";
 static const char* IO_FITS_IMGFORMAT = "fits/io/fitsimageformat";
+
+static const char* TOOL_FILE_MANAGER = "fits/tools/filemanager";
+static const char* TOOL_SCRIPT_EDITOR = "fits/tools/scripteditor";
+static const char* TOOL_TEXT_EDITOR = "fits/tools/texteditor";
+static const char* TOOL_OFFICE_EDITOR = "fits/tools/officeeditor";
+
+static const char* LOGBOOK_LATEST_FIRST = "fits/logbook/latestfirst";
 
 Settings::Settings()
 {
@@ -130,3 +137,51 @@ int Settings::getFitsImageFormat() const
 {
   return settings.value(IO_FITS_IMGFORMAT,0).toInt();
 }
+
+void Settings::setTool(Tools tool, QString cmd)
+{
+  switch (tool)
+  {
+    case FileManager:
+      settings.setValue(TOOL_FILE_MANAGER,cmd);
+      break;
+    case ScriptEditor:
+      settings.setValue(TOOL_SCRIPT_EDITOR,cmd);
+      break;
+    case TextEditor:
+      settings.setValue(TOOL_TEXT_EDITOR,cmd);
+      break;
+    case OfficeEditor:
+      settings.setValue(TOOL_OFFICE_EDITOR,cmd);
+      break;
+  }
+}
+
+QString Settings::getTool(Tools tool) const
+{
+  switch (tool)
+  {
+    case FileManager:
+      return settings.value(TOOL_FILE_MANAGER,"").toString();
+    case ScriptEditor:
+      return settings.value(TOOL_SCRIPT_EDITOR,"").toString();
+    case TextEditor:
+      return settings.value(TOOL_TEXT_EDITOR,"").toString();
+    case OfficeEditor:
+      return settings.value(TOOL_OFFICE_EDITOR,"").toString();
+  }
+  return "";
+}
+
+void Settings::setLogbookLatestFirst(bool flag)
+{
+  settings.setValue(LOGBOOK_LATEST_FIRST,flag);
+}
+
+bool Settings::isLogbookLatestFirst() const
+{
+  return settings.value(LOGBOOK_LATEST_FIRST,false).toBool();
+}
+
+
+

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - configuration dialog                                                *
  *                                                                              *
- * modified: 2022-12-03                                                         *
+ * modified: 2025-02-22                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #include "ui_configurationdialog.h"
 #include "../appsettings.h"
 #include "../palettefactory.h"
+#include <QFileDialog>
 #include <QStyleFactory>
 #include <QSettings>
 
@@ -39,6 +40,10 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
   }
   AppSettings settings;
   updateFields(settings);
+  connect(ui->browseFileManagerButton,&QPushButton::clicked,this,[this](){browse(ui->fileManagerField);});
+  connect(ui->browseScriptEditorButton,&QPushButton::clicked,this,[this](){browse(ui->scriptEditorField);});
+  connect(ui->browseTextEditorButton,&QPushButton::clicked,this,[this](){browse(ui->textEditorField);});
+  connect(ui->browseOfficeButton,&QPushButton::clicked,this,[this](){browse(ui->officeTextEditorField);});
 }
 
 ConfigurationDialog::~ConfigurationDialog()
@@ -59,13 +64,19 @@ void ConfigurationDialog::commitFields(AppSettings &settings)
   settings.setAlwaysSaveFits(ui->alwaysSaveFitsBox->isChecked());
   settings.setWriteMetadataFile(ui->saveMetadataBox->isChecked());
   if (ui->fitsDoubleButton->isChecked())
+
     settings.setFitsImageFormat(0);
   else
     settings.setFitsImageFormat(1);
   settings.setLogbookLogOpen(ui->logLoadingBox->isChecked());
   settings.setLogbookOpenLast(ui->openLastLogBox->isChecked());
+  settings.setLogbookLatestFirst(ui->showLatestFirstBox->isChecked());
   settings.setProfileStopTracking(ui->profileClickBox->isChecked());
   settings.setScriptOutputToLogwidget(ui->logWidgetOutputBox->isChecked());
+  settings.setTool(Settings::FileManager,ui->fileManagerField->text());
+  settings.setTool(Settings::ScriptEditor,ui->scriptEditorField->text());
+  settings.setTool(Settings::TextEditor,ui->textEditorField->text());
+  settings.setTool(Settings::OfficeEditor,ui->officeTextEditorField->text());
 
   QString style = settings.getStyle();
   QApplication::setStyle(QStyleFactory::create(style));
@@ -92,6 +103,21 @@ void ConfigurationDialog::updateFields(const AppSettings &settings)
   }
   ui->logLoadingBox->setChecked(settings.isLogbookLogOpen());
   ui->openLastLogBox->setChecked(settings.isLogbookOpenLast());
+  ui->showLatestFirstBox->setChecked(settings.isLogbookLatestFirst());
   ui->profileClickBox->setChecked(settings.isProfileStopTracking());
   ui->logWidgetOutputBox->setChecked(settings.isScriptOutputToLogwidget());
+  ui->fileManagerField->setText(settings.getTool(Settings::FileManager));
+  ui->scriptEditorField->setText(settings.getTool(Settings::ScriptEditor));
+  ui->officeTextEditorField->setText(settings.getTool(Settings::OfficeEditor));
+  ui->textEditorField->setText(settings.getTool(Settings::TextEditor));
 }
+
+void ConfigurationDialog::browse(QLineEdit* field)
+{
+  QString filename = QFileDialog::getOpenFileName(this,QApplication::applicationDisplayName(),"/usr/bin");
+  if (!filename.isNull())
+  {
+    field->setText(filename);
+  }
+}
+

@@ -59,6 +59,7 @@ public:
 
 signals:
   void openFile(QString file);
+  void runFile(QString file);
   void openSelection();
   void copySelectionToFilelist();
   void workingDirChanged(const QString& dir);
@@ -71,6 +72,7 @@ private:
   void newFolder();
   void rename();
   void remove();
+  void handleDoubleClick(const QModelIndex &index);
   void filterChanged(const QString& text);
   void clearFilterlist();
 

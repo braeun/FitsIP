@@ -120,6 +120,12 @@ bool FileList::save(const QString &filename)
 
 bool FileList::load(const QString &filename)
 {
+  clear();
+  return append(filename);
+}
+
+bool FileList::append(const QString &filename)
+{
   QFile file(filename);
   if (!file.open(QFile::ReadOnly)) return false;
   std::vector<QFileInfo> list;
@@ -131,6 +137,19 @@ bool FileList::load(const QString &filename)
     line = s.readLine();
   }
   file.close();
-  setFiles(list);
+  addFiles(list);
   return true;
 }
+
+QModelIndex FileList::find(QString txt)
+{
+  for (size_t row=0;row<files.size();++row)
+  {
+    if (files[row].fileName().contains(txt))
+    {
+      return createIndex(row,0);
+    }
+  }
+  return QModelIndex();
+}
+

@@ -1,5 +1,6 @@
 ﻿
 set(private_header_list
+  externaltoolslauncher.h
   filelist.h
   fitsimage.h
   fitsobject.h
@@ -25,6 +26,7 @@ set(private_header_list
   undostack.h
   dialogs/imageselectdialog.h
   dialogs/imageselectwidget.h
+  dialogs/pluginfilelistreturndialog.h
   dialogs/progressdialog.h
   dialogs/psfdialog.h
   dialogs/textinfodialog.h
@@ -70,6 +72,7 @@ set(private_header_list
   )
 
 add_library(fitsbase
+  externaltoolslauncher.cpp
   filelist.cpp
   fitsimage.cpp
   fitsobject.cpp
@@ -94,6 +97,7 @@ add_library(fitsbase
   dialogs/imageselectdialog.ui
   dialogs/imageselectwidget.cpp
   dialogs/imageselectwidget.ui
+  dialogs/pluginfilelistreturndialog.cpp dialogs/pluginfilelistreturndialog.ui
   dialogs/progressdialog.cpp
   dialogs/progressdialog.ui
   dialogs/psfdialog.cpp

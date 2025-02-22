@@ -57,6 +57,10 @@ public:
 
   bool load(const QString& filename);
 
+  bool append(const QString& filename);
+
+  QModelIndex find(QString txt);
+
 private:
   std::vector<QFileInfo> files;
 };

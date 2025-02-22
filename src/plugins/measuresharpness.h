@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - measure the sharpness of images                                     *
  *                                                                              *
- * modified: 2025-02-12                                                         *
+ * modified: 2025-02-21                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -30,6 +30,8 @@
 
 #define QT_STATICPLUGIN
 #include <QtPlugin>
+
+class MeasureSharpnessResultDialog;
 
 struct SharpnessData
 {
@@ -75,9 +77,9 @@ public:
 private:
   SharpnessData evaluate(const QFileInfo info, QRect selection);
   SharpnessData calculateSharpness(std::shared_ptr<FitsImage> img, QRect selection=QRect()) const;
-
   void copyToLog();
 
+  MeasureSharpnessResultDialog* resultDialog;
   std::vector<SharpnessData> results;
 
 };

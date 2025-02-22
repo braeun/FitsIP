@@ -77,3 +77,4 @@ void PSFWidget::on_functionBox_currentTextChanged(const QString &text)
   }
 }
 
+

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the log book                                      *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2025-02-22                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -291,7 +291,8 @@ void LogbookWidget::rebuildTree()
   ui->logbookTreeWidget->setHeaderLabels(header);
   ui->logbookTreeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
   QList<QTreeWidgetItem*> items;
-  for (const auto& e : logbook->getEntries(filter))
+  std::vector<LogbookEntry> entries = logbook->getEntries(filter,AppSettings().isLogbookLatestFirst());
+  for (const auto& e : entries)
   {
     QStringList columns;
     QString tag = e.getTypeString();
@@ -313,7 +314,7 @@ void LogbookWidget::rebuildTreeByDate()
   ui->logbookTreeWidget->setHeaderLabels(header);
   ui->logbookTreeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
   QList<QTreeWidgetItem*> items;
-  for (const auto& e : logbook->getEntries(filter))
+  for (const auto& e : logbook->getEntries(filter,AppSettings().isLogbookLatestFirst()))
   {
     QString tag = e.getTypeString();
     QString date = e.getTimestamp().date().toString(Qt::ISODate);
@@ -337,7 +338,7 @@ void LogbookWidget::rebuildTreeByProject()
   ui->logbookTreeWidget->setHeaderLabels(header);
   ui->logbookTreeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
   QList<QTreeWidgetItem*> items;
-  for (const auto& e : logbook->getEntries(filter))
+  for (const auto& e : logbook->getEntries(filter,AppSettings().isLogbookLatestFirst()))
   {
     QString tag = e.getTypeString();
     QStringList columns;
@@ -360,7 +361,7 @@ void LogbookWidget::rebuildTreeByProjectByDate()
   ui->logbookTreeWidget->setHeaderLabels(header);
   ui->logbookTreeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
   QList<QTreeWidgetItem*> items;
-  for (const auto& e : logbook->getEntries(filter))
+  for (const auto& e : logbook->getEntries(filter,AppSettings().isLogbookLatestFirst()))
   {
     QString tag = e.getTypeString();
     QString date = e.getTimestamp().date().toString(Qt::ISODate);
@@ -385,7 +386,7 @@ void LogbookWidget::rebuildTreeByProjectByStep()
   ui->logbookTreeWidget->setHeaderLabels(header);
   ui->logbookTreeWidget->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
   QList<QTreeWidgetItem*> items;
-  for (const auto& e : logbook->getEntries(filter))
+  for (const auto& e : logbook->getEntries(filter,AppSettings().isLogbookLatestFirst()))
   {
     QString tag = e.getTypeString();
     QStringList columns;

@@ -137,7 +137,7 @@ std::shared_ptr<FitsImage> FitsIO::read(QString filename)
 bool FitsIO::write(QString filename, std::shared_ptr<FitsImage> img)
 {
   Settings settings;
-  int32_t format = settings.getFitsImageFormat();
+  int format = settings.getFitsImageFormat();
   CCfits::FITS* fits = nullptr;
   try
   {

@@ -174,7 +174,9 @@ private:
 //  void display(int id);
   void updateDisplay();
   void updateMetadata();
+  void run(const QFileInfo& fileinfo);
   void open(const QFileInfo& fileinfo);
+  void openExternal(const QFileInfo& fileinfo);
   void openImage(const QFileInfo& fileinfo);
   void openSelection();
   void copySelectionToList();

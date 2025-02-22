@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-02-19                                                         *
+ * modified: 2025-02-22                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -33,8 +33,10 @@
 #include "dialogs/configurationdialog.h"
 #include "dialogs/editmetadatadialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
+#include <fitsbase/externaltoolslauncher.h>
 #include <fitsbase/filelist.h>
 #include <fitsbase/pixellist.h>
+#include <fitsbase/dialogs/pluginfilelistreturndialog.h>
 #include <fitsbase/io/iofactory.h>
 #include <fitsbase/logbook/xmllogbookstorage.h>
 #include <fitsbase/pluginfactory.h>
@@ -48,6 +50,7 @@
 #include <QListWidgetItem>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QProcess>
 #include <QSettings>
 #include <QThread>
 #include <QDebug>
@@ -95,6 +98,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   loadPlugins();
 
   connect(ui->fileSystemView,&FileSystemView::openFile,this,[this](QString file){open(QFileInfo(file));});
+  connect(ui->fileSystemView,&FileSystemView::runFile,this,[this](QString file){run(QFileInfo(file));});
   connect(ui->fileSystemView,&FileSystemView::openSelection,this,[this]{openSelection();});
   connect(ui->fileSystemView,&FileSystemView::copySelectionToFilelist,this,[this]{copySelectionToList();});
 
@@ -170,6 +174,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->actionActive,&QAction::toggled,&logbook,&Logbook::activate);
 
   connect(ui->actionLoad_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::load);
+  connect(ui->actionAppend_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::append);
   connect(ui->actionSave_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::save);
   connect(ui->actionLoad_Pixel_List,&QAction::triggered,ui->pixellistWidget,&PixelListWidget::load);
   connect(ui->actionSave_Pixel_List,&QAction::triggered,ui->pixellistWidget,&PixelListWidget::save);
@@ -222,6 +227,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
 #endif
   if (script)
   {
+    ui->actionRun_Script->setEnabled(true);
     connect(consoleWidget,&ConsoleWidget::consoleCommand,this,&MainWindow::runScriptCmd);
     setScriptOutput();
   }
@@ -366,6 +372,7 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
     if (imglist.empty() && filelist.empty())
     {
       QMessageBox::warning(this,QApplication::applicationDisplayName(),"Plugin requires a list of files!");
+      return;
     }
     else if (filelist.empty())
     {
@@ -377,7 +384,23 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
     }
     if (ret == OpPlugin::OK)
     {
-      if (!op->getFileList().empty() && selectedFileList) selectedFileList->setFiles(op->getFileList());
+      if (!op->getFileList().empty() && selectedFileList)
+      {
+        PluginFilelistReturnDialog d(this);
+        d.setListSize(op->getFileList().size());
+        d.exec();
+        switch (d.getAction())
+        {
+          case PluginFilelistReturnDialog::Ignore:
+            break;
+          case PluginFilelistReturnDialog::Append:
+            selectedFileList->addFiles(op->getFileList());
+            break;
+          case PluginFilelistReturnDialog::Replace:
+            selectedFileList->setFiles(op->getFileList());
+            break;
+        }
+      }
       if (op->createsNewImage())
       {
         for (auto img : op->getCreatedImages())
@@ -472,7 +495,23 @@ void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, 
       if (activeFile) activeFile->updateHistogram();
       updateDisplay();
     }
-    if (!op->getFileList().empty() && selectedFileList) selectedFileList->setFiles(op->getFileList());
+    if (!op->getFileList().empty() && selectedFileList)
+    {
+      PluginFilelistReturnDialog d(this);
+      d.setListSize(op->getFileList().size());
+      d.exec();
+      switch (d.getAction())
+      {
+        case PluginFilelistReturnDialog::Ignore:
+          break;
+        case PluginFilelistReturnDialog::Append:
+          selectedFileList->addFiles(op->getFileList());
+          break;
+        case PluginFilelistReturnDialog::Replace:
+          selectedFileList->setFiles(op->getFileList());
+          break;
+      }
+    }
   }
   else if (ret == OpPlugin::ERROR)
   {
@@ -580,13 +619,9 @@ void MainWindow::updateMetadata()
   }
 }
 
-void MainWindow::open(const QFileInfo &fileinfo)
+void MainWindow::run(const QFileInfo &fileinfo)
 {
-  if (IOFactory::getInstance()->isImage(fileinfo.absoluteFilePath()))
-  {
-    openImage(fileinfo);
-  }
-  else if (IOFactory::getInstance()->isScript(fileinfo.absoluteFilePath()))
+  if (IOFactory::getInstance()->isScript(fileinfo.absoluteFilePath()))
   {
     if (QMessageBox::question(this,"Execute Script","Really execute the script '"+fileinfo.fileName()+"'") == QMessageBox::Yes)
     {
@@ -597,9 +632,40 @@ void MainWindow::open(const QFileInfo &fileinfo)
   }
   else
   {
-    QMessageBox::information(this,QApplication::applicationDisplayName(),"Don't know how to open file '"+fileinfo.fileName()+"'");
+    QMessageBox::information(this,QApplication::applicationDisplayName(),"'"+fileinfo.fileName()+"' is not a known script file!");
   }
 }
+
+void MainWindow::open(const QFileInfo &fileinfo)
+{
+  if (IOFactory::getInstance()->isImage(fileinfo.absoluteFilePath()))
+  {
+    openImage(fileinfo);
+  }
+//  else if (IOFactory::getInstance()->isScript(fileinfo.absoluteFilePath()))
+//  {
+////    if (QMessageBox::question(this,"Execute Script","Really execute the script '"+fileinfo.fileName()+"'") == QMessageBox::Yes)
+////    {
+////      QSettings settings;
+////      settings.setValue(AppSettings::PATH_SCRIPT,fileinfo.absolutePath());
+////      runScriptFile(fileinfo);
+////    }
+//  }
+  else
+  {
+    openExternal(fileinfo);
+//    QMessageBox::information(this,QApplication::applicationDisplayName(),"Don't know how to open file '"+fileinfo.fileName()+"'");
+  }
+}
+
+void MainWindow::openExternal(const QFileInfo& file)
+{
+  if (!ExternalToolsLauncher().open(file))
+  {
+    QMessageBox::information(this,QApplication::applicationDisplayName(),"Don't know how to open file '"+file.fileName()+"'");
+  }
+}
+
 
 void MainWindow::openImage(const QFileInfo &fileinfo)
 {
@@ -1195,4 +1261,5 @@ void MainWindow::on_actionRun_Script_triggered()
     runScriptFile(info);
   }
 }
+
 

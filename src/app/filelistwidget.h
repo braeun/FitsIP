@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing a file list                                       *
  *                                                                              *
- * modified: 2025-02-19                                                         *
+ * modified: 2025-02-22                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -51,6 +51,8 @@ public:
 
   void load();
 
+  void append();
+
   int next();
 
   int previous();
@@ -67,6 +69,7 @@ private slots:
 
 private:
   void removeFiles();
+  void search();
 
   Ui::FileListWidget *ui;
   std::shared_ptr<FileList> fileList;

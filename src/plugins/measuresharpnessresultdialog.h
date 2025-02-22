@@ -44,14 +44,13 @@ public:
 
   void setResult(const std::vector<SharpnessData>& entries);
 
-  const std::vector<QFileInfo>& getFileList() const;
+  std::vector<QFileInfo> getFileList() const;
 
 signals:
   void writeToLogbook();
+  void fileListChanged();
 
 private slots:
-  void on_copyButton_clicked();
-
   void on_removeRowsButton_clicked();
 
   void on_saveButton_clicked();
@@ -61,7 +60,6 @@ private slots:
 private:
   Ui::MeasureSharpnessResultDialog *ui;
   std::vector<SharpnessData> entries;
-  std::vector<QFileInfo> filelist;
 };
 
 #endif // MEASURESHARPNESSRESULTDIALOG_H

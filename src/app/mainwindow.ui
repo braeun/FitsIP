@@ -377,6 +377,7 @@
       <string>File List</string>
      </property>
      <addaction name="actionLoad_File_List"/>
+     <addaction name="actionAppend_File_List"/>
      <addaction name="actionSave_File_List"/>
     </widget>
     <widget class="QMenu" name="menuPixel_List">
@@ -1352,13 +1353,19 @@
   </action>
   <action name="actionRun_Script">
    <property name="icon">
-    <iconset theme="system-run"/>
+    <iconset theme="system-run">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Run Script...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionAppend_File_List">
+   <property name="text">
+    <string>Append File List...</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

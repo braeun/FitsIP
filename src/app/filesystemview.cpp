@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the filesystem view and associated controls       *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2025-02-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -67,6 +67,8 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   connect(folderContextMenu->addAction("Rename Folder..."),&QAction::triggered,this,[this]{rename();});
   folderContextMenu->addSeparator();
   connect(folderContextMenu->addAction("Remove Folder(s)..."),&QAction::triggered,this,[this]{remove();});
+  folderContextMenu->addSeparator();
+  connect(folderContextMenu->addAction("Open in Filemanager"),&QAction::triggered,this,[this]{emit openFile(filesystemModel->filePath(contextIndex));});
 
   imageContextMenu = new QMenu(this);
   connect(imageContextMenu->addAction("Open Image(s)"),&QAction::triggered,this,[this]{emit openSelection();});
@@ -77,7 +79,8 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   connect(imageContextMenu->addAction("Remove File(s)..."),&QAction::triggered,this,[this]{remove();});
 
   scriptContextMenu = new QMenu(this);
-  connect(scriptContextMenu->addAction("Execute Script"),&QAction::triggered,this,[this]{if (QFileInfo(filesystemModel->filePath(contextIndex)).isFile()) emit openFile(filesystemModel->filePath(contextIndex));});
+  connect(scriptContextMenu->addAction("Execute Script"),&QAction::triggered,this,[this]{if (QFileInfo(filesystemModel->filePath(contextIndex)).isFile()) emit runFile(filesystemModel->filePath(contextIndex));});
+  connect(scriptContextMenu->addAction("Open File"),&QAction::triggered,this,[this]{if (QFileInfo(filesystemModel->filePath(contextIndex)).isFile()) emit openFile(filesystemModel->filePath(contextIndex));});
   scriptContextMenu->addSeparator();
   connect(scriptContextMenu->addAction("Rename File..."),&QAction::triggered,this,[this]{rename();});
   scriptContextMenu->addSeparator();
@@ -88,7 +91,7 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   fileContextMenu->addSeparator();
   connect(fileContextMenu->addAction("Remove File(s)..."),&QAction::triggered,this,[this]{remove();});
 
-  connect(ui->filesystemView,&QTreeView::doubleClicked,this,[this](const QModelIndex &index){if (QFileInfo(filesystemModel->filePath(index)).isFile()) emit openFile(filesystemModel->filePath(index));});
+  connect(ui->filesystemView,&QTreeView::doubleClicked,this,&FileSystemView::handleDoubleClick);
   connect(ui->filesystemView,&QTreeView::customContextMenuRequested,this,[this](const QPoint& pos){showContextMenu(pos);});
   connect(ui->setRootButton,&QAbstractButton::clicked,this,[this]{selectRoot();});
   connect(ui->rootField,&QLineEdit::returnPressed,this,[this]{rootChanged();});
@@ -252,6 +255,19 @@ void FileSystemView::remove()
     }
   }
 }
+
+void FileSystemView::handleDoubleClick(const QModelIndex &index)
+{
+  QFileInfo info(filesystemModel->filePath(index));
+  if (info.isFile())
+  {
+    if (IOFactory::getInstance()->isScript(info.fileName()))
+      emit runFile(info.absoluteFilePath());
+    else
+      emit openFile(info.absoluteFilePath());
+  }
+}
+
 
 void FileSystemView::filterChanged(const QString& text)
 {

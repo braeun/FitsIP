@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing a file list                                       *
  *                                                                              *
- * modified: 2025-02-19                                                         *
+ * modified: 2025-02-22                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #include "ui_filelistwidget.h"
 #include "appsettings.h"
 #include <fitsbase/filelist.h>
+#include <QInputDialog>
 #include <QMenu>
 
 FileListWidget::FileListWidget(QWidget *parent) :
@@ -35,16 +36,21 @@ FileListWidget::FileListWidget(QWidget *parent) :
   // ui->fileList->setModel(fileList);
   contextMenu = new QMenu();
   QAction* open = contextMenu->addAction("Open Selected");
-  connect(open,&QAction::triggered,[=](){emit openSelected();});
+  connect(open,&QAction::triggered,this,[this](){emit openSelected();});
   contextMenu->addSeparator();
   QAction* load = contextMenu->addAction("Load...");
   connect(load,&QAction::triggered,this,&FileListWidget::load);
+  QAction* append = contextMenu->addAction("Append...");
+  connect(append,&QAction::triggered,this,&FileListWidget::append);
   QAction* save = contextMenu->addAction("Save...");
   connect(save,&QAction::triggered,this,&FileListWidget::save);
   contextMenu->addSeparator();
+  QAction* search = contextMenu->addAction("Search...");
+  connect(search,&QAction::triggered,this,&FileListWidget::search);
+  contextMenu->addSeparator();
   QAction* remove = contextMenu->addAction("Remove Selected");
   connect(remove,&QAction::triggered,this,&FileListWidget::removeFiles);
-  contextMenu->addSeparator();
+//  contextMenu->addSeparator();
   QAction* clear = contextMenu->addAction("Clear");
   connect(clear,&QAction::triggered,this,&FileListWidget::clear);
 }
@@ -79,6 +85,19 @@ void FileListWidget::load()
     if (!fn.isNull())
     {
       fileList->load(fn);
+    }
+  }
+}
+
+void FileListWidget::append()
+{
+  if (fileList)
+  {
+    AppSettings settings;
+    QString fn = settings.getOpenFilename(this,AppSettings::PATH_FILELIST,"File list (*.lst);;All files (*)");
+    if (!fn.isNull())
+    {
+      fileList->append(fn);
     }
   }
 }
@@ -148,5 +167,19 @@ void FileListWidget::removeFiles()
     }
   }
   fileList->setFiles(filelist);
+}
+
+void FileListWidget::search()
+{
+  QString txt = QInputDialog::getText(this,"Search","Filename contains:");
+  if (!txt.isEmpty())
+  {
+    QModelIndex index = fileList->find(txt);
+    if (index.isValid())
+    {
+      ui->fileList->selectionModel()->select(index,QItemSelectionModel::ClearAndSelect);
+      ui->fileList->scrollTo(index);
+    }
+  }
 }
 

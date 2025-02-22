@@ -127,15 +127,31 @@ void Logbook::remove(int64_t id)
   }
 }
 
-std::vector<LogbookEntry> Logbook::getEntries() const
+std::vector<LogbookEntry> Logbook::getEntries(bool latestFirst) const
 {
-  if (store) return store->getEntries();
+  if (store)
+  {
+    auto entries = store->getEntries();
+    if (latestFirst)
+    {
+      std::sort(entries.begin(),entries.end(),[](const LogbookEntry& e1, const LogbookEntry &e2){return e2.getTimestamp()<e1.getTimestamp();});
+    }
+    return entries;
+  }
   return std::vector<LogbookEntry>();
 }
 
-std::vector<LogbookEntry> Logbook::getEntries(const LogbookFilter& filter) const
+std::vector<LogbookEntry> Logbook::getEntries(const LogbookFilter& filter, bool latestFirst) const
 {
-  if (store) return store->getEntries(filter);
+  if (store)
+  {
+    auto entries = store->getEntries(filter);
+    if (latestFirst)
+    {
+      std::sort(entries.begin(),entries.end(),[](const LogbookEntry& e1, const LogbookEntry &e2){return e2.getTimestamp()<e1.getTimestamp();});
+    }
+    return entries;
+  }
   return std::vector<LogbookEntry>();
 }
 
@@ -238,7 +254,7 @@ bool Logbook::exportPlainText(const QString &file)
   os << getDescription() << Qt::endl;
   os << Qt::endl;
   QDate lastDate;
-  for (const LogbookEntry& e : getEntries())
+  for (const LogbookEntry& e : getEntries(false))
   {
     if (e.getTimestamp().date() != lastDate)
     {

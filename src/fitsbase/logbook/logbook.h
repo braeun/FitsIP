@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2025-02-15                                                         *
+ * modified: 2025-02-22                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -77,9 +77,9 @@ public:
 
   void remove(int64_t id);
 
-  std::vector<LogbookEntry> getEntries() const;
+  std::vector<LogbookEntry> getEntries(bool latestFirst) const;
 
-  std::vector<LogbookEntry> getEntries(const LogbookFilter& filter) const;
+  std::vector<LogbookEntry> getEntries(const LogbookFilter& filter, bool latestFirst) const;
 
   const LogbookEntry& getLastEntry() const;
 
