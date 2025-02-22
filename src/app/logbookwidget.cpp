@@ -195,7 +195,10 @@ QTreeWidgetItem* LogbookWidget::addEntry(const LogbookEntry &e)
           << e.getProject() << e.getStep()
           << tag << e.getText() << QString::number(e.getId());
   QTreeWidgetItem* item = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr),columns);
-  ui->logbookTreeWidget->addTopLevelItem(item);
+  if (AppSettings().isLogbookLatestFirst())
+    ui->logbookTreeWidget->insertTopLevelItem(0,item);
+  else
+    ui->logbookTreeWidget->addTopLevelItem(item);
   return item;
 }
 

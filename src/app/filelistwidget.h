@@ -62,14 +62,13 @@ public:
 signals:
   void openSelected();
 
-private slots:
-  void on_fileList_customContextMenuRequested(const QPoint &pos);
-
-  void on_fileList_doubleClicked(const QModelIndex &index);
-
 private:
+  void contextMenuRequested(const QPoint &pos);
+  void doubleClicked(const QModelIndex &index);
   void removeFiles();
   void search();
+  void copySelectionToClipboard();
+  void copyFiles();
 
   Ui::FileListWidget *ui;
   std::shared_ptr<FileList> fileList;

@@ -24,6 +24,10 @@
 #include "ui_filelistwidget.h"
 #include "appsettings.h"
 #include <fitsbase/filelist.h>
+#include <QClipboard>
+#include <QDebug>
+#include <QDir>
+#include <QFileDialog>
 #include <QInputDialog>
 #include <QMenu>
 
@@ -32,11 +36,16 @@ FileListWidget::FileListWidget(QWidget *parent) :
   ui(new Ui::FileListWidget)
 {
   ui->setupUi(this);
-  // fileList = new FileList(this);
-  // ui->fileList->setModel(fileList);
+
+  connect(ui->fileList,&QListView::customContextMenuRequested,this,&FileListWidget::contextMenuRequested);
+  connect(ui->fileList,&QListView::doubleClicked,this,&FileListWidget::doubleClicked);
   contextMenu = new QMenu();
   QAction* open = contextMenu->addAction("Open Selected");
   connect(open,&QAction::triggered,this,[this](){emit openSelected();});
+  QAction* copyToClipboard = contextMenu->addAction("Copy Selection to Clipboard");
+  connect(copyToClipboard,&QAction::triggered,this,&FileListWidget::copySelectionToClipboard);
+  QAction* copyFiles = contextMenu->addAction("Copy Files...");
+  connect(copyFiles,&QAction::triggered,this,&FileListWidget::copyFiles);
   contextMenu->addSeparator();
   QAction* load = contextMenu->addAction("Load...");
   connect(load,&QAction::triggered,this,&FileListWidget::load);
@@ -146,12 +155,12 @@ std::vector<QFileInfo> FileListWidget::getSelection() const
 
 
 
-void FileListWidget::on_fileList_customContextMenuRequested(const QPoint &pos)
+void FileListWidget::contextMenuRequested(const QPoint &pos)
 {
   contextMenu->popup(ui->fileList->mapToGlobal(pos));
 }
 
-void FileListWidget::on_fileList_doubleClicked(const QModelIndex &index)
+void FileListWidget::doubleClicked(const QModelIndex &index)
 {
   emit openSelected();
 }
@@ -183,3 +192,47 @@ void FileListWidget::search()
   }
 }
 
+void FileListWidget::copySelectionToClipboard()
+{
+  QString txt = "";
+  for (int32_t row=0;row<fileList->rowCount();row++)
+  {
+    if (ui->fileList->selectionModel()->isRowSelected(row,QModelIndex()))
+    {
+      txt += fileList->getFiles()[row].absoluteFilePath();
+      txt += "\n";
+    }
+  }
+  QApplication::clipboard()->setText(txt);
+}
+
+void FileListWidget::copyFiles()
+{
+  std::vector<QFileInfo> filelist;
+  for (int32_t row=0;row<fileList->rowCount();row++)
+  {
+    if (ui->fileList->selectionModel()->isRowSelected(row,QModelIndex()))
+    {
+      filelist.push_back(fileList->getFiles()[row]);
+    }
+  }
+  if (!filelist.empty())
+  {
+    QSettings settings;
+    QString path = settings.value(AppSettings::PATH_LAST,QDir::homePath()).toString();
+    QString p = QFileDialog::getExistingDirectory(this,"Copy Files",path);
+    if (!p.isNull())
+    {
+      settings.setValue(AppSettings::PATH_LAST,p);
+      QDir dir(p);
+      for (const QFileInfo& info : filelist)
+      {
+        bool ret = QFile::copy(info.absoluteFilePath(),dir.absoluteFilePath(info.fileName()));
+        if (!ret)
+        {
+          qWarning() << "Failed to copy " << info.absoluteFilePath() << " to " << dir.absoluteFilePath(info.fileName());
+        }
+      }
+    }
+  }
+}

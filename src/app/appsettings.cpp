@@ -33,6 +33,7 @@ const char* AppSettings::PATH_FILELIST = "fits/path/filelist";
 const char* AppSettings::PATH_PIXELLIST = "fits/path/pixellist";
 const char* AppSettings::PATH_STARLIST = "fits/path/starlist";
 const char* AppSettings::PATH_PROFILE = "fits/path/profile";
+const char* AppSettings::PATH_LAST = "fits/path/last";
 
 static const char* FILE_FILTERS = "files/filter";
 static const char* FILE_CURRENT_FILTER = "files/currentfilter";
