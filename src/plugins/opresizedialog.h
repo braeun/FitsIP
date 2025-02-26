@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - resize image dialog                                                 *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-02-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,16 +37,22 @@ public:
   explicit OpResizeDialog(QWidget *parent = nullptr);
   ~OpResizeDialog();
 
-  int getMode();
+  void setCurrentSize(int w, int h);
 
-  int getFactor();
+  double getFactorX() const;
 
-  bool isNearestNeighborInterpolation();
+  double getFactorY() const;
 
-  bool isBilinearInterpolation();
+  bool isNoScaling() const;
+
+  bool isNearestNeighborInterpolation() const;
+
+  bool isBilinearInterpolation() const;
 
 private:
   Ui::OpResizeDialog *ui;
+  int currentWidth;
+  int currentHeight;
 };
 
 #endif // OPRESIZEDIALOG_H

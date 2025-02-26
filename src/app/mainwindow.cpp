@@ -303,7 +303,7 @@ QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
   QMenu* menu = nullptr;
   QMenu* lastmenu = nullptr;
   QList<QAction*> actions = ui->menubar->actions();
-  for (int32_t i=0;i<entries.size()-1;i++)
+  for (int i=0;i<entries.size()-1;i++)
   {
     for (QAction* a : actions)
     {
@@ -441,7 +441,7 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
 
 std::vector<QFileInfo> MainWindow::getFileList()
 {
-  int32_t src = -1;
+  int src = -1;
   QStringList files;
   if (ui->fileSystemView->isVisible())
   {
@@ -605,9 +605,9 @@ void MainWindow::updateMetadata()
     ui->metadataTable->item(3,0)->setText(metadata.telescope);
     ui->metadataTable->item(4,0)->setText(metadata.instrument);
     ui->metadataTable->item(5,0)->setText(QString::number(metadata.exposure));
-    int32_t first = ui->historyTable->rowCount();
+    int first = ui->historyTable->rowCount();
     ui->historyTable->setRowCount(metadata.history.size());
-    for (int32_t i=first;i<metadata.history.size();i++)
+    for (int i=first;i<metadata.history.size();i++)
     {
       ui->historyTable->setItem(i,0,new QTableWidgetItem(metadata.history[i]));
     }
@@ -780,7 +780,7 @@ void MainWindow::logPluginOperation(QString image, QString op)
   }
 }
 
-void MainWindow::zoom(int32_t z)
+void MainWindow::zoom(int z)
 {
   ui->scrollArea->setWidgetResizable(z==0);
   if (z == 0)
@@ -957,7 +957,7 @@ std::shared_ptr<FileList> MainWindow::getSelectedFileList() const
 
 
 
-void MainWindow::onImageScaleChanged(double min, double max, int32_t scale)
+void MainWindow::onImageScaleChanged(double min, double max, int scale)
 {
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
@@ -1107,14 +1107,18 @@ void MainWindow::on_actionClose_Image_triggered()
   {
     on_actionClose_All_Images_triggered();
   }
-  else
+  else if (ui->openFileList->currentIndex().isValid())
   {
-    int32_t row = ui->openFileList->currentIndex().row();
+    int row = ui->openFileList->currentIndex().row();
     imageCollection->removeActiveFile();
     if (static_cast<size_t>(row) >= imageCollection->getFiles().size()) row = imageCollection->getFiles().size() - 1;
     imageCollection->setActiveFile(row);
     ui->openFileList->setCurrentIndex(imageCollection->index(row,0,QModelIndex()));
     display(imageCollection->getActiveFile());
+  }
+  else
+  {
+    display(std::shared_ptr<FitsObject>());
   }
 }
 

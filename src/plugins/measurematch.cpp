@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to match two images                                          *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2025-02-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -145,7 +145,7 @@ void MeasureMatch::setTemplate(std::shared_ptr<FitsImage> image, QRect a)
   if (factor > 1)
   {
     OpResize op;
-    img = op.grow(image,factor,true);
+    img = op.growBilinear(image,factor,factor);
     aoi = QRect(aoi.x()*factor,aoi.y()*factor,aoi.width()*factor,aoi.height()*factor);
   }
   else
@@ -311,7 +311,7 @@ void MeasureMatch::createI(std::shared_ptr<FitsImage> image)
   if (factor > 1)
   {
     OpResize op;
-    img = op.grow(image,factor,true);
+    img = op.growBilinear(image,factor,factor);
   }
   else
   {

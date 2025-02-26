@@ -95,7 +95,7 @@ protected:
 private slots:
   void logPluginOperation(QString image, QString op);
 
-  void zoom(int32_t z);
+  void zoom(int z);
 
   void addPixel(QPoint p);
 
@@ -105,7 +105,7 @@ private slots:
 
   void on_actionMetadata_triggered();
 
-  void onImageScaleChanged(double min, double max, int32_t scale);
+  void onImageScaleChanged(double min, double max, int scale);
 
   void on_actionOpen_triggered();
 

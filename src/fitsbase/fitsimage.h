@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-02-09                                                         *
+ * modified: 2025-02-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -164,6 +164,19 @@ public:
    * @return the new sub image
    */
   std::shared_ptr<FitsImage> subImage(const QRect& r) const;
+
+  /**
+   * @brief Return this image resized to the new width and height.
+   *
+   * If the new width /height are larger than the current one, a empty border
+   * will be created. If they are smaller, the image will be cropped. IIn any
+   * case the center of the new image corresponds to the center of the original
+   * image.
+   * @param w the new width
+   * @param h the new height
+   * @return the resized image
+   */
+  std::shared_ptr<FitsImage> resizedImage(int w, int h) const;
 
   /**
    * @brief Return a gray scale image of this one.

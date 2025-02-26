@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-02-09                                                         *
+ * modified: 2025-02-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -251,6 +251,32 @@ std::shared_ptr<FitsImage> FitsImage::subImage(const QRect &r) const
   }
   return img;
 }
+
+std::shared_ptr<FitsImage> FitsImage::resizedImage(int w, int h) const
+{
+  auto img = std::make_shared<FitsImage>(name,w,h,getDepth());
+  int xoff = (w - width) / 2;
+  int yoff = (h - height) / 2;
+  for (int d=0;d<getDepth();d++)
+  {
+    int xs = xoff >= 0 ? 0 : -xoff;
+    int xd = xoff >= 0 ? xoff : 0;
+    int xcnt = xoff >= 0 ? width : w;
+    int ys = yoff >= 0 ? 0 : -yoff;
+    int yd = yoff >= 0 ? yoff : 0;
+    int lines = yoff >= 0 ? height : h;
+    ValueType* dst = img->getLayer(d)->getData() + yd * w + xd;
+    ValueType* src = getLayer(d)->getData() + ys * width + xs;
+    for (int i=0;i<lines;++i)
+    {
+      memcpy(dst,src,xcnt*sizeof(ValueType));
+      dst += w;
+      src += width;
+    }
+  }
+  return img;
+}
+
 
 std::shared_ptr<FitsImage> FitsImage::toGray()
 {

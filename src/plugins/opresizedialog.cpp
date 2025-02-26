@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - resize image dialog                                                 *
  *                                                                              *
- * modified: 2023-02-04                                                         *
+ * modified: 2025-02-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,11 +23,13 @@
 #include "opresizedialog.h"
 #include "ui_opresizedialog.h"
 
-OpResizeDialog::OpResizeDialog(QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::OpResizeDialog)
+OpResizeDialog::OpResizeDialog(QWidget *parent):QDialog(parent),
+  ui(new Ui::OpResizeDialog),
+  currentWidth(100),
+  currentHeight(100)
 {
   ui->setupUi(this);
+  connect(ui->keepAspectRatioBox,&QCheckBox::clicked,this,[this](bool checked){ui->yFactorSpinner->setDisabled(checked);});
 }
 
 OpResizeDialog::~OpResizeDialog()
@@ -35,22 +37,56 @@ OpResizeDialog::~OpResizeDialog()
   delete ui;
 }
 
-int OpResizeDialog::getMode()
+void OpResizeDialog::setCurrentSize(int w, int h)
 {
-  return ui->modeBox->currentIndex();
+  currentWidth = w;
+  currentHeight = h;
+  ui->widthField->setText(QString::number(currentWidth));
+  ui->heightField->setText(QString::number(currentHeight));
 }
 
-int OpResizeDialog::getFactor()
+
+
+double OpResizeDialog::getFactorX() const
 {
-  return ui->factorBox->value();
+  if (ui->factorButton->isChecked())
+  {
+    return ui->xFactorSpinner->value();
+  }
+  if (ui->widthField->text().isEmpty())
+  {
+    return 1.0;
+  }
+  double f = ui->widthField->text().toDouble() / currentWidth;
+  if (ui->keepAspectRatioBox->isChecked() && !ui->heightField->text().isEmpty())
+  {
+    double f1 = ui->heightField->text().toDouble() / currentHeight;
+    f = std::min(f,f1);
+  }
+  return f;
 }
 
-bool OpResizeDialog::isNearestNeighborInterpolation()
+double OpResizeDialog::getFactorY() const
+{
+  if (ui->keepAspectRatioBox->isChecked()) return getFactorX();
+  if (ui->factorButton->isChecked())
+  {
+    return ui->yFactorSpinner->value();
+  }
+  return ui->heightField->text().toDouble() / currentHeight;
+}
+
+bool OpResizeDialog::isNoScaling() const
+{
+  return ui->noScalingButton->isChecked();
+}
+
+bool OpResizeDialog::isNearestNeighborInterpolation() const
 {
   return ui->nearestNeighborButton->isChecked();
 }
 
-bool OpResizeDialog::isBilinearInterpolation()
+bool OpResizeDialog::isBilinearInterpolation() const
 {
   return ui->bilinearButton->isChecked();
 }
