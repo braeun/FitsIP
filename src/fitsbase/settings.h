@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-02-22                                                         *
+ * modified: 2025-02-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -113,6 +113,12 @@ public:
   void setLogbookLatestFirst(bool flag);
 
   bool isLogbookLatestFirst() const;
+
+  void setInternalDirectory(QString path);
+
+  QString getInternalDirectory() const;
+
+  QString getInternalPSFDirectory() const;
 
 
   static const char* PATH_IMAGE;    //!< key for fits image path

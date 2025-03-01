@@ -55,6 +55,7 @@ set(private_header_list
   math/filter/simplelowpassfilter.h
   psf/cosinebellpsf.h
   psf/gaussianpsf.h
+  psf/imagepsf.h
   psf/psf.h
   psf/psffactory.h
   profiling/profilerentry.h
@@ -130,6 +131,7 @@ add_library(fitsbase
   math/filter/simplelowpassfilter.cpp
   psf/cosinebellpsf.cpp
   psf/gaussianpsf.cpp
+  psf/imagepsf.cpp
   psf/psf.cpp
   psf/psffactory.cpp
   profiling/profilerentry.cpp

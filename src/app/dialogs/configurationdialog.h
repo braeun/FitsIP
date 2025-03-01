@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - configuration dialog                                                *
  *                                                                              *
- * modified: 2025-02-22                                                         *
+ * modified: 2025-02-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,7 +46,7 @@ public:
 private:
   void commitFields(AppSettings& settings);
   void updateFields(const AppSettings& settings);
-  void browse(QLineEdit* field);
+  void browse(QLineEdit* field, QString path);
 
   Ui::ConfigurationDialog *ui;
 };

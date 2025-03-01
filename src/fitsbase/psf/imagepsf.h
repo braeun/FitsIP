@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - dialog to create a test image fom a PSF                             *
+ * FitsIP - image based point-spread-function                                   *
  *                                                                              *
- * modified: 2023-02-03                                                         *
+ * modified: 2025-02-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,44 +20,29 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "psftestimagedialog.h"
-#include "ui_psftestimagedialog.h"
+#ifndef IMAGEPSF_H
+#define IMAGEPSF_H
 
-PSFTestImageDialog::PSFTestImageDialog(QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::PSFTestImageDialog)
+#include "psf.h"
+#include "../fitsimage.h"
+
+class ImagePSF: public PSF
 {
-  ui->setupUi(this);
-}
+public:
+  ImagePSF(QString filename);
+  virtual ~ImagePSF();
 
-PSFTestImageDialog::~PSFTestImageDialog()
-{
-  delete ui;
-}
+  virtual QString getName() const override;
 
-QString PSFTestImageDialog::getFunction() const
-{
-  return ui->psfWidget->getFunction();
-}
+  virtual void init() override;
 
-std::vector<ValueType> PSFTestImageDialog::getParameters() const
-{
-  return ui->psfWidget->getParameters();
-}
+  virtual std::shared_ptr<FitsImage> createPSF(int w, int h, const std::vector<ValueType>& par) const override;
 
-int PSFTestImageDialog::getWidth() const
-{
-  return ui->widthBox->value();
-}
+  virtual std::shared_ptr<FitsImage> createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const override;
 
-int PSFTestImageDialog::getHeight() const
-{
-  return  ui->heightBox->value();
-}
+private:
+  QString filename;
+  std::shared_ptr<FitsImage> img;
+};
 
-double PSFTestImageDialog::getAmplitude() const
-{
-  return ui->amplitudeField->text().toDouble();
-}
-
-
+#endif // IMAGEPSF_H

@@ -101,12 +101,14 @@ if (FFTW_FOUND)
   list(APPEND plugin_headers
     lucyrichardsondeconvolution.h
     opfft.h
+    opfftconvolution.h
     opinvfft.h
     vancittertdeconvolution.h
     )
   list(APPEND plugin_sources
     lucyrichardsondeconvolution.cpp
     opfft.cpp
+    opfftconvolution.cpp
     opinvfft.cpp
     vancittertdeconvolution.cpp
     )
@@ -133,6 +135,7 @@ set(private_header_list
   opcombinechannelsdialog.h
   opcropdialog.h
   opddpdialog.h
+  opfftconvolutiondialog.h
   opgaussblurdialog.h
 #  opgrowdialog.h
   opkerneldialog.h
@@ -161,6 +164,7 @@ add_library(fitsplugins
   opcombinechannelsdialog.cpp opcombinechannelsdialog.ui
   opcropdialog.cpp opcropdialog.ui
   opddpdialog.cpp opddpdialog.ui
+  opfftconvolutiondialog.cpp opfftconvolutiondialog.ui
   opgaussblurdialog.cpp opgaussblurdialog.ui
 #  opgrowdialog.cpp opgrowdialog.ui
   opkerneldialog.cpp opkerneldialog.ui

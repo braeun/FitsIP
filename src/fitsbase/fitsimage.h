@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-02-26                                                         *
+ * modified: 2025-03-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -49,6 +49,8 @@ public:
   ValueType* getData();
 
   const ValueType* getData() const;
+
+  void blit(Layer* layer, int x, int y, int w, int h, int xd, int yd);
 
 private:
   int width;
@@ -177,6 +179,8 @@ public:
    * @return the resized image
    */
   std::shared_ptr<FitsImage> resizedImage(int w, int h) const;
+
+  void blit(FitsImage* src, int x, int y, int w, int h, int xd, int yd);
 
   /**
    * @brief Return a gray scale image of this one.

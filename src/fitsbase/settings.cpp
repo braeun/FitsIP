@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-02-22                                                         *
+ * modified: 2025-02-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -32,6 +32,8 @@ const char* Settings::PATH_EXPORT = "fits/path/export";
 const char* Settings::PATH_LOGBOOK = "fits/path/logbook";
 
 const char* Settings::PATH_SCRIPT = "fits/path/script";
+
+static const char* PATH_INTERNAL = "fits/path/internal";
 
 static const char* PREVIEW_WIDTH = "fits/preview/width";
 static const char* PREVIEW_HEIGHT = "fits/preview/height";
@@ -183,5 +185,43 @@ bool Settings::isLogbookLatestFirst() const
   return settings.value(LOGBOOK_LATEST_FIRST,false).toBool();
 }
 
+void Settings::setInternalDirectory(QString path)
+{
+  settings.setValue(PATH_INTERNAL,path);
+}
 
+QString Settings::getInternalDirectory() const
+{
+  QString path = settings.value(PATH_INTERNAL,"").toString();
+  if (path.isEmpty())
+  {
+    path = QDir::home().absoluteFilePath(".fitsip");
+  }
+  QFileInfo info(path);
+  if (info.exists())
+  {
+    if (!info.isDir())
+    {
+      QFile::remove(path);
+    }
+  }
+  if (!info.exists())
+  {
+    if (!QDir(path).mkpath(path))
+    {
+      path = QDir::homePath();
+    }
+  }
+  return path;
+}
+
+QString Settings::getInternalPSFDirectory() const
+{
+  QFileInfo info(getInternalDirectory()+"/psf");
+  if (!info.exists())
+  {
+    QDir(getInternalDirectory()).mkpath("psf");
+  }
+  return info.absoluteFilePath();
+}
 

@@ -50,6 +50,10 @@ public:
   int getGreenValue(int n) const    { return ((n >= 0 && n < bin) ? (data[2])[n] : 0); }
   int getBlueValue(int n) const     { return ((n >= 0 && n < bin) ? (data[3])[n] : 0); }
   int getValue(int i, int n) const  { return ((n >= 0 && n < bin) ? (data[i])[n] : 0); }
+  ValueType getBrightness() const   { return brightness[0]; }
+  ValueType getRedBrightness() const   { return brightness[1]; }
+  ValueType getGreenBrightness() const   { return brightness[2]; }
+  ValueType getBlueBrightness() const   { return brightness[3]; }
 
   /**
    * @brief Clear histogram
@@ -112,6 +116,7 @@ public:
   std::vector<int> data[4]; /* 4 histograms: [0] = gray level; [1] = red; [2] = green; [3] = blue */
   ValueType min;    /* minimum bin */
   ValueType max;    /* maximum bin */
+  ValueType brightness[4]; /* integral of all pixel values: [0] = gray level; [1] = red; [2] = green; [3] = blue */
 };
 
 /*
@@ -121,6 +126,7 @@ inline void Histogram::inc(ValueType v)
 {
   int n = static_cast<int>((v - min) / (max - min) * bin);
   if (n >= 0 && n < bin) (data[0])[n]++;
+  brightness[0] += v;
 }
 
 /*
@@ -130,10 +136,13 @@ inline void Histogram::inc(const RGBValue &rgb)
 {
   int n = static_cast<int>((rgb.r - min) / (max - min) * bin);
   if (n >= 0 && n < bin) (data[1])[n]++;
+  brightness[1] += rgb.r;
   n = static_cast<int>((rgb.g - min) / (max - min) * bin);
   if (n >= 0 && n < bin) (data[2])[n]++;
+  brightness[2] += rgb.g;
   n = static_cast<int>((rgb.b - min) / (max - min) * bin);
   if (n >= 0 && n < bin) (data[3])[n]++;
+  brightness[3] += rgb.b;
 }
 
 

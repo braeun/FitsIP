@@ -161,6 +161,8 @@ private slots:
 
   void on_actionRun_Script_triggered();
 
+  void on_actionSave_As_PSF_triggered();
+
 private:
 
   enum SelectionMode { None, SelectPixel };

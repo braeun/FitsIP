@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-02-26                                                         *
+ * modified: 2025-03-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -53,6 +53,46 @@ void Layer::setData(std::valarray<ValueType> &d)
     *p++ = d[i];
   }
 }
+
+void Layer::blit(Layer* layer, int x, int y, int w, int h, int xd, int yd)
+{
+  if (x < 0)
+  {
+    w += x;
+    xd -= x;
+    x = 0;
+  }
+  if (x + w > layer->width) w = layer->width - x;
+  if (y < 0)
+  {
+    h += y;
+    yd -= y;
+    y = 0;
+  }
+  if (y + h > layer->height) h = layer->height - y;
+  if (xd < 0)
+  {
+    w += xd;
+    x -= xd;
+    xd = 0;
+  }
+  if (yd < 0)
+  {
+    h += yd;
+    y -= yd;
+    yd = 0;
+  }
+  if (w < 0 || h < 0) throw std::invalid_argument("cannot blit as resulting area would have negative width and/or height");
+  for (int j=0;j<h;j++)
+  {
+    ValueType* src = layer->data + y * layer->width + x;
+    ValueType* dst = data + yd * width + xd;
+    memcpy(dst,src,w*sizeof(ValueType));
+    ++y;
+    ++yd;
+  }
+}
+
 
 
 
@@ -276,6 +316,17 @@ std::shared_ptr<FitsImage> FitsImage::resizedImage(int w, int h) const
   }
   return img;
 }
+
+void FitsImage::blit(FitsImage* src, int x, int y, int w, int h, int xd, int yd)
+{
+  for (int d=0;d<getDepth();++d)
+  {
+    int sd = d;
+    if (sd >= src->getDepth()) sd = src->getDepth() - 1;
+    layers[d]->blit(src->layers[sd].get(),x,y,w,h,xd,yd);
+  }
+}
+
 
 
 std::shared_ptr<FitsImage> FitsImage::toGray()

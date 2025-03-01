@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - configuration dialog                                                *
  *                                                                              *
- * modified: 2025-02-22                                                         *
+ * modified: 2025-02-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,6 +28,8 @@
 #include <QStyleFactory>
 #include <QSettings>
 
+const char* bindir = "/usr/bin";
+
 ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
   QDialog(parent),
   ui(new Ui::ConfigurationDialog)
@@ -40,10 +42,11 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
   }
   AppSettings settings;
   updateFields(settings);
-  connect(ui->browseFileManagerButton,&QPushButton::clicked,this,[this](){browse(ui->fileManagerField);});
-  connect(ui->browseScriptEditorButton,&QPushButton::clicked,this,[this](){browse(ui->scriptEditorField);});
-  connect(ui->browseTextEditorButton,&QPushButton::clicked,this,[this](){browse(ui->textEditorField);});
-  connect(ui->browseOfficeButton,&QPushButton::clicked,this,[this](){browse(ui->officeTextEditorField);});
+  connect(ui->browseFileManagerButton,&QPushButton::clicked,this,[this](){browse(ui->fileManagerField,bindir);});
+  connect(ui->browseScriptEditorButton,&QPushButton::clicked,this,[this](){browse(ui->scriptEditorField,bindir);});
+  connect(ui->browseTextEditorButton,&QPushButton::clicked,this,[this](){browse(ui->textEditorField,bindir);});
+  connect(ui->browseOfficeButton,&QPushButton::clicked,this,[this](){browse(ui->officeTextEditorField,bindir);});
+  connect(ui->browseInternalButton,&QPushButton::clicked,this,[this](){browse(ui->internalDirectoryField,AppSettings().getInternalDirectory());});
 }
 
 ConfigurationDialog::~ConfigurationDialog()
@@ -68,6 +71,7 @@ void ConfigurationDialog::commitFields(AppSettings &settings)
     settings.setFitsImageFormat(0);
   else
     settings.setFitsImageFormat(1);
+  settings.setInternalDirectory(ui->internalDirectoryField->text());
   settings.setLogbookLogOpen(ui->logLoadingBox->isChecked());
   settings.setLogbookOpenLast(ui->openLastLogBox->isChecked());
   settings.setLogbookLatestFirst(ui->showLatestFirstBox->isChecked());
@@ -101,6 +105,7 @@ void ConfigurationDialog::updateFields(const AppSettings &settings)
       ui->fitsFloatButton->setChecked(true);
       break;
   }
+  ui->internalDirectoryField->setText(settings.getInternalDirectory());
   ui->logLoadingBox->setChecked(settings.isLogbookLogOpen());
   ui->openLastLogBox->setChecked(settings.isLogbookOpenLast());
   ui->showLatestFirstBox->setChecked(settings.isLogbookLatestFirst());
@@ -112,9 +117,9 @@ void ConfigurationDialog::updateFields(const AppSettings &settings)
   ui->textEditorField->setText(settings.getTool(Settings::TextEditor));
 }
 
-void ConfigurationDialog::browse(QLineEdit* field)
+void ConfigurationDialog::browse(QLineEdit* field, QString path)
 {
-  QString filename = QFileDialog::getOpenFileName(this,QApplication::applicationDisplayName(),"/usr/bin");
+  QString filename = QFileDialog::getOpenFileName(this,QApplication::applicationDisplayName(),path);
   if (!filename.isNull())
   {
     field->setText(filename);

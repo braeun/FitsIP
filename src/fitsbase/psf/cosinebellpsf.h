@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - cosine bell shaped point-spread-function                            *
  *                                                                              *
- * modified: 2023-02-03                                                         *
+ * modified: 2025-02-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *

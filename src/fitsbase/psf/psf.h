@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for point-spread-functions                       *
  *                                                                              *
- * modified: 2023-01-07                                                         *
+ * modified: 2025-02-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -38,7 +38,9 @@ public:
 
   virtual QString getName() const = 0;
 
-  virtual ValueType value(ValueType x, ValueType y, const std::vector<ValueType>& par) const = 0;
+  virtual void init();
+
+  virtual ValueType value(ValueType x, ValueType y, const std::vector<ValueType>& par) const;
 
   /**
    * @brief Create a fits image of the point-spread-function suitable for (de)convolution.
@@ -51,7 +53,7 @@ public:
    * @param par parameters for the psf
    * @return the image
    */
-  virtual std::shared_ptr<FitsImage> createPSF(uint32_t w, uint32_t h, const std::vector<ValueType>& par) const;
+  virtual std::shared_ptr<FitsImage> createPSF(int w, int h, const std::vector<ValueType>& par) const;
 
   /**
    * @brief Create a fits image with the point-spread-function suitable for display.
@@ -62,9 +64,9 @@ public:
    * @param par parameters for the psf
    * @return the image
    */
-  virtual std::shared_ptr<FitsImage> createPSFForDisplay(uint32_t w, uint32_t h, const std::vector<ValueType>& par) const;
+  virtual std::shared_ptr<FitsImage> createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const;
 
-  virtual std::vector<QString> getParameterNames() const = 0;
+  virtual std::vector<QString> getParameterNames() const;
 
 };
 

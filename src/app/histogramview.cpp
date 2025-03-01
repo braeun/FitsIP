@@ -31,12 +31,20 @@
 #include <qwt_plot_picker.h>
 #include <QDebug>
 
+static const int sliderrange = 1000;
+
 HistogramView::HistogramView(QWidget *parent):QWidget(parent),
   ui(new Ui::HistogramView),
-  updating(false)
+  updating(false),
+  histmin(0),
+  histmax(0)
 {
   ui->setupUi(this);
+  ui->scalingSlider->setMinimum(0);
+  ui->scalingSlider->setMaximum(sliderrange);
   ui->scalingSlider->setHandleMovementMode(QxtSpanSlider::NoCrossing);
+  ui->scalingSlider->setTickInterval(sliderrange/10);
+  ui->scalingSlider->setTickPosition(QSlider::TicksBelow);
   connect(ui->scalingSlider,&QxtSpanSlider::spanChanged,this,&HistogramView::spanChanged);
 
   ui->forAllButton->setChecked(AppSettings().isImageScaleForAll());
@@ -68,6 +76,10 @@ HistogramView::HistogramView(QWidget *parent):QWidget(parent),
   plotPicker->setRubberBandPen(palette().color(QPalette::WindowText));
   QwtPickerMachine* pickerMachine = new QwtPickerTrackerMachine();
   plotPicker->setStateMachine(pickerMachine);
+
+  connect(ui->imageMinIntensity,&QLineEdit::returnPressed,this,&HistogramView::changeIntensity);
+  connect(ui->imageMaxIntensity,&QLineEdit::returnPressed,this,&HistogramView::changeIntensity);
+  connect(ui->imageScaleBox,&QComboBox::currentTextChanged,this,&HistogramView::changeIntensity);
 }
 
 HistogramView::~HistogramView()
@@ -84,21 +96,30 @@ void HistogramView::setImage(std::shared_ptr<FitsObject> obj)
   if (image)
   {
     auto hist = image->getHistogram();
-    double min = hist.getMin();
-    double max = hist.getMax();
+    double min,max;
     if (keepscaling)
     {
       min = minMarker->xValue(); //std::max(min,minMarker->xValue());
       max = maxMarker->xValue(); //std::min(max,maxMarker->xValue());
+      histmin = std::min((double)hist.getMin(),min);
+      histmax = std::max((double)hist.getMax(),max);
     }
+    else
+    {
+      histmin = hist.getMin();
+      histmax = hist.getMax();
+      min = histmin;
+      max = histmax;
+    }
+    if (histmin == histmax) histmax += 1.0;
     minMarker->setXValue(min);
     maxMarker->setXValue(max);
     ui->imageMinIntensity->setText(QString::number(min));
     ui->imageMaxIntensity->setText(QString::number(max));
-    ui->scalingSlider->setMinimum(std::min((double)hist.getMin(),min));
-    ui->scalingSlider->setMaximum(std::max((double)hist.getMax(),max));
-    ui->scalingSlider->setLowerValue(min);
-    ui->scalingSlider->setUpperValue(max);
+//    ui->scalingSlider->setMinimum(std::min((double)hist.getMin(),min));
+//    ui->scalingSlider->setMaximum(std::max((double)hist.getMax(),max));
+    ui->scalingSlider->setLowerValue(toSlider(min));
+    ui->scalingSlider->setUpperValue(toSlider(max));
   }
   ui->chartWidget->setAxisAutoScale(QwtPlot::yLeft,true);
   ui->chartWidget->setAxisAutoScale(QwtPlot::xBottom,true);
@@ -160,19 +181,19 @@ void HistogramView::spanChanged(int min, int max)
 {
   if (!updating)
   {
-    ui->imageMinIntensity->setText(QString::number(min));
-    ui->imageMaxIntensity->setText(QString::number(max));
-    on_imageMinIntensity_returnPressed();
+    ui->imageMinIntensity->setText(QString::number(fromSlider(min)));
+    ui->imageMaxIntensity->setText(QString::number(fromSlider(max)));
+    changeIntensity();
   }
 }
 
-void HistogramView::on_imageMinIntensity_returnPressed()
+void HistogramView::changeIntensity()
 {
   updating = true;
   double min = ui->imageMinIntensity->text().toDouble();
   double max = ui->imageMaxIntensity->text().toDouble();
-  ui->scalingSlider->setLowerValue(min);
-  ui->scalingSlider->setUpperValue(max);
+  ui->scalingSlider->setLowerValue(toSlider(min));
+  ui->scalingSlider->setUpperValue(toSlider(max));
   minMarker->setXValue(min);
   maxMarker->setXValue(max);
   ui->chartWidget->replot();
@@ -181,12 +202,13 @@ void HistogramView::on_imageMinIntensity_returnPressed()
   emit imageScaleChanged(min,max,scale);
 }
 
-void HistogramView::on_imageMaxIntensity_returnPressed()
+int HistogramView::toSlider(double v)
 {
-  on_imageMinIntensity_returnPressed();
+  return static_cast<int>((v - histmin)/(histmax-histmin) * sliderrange);
 }
 
-void HistogramView::on_imageScaleBox_currentIndexChanged(int index)
+double HistogramView::fromSlider(int v)
 {
-  on_imageMinIntensity_returnPressed();
+  return static_cast<double>(v) / sliderrange * (histmax - histmin) + histmin;
 }
+

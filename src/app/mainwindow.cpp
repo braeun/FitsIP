@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-02-22                                                         *
+ * modified: 2025-02-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -39,6 +39,7 @@
 #include <fitsbase/dialogs/pluginfilelistreturndialog.h>
 #include <fitsbase/io/iofactory.h>
 #include <fitsbase/logbook/xmllogbookstorage.h>
+#include <fitsbase/psf/psffactory.h>
 #include <fitsbase/pluginfactory.h>
 #include <fitsbase/widgets/previewoptions.h>
 #include <QActionGroup>
@@ -48,6 +49,7 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QListWidgetItem>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QProcess>
@@ -1266,4 +1268,25 @@ void MainWindow::on_actionRun_Script_triggered()
   }
 }
 
+void MainWindow::on_actionSave_As_PSF_triggered()
+{
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
+  if (activeFile == nullptr)
+  {
+    QMessageBox::warning(this,"Save as PSF","No current image displayed!");
+    return;
+  }
+  QString name = QInputDialog::getText(this,"Save as PSF","Name:");
+  if (!name.isEmpty())
+  {
+    SimpleProfiler profiler("SavePSF");
+    profiler.start();
+    bool ret = PSFFactory::getInstance()->addPSF(activeFile->getImage(),name);
+    profiler.stop();
+    if (!ret)
+    {
+      QMessageBox::critical(this,"Save as PSF","Failed to save image as PSF!");
+    }
+  }
+}
 

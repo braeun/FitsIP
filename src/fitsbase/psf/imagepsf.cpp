@@ -1,6 +1,6 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - create a test image from a PSF                                      *
+ * FitsIP - image based point-spread-function                                   *
  *                                                                              *
  * modified: 2025-03-01                                                         *
  *                                                                              *
@@ -20,71 +20,55 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "psftestimage.h"
-#include "psftestimagedialog.h"
-#include <fitsbase/fitsimage.h>
-#include <fitsbase/psf/psffactory.h>
+#include "imagepsf.h"
+#include "../io/iofactory.h"
+#include <QFileInfo>
 
-PSFTestImage::PSFTestImage():
-  dlg(nullptr)
+ImagePSF::ImagePSF(QString filename):PSF(),
+  filename(filename)
 {
 }
 
-PSFTestImage::~PSFTestImage()
+ImagePSF::~ImagePSF()
 {
 }
 
-bool PSFTestImage::requiresImage() const
+QString ImagePSF::getName() const
 {
-  return false;
+  return QFileInfo(filename).baseName();
 }
 
-bool PSFTestImage::requiresFileList() const
+void ImagePSF::init()
 {
-  return false;
-}
-
-bool PSFTestImage::createsNewImage() const
-{
-  return true;
-}
-
-std::vector<std::shared_ptr<FitsObject>> PSFTestImage::getCreatedImages() const
-{
-  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
-}
-
-
-QString PSFTestImage::getMenuEntry() const
-{
-  return "Image/Test Images/PSF...";
-}
-
-OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
-{
-  if (!dlg)
+  if (!img)
   {
-    dlg = new PSFTestImageDialog();
-  }
-  if (dlg->exec())
-  {
-    img = std::make_shared<FitsImage>(dlg->getFunction(),dlg->getWidth(),dlg->getHeight());
-    ValueType a = dlg->getAmplitude();
-    std::vector<ValueType> par = dlg->getParameters();
-    auto psf = PSFFactory::getInstance()->getPSF(dlg->getFunction());
-    if (psf)
+    IOHandler* handler = IOFactory::getInstance()->getHandler(filename);
+    if (handler)
     {
-      img = psf->createPSFForDisplay(dlg->getWidth(),dlg->getHeight(),par);
-      *img *= a;
-      emit logOperation("New Image","Created test image for "+dlg->getFunction());
-      return OK;
+      img = handler->read(filename);
     }
-    else
+    if (!img)
     {
-      setError("Internal Error: PSF '"+dlg->getFunction()+"' not found!");
-      return ERROR;
+      img = std::make_shared<FitsImage>(getName(),50,50);
     }
   }
-  return CANCELLED;
 }
 
+std::shared_ptr<FitsImage> ImagePSF::createPSF(int w, int h, const std::vector<ValueType>& par) const
+{
+  auto dst = std::make_shared<FitsImage>("",w,h,img->getDepth());
+  int iw2 = img->getWidth() / 2;
+  int iwodd = (img->getWidth() % 2);
+  int ih2 = img->getHeight() / 2;
+  int ihodd = (img->getHeight() % 2);
+  dst->blit(img.get(),iw2,ih2,iw2+iwodd,ih2+ihodd,0,0);
+  dst->blit(img.get(),0,0,iw2,ih2,dst->getWidth()-iw2,dst->getHeight()-ih2);
+  dst->blit(img.get(),0,ih2,iw2,ih2+ihodd,dst->getWidth()-iw2,0);
+  dst->blit(img.get(),iw2,0,iw2+iwodd,ih2,0,dst->getHeight()-ih2);
+  return dst;
+}
+
+std::shared_ptr<FitsImage> ImagePSF::createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const
+{
+  return img;//->resizedImage(w,h);
+}

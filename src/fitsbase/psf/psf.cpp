@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for point-spread-functions                       *
  *                                                                              *
- * modified: 2023-02-03                                                         *
+ * modified: 2025-02-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -31,15 +31,24 @@ PSF::~PSF()
 {
 }
 
-std::shared_ptr<FitsImage> PSF::createPSF(uint32_t w, uint32_t h, const std::vector<ValueType>& par) const
+void PSF::init()
+{
+}
+
+ValueType PSF::value(ValueType x, ValueType y, const std::vector<ValueType>& par) const
+{
+  return 0;
+}
+
+std::shared_ptr<FitsImage> PSF::createPSF(int w, int h, const std::vector<ValueType>& par) const
 {
   auto img = std::make_shared<FitsImage>(getName(),w,h);
   ValueType sum = 0;
-  for (uint32_t y=0;y<img->getHeight();y++)
+  for (int y=0;y<img->getHeight();y++)
   {
     ValueType yv = y < h/2 ? y : h - y;
     PixelIterator it = img->getPixelIterator(0,y);
-    for (uint32_t x=0;x<img->getWidth();x++)
+    for (int x=0;x<img->getWidth();x++)
     {
       ValueType xv = x < w/2 ? x : w - x;
       it[0] = value(xv,yv,par);
@@ -51,14 +60,14 @@ std::shared_ptr<FitsImage> PSF::createPSF(uint32_t w, uint32_t h, const std::vec
   return img;
 }
 
-std::shared_ptr<FitsImage> PSF::createPSFForDisplay(uint32_t w, uint32_t h, const std::vector<ValueType>& par) const
+std::shared_ptr<FitsImage> PSF::createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const
 {
   auto img = std::make_shared<FitsImage>(getName(),w,h);
   PixelIterator it = img->getPixelIterator();
-  for (uint32_t y=0;y<img->getHeight();y++)
+  for (int y=0;y<img->getHeight();y++)
   {
     ValueType yv = y - img->getHeight() / 2.0;
-    for (uint32_t x=0;x<img->getWidth();x++)
+    for (int x=0;x<img->getWidth();x++)
     {
       ValueType xv = x - img->getWidth() / 2.0;
       it[0] = value(xv,yv,par);
@@ -66,6 +75,11 @@ std::shared_ptr<FitsImage> PSF::createPSFForDisplay(uint32_t w, uint32_t h, cons
     }
   }
   return img;
+}
+
+std::vector<QString> PSF::getParameterNames() const
+{
+  return std::vector<QString>();
 }
 
 

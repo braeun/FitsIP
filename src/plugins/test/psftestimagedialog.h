@@ -49,10 +49,6 @@ public:
 
   double getAmplitude() const;
 
-  double getCenterX() const;
-
-  double getCenterY() const;
-
 private:
   Ui::PSFTestImageDialog *ui;
 };

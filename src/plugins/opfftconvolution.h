@@ -1,6 +1,6 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - create a test image from a PSF                                      *
+ * FitsIP - convolve an image using FFT                                         *
  *                                                                              *
  * modified: 2025-03-01                                                         *
  *                                                                              *
@@ -20,71 +20,40 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "psftestimage.h"
-#include "psftestimagedialog.h"
-#include <fitsbase/fitsimage.h>
-#include <fitsbase/psf/psffactory.h>
+#ifndef OPFFTCONVOLUTION_H
+#define OPFFTCONVOLUTION_H
 
-PSFTestImage::PSFTestImage():
-  dlg(nullptr)
+#include <fitsbase/opplugin.h>
+#include <QObject>
+
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
+class PSF;
+class OpFFTConvolutionDialog;
+
+class OpFFTConvolution: public OpPlugin
 {
-}
+  Q_OBJECT
+  Q_PLUGIN_METADATA(IID OpPlugin_iid)
+  Q_INTERFACES(OpPlugin)
+public:
+  OpFFTConvolution();
+  virtual ~OpFFTConvolution() override;
 
-PSFTestImage::~PSFTestImage()
-{
-}
+  virtual QString getMenuEntry() const override;
 
-bool PSFTestImage::requiresImage() const
-{
-  return false;
-}
+#ifdef USE_PYTHON
+  virtual void bindPython(void* m) const override;
+#endif
 
-bool PSFTestImage::requiresFileList() const
-{
-  return false;
-}
+  virtual ResultType execute(std::shared_ptr<FitsObject> image, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
 
-bool PSFTestImage::createsNewImage() const
-{
-  return true;
-}
+  std::shared_ptr<FitsImage> fftconvolution(FitsImage* img, const PSF* psf, const std::vector<ValueType>& par) const;
 
-std::vector<std::shared_ptr<FitsObject>> PSFTestImage::getCreatedImages() const
-{
-  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
-}
+private:
+  OpFFTConvolutionDialog* dlg;
 
+};
 
-QString PSFTestImage::getMenuEntry() const
-{
-  return "Image/Test Images/PSF...";
-}
-
-OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
-{
-  if (!dlg)
-  {
-    dlg = new PSFTestImageDialog();
-  }
-  if (dlg->exec())
-  {
-    img = std::make_shared<FitsImage>(dlg->getFunction(),dlg->getWidth(),dlg->getHeight());
-    ValueType a = dlg->getAmplitude();
-    std::vector<ValueType> par = dlg->getParameters();
-    auto psf = PSFFactory::getInstance()->getPSF(dlg->getFunction());
-    if (psf)
-    {
-      img = psf->createPSFForDisplay(dlg->getWidth(),dlg->getHeight(),par);
-      *img *= a;
-      emit logOperation("New Image","Created test image for "+dlg->getFunction());
-      return OK;
-    }
-    else
-    {
-      setError("Internal Error: PSF '"+dlg->getFunction()+"' not found!");
-      return ERROR;
-    }
-  }
-  return CANCELLED;
-}
-
+#endif // OPFFTCONVOLUTION_H

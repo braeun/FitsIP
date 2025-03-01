@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - declaration of static plugins                                       *
  *                                                                              *
- * modified: 2025-02-10                                                         *
+ * modified: 2025-03-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -59,6 +59,7 @@ Q_IMPORT_PLUGIN(OpGaussBlur)
 Q_IMPORT_PLUGIN(OpUnsharpMask)
 Q_IMPORT_PLUGIN(OpDDP)
 #ifdef HAVE_FFTW
+Q_IMPORT_PLUGIN(OpFFTConvolution)
 Q_IMPORT_PLUGIN(VanCittertDeconvolution)
 Q_IMPORT_PLUGIN(LucyRichardsonDeconvolution)
 #endif

@@ -62,19 +62,13 @@ signals:
 protected:
   void changeEvent(QEvent* event);
 
-private slots:
-
-  void handleZoomed(const QRectF &rect);
-
-  void spanChanged(int min, int max);
-
-  void on_imageMinIntensity_returnPressed();
-
-  void on_imageMaxIntensity_returnPressed();
-
-  void on_imageScaleBox_currentIndexChanged(int index);
-
 private:
+  void handleZoomed(const QRectF &rect);
+  void spanChanged(int min, int max);
+  void changeIntensity();
+  int toSlider(double v);
+  double fromSlider(int v);
+
   Ui::HistogramView *ui;
   std::shared_ptr<FitsObject> image;
   QwtPlotCurve* grayCurve;
@@ -84,6 +78,8 @@ private:
   QwtPlotGrid* grid;
   QwtPlotPicker* plotPicker;
   bool updating;
+  double histmin;
+  double histmax;
 };
 
 #endif // HISTOGRAMVIEW_H

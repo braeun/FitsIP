@@ -74,6 +74,7 @@ void Histogram::clear(void)
   for (size_t i=0;i<4;i++)
   {
     data[i].clear();
+    brightness[i] = 0;
   }
 }
 
@@ -82,6 +83,7 @@ void Histogram::build(FitsImage* img)
   for (size_t i=0;i<4;i++)
   {
     data[i].assign(bin,0);
+    brightness[i] = 0;
   }
   sum = img->getWidth() * img->getHeight();
   bool rgb = img->getDepth() == 3;
