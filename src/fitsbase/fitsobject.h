@@ -51,6 +51,10 @@ public:
 
   void setImage(const std::shared_ptr<FitsImage>& img);
 
+  QRect getAOI() const;
+
+  void setAOI(const QRect& r);
+
   const Histogram& getHistogram(bool update=false);
 
   void updateHistogram();
@@ -86,6 +90,7 @@ private:
   const int id;
   QString  filename;
   std::shared_ptr<FitsImage> image;
+  QRect aoi;
   Histogram histogram;
   Profile xprofile;
   Profile yprofile;

@@ -71,6 +71,16 @@ void FitsObject::setImage(const std::shared_ptr<FitsImage>& img)
   image = img;
 }
 
+QRect FitsObject::getAOI() const
+{
+  return aoi;
+}
+
+void FitsObject::setAOI(const QRect& r)
+{
+  aoi = r;
+}
+
 const Histogram& FitsObject::getHistogram(bool update)
 {
   if (histogram.isEmpty() || update)

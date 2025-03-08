@@ -560,23 +560,21 @@ void MainWindow::updateDisplay()
     QImage tmp = activeFile->getImage()->toQImage(scaleMin,scaleMax,scale);
     imageWidget->setImage(tmp);
     if (!ui->scrollArea->widgetResizable()) imageWidget->adjustSize();
-    ui->widthLabel->setText(QString::number(activeFile->getImage()->getWidth()));
-    ui->heightLabel->setText(QString::number(activeFile->getImage()->getHeight()));
+    imageWidget->setAOI(activeFile->getAOI());
+    QString txt = QString::asprintf("%4d,%4d",activeFile->getImage()->getWidth(),activeFile->getImage()->getHeight());
     switch (activeFile->getImage()->getDepth())
     {
       case 1:
-        ui->colorLabel->setText("GRAY");
+        txt += " GRAY";
         break;
       case 2:
-        ui->colorLabel->setText("FFT");
+        txt += " FFT";
         break;
       case 3:
-        ui->colorLabel->setText("RGB");
-        break;
-      default:
-        ui->colorLabel->setText("---");
+        txt += " RGB";
         break;
     }
+    ui->infoLabel->setText(txt);
   }
   else
   {
@@ -807,18 +805,23 @@ void MainWindow::addPixel(QPoint p)
 
 void MainWindow::updateCursor(QPoint p)
 {
-  ui->xLabel->setText(QString::number(p.x()));
-  ui->yLabel->setText(QString::number(p.y()));
+  QString txt = QString::asprintf("%4d,%4d",p.x(),p.y());
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
-    ui->valueLabel->setText(QString::number(activeFile->getImage()->getConstPixelIterator(p.x(),p.y()).getRGB().gray()));
+    txt += " : " + QString::number(activeFile->getImage()->getConstPixelIterator(p.x(),p.y()).getRGB().gray());
   }
+  ui->cursorLabel->setText(txt);
 }
 
 void MainWindow::updateAOI(QRect r)
 {
   ui->aoiLabel->setText(QString("%1,%2 %3x%4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()));
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
+  if (activeFile)
+  {
+    activeFile->setAOI(r);
+  }
 }
 
 void MainWindow::runScriptCmd(const QString& cmd)

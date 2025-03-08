@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - list of selected pixels                                             *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -57,6 +57,7 @@ public:
 
   PixelList* copy();
 
+  [[deprecated]]
   static PixelList* getGlobalInstance();
 
 private:

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the actual image                                  *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-03-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -95,6 +95,13 @@ void ImageWidget::adjustSize()
 void ImageWidget::clearAOI()
 {
   aoi = QRect();
+  repaint();
+  emit aoiChanged(aoi);
+}
+
+void ImageWidget::setAOI(const QRect& r)
+{
+  aoi = r;
   repaint();
   emit aoiChanged(aoi);
 }

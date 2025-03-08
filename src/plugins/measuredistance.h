@@ -1,6 +1,6 @@
-﻿/********************************************************************************
+/********************************************************************************
  *                                                                              *
- * FitsIP - widget to display the actual image                                  *
+ * FitsIP - measure the distance of two points in an image                      *
  *                                                                              *
  * modified: 2025-03-07                                                         *
  *                                                                              *
@@ -20,70 +20,29 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef IMAGEWIDGET_H
-#define IMAGEWIDGET_H
+#ifndef MEASUREDISTANCE_H
+#define MEASUREDISTANCE_H
 
-#include <QWidget>
-#include <QImage>
-#include <QCursor>
+#include <fitsbase/opplugin.h>
+#include <QObject>
+#include <vector>
 
-class QPainter;
+#define QT_STATICPLUGIN
+#include <QtPlugin>
 
-class ImageWidget : public QWidget
+
+class MeasureDistance: public OpPlugin
 {
   Q_OBJECT
+  Q_PLUGIN_METADATA(IID OpPlugin_iid)
+  Q_INTERFACES(OpPlugin)
+
 public:
-  explicit ImageWidget(QWidget *parent = nullptr);
+  MeasureDistance();
+  virtual ~MeasureDistance() override;
 
-  virtual int heightForWidth(int w) const override;
+  virtual QString getMenuEntry() const override;
 
-  void setImage(const QImage& img);
-
-  const QImage& getImage() const;
-
-  void setZoom(int32_t z);
-
-  void adjustSize();
-
-  void clearAOI();
-
-  void setAOI(const QRect& r);
-
-  QRect getAOI() const;
-
-signals:
-  void cursorMoved(QPoint p);
-
-  void cursorSet(QPoint p);
-
-  void aoiChanged(QRect r);
-
-  void setPixel(QPoint p);
-
-public slots:
-
-protected:
-  virtual void paintEvent(QPaintEvent* event) override;
-  virtual void mousePressEvent(QMouseEvent *event) override;
-  virtual void mouseReleaseEvent(QMouseEvent *event) override;
-  virtual void mouseMoveEvent(QMouseEvent *event) override;
-
-private:
-//  void drawRectangle(QPainter& p, QPoint start, QPoint stop);
-  void drawAOI(QPainter& p);
-  void drawPixelList(QPainter& p);
-  void drawStarList(QPainter& p);
-
-  QCursor cursor;
-  QImage image;
-  QImage origImage;
-  QRect imageRect;
-  QPoint dragStart;
-  QPoint dragStop;
-  QRect aoi;
-  /* <0 zoom out, 0 fit */
-  int zoom;
-  double zoomFactor;
 };
 
-#endif // IMAGEWIDGET_H
+#endif // MEASUREDISTANCE_H
