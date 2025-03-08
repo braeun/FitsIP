@@ -53,7 +53,7 @@ std::vector<std::shared_ptr<FitsObject>> SynthesizeBackground::getCreatedImages(
   return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
-OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new SynthesizeBackgroundDialog();
   Histogram hist;
@@ -81,7 +81,7 @@ OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> i
     }
     uint32_t deg = dlg->getPolynomDegree();
     std::vector<std::vector<double>> coeff;
-    for (u_int32_t l=0;l<image->getImage()->getDepth();l++)
+    for (int l=0;l<image->getImage()->getDepth();l++)
     {
       coeff.push_back(getCoefficients(list,deg,l));
     }

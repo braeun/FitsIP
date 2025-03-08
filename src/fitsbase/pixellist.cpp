@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - list of selected pixels                                             *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,8 +27,6 @@
 std::vector<QString> PixelList::headers{
   "X", "Y", "Value 1", "Value 2", "Value 3"
 };
-
-PixelList* PixelList::globalStarlist = nullptr;
 
 PixelList::PixelList(QObject* parent):QAbstractTableModel(parent)
 {
@@ -187,11 +185,5 @@ PixelList* PixelList::copy()
   PixelList* list = new PixelList;
   list->setPixels(pixels);
   return list;
-}
-
-PixelList* PixelList::getGlobalInstance()
-{
-  if (!globalStarlist) globalStarlist = new PixelList;
-  return globalStarlist;
 }
 

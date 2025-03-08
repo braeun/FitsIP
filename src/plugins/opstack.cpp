@@ -69,7 +69,7 @@ bool OpStack::requiresFileList() const
   return true;
 }
 
-OpPlugin::ResultType OpStack::execute(const std::vector<QFileInfo>& list, QRect aoi, const PreviewOptions& opt)
+OpPlugin::ResultType OpStack::execute(const std::vector<QFileInfo>& list, const OpPluginData& data)
 {
   if (list.size() < 2)
   {
@@ -115,10 +115,10 @@ OpPlugin::ResultType OpStack::execute(const std::vector<QFileInfo>& list, QRect 
         ret = prepare(list[0],dlg->isSubtractSky());
         break;
       case Align::TemplateMatch:
-        ret = prepareTemplate(list[0],dlg->isSubtractSky(),aoi,dlg->isFullTemplateMatch(),dlg->getTemplateMatchRange());
+        ret = prepareTemplate(list[0],dlg->isSubtractSky(),data.aoi,dlg->isFullTemplateMatch(),dlg->getTemplateMatchRange());
         break;
       case Align::StarMatch:
-        ret = prepareStarMatch(list[0],dlg->isSubtractSky(),dlg->getSearchBoxSize(),dlg->getStarBoxSize(),dlg->isAllowRotation(),dlg->getStarMaxMovement());
+        ret = prepareStarMatch(list[0],data.pixellist,dlg->isSubtractSky(),dlg->getSearchBoxSize(),dlg->getStarBoxSize(),dlg->isAllowRotation(),dlg->getStarMaxMovement());
         break;
     }
     if (ret != OK)
@@ -201,9 +201,9 @@ OpPlugin::ResultType OpStack::prepareTemplate(const QFileInfo &file, bool subsky
   return res;
 }
 
-OpPlugin::ResultType OpStack::prepareStarMatch(const QFileInfo &file, bool subsky, int searchbox, int starbox, bool rotate, double maxmove)
+OpPlugin::ResultType OpStack::prepareStarMatch(const QFileInfo &file, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove)
 {
-  if (PixelList::getGlobalInstance()->getPixels().empty())
+  if (pixellist->getPixels().empty())
   {
     qWarning() << "No stars selected for star matching";
     return ERROR;
@@ -226,7 +226,7 @@ OpPlugin::ResultType OpStack::prepareStarMatch(const QFileInfo &file, bool subsk
   if (res == OK)
   {
     std::vector<Star> stars;
-    for (const Pixel& pixel : PixelList::getGlobalInstance()->getPixels())
+    for (const Pixel& pixel : pixellist->getPixels())
     {
       Star star;
       star.x = pixel.x;

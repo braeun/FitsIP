@@ -69,13 +69,13 @@ void OpMul::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpMul::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpMul::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg == nullptr)
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Multiply by Image");
-    dlg->setImageCollection(getImageCollection());
+    dlg->setImageCollection(data.imageCollection);
   }
   dlg->setPrompt("Multiply "+image->getName()+" by:");
   if (dlg->exec())

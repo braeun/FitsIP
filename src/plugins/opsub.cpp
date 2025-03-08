@@ -69,13 +69,13 @@ void OpSub::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpSub::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpSub::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg == nullptr)
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Subtract by Image");
-    dlg->setImageCollection(getImageCollection());
+    dlg->setImageCollection(data.imageCollection);
   }
   dlg->setPrompt("Subtract from "+image->getName()+":");
   if (dlg->exec())

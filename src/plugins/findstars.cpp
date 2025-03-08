@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - star detection class                                                *
  *                                                                              *
- * modified: 2025-02-11                                                         *
+ * modified: 2025-03-08                                                         *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.                                           *
  ********************************************************************************
@@ -96,7 +96,7 @@ QString FindStars::getMenuEntry() const
   return "Measure/Find Stars...";
 }
 
-OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsObject> image, QRect rect, const PreviewOptions& opt)
+OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   Histogram hist;
   hist.build(image->getImage().get());
@@ -136,9 +136,9 @@ OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsObject> image, QRect
     maxiter = d.getIterations();
     profiler.start();
     auto img = image->getImage();
-    if (!rect.isEmpty())
+    if (!data.aoi.isEmpty())
     {
-      img = img->subImage(rect);
+      img = img->subImage(data.aoi);
     }
 //    if (image->getDepth() > 1)
 //    {
@@ -155,8 +155,8 @@ OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsObject> image, QRect
     c_hot = 0;
     c_star = 0;
     std::vector<Star> stars = findStars(img);
-    StarList::getGlobalInstance()->setStars(stars);
-    StarList::getGlobalInstance()->shift(rect.x(),rect.y());
+    data.starlist->setStars(stars);
+    data.starlist->shift(data.aoi.x(),data.aoi.y());
     profiler.stop();
     logProfiler(image->getName());
     qDebug() << "FindStars:";

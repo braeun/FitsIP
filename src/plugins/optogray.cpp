@@ -62,7 +62,7 @@ void OpToGray::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (image->getImage()->getDepth() != 3)
   {

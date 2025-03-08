@@ -66,7 +66,7 @@ void OpSqrt::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpSqrt::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpSqrt::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   profiler.start();
   calcSqrt(image->getImage());

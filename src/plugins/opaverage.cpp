@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - create an average of several images                                 *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -57,7 +57,7 @@ bool OpAverage::requiresFileList() const
   return true;
 }
 
-OpPlugin::ResultType OpAverage::execute(const std::vector<QFileInfo>& list, QRect /*aoi*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpAverage::execute(const std::vector<QFileInfo>& list, const OpPluginData& data)
 {
   if (list.empty()) return CANCELLED;
   ProgressDialog* prog = list.size() > 2 ? new ProgressDialog() : nullptr;

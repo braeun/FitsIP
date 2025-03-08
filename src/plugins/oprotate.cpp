@@ -81,7 +81,7 @@ void OpRotate::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg == nullptr)
   {

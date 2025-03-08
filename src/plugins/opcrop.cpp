@@ -83,9 +83,10 @@ void OpCrop::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, QRect r, const PreviewOptions& opt)
+OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpCropDialog();
+  QRect r = data.aoi;
   dlg->setSelection(r);
   if (dlg->exec())
   {

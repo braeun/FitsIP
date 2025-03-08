@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin factory                                                      *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,17 +46,13 @@ public:
 
   Plugin* loadPlugin(QString filename);
 
-  void setImageCollection(ImageCollection* col);
-
 signals:
   void logOperation(QString image, QString op);
 
   void logProfilerResult(QString profiler, QString image, int w, int h, int64_t t, QString notes);
 
 private:
-
   std::vector<std::shared_ptr<QPluginLoader>> plugins;
-  ImageCollection* imageCollection;
 #ifdef USE_PYTHON
   void* pymod;
 #endif

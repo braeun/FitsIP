@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin factory                                                      *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,8 +26,7 @@
 #include <QDebug>
 #include <utility>
 
-PluginFactory::PluginFactory():
-  imageCollection(nullptr)
+PluginFactory::PluginFactory()
 {
   for (const QObject* o : QPluginLoader::staticInstances())
   {
@@ -97,7 +96,6 @@ Plugin* PluginFactory::loadPlugin(QString filename)
     OpPlugin* op = dynamic_cast<OpPlugin*>(p);
     if (op)
     {
-      op->setImageCollection(imageCollection);
 #ifdef USE_PYTHON
       op->bindPython(pymod);
 #endif
@@ -106,30 +104,5 @@ Plugin* PluginFactory::loadPlugin(QString filename)
     }
   }
   return p;
-}
-
-void PluginFactory::setImageCollection(ImageCollection *col)
-{
-  imageCollection = col;
-  for (QObject* o : QPluginLoader::staticInstances())
-  {
-    OpPlugin* op = dynamic_cast<OpPlugin*>(o);
-    if (op)
-    {
-      op->setImageCollection(col);
-    }
-  }
-  for (auto& plugin : plugins)
-  {
-    Plugin* p = dynamic_cast<Plugin*>(plugin->instance());
-    if (p)
-    {
-      OpPlugin* op = dynamic_cast<OpPlugin*>(p);
-      if (op)
-      {
-        op->setImageCollection(col);
-      }
-    }
-  }
 }
 

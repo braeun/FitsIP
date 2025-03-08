@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to align images                                              *
  *                                                                              *
- * modified: 2022-12-03                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -55,7 +55,7 @@ bool OpAlign::requiresFileList() const
   return true;
 }
 
-OpPlugin::ResultType OpAlign::execute(const std::vector<QFileInfo>& list, QRect aoi, const PreviewOptions& opt)
+OpPlugin::ResultType OpAlign::execute(const std::vector<QFileInfo>& list, const OpPluginData& data)
 {
   if (list.size() < 2) return CANCELLED;
   if (!dlg) dlg = new OpAlignDialog();
@@ -71,7 +71,7 @@ OpPlugin::ResultType OpAlign::execute(const std::vector<QFileInfo>& list, QRect 
       prog->setMaximum(list.size());
       prog->show();
     }
-    ResultType ret = prepare(list[0],aoi);
+    ResultType ret = prepare(list[0],data.aoi);
     if (ret != OK)
     {
       if (prog) prog->deleteLater();

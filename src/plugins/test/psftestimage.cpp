@@ -60,7 +60,7 @@ QString PSFTestImage::getMenuEntry() const
   return "Image/Test Images/PSF...";
 }
 
-OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsObject> /*image*/, const OpPluginData& data)
 {
   if (!dlg)
   {

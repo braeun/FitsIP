@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - measure the sharpness of images                                     *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -88,7 +88,7 @@ void MeasureSharpness::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType MeasureSharpness::execute(const std::vector<QFileInfo>& list, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType MeasureSharpness::execute(const std::vector<QFileInfo>& list, const OpPluginData& data)
 {
   if (list.empty()) return CANCELLED;
   ProgressDialog* prog = list.size() > 2 ? new ProgressDialog() : nullptr;
@@ -109,7 +109,7 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<QFileInfo>& lis
       QApplication::processEvents();
       if (prog->isCancelled()) break;
     }
-    SharpnessData entry = evaluate(info,selection);
+    SharpnessData entry = evaluate(info,data.aoi);
     if (entry.info.exists())
     {
       results.push_back(entry);
@@ -126,7 +126,7 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<QFileInfo>& lis
   return OK;
 }
 
-OpPlugin::ResultType MeasureSharpness::execute(const std::vector<std::shared_ptr<FitsObject>>& list, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType MeasureSharpness::execute(const std::vector<std::shared_ptr<FitsObject>>& list, const OpPluginData& data)
 {
   if (list.empty()) return CANCELLED;
   ProgressDialog* prog = list.size() > 2 ? new ProgressDialog() : nullptr;
@@ -148,11 +148,11 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<std::shared_ptr
       QApplication::processEvents();
       if (prog->isCancelled()) break;
     }
-    SharpnessData data = calculateSharpness(obj->getImage(),selection);
-    data.info = info;
-    data.filename = info.absoluteFilePath().toStdString();
-    results.push_back(data);
-    normvaravg.add(data.normalizedVariance);
+    SharpnessData result = calculateSharpness(obj->getImage(),data.aoi);
+    result.info = info;
+    result.filename = info.absoluteFilePath().toStdString();
+    results.push_back(result);
+    normvaravg.add(result.normalizedVariance);
   }
   if (prog) prog->deleteLater();
   if (results.empty()) return CANCELLED;

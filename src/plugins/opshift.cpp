@@ -68,7 +68,7 @@ void OpShift::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg == nullptr) dlg = new OpShiftDialog();
   dlg->setImageSize(image->getImage()->getWidth(),image->getImage()->getHeight());

@@ -63,10 +63,10 @@ void OpKernel::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpKernelDialog();
-  dlg->setSourceImage(image->getImage(),selection,opt);
+  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
   dlg->setKernelNames(KernelRepository::instance().getKernelNames());
   if (!dlg->exec()) return CANCELLED;
   Kernel kernel = KernelRepository::instance().getKernel(dlg->getKernelName());
@@ -98,7 +98,7 @@ void OpKernel::convolve(std::shared_ptr<FitsImage> image, const Kernel& kernel) 
         ConstPixelIterator it2 = tmp.getConstPixelIterator(x0-wk2,y);
         for (uint32_t ck=0;ck<kernel.getWidth();ck++)
         {
-          for (uint32_t d=0;d<image->getDepth();d++)
+          for (int d=0;d<image->getDepth();d++)
           {
             it1[d] += kernel[rk][ck] * it2[d];
           }

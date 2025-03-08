@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - perform cross carrelation                                           *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -70,19 +70,19 @@ void MeasureCrossCorrelation::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg == nullptr)
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Cross Correlation");
-    dlg->setImageCollection(getImageCollection());
+    dlg->setImageCollection(data.imageCollection);
   }
   if (dlg->exec())
   {
     std::shared_ptr<FitsObject> file = dlg->getImage();
     profiler.start();
-    img = correlate(image,file,selection);
+    img = correlate(image,file,data.aoi);
     profiler.stop();
     log(img,"Cross correlation between: "+image->getImage()->getName()+" and "+file->getImage()->getName());
     logProfiler(img);

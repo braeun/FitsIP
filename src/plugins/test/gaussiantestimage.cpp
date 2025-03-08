@@ -60,7 +60,7 @@ QString GaussianTestImage::getMenuEntry() const
   return "Image/Test Images/Gaussian...";
 }
 
-OpPlugin::ResultType GaussianTestImage::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType GaussianTestImage::execute(std::shared_ptr<FitsObject> /*image*/, const OpPluginData& data)
 {
   if (!dlg)
   {

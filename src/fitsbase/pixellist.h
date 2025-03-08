@@ -31,6 +31,8 @@ class PixelList: public QAbstractTableModel
 {
   Q_OBJECT
 public:
+  explicit PixelList(QObject* parent=nullptr);
+
   void clear();
 
   void addPixel(const Pixel& pixel);
@@ -57,16 +59,10 @@ public:
 
   PixelList* copy();
 
-  [[deprecated]]
-  static PixelList* getGlobalInstance();
-
 private:
-  explicit PixelList(QObject* parent=nullptr);
-
   std::vector<Pixel> pixels;
 
   static std::vector<QString> headers;
-  static PixelList* globalStarlist;
 
 };
 

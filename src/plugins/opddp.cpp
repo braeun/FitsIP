@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - digital development processing                                      *
  *                                                                              *
- * modified: 2025-02-05                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -62,10 +62,10 @@ void OpDDP::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpDDPDialog();
-  dlg->setSourceImage(image->getImage(),selection,opt);
+  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();

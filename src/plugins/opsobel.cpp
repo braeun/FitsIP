@@ -59,7 +59,7 @@ void OpSobel::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   profiler.start();
   auto img = applyFilter(image->getImage());

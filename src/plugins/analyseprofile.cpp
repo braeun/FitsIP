@@ -15,7 +15,7 @@ QString AnalyseProfile::getMenuEntry() const
   return "Analyse/Analyse Profiles...";
 }
 
-OpPlugin::ResultType AnalyseProfile::execute(std::shared_ptr<FitsObject> image, QRect rect, const PreviewOptions& opt)
+OpPlugin::ResultType AnalyseProfile::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (image->getXProfile().empty() || image->getYProfile().empty())
   {

@@ -56,12 +56,12 @@ public:
 
   virtual bool requiresFileList() const override;
 
-  virtual ResultType execute(const std::vector<QFileInfo>& list, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(const std::vector<QFileInfo>& list, const OpPluginData& data=OpPluginData()) override;
 
 private:
   ResultType prepare(const QFileInfo& file, bool subsky);
   ResultType prepareTemplate(const QFileInfo& file, bool subsky, QRect aoi, bool full, int range);
-  ResultType prepareStarMatch(const QFileInfo& file, bool subsky, int searchbox, int starbox, bool rotate, double maxmove);
+  ResultType prepareStarMatch(const QFileInfo& file, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove);
   ResultType stack(const QFileInfo& file);
   ResultType stackTemplate(const QFileInfo& file);
   ResultType stackStarMatch(const QFileInfo& file);

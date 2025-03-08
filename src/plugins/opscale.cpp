@@ -63,7 +63,7 @@ void OpScale::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg.exec())
   {

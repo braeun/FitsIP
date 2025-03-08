@@ -65,7 +65,7 @@ void OpLog::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpLog::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpLog::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   profiler.start();
   calcLog(image->getImage());

@@ -40,6 +40,8 @@ public:
   explicit PixelListWidget(QWidget *parent = nullptr);
   ~PixelListWidget();
 
+  void setPixelList(PixelList* list);
+
   void clear();
 
   void save();

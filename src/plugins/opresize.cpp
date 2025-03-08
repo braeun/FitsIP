@@ -100,7 +100,7 @@ void OpResize::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg == nullptr)
   {

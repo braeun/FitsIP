@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image calibration with flatfield and dark image                     *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -52,14 +52,14 @@ bool OpCalibration::requiresFileList() const
   return true;
 }
 
-OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, const OpPluginData& data)
 {
   if (list.empty()) return CANCELLED;
   if (!dlg)
   {
     dlg = new OpCalibrationDialog();
   }
-  dlg->setImageCollection(getImageCollection());
+  dlg->setImageCollection(data.imageCollection);
   dlg->setOutputPath(list[0].absolutePath());
   if (!dlg->exec()) return CANCELLED;
   QDir dir(dlg->getOutputPath());

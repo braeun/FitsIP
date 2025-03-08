@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - list of selected/detected stars                                     *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -55,13 +55,10 @@ public:
 
   bool load(const QString& filename);
 
-  static StarList* getGlobalInstance();
-
 private:
   std::vector<Star> stars;
 
   static std::vector<QString> headers;
-  static StarList* globalStarlist;
 
 };
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - file object containing the image and other data                     *
  *                                                                              *
- * modified: 2025-02-01                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,7 +25,9 @@
 
 #include "fitsimage.h"
 #include "histogram.h"
+#include "pixellist.h"
 #include "profile.h"
+#include "starlist.h"
 #include "undostack.h"
 #include <memory>
 #include <string>
@@ -38,8 +40,11 @@ class FitsObject
 {
 public:
   FitsObject(std::shared_ptr<FitsImage> img, const QString& filename="");
-
   FitsObject(std::shared_ptr<FitsImage> img, const std::string& filename);
+  FitsObject(const FitsObject& obj) = delete;
+  ~FitsObject();
+
+  FitsObject& operator=(const FitsObject& obj) = delete;
 
   int getId() const;
 
@@ -66,6 +71,10 @@ public:
   void setYProfile(const Profile& p);
 
   const Profile& getYProfile() const;
+
+  PixelList* getPixelList() const;
+
+  StarList* getStarList() const;
 
   bool save(const QString& filename);
 
@@ -94,6 +103,8 @@ private:
   Histogram histogram;
   Profile xprofile;
   Profile yprofile;
+  std::unique_ptr<PixelList> pixelList;
+  std::unique_ptr<StarList> starList;
   UndoStack undostack;
 
   static int idCounter;

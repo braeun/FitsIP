@@ -76,13 +76,13 @@ void OpFFT::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
+OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   profiler.start();
-  if (aoi.isNull())
+  if (data.aoi.isNull())
     img = fft(*image->getImage());
   else
-    img = fft(*image->getImage()->subImage(aoi));
+    img = fft(*image->getImage()->subImage(data.aoi));
   profiler.stop();
   logProfiler(img);
   return OK;

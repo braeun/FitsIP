@@ -61,10 +61,10 @@ void OpUnsharpMask::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpUnsharpMask::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpUnsharpMask::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpUnsharpMaskDialog();
-  dlg->setSourceImage(image->getImage(),selection,opt);
+  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();

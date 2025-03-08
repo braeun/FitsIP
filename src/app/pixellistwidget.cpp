@@ -26,13 +26,11 @@
 #include <fitsbase/pixellist.h>
 #include <QMenu>
 
-PixelListWidget::PixelListWidget(QWidget *parent) :
-  QWidget(parent),
-  ui(new Ui::PixelListWidget)
+PixelListWidget::PixelListWidget(QWidget *parent):QWidget(parent),
+  ui(new Ui::PixelListWidget),
+  pixellist(nullptr)
 {
   ui->setupUi(this);
-  pixellist = PixelList::getGlobalInstance();
-  ui->pixellistTable->setModel(pixellist);
   contextMenu = new QMenu();
   QAction* load = contextMenu->addAction("Load...");
   connect(load,&QAction::triggered,this,&PixelListWidget::load);
@@ -53,6 +51,14 @@ PixelListWidget::~PixelListWidget()
 void PixelListWidget::on_pixellistTable_customContextMenuRequested(const QPoint &pos)
 {
   contextMenu->popup(ui->pixellistTable->mapToGlobal(pos));
+}
+
+void PixelListWidget::setPixelList(PixelList* list)
+{
+  pixellist = list;
+  QItemSelectionModel *m = ui->pixellistTable->selectionModel();
+  ui->pixellistTable->setModel(list);
+  delete m;
 }
 
 void PixelListWidget::clear()

@@ -56,7 +56,7 @@ public:
   virtual void bindPython(void* m) const override;
 #endif
 
-  virtual ResultType execute(std::shared_ptr<FitsObject> list, QRect aoi=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(std::shared_ptr<FitsObject> list, const OpPluginData& data=OpPluginData()) override;
 
   void setTemplate(std::shared_ptr<FitsImage> image, QRect aoi=QRect());
 

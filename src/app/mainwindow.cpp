@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-02-28                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -64,12 +64,16 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
 {
   ui->setupUi(this);
 
+  defaultPixelList = std::make_unique<PixelList>();
+  ui->pixellistWidget->setPixelList(defaultPixelList.get());
+
+  defaultStarList = std::make_unique<StarList>();
+  ui->starlistWidget->setStarList(defaultStarList.get());
+
   pluginFactory = std::make_unique<PluginFactory>();
   imageCollection = std::make_unique<ImageCollection>();
 //  scriptInterface = std::make_unique<ScriptInterface>();
   selectedFileList = std::make_shared<FileList>();
-
-  pluginFactory->setImageCollection(imageCollection.get());
 
   ui->fileListWidget->setFileList(selectedFileList);
 
@@ -362,6 +366,12 @@ QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
 void MainWindow::executeOpPlugin(OpPlugin *op)
 {
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
+  OpPluginData data;
+  data.aoi = imageWidget->getAOI();
+  data.previewOptions.scale = static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale());
+  data.imageCollection = imageCollection.get();
+  data.pixellist = (activeFile) ? activeFile->getPixelList() : defaultPixelList.get();
+  data.starlist = (activeFile) ? activeFile->getStarList() : defaultStarList.get();
   if (op->requiresFileList())
   {
     std::vector<std::shared_ptr<FitsObject>> imglist;
@@ -378,11 +388,11 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
     }
     else if (filelist.empty())
     {
-      ret = op->execute(imglist,imageWidget->getAOI());
+      ret = op->execute(imglist,data);
     }
     else
     {
-      ret = op->execute(filelist,imageWidget->getAOI());
+      ret = op->execute(filelist,data);
     }
     if (ret == OpPlugin::OK)
     {
@@ -422,18 +432,16 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
       QMessageBox::warning(this,QApplication::applicationDisplayName(),"Plugin execution error!\n"+op->getError());
     }
   }
-  else if (activeFile != nullptr)
+  else if (activeFile)
   {
     qDebug() << "Executing: " << op->getMenuEntry();
     activeFile->pushUndo();
     ui->actionUndo->setEnabled(activeFile->isUndoAvailable());
-    PreviewOptions opt;
-    opt.scale = static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale());
-    executeOpPlugin(op,activeFile,imageWidget->getAOI(),opt);
+    executeOpPlugin(op,activeFile,data);
   }
   else if (!op->requiresImage())
   {
-    executeOpPlugin(op,std::shared_ptr<FitsObject>(),QRect(),PreviewOptions());
+    executeOpPlugin(op,std::shared_ptr<FitsObject>(),data);
   }
   else
   {
@@ -473,14 +481,14 @@ std::vector<QFileInfo> MainWindow::getFileList()
   return filelist;
 }
 
-void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, QRect aoi, const PreviewOptions& opt)
+void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, const OpPluginData& data)
 {
-  OpPlugin::ResultType ret = op->execute(img,aoi,opt);
+  OpPlugin::ResultType ret = op->execute(img,data);
   if (ret == OpPlugin::OK)
   {
     if (op->createsNewImage())
     {
-      for (auto img : op->getCreatedImages())
+      for (const auto& img : op->getCreatedImages())
       {
 //        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
         imageCollection->addFile(img);
@@ -535,6 +543,8 @@ void MainWindow::display(std::shared_ptr<FitsObject> file)
   {
     ui->activeFileLabel->setText("");
   }
+  ui->pixellistWidget->setPixelList(file->getPixelList());
+  ui->starlistWidget->setStarList(file->getStarList());
   updateDisplay();
 //  updateOpenFileListSelection();
 }
@@ -558,7 +568,7 @@ void MainWindow::updateDisplay()
     double scaleMax = ui->histogramWidget->getScaleMax();
     FitsImage::Scale scale = static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale());
     QImage tmp = activeFile->getImage()->toQImage(scaleMin,scaleMax,scale);
-    imageWidget->setImage(tmp);
+    imageWidget->setImage(tmp,activeFile->getPixelList(),activeFile->getStarList());
     if (!ui->scrollArea->widgetResizable()) imageWidget->adjustSize();
     imageWidget->setAOI(activeFile->getAOI());
     QString txt = QString::asprintf("%4d,%4d",activeFile->getImage()->getWidth(),activeFile->getImage()->getHeight());
@@ -578,7 +588,7 @@ void MainWindow::updateDisplay()
   }
   else
   {
-    imageWidget->setImage(QImage());
+    imageWidget->setImage(QImage(),nullptr,nullptr);
   }
   updateMetadata();
   profiler.stop();
@@ -798,7 +808,7 @@ void MainWindow::addPixel(QPoint p)
     if (activeFile)
     {
       Pixel pixel = activeFile->getImage()->getPixel(p.x(),p.y());
-      PixelList::getGlobalInstance()->addPixel(pixel);
+      activeFile->getPixelList()->addPixel(pixel);
     }
   }
 }
@@ -968,7 +978,7 @@ void MainWindow::onImageScaleChanged(double min, double max, int scale)
   if (activeFile)
   {
     QImage tmp = activeFile->getImage()->toQImage(min,max,static_cast<FitsImage::Scale>(scale));
-    imageWidget->setImage(tmp);
+    imageWidget->setImage(tmp,activeFile->getPixelList(),activeFile->getStarList());
   }
 }
 
@@ -1115,20 +1125,26 @@ void MainWindow::on_actionClose_Image_triggered()
   else if (ui->openFileList->currentIndex().isValid())
   {
     int row = ui->openFileList->currentIndex().row();
-    imageCollection->removeActiveFile();
+    /* keep old active file until all UI elements are updated with new one */
+    auto old = imageCollection->removeActiveFile();
     if (static_cast<size_t>(row) >= imageCollection->getFiles().size()) row = imageCollection->getFiles().size() - 1;
     imageCollection->setActiveFile(row);
     ui->openFileList->setCurrentIndex(imageCollection->index(row,0,QModelIndex()));
     display(imageCollection->getActiveFile());
+    old.reset();
   }
   else
   {
+    ui->pixellistWidget->setPixelList(defaultPixelList.get());
+    ui->starlistWidget->setStarList(defaultStarList.get());
     display(std::shared_ptr<FitsObject>());
   }
 }
 
 void MainWindow::on_actionClose_All_Images_triggered()
 {
+  ui->pixellistWidget->setPixelList(defaultPixelList.get());
+  ui->starlistWidget->setStarList(defaultStarList.get());
   imageCollection->removeAll();
   display(std::shared_ptr<FitsObject>());
 }

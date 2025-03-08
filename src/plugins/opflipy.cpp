@@ -64,7 +64,7 @@ void OpFlipY::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpFlipY::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpFlipY::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   profiler.start();
   flip(image->getImage());

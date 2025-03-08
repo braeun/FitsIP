@@ -95,12 +95,12 @@ void MeasureMatch::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
+OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg == nullptr)
   {
     dlg = new MeasureMatchDialog();
-    dlg->setImageCollection(getImageCollection());
+    dlg->setImageCollection(data.imageCollection);
   }
   if (dlg->exec())
   {

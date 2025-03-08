@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the actual image                                  *
  *                                                                              *
- * modified: 2025-03-07                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,7 +27,9 @@
 #include <QImage>
 #include <QCursor>
 
+class PixelList;
 class QPainter;
+class StarList;
 
 class ImageWidget : public QWidget
 {
@@ -37,7 +39,7 @@ public:
 
   virtual int heightForWidth(int w) const override;
 
-  void setImage(const QImage& img);
+  void setImage(const QImage& img, PixelList* pixels, StarList* stars);
 
   const QImage& getImage() const;
 
@@ -84,6 +86,8 @@ private:
   /* <0 zoom out, 0 fit */
   int zoom;
   double zoomFactor;
+  PixelList* pixellist;
+  StarList* starlist;
 };
 
 #endif // IMAGEWIDGET_H

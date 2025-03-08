@@ -31,18 +31,14 @@
 #include <QDebug>
 #include <algorithm>
 
-ImageWidget::ImageWidget(QWidget *parent): QWidget(parent)
+ImageWidget::ImageWidget(QWidget *parent): QWidget(parent),
+  pixellist(nullptr),
+  starlist(nullptr)
 {
   setMouseTracking(true);
   QPixmap p("://resources/cursors/crosshair.png");
   cursor = QCursor(p);
   setCursor(cursor);
-  connect(PixelList::getGlobalInstance(),&PixelList::rowsInserted,this,[this](const QModelIndex&,int,int){repaint();});
-  connect(PixelList::getGlobalInstance(),&PixelList::rowsRemoved,this,[this](const QModelIndex&,int,int){repaint();});
-  connect(PixelList::getGlobalInstance(),&PixelList::layoutChanged,this,[this](){repaint();});
-  connect(StarList::getGlobalInstance(),&StarList::rowsInserted,this,[this](const QModelIndex&,int,int){repaint();});
-  connect(StarList::getGlobalInstance(),&StarList::rowsRemoved,this,[this](const QModelIndex&,int,int){repaint();});
-  connect(StarList::getGlobalInstance(),&StarList::layoutChanged,this,[this](){repaint();});
 }
 
 int ImageWidget::heightForWidth(int w) const
@@ -51,8 +47,30 @@ int ImageWidget::heightForWidth(int w) const
   return static_cast<int>(static_cast<double>(image.height())/image.width()*w);
 }
 
-void ImageWidget::setImage(const QImage& img)
+void ImageWidget::setImage(const QImage& img, PixelList* pixels, StarList* stars)
 {
+  if (pixellist)
+  {
+    disconnect(pixellist,nullptr,this,nullptr);
+  }
+  pixellist = pixels;
+  if (pixellist)
+  {
+    connect(pixellist,&PixelList::rowsInserted,this,[this](const QModelIndex&,int,int){repaint();});
+    connect(pixellist,&PixelList::rowsRemoved,this,[this](const QModelIndex&,int,int){repaint();});
+    connect(pixellist,&PixelList::layoutChanged,this,[this](){repaint();});
+  }
+  if (starlist)
+  {
+    disconnect(starlist,nullptr,this,nullptr);
+  }
+  starlist = stars;
+  if (starlist)
+  {
+    connect(starlist,&StarList::rowsInserted,this,[this](const QModelIndex&,int,int){repaint();});
+    connect(starlist,&StarList::rowsRemoved,this,[this](const QModelIndex&,int,int){repaint();});
+    connect(starlist,&StarList::layoutChanged,this,[this](){repaint();});
+  }
   origImage = img;
   if (zoom < -1)
   {
@@ -81,7 +99,7 @@ const QImage& ImageWidget::getImage() const
 void ImageWidget::setZoom(int32_t z)
 {
   zoom = z;
-  if (!origImage.isNull()) setImage(origImage);
+  if (!origImage.isNull()) setImage(origImage,pixellist,starlist);
 }
 
 void ImageWidget::adjustSize()
@@ -126,8 +144,8 @@ void ImageWidget::paintEvent(QPaintEvent* /*event*/)
     p.drawImage(imageRect,image);
 //    drawRectangle(p,dragStart,dragStop);
     drawAOI(p);
-    if (settings.isShowPixellist()) drawPixelList(p);
-    if (settings.isShowStarlist()) drawStarList(p);
+    if (pixellist && settings.isShowPixellist()) drawPixelList(p);
+    if (starlist && settings.isShowStarlist()) drawStarList(p);
   }
 }
 
@@ -211,7 +229,7 @@ void ImageWidget::drawPixelList(QPainter& p)
   p.save();
   p.setPen(Qt::red);
   double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
-  for (const Pixel& pixel : PixelList::getGlobalInstance()->getPixels())
+  for (const Pixel& pixel : pixellist->getPixels())
   {
     QPoint pt = QPoint(pixel.x,pixel.y) / scale * zoomFactor + imageRect.topLeft();
     p.drawLine(pt-QPoint(5,0),pt+QPoint(5,0));
@@ -225,7 +243,7 @@ void ImageWidget::drawStarList(QPainter& p)
   p.save();
   p.setPen(Qt::green);
   double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
-  for (const Star& star : StarList::getGlobalInstance()->getStars())
+  for (const Star& star :starlist->getStars())
   {
     QPointF pt = QPointF(star.x,star.y) / scale * zoomFactor + imageRect.topLeft();
     double r = star.fwhm / 2 / scale;

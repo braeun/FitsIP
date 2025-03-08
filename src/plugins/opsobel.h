@@ -49,7 +49,7 @@ public:
   virtual void bindPython(void* m) const override;
 #endif
 
-  virtual ResultType execute(std::shared_ptr<FitsObject> img, QRect selection=QRect(), const PreviewOptions& opt=PreviewOptions()) override;
+  virtual ResultType execute(std::shared_ptr<FitsObject> img, const OpPluginData& data=OpPluginData()) override;
 
 private:
   std::shared_ptr<FitsImage> applyFilter(std::shared_ptr<FitsImage> img) const;

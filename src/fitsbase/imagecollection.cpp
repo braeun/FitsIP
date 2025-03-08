@@ -73,13 +73,15 @@ std::shared_ptr<FitsObject> ImageCollection::getFile(const QString& filename) co
   return std::shared_ptr<FitsObject>();
 }
 
-void ImageCollection::removeActiveFile()
+std::shared_ptr<FitsObject> ImageCollection::removeActiveFile()
 {
-  if (!activeFile) return;
+  std::shared_ptr<FitsObject> old;
+  if (!activeFile) return old;
   for (uint i=0;i<files.size();i++)
   {
     if (files[i].get() == activeFile.get())
     {
+      old = activeFile;
       QModelIndex parent;
       beginRemoveRows(parent,i,i);
       files.erase(files.begin()+i);
@@ -88,6 +90,7 @@ void ImageCollection::removeActiveFile()
       break;
     }
   }
+  return old;
 }
 
 void ImageCollection::removeAll()

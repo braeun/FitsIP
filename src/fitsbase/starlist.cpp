@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - list of selected/detected stars                                     *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,8 +28,6 @@
 std::vector<QString> StarList::headers{
   "X", "Y", "FWHM", "X Width", "Y Width", "Roundness", "Sharpness", "Hotness"
 };
-
-StarList* StarList::globalStarlist = nullptr;
 
 StarList::StarList(QObject* parent):QAbstractTableModel(parent)
 {
@@ -188,8 +186,3 @@ bool StarList::load(const QString &filename)
   return true;
 }
 
-StarList* StarList::getGlobalInstance()
-{
-  if (!globalStarlist) globalStarlist = new StarList;
-  return globalStarlist;
-}

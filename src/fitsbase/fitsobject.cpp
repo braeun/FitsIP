@@ -33,6 +33,8 @@ FitsObject::FitsObject(std::shared_ptr<FitsImage> img, const QString&  fn):
   filename(fn),
   image(img)
 {
+  pixelList = std::make_unique<PixelList>();
+  starList = std::make_unique<StarList>();
 //  QFileInfo info(filename);
 //  histogram.build(image.get());
 }
@@ -42,8 +44,15 @@ FitsObject::FitsObject(std::shared_ptr<FitsImage> img, const std::string&  fn):
  filename(QString::fromStdString(fn)),
  image(img)
 {
+  pixelList = std::make_unique<PixelList>();
+  starList = std::make_unique<StarList>();
 //  QFileInfo info(filename);
 //  histogram.build(image.get());
+}
+
+FitsObject::~FitsObject()
+{
+
 }
 
 int32_t FitsObject::getId() const
@@ -113,6 +122,16 @@ void FitsObject::setYProfile(const Profile& p)
 const Profile& FitsObject::getYProfile() const
 {
   return yprofile;
+}
+
+PixelList* FitsObject::getPixelList() const
+{
+  return pixelList.get();
+}
+
+StarList* FitsObject::getStarList() const
+{
+  return starList.get();
 }
 
 bool FitsObject::save(const QString& fn)

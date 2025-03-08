@@ -52,7 +52,7 @@ public:
 
   std::shared_ptr<FitsObject> getFile(const QString& filename) const;
 
-  void removeActiveFile();
+  std::shared_ptr<FitsObject> removeActiveFile();
 
   void removeAll();
 

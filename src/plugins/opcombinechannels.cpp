@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - combine RGB channels                                                *
  *                                                                              *
- * modified: 2024-12-12                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -75,10 +75,10 @@ void OpCombineChannels::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsObject> /*image*/, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsObject> /*image*/, const OpPluginData& data)
 {
   ImageCollection collection;
-  for (const auto& img : getImageCollection()->getFiles())
+  for (const auto& img : data.imageCollection->getFiles())
   {
     if (img->getImage()->getDepth() == 1)
     {

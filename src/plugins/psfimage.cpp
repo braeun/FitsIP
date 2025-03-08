@@ -61,7 +61,7 @@ QString PSFImage::getMenuEntry() const
   return "Image/PSF...";
 }
 
-OpPlugin::ResultType PSFImage::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType PSFImage::execute(std::shared_ptr<FitsObject> /*image*/, const OpPluginData& data)
 {
   PSFDialog d;
   if (d.exec())

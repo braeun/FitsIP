@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the selected/detected star list                   *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -31,8 +31,6 @@ StarListWidget::StarListWidget(QWidget *parent) :
   ui(new Ui::StarListWidget)
 {
   ui->setupUi(this);
-  starlist = StarList::getGlobalInstance();
-  ui->starlistTable->setModel(starlist);
   contextMenu = new QMenu();
   QAction* load = contextMenu->addAction("Load...");
   connect(load,&QAction::triggered,this,&StarListWidget::load);
@@ -43,6 +41,14 @@ StarListWidget::StarListWidget(QWidget *parent) :
 StarListWidget::~StarListWidget()
 {
   delete ui;
+}
+
+void StarListWidget::setStarList(StarList* list)
+{
+  starlist = list;
+  QItemSelectionModel *m = ui->starlistTable->selectionModel();
+  ui->starlistTable->setModel(list);
+  delete m;
 }
 
 void StarListWidget::clear()

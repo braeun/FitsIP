@@ -76,7 +76,7 @@ void OpInvFFT::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
+OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (image->getImage()->getDepth() != 2 || image->getImage()->preFFTHeight == 0 || image->getImage()->preFFTWidth == 0)
   {
@@ -87,10 +87,10 @@ OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, QRect 
   else
   {
     profiler.start();
-    if (aoi.isNull())
+    if (data.aoi.isNull())
       img = invfft(image->getImage());
     else
-      img = invfft(image->getImage()->subImage(aoi));
+      img = invfft(image->getImage()->subImage(data.aoi));
     profiler.stop();
   }
   logProfiler(img);

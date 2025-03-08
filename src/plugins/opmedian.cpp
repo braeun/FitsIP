@@ -62,10 +62,10 @@ void OpMedian::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpMedianDialog();
-  dlg->setSourceImage(image->getImage(),selection,opt);
+  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     QApplication::setOverrideCursor(Qt::BusyCursor);

@@ -69,13 +69,13 @@ void OpDiv::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg == nullptr)
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Divide by Image");
-    dlg->setImageCollection(getImageCollection());
+    dlg->setImageCollection(data.imageCollection);
   }
   dlg->setPrompt("Divide "+image->getName()+ "by:");
   if (dlg->exec())

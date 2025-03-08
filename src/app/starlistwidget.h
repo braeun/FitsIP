@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the selected/detected star list                   *
  *                                                                              *
- * modified: 2025-01-24                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -38,6 +38,8 @@ class StarListWidget : public QWidget
 public:
   explicit StarListWidget(QWidget *parent = nullptr);
   ~StarListWidget();
+
+  void setStarList(StarList* list);
 
   void clear();
 

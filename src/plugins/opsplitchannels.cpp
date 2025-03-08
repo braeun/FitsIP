@@ -84,7 +84,7 @@ void OpSplitChannels::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsObject> image, QRect /*aoi*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (image->getImage()->getDepth() != 3)
   {

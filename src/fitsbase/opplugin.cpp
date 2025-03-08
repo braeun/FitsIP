@@ -28,8 +28,7 @@
 Q_LOGGING_CATEGORY(LOG_PROFILER,"profiler");
 
 OpPlugin::OpPlugin():
-  error(""),
-  imageCollection(nullptr)
+  error("")
 {
 }
 
@@ -57,24 +56,24 @@ std::vector<std::shared_ptr<FitsObject>> OpPlugin::getCreatedImages() const
   return std::vector<std::shared_ptr<FitsObject>>();
 }
 
-OpPlugin::ResultType OpPlugin::execute(std::shared_ptr<FitsObject> /*image*/, QRect /*selection*/, const PreviewOptions& /*opt*/)
+OpPlugin::ResultType OpPlugin::execute(std::shared_ptr<FitsObject> /*image*/, const OpPluginData& /*data*/)
 {
   return CANCELLED;
 }
 
-OpPlugin::ResultType OpPlugin::execute(const std::vector<QFileInfo>& /*list*/, QRect /*selection*/, const PreviewOptions& /*opt*/)
+OpPlugin::ResultType OpPlugin::execute(const std::vector<QFileInfo>& /*list*/, const OpPluginData& /*data*/)
 {
   return CANCELLED;
 }
 
-OpPlugin::ResultType OpPlugin::execute(const std::vector<std::shared_ptr<FitsObject>>& list, QRect selection, const PreviewOptions& opt)
+OpPlugin::ResultType OpPlugin::execute(const std::vector<std::shared_ptr<FitsObject>>& list, const OpPluginData& data)
 {
   std::vector<QFileInfo> filelist;
   for (const std::shared_ptr<FitsObject>& file : list)
   {
     filelist.push_back(QFileInfo(file->getFilename()));
   }
-  return execute(filelist,selection,opt);
+  return execute(filelist,data);
 }
 
 const std::vector<QFileInfo> OpPlugin::getFileList() const
@@ -89,17 +88,6 @@ QString OpPlugin::getError() const
 
 void OpPlugin::bindPython(void*) const
 {
-}
-
-void OpPlugin::setImageCollection(ImageCollection* col)
-{
-  imageCollection = col;
-}
-
-
-ImageCollection* OpPlugin::getImageCollection() const
-{
-  return imageCollection;
 }
 
 void OpPlugin::setError(const QString &err)

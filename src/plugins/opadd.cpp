@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to add two images                                            *
  *                                                                              *
- * modified: 2025-01-31                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -69,13 +69,13 @@ void OpAdd::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpAdd::execute(std::shared_ptr<FitsObject> image, QRect /*selection*/, const PreviewOptions& opt)
+OpPlugin::ResultType OpAdd::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (dlg == nullptr)
   {
     dlg = new ImageSelectDialog();
     dlg->setTitle("Add Image");
-    dlg->setImageCollection(getImageCollection());
+    dlg->setImageCollection(data.imageCollection);
   }
   dlg->setPrompt("Add to "+image->getName()+":");
   if (dlg->exec())

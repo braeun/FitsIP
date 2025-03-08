@@ -2,7 +2,7 @@
  *                                                                              *
  * Fits - image statistics plugin                                               *
  *                                                                              *
- * modified: 2025-02-11                                                         *
+ * modified: 2025-03-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.   All Rights Reserved.                    *
@@ -45,9 +45,9 @@ QString MeasureStatistics::getMenuEntry() const
   return "Measure/Image Statistics...";
 }
 
-OpPlugin::ResultType MeasureStatistics::execute(std::shared_ptr<FitsObject> image, QRect rect, const PreviewOptions& opt)
+OpPlugin::ResultType MeasureStatistics::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
-  stat = ImageStatistics(*image->getImage(),rect);
+  stat = ImageStatistics(*image->getImage(),data.aoi);
   logOperation(image->getImage()->getName(),"Image Statistics:\n"+toString());
   TextInfoDialog d;
   d.setTitle("Image Statistics");

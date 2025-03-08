@@ -39,7 +39,7 @@ void OpFFTConvolution::bindPython(void* mod) const
 }
 #endif
 
-OpPlugin::ResultType OpFFTConvolution::execute(std::shared_ptr<FitsObject> image, QRect aoi, const PreviewOptions& opt)
+OpPlugin::ResultType OpFFTConvolution::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpFFTConvolutionDialog();
   if (dlg->exec())

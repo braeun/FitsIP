@@ -49,8 +49,6 @@ class EditMetadataDialog;
 class FileList;
 class LogWidget;
 
-class PreviewOptions;
-
 struct PluginMenuEntry
 {
   QAction* action;
@@ -171,7 +169,7 @@ private:
   void addOpPlugin(OpPlugin* op);
   QAction* addMenuEntry(QString entry, QIcon icon);
   void executeOpPlugin(OpPlugin* op);
-  void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, QRect roi, const PreviewOptions& opt);
+  void executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, const OpPluginData& data);
   std::vector<QFileInfo> getFileList();
 //  void display(int id);
   void updateDisplay();
@@ -196,6 +194,8 @@ private:
   std::unique_ptr<PluginFactory> pluginFactory;
   std::vector<PluginMenuEntry> pluginMenus;
   std::map<QString,QToolBar*> pluginToolbars;
+  std::unique_ptr<PixelList> defaultPixelList;
+  std::unique_ptr<StarList> defaultStarList;
   ImageWidget* imageWidget;
   ConsoleWidget* consoleWidget;
   EditMetadataDialog* editMetadataDialog;
