@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - configuration dialog                                                *
  *                                                                              *
- * modified: 2025-02-28                                                         *
+ * modified: 2025-03-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,6 +27,7 @@
 #include <QFileDialog>
 #include <QStyleFactory>
 #include <QSettings>
+#include <QSqlDatabase>
 
 const char* bindir = "/usr/bin";
 
@@ -35,6 +36,7 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
   ui(new Ui::ConfigurationDialog)
 {
   ui->setupUi(this);
+  ui->dbDriverBox->addItems(QSqlDatabase::drivers());
   ui->styleBox->insertItems(0,QStyleFactory::keys());
   for (const QString& key : PaletteFactory::getPaletteNames())
   {
@@ -81,6 +83,11 @@ void ConfigurationDialog::commitFields(AppSettings &settings)
   settings.setTool(Settings::ScriptEditor,ui->scriptEditorField->text());
   settings.setTool(Settings::TextEditor,ui->textEditorField->text());
   settings.setTool(Settings::OfficeEditor,ui->officeTextEditorField->text());
+  settings.setDatabaseDriver(ui->dbDriverBox->currentText());
+  settings.setDatabase(ui->dbNameField->text());
+  settings.setDatabaseHost(ui->dbHostField->text());
+  settings.setDatabaseUser(ui->dbUserField->text());
+  settings.setDatabasePassword(ui->dbPasswordField->text());
 
   QString style = settings.getStyle();
   QApplication::setStyle(QStyleFactory::create(style));
@@ -115,6 +122,18 @@ void ConfigurationDialog::updateFields(const AppSettings &settings)
   ui->scriptEditorField->setText(settings.getTool(Settings::ScriptEditor));
   ui->officeTextEditorField->setText(settings.getTool(Settings::OfficeEditor));
   ui->textEditorField->setText(settings.getTool(Settings::TextEditor));
+  if (QSqlDatabase::isDriverAvailable(settings.getDatabaseDriver()))
+  {
+    ui->dbDriverBox->setCurrentText(settings.getDatabaseDriver());
+  }
+  else
+  {
+    ui->dbDriverBox->setCurrentIndex(0);
+  }
+  ui->dbNameField->setText(settings.getDatabase());
+  ui->dbHostField->setText(settings.getDatabaseHost());
+  ui->dbUserField->setText(settings.getDatabaseUser());
+  ui->dbPasswordField->setText(settings.getDatabasePassword());
 }
 
 void ConfigurationDialog::browse(QLineEdit* field, QString path)

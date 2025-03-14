@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-02-28                                                         *
+ * modified: 2025-03-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -48,6 +48,12 @@ static const char* TOOL_TEXT_EDITOR = "fits/tools/texteditor";
 static const char* TOOL_OFFICE_EDITOR = "fits/tools/officeeditor";
 
 static const char* LOGBOOK_LATEST_FIRST = "fits/logbook/latestfirst";
+
+static const char* DB_NAME = "fits/db/name";
+static const char* DB_DRIVER = "fits/db/driver";
+static const char* DB_HOST = "fits/db/host";
+static const char* DB_USER = "fits/db/user";
+static const char* DB_PASSWORD = "fits/db/password";
 
 Settings::Settings()
 {
@@ -223,5 +229,55 @@ QString Settings::getInternalPSFDirectory() const
     QDir(getInternalDirectory()).mkpath("psf");
   }
   return info.absoluteFilePath();
+}
+
+void Settings::setDatabase(QString name)
+{
+  settings.setValue(DB_NAME,name);
+}
+
+QString Settings::getDatabase() const
+{
+  return settings.value(DB_NAME,"fitsdb").toString();
+}
+
+void Settings::setDatabaseDriver(QString name)
+{
+  settings.setValue(DB_DRIVER,name);
+}
+
+QString Settings::getDatabaseDriver() const
+{
+  return settings.value(DB_DRIVER,"QSQLITE").toString();
+}
+
+void Settings::setDatabaseHost(QString name)
+{
+  settings.setValue(DB_HOST,name);
+}
+
+QString Settings::getDatabaseHost() const
+{
+  return settings.value(DB_HOST,"").toString();
+}
+
+void Settings::setDatabaseUser(QString name)
+{
+  settings.setValue(DB_USER,name);
+}
+
+QString Settings::getDatabaseUser() const
+{
+  return settings.value(DB_USER,"").toString();
+}
+
+void Settings::setDatabasePassword(QString name)
+{
+  settings.setValue(DB_PASSWORD,name);
+}
+
+QString Settings::getDatabasePassword() const
+{
+  return settings.value(DB_PASSWORD,"").toString();
 }
 

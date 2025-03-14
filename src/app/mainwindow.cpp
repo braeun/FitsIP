@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-03-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,6 +37,7 @@
 #include <fitsbase/filelist.h>
 #include <fitsbase/pixellist.h>
 #include <fitsbase/dialogs/pluginfilelistreturndialog.h>
+#include <fitsbase/io/db.h>
 #include <fitsbase/io/iofactory.h>
 #include <fitsbase/logbook/xmllogbookstorage.h>
 #include <fitsbase/psf/psffactory.h>
@@ -63,6 +64,8 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   selectionMode(None)
 {
   ui->setupUi(this);
+  AppSettings settings;
+  db::configure(settings);
 
   defaultPixelList = std::make_unique<PixelList>();
   ui->pixellistWidget->setPixelList(defaultPixelList.get());
@@ -172,7 +175,6 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
     }
   }
 
-  AppSettings settings;
   if (!settings.getLogbook().isEmpty() && settings.isLogbookOpenLast()) openLogbook(settings.getLogbook());
   ui->logbookWidget->setLogbook(&logbook);
 
@@ -609,17 +611,17 @@ void MainWindow::updateMetadata()
   if (activeFile)
   {
     const ImageMetadata& metadata = activeFile->getImage()->getMetadata();
-    ui->metadataTable->item(0,0)->setText(metadata.object);
-    ui->metadataTable->item(1,0)->setText(metadata.date.toString(Qt::ISODate));
-    ui->metadataTable->item(2,0)->setText(metadata.observer);
-    ui->metadataTable->item(3,0)->setText(metadata.telescope);
-    ui->metadataTable->item(4,0)->setText(metadata.instrument);
-    ui->metadataTable->item(5,0)->setText(QString::number(metadata.exposure));
+    ui->metadataTable->item(0,0)->setText(metadata.getObject());
+    ui->metadataTable->item(1,0)->setText(metadata.getObsDateTime().toString(Qt::ISODate));
+    ui->metadataTable->item(2,0)->setText(metadata.getObserver());
+    ui->metadataTable->item(3,0)->setText(metadata.getTelescope());
+    ui->metadataTable->item(4,0)->setText(metadata.getInstrument());
+    ui->metadataTable->item(5,0)->setText(QString::number(metadata.getExposureTime()));
     int first = ui->historyTable->rowCount();
-    ui->historyTable->setRowCount(metadata.history.size());
-    for (int i=first;i<metadata.history.size();i++)
+    ui->historyTable->setRowCount(metadata.getHistory().size());
+    for (int i=first;i<metadata.getHistory().size();i++)
     {
-      ui->historyTable->setItem(i,0,new QTableWidgetItem(metadata.history[i]));
+      ui->historyTable->setItem(i,0,new QTableWidgetItem(metadata.getHistory()[i]));
     }
   }
   else
@@ -1155,9 +1157,11 @@ void MainWindow::on_actionPreferences_triggered()
   if (dlg->exec())
   {
     dlg->commit();
+    AppSettings settings;
     ui->logbookWidget->rebuild();
-    ui->profileWidget->setClickEndsTracking(AppSettings().isProfileStopTracking());
+    ui->profileWidget->setClickEndsTracking(settings.isProfileStopTracking());
     setScriptOutput();
+    db::configure(settings);
   }
   delete dlg;
 }

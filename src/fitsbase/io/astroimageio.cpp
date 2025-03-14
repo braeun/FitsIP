@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - astro image format reader and writer                                *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-03-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -94,7 +94,7 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0100(QFile *f, const QFileInfo& 
   /* image data */
   QByteArray a = f->read(sizeof(uint64_t));
   uint64_t msec = *(reinterpret_cast<uint64_t*>(a.data()));
-  metadata.date = QDateTime::fromMSecsSinceEpoch(msec);
+  metadata.setObsDateTime(QDateTime::fromMSecsSinceEpoch(msec));
   a = f->read(sizeof(uint32_t));
   uint32_t w = *(reinterpret_cast<uint32_t*>(a.data()));
   a = f->read(sizeof(uint32_t));
@@ -103,7 +103,7 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0100(QFile *f, const QFileInfo& 
   uint32_t bpp = *(reinterpret_cast<uint32_t*>(a.data()));
   if (bpp != 8) throw std::runtime_error("AstroImageIO: bpp!=8 is not supported");
   a = f->read(sizeof(double));
-  metadata.exposure = *(reinterpret_cast<double*>(a.data()));
+  metadata.setExposureTime(*(reinterpret_cast<double*>(a.data())));
   /* metadata table */
   a = f->read(sizeof(uint32_t));
   uint32_t rows = *(reinterpret_cast<uint32_t*>(a.data()));
@@ -112,13 +112,13 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0100(QFile *f, const QFileInfo& 
     QString key = f->read(KEY_LEN);
     QString value = f->read(VALUE_LEN);
     if (key == ai_key_object)
-      metadata.object = value;
+      metadata.setObject(value);
     else if (key == ai_key_observer)
-      metadata.observer = value;
+      metadata.setObserver(value);
     else if (key == ai_key_instrument)
-      metadata.instrument = value;
+      metadata.setInstrument(value);
     else if (key == ai_key_telescope)
-      metadata.telescope = value;
+      metadata.setTelescope(value);
     --rows;
   }
   /* the image data */
@@ -145,7 +145,7 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0200(QFile *f, const QFileInfo& 
   /* image data */
   QByteArray a = f->read(sizeof(uint64_t));
   uint64_t msec = *(reinterpret_cast<uint64_t*>(a.data()));
-  metadata.date = QDateTime::fromMSecsSinceEpoch(msec);
+  metadata.setObsDateTime(QDateTime::fromMSecsSinceEpoch(msec));
   a = f->read(sizeof(uint32_t));
   uint32_t w = *(reinterpret_cast<uint32_t*>(a.data()));
   a = f->read(sizeof(uint32_t));
@@ -154,7 +154,7 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0200(QFile *f, const QFileInfo& 
   uint32_t bytesPerPixel = *(reinterpret_cast<uint32_t*>(a.data()));
   if (bytesPerPixel != 1 && bytesPerPixel != 2 && bytesPerPixel != 4) throw std::runtime_error("AstroImageIO: unsupported bytes per pixel count");
   a = f->read(sizeof(double));
-  metadata.exposure = *(reinterpret_cast<double*>(a.data()));
+  metadata.setExposureTime(*(reinterpret_cast<double*>(a.data())));
   /* metadata table */
   a = f->read(sizeof(uint32_t));
   uint32_t rows = *(reinterpret_cast<uint32_t*>(a.data()));
@@ -163,13 +163,13 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0200(QFile *f, const QFileInfo& 
     QString key = f->read(KEY_LEN);
     QString value = f->read(VALUE_LEN);
     if (key == ai_key_object)
-      metadata.object = value;
+      metadata.setObject(value);
     else if (key == ai_key_observer)
-      metadata.observer = value;
+      metadata.setObserver(value);
     else if (key == ai_key_instrument)
-      metadata.instrument = value;
+      metadata.setInstrument(value);
     else if (key == ai_key_telescope)
-      metadata.telescope = value;
+      metadata.setTelescope(value);
     --rows;
   }
   /* the image data */

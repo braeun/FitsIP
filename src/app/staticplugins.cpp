@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - declaration of static plugins                                       *
  *                                                                              *
- * modified: 2025-03-01                                                         *
+ * modified: 2025-03-10                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -66,6 +66,7 @@ Q_IMPORT_PLUGIN(LucyRichardsonDeconvolution)
 
 Q_IMPORT_PLUGIN(AnalyseProfile)
 
+Q_IMPORT_PLUGIN(MeasureDistance)
 Q_IMPORT_PLUGIN(MeasureStatistics)
 Q_IMPORT_PLUGIN(MeasureSharpness)
 Q_IMPORT_PLUGIN(MeasureCrossCorrelation)

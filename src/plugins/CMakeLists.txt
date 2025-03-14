@@ -129,6 +129,7 @@ set(private_header_list
   analyseprofiledialog.h
   findstarsdialog.h
   lucyrichardsondeconvolutiondialog.h
+  measuredistancedialog.h
   measurematchdialog.h
 #  measurerankresultdialog.h
   measuresharpnessresultdialog.h
@@ -158,6 +159,7 @@ add_library(fitsplugins
   analyseprofiledialog.cpp analyseprofiledialog.ui
   findstarsdialog.cpp findstarsdialog.ui
   lucyrichardsondeconvolutiondialog.cpp lucyrichardsondeconvolutiondialog.ui
+  measuredistancedialog.cpp measuredistancedialog.ui
   measurematchdialog.cpp measurematchdialog.ui
 #  measurerankresultdialog.cpp measurerankresultdialog.ui
   measuresharpnessresultdialog.cpp measuresharpnessresultdialog.ui

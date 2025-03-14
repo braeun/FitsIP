@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - measure the distance of two points in an image                      *
+ * FitsIP - measure the distance dialog                                         *
  *                                                                              *
- * modified: 2025-03-11                                                         *
+ * modified: 2025-03-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,35 +20,43 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef MEASUREDISTANCE_H
-#define MEASUREDISTANCE_H
+#ifndef MEASUREDISTANCEDIALOG_H
+#define MEASUREDISTANCEDIALOG_H
 
-#include <fitsbase/opplugin.h>
-#include <QObject>
-#include <vector>
+#include <QDialog>
+#include <fitsbase/pixel.h>
+#include <fitsbase/io/db.h>
 
-#define QT_STATICPLUGIN
-#include <QtPlugin>
+class PixelList;
 
-
+namespace Ui {
 class MeasureDistanceDialog;
+}
 
-class MeasureDistance: public OpPlugin
+class MeasureDistanceDialog : public QDialog
 {
   Q_OBJECT
-  Q_PLUGIN_METADATA(IID OpPlugin_iid)
-  Q_INTERFACES(OpPlugin)
 
 public:
-  MeasureDistance();
-  virtual ~MeasureDistance() override;
+  explicit MeasureDistanceDialog(QWidget *parent = nullptr);
+  ~MeasureDistanceDialog();
 
-  virtual QString getMenuEntry() const override;
+  void setPixelList(PixelList* list);
 
-  virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
+protected:
+  void showEvent(QShowEvent *event) override;
 
 private:
-  MeasureDistanceDialog* dlg;
+  void cameraSelected(const QString& name);
+  void calculate();
+  void save();
+
+  Ui::MeasureDistanceDialog *ui;
+  double p1x;
+  double p1y;
+  double p2x;
+  double p2y;
+  std::vector<db::Camera> cameras;
 };
 
-#endif // MEASUREDISTANCE_H
+#endif // MEASUREDISTANCEDIALOG_H

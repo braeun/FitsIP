@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to edit image metadata                                       *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-03-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -38,20 +38,45 @@ EditMetadataDialog::~EditMetadataDialog()
 
 void EditMetadataDialog::displayMetadata(const ImageMetadata &data)
 {
-  ui->objectField->setText(data.object);
-  ui->observerField->setText(data.observer);
-  ui->telescopeField->setText(data.telescope);
-  ui->instrumentField->setText(data.instrument);
-  ui->exposureField->setText(QString::number(data.exposure));
-  ui->dateField->setDateTime(data.date);
+  ui->objectField->setText(data.getObject());
+  ui->observerField->setText(data.getObserver());
+  ui->telescopeField->setText(data.getTelescope());
+  ui->instrumentField->setText(data.getInstrument());
+  ui->exposureField->setText(QString::number(data.getExposureTime()));
+  ui->dateField->setDateTime(data.getObsDateTime());
+  ui->tableWidget->clearContents();
+  ui->tableWidget->setRowCount(data.getEntries().size());
+  int row = 0;
+  for (const auto& entry : data.getEntries())
+  {
+    ui->tableWidget->setItem(row,0,new QTableWidgetItem(entry.first));
+    ui->tableWidget->setItem(row,1,new QTableWidgetItem(entry.second.value));
+    ui->tableWidget->setItem(row,2,new QTableWidgetItem(entry.second.comment));
+    ++row;
+  }
 }
 
 void EditMetadataDialog::commit(ImageMetadata &data)
 {
-  data.object = ui->objectField->text();
-  data.observer = ui->observerField->text();
-  data.telescope = ui->telescopeField->text();
-  data.instrument = ui->instrumentField->text();
-  data.exposure = ui->exposureField->text().toDouble();
-  data.date = ui->dateField->dateTime();
+  if (ui->tabWidget->currentIndex() == 0)
+  {
+    data.setObject(ui->objectField->text());
+    data.setObserver(ui->observerField->text());
+    data.setTelescope(ui->telescopeField->text());
+    data.setInstrument(ui->instrumentField->text());
+    data.setExposureTime(ui->exposureField->text().toDouble());
+    data.setObsDateTime(ui->dateField->dateTime());
+  }
+  else
+  {
+    std::map<QString,ImageMetadata::Entry> entries;
+    for (int r=0;r<ui->tableWidget->rowCount();++r)
+    {
+      QString key = ui->tableWidget->item(r,0)->text();
+      QString value = ui->tableWidget->item(r,1)->text();
+      QString comment = ui->tableWidget->item(r,2)->text();
+      entries[key] = ImageMetadata::Entry{.value{value},.comment{comment}};
+    }
+    data.setEntries(entries);
+  }
 }

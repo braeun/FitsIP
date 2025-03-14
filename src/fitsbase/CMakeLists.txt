@@ -33,6 +33,7 @@ set(private_header_list
   dialogs/twovaluedialog.h
   io/astroimageio.h
   io/cookbookio.h
+  io/db.h
   io/fitsio.h
   io/iofactory.h
   io/iohandler.h
@@ -109,6 +110,7 @@ add_library(fitsbase
   dialogs/twovaluedialog.ui
   io/astroimageio.cpp
   io/cookbookio.cpp
+  io/db.cpp
   io/fitsio.cpp
   io/iofactory.cpp
   io/iohandler.cpp
@@ -167,6 +169,7 @@ target_link_libraries(fitsbase
   PUBLIC PkgConfig::cfitsio
   PUBLIC PkgConfig::QWT
   PUBLIC Qt5::Xml
+  PUBLIC Qt5::Sql
   PUBLIC Qt5::Widgets
   PUBLIC Qt5::Core
   )

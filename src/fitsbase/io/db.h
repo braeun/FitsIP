@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - measure the distance of two points in an image                      *
+ * FitsIP - database configuration                                              *
  *                                                                              *
- * modified: 2025-03-11                                                         *
+ * modified: 2025-03-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,35 +20,35 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef MEASUREDISTANCE_H
-#define MEASUREDISTANCE_H
+#ifndef DB_H
+#define DB_H
 
-#include <fitsbase/opplugin.h>
-#include <QObject>
 #include <vector>
+#include <QString>
 
-#define QT_STATICPLUGIN
-#include <QtPlugin>
+class Settings;
 
-
-class MeasureDistanceDialog;
-
-class MeasureDistance: public OpPlugin
+namespace db
 {
-  Q_OBJECT
-  Q_PLUGIN_METADATA(IID OpPlugin_iid)
-  Q_INTERFACES(OpPlugin)
 
-public:
-  MeasureDistance();
-  virtual ~MeasureDistance() override;
-
-  virtual QString getMenuEntry() const override;
-
-  virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
-
-private:
-  MeasureDistanceDialog* dlg;
+struct Camera
+{
+  QString name;
+  double pixelwidth;
+  double pixelheight;
 };
 
-#endif // MEASUREDISTANCE_H
+extern const char* CONNECTION_NAME;
+
+extern void configure(const Settings& settings);
+
+extern std::vector<Camera> getCameras();
+
+extern void addCamera(const Camera& c);
+
+extern void updateCamera(const Camera& c);
+
+
+} // namespace
+
+#endif // DB_H

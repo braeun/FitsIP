@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-03-01                                                         *
+ * modified: 2025-03-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -241,7 +241,7 @@ void FitsImage::setMetadata(const ImageMetadata& data)
 
 void FitsImage::log(QString msg)
 {
-  metadata.history.push_back(msg);
+  metadata.addHistory(msg);
 }
 
 bool FitsImage::isCompatible(const FitsImage &img) const

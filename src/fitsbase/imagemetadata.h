@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - metadata for the image                                              *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-03-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,7 @@
 #ifndef IMAGEMETADATA_H
 #define IMAGEMETADATA_H
 
+#include <map>
 #include <QString>
 #include <QDateTime>
 #include <QStringList>
@@ -30,14 +31,56 @@
 class ImageMetadata
 {
 public:
+  struct Entry
+  {
+    QString value;
+    QString comment;
+  };
+
   ImageMetadata();
 
-  QString object = "";
-  QString observer = "";
-  QString instrument = "";
-  QString telescope = "";
-  double exposure = 0;
-  QDateTime date;
+  void setEntries(const std::map<QString,Entry>& map);
+
+  const std::map<QString,Entry>& getEntries() const;
+
+  void addEntry(const QString& key, const QString& value, const QString& comment="");
+
+  QString getValue(const QString& key) const;
+
+  QString getComment(const QString& key) const;
+
+  void setHistory(const QStringList& h);
+
+  const QStringList& getHistory() const;
+
+  void addHistory(const QString& msg);
+
+  void setObject(const QString& s);
+
+  QString getObject() const;
+
+  void setObserver(const QString& s);
+
+  QString getObserver() const;
+
+  void setInstrument(const QString& s);
+
+  QString getInstrument() const;
+
+  void setTelescope(const QString& s);
+
+  QString getTelescope() const;
+
+  void setExposureTime(double t);
+
+  double getExposureTime() const;
+
+  void setObsDateTime(QDateTime t);
+
+  QDateTime getObsDateTime() const;
+
+private:
+  std::map<QString,Entry> entries;
   QStringList history;
 };
 

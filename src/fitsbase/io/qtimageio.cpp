@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - reader and writer for image formats handled by Qt                   *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2025-03-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -128,19 +128,20 @@ void QtImageIO::readMetadata(QString filename, ImageMetadata* data)
         tokens.removeFirst();
         QString value = tokens.join(":").trimmed();
         if (id == "date")
-          data->date = QDateTime::fromString(value,Qt::ISODateWithMs);
+          data->setObsDateTime(QDateTime::fromString(value,Qt::ISODateWithMs));
         else if (id == "object")
-          data->object = value;
+          data->setObject(value);
         else if (id == "observer")
-          data->observer = value;
+          data->setObserver(value);
         else if (id == "instrument")
-          data->instrument = value;
+          data->setInstrument(value);
         else if (id == "telescope")
-          data->telescope = value;
+          data->setTelescope(value);
         else if (id == "exposure")
         {
-          data->exposure = value.toDouble();
-          if (data->exposure < 1.0E-6) data->exposure = 0;
+          double v = value.toDouble();
+          if (v < 1.0E-6) v = 0;
+          data->setExposureTime(v);
         }
       }
     }
@@ -155,12 +156,12 @@ void QtImageIO::writeMetadata(QString filename, const ImageMetadata& data)
   if (file.open(QIODevice::WriteOnly|QIODevice::Text))
   {
     QTextStream os(&file);
-    os << "date: " << data.date.toString(Qt::ISODateWithMs) << Qt::endl;
-    os << "object: " << data.object << Qt::endl;
-    os << "observer: " << data.observer << Qt::endl;
-    os << "instrument: " << data.instrument << Qt::endl;
-    os << "telescope: " << data.telescope << Qt::endl;
-    os << "exposure: " << data.exposure << Qt::endl;
+    os << "date: " << data.getObsDateTime().toString(Qt::ISODateWithMs) << Qt::endl;
+    os << "object: " << data.getObject() << Qt::endl;
+    os << "observer: " << data.getObserver() << Qt::endl;
+    os << "instrument: " << data.getInstrument() << Qt::endl;
+    os << "telescope: " << data.getTelescope() << Qt::endl;
+    os << "exposure: " << data.getExposureTime() << Qt::endl;
   }
 }
 
@@ -203,30 +204,30 @@ void QtImageIO::readExif(QString filename, ImageMetadata* data)
       {
         QDate date = QDate::fromString(list[0].replace(":","-"),Qt::ISODate);
         QTime time = QTime::fromString(list[1]);
-        data->date = QDateTime(date,time);
+        data->setObsDateTime(QDateTime(date,time));
       }
       else
       {
         QDateTime date = QDateTime::fromString(QString::fromStdString(pos->value().toString()),Qt::ISODate);
-        data->date = date;
+        data->setObsDateTime(date);
       }
-      std::cout << data->date.toString().toStdString() << std::endl;
+      std::cout << data->getObsDateTime().toString().toStdString() << std::endl;
     }
   }
 //  pos = exifData.findKey(Exiv2::ExifKey("Exif.Image.Make"));
 //  if (pos != exifData.end()) addTag(MAKE,QString::fromStdString(pos->value().toString()),"Make");
   pos = exifData.findKey(Exiv2::ExifKey("Exif.Image.Model"));
-  if (pos != exifData.end()) data->instrument = QString::fromStdString(pos->value().toString());
+  if (pos != exifData.end()) data->setInstrument(QString::fromStdString(pos->value().toString()));
   pos = exifData.findKey(Exiv2::ExifKey("Exif.Photo.CameraOwnerName"));
   if (pos != exifData.end())
-    data->observer = QString::fromStdString(pos->value().toString());
+    data->setObserver(QString::fromStdString(pos->value().toString()));
   else
   {
     pos = exifData.findKey(Exiv2::ExifKey("Exif.Canon.OwnerName"));
-    if (pos != exifData.end()) data->observer = QString::fromStdString(pos->value().toString());
+    if (pos != exifData.end()) data->setObserver(QString::fromStdString(pos->value().toString()));
   }
   pos = exifData.findKey(Exiv2::ExifKey("Exif.Photo.ExposureTime"));
-  if (pos != exifData.end()) data->exposure = pos->value().toFloat();
+  if (pos != exifData.end()) data->setExposureTime(pos->value().toFloat());
 //  pos = exifData.findKey(Exiv2::ExifKey("Exif.Image.ISOSpeedRatings"));
 //  if (pos != exifData.end()) addTag(ISO,QString::fromStdString(pos->value().toString()),"ISOSpeedRatings");
   image->clearMetadata();
@@ -240,11 +241,11 @@ void QtImageIO::writeExif(QString filename, std::shared_ptr<FitsImage> img)
     image = Exiv2::ImageFactory::open(filename.toStdString());
     image->readMetadata();
     Exiv2::ExifData& exifData = image->exifData();
-    Exiv2::AsciiValue sv(img->getMetadata().observer.toStdString());
+    Exiv2::AsciiValue sv(img->getMetadata().getObserver().toStdString());
     exifData.add(Exiv2::ExifKey("Exif.Photo.CameraOwnerName"),&sv);
-    sv = Exiv2::AsciiValue(img->getMetadata().instrument.toStdString());
+    sv = Exiv2::AsciiValue(img->getMetadata().getInstrument().toStdString());
     exifData.add(Exiv2::ExifKey("Exif.Image.Model"),&sv);
-    Exiv2::FloatValue fv(static_cast<float>(img->getMetadata().exposure));
+    Exiv2::FloatValue fv(static_cast<float>(img->getMetadata().getExposureTime()));
     exifData.add(Exiv2::ExifKey("Exif.Photo.ExposureTime"),&fv);
   //  image->setExifData(exifData);
     image->writeMetadata();

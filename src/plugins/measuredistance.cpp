@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - measure the distance of two points in an image                      *
  *                                                                              *
- * modified: 2025-03-07                                                         *
+ * modified: 2025-03-11                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -21,17 +21,32 @@
  ********************************************************************************/
 
 #include "measuredistance.h"
+#include "measuredistancedialog.h"
 
-MeasureDistance::MeasureDistance()
+MeasureDistance::MeasureDistance():
+  dlg(nullptr)
 {
 }
 
 MeasureDistance::~MeasureDistance()
 {
+  if (dlg) dlg->deleteLater();
 }
 
 QString MeasureDistance::getMenuEntry() const
 {
   return "Measure/Distance...";
 }
+
+OpPlugin::ResultType MeasureDistance::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
+{
+  if (!dlg)
+  {
+    dlg = new MeasureDistanceDialog();
+  }
+  dlg->setPixelList(image->getPixelList());
+  dlg->exec();
+  return OpPlugin::OK;
+}
+
 

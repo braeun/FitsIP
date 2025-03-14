@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - FITS image format reader and writer                                 *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2025-03-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -68,37 +68,38 @@ std::shared_ptr<FitsImage> FitsIO::read(QString filename)
     fits.pHDU().readAllKeys();
     const std::map<std::string,CCfits::Keyword*>& keywords = fits.pHDU().keyWord();
     std::string v;
-    QString date = "";
-    QString time = "";
+//    QString date = "";
+//    QString time = "";
     for (const auto& entry : keywords)
     {
+      metadata.addEntry(QString::fromStdString(entry.first),QString::fromStdString(entry.second->value(v)));
 //      qDebug() << entry.first.c_str() << ": " << entry.second->value(v).c_str();
-      if (entry.first == "OBJECT") metadata.object = QString::fromStdString(entry.second->value(v));
-      if (entry.first == "INSTRUME") metadata.instrument = QString::fromStdString(entry.second->value(v));
-      if (entry.first == "TELESCOP") metadata.telescope = QString::fromStdString(entry.second->value(v));
-      if (entry.first == "OBSERVER") metadata.observer = QString::fromStdString(entry.second->value(v));
-      if (entry.first == "EXPTIME") metadata.exposure = QString::fromStdString(entry.second->value(v)).toDouble();
-      if (entry.first == "DATE-OBS") date = QString::fromStdString(entry.second->value(v));
-      if (entry.first == "TIME-OBS") time = QString::fromStdString(entry.second->value(v));
-      /* non standard keywords */
-      if (entry.first == "PREFFTW") img->preFFTWidth = QString::fromStdString(entry.second->value(v)).toDouble();
-      if (entry.first == "PREFFTH") img->preFFTHeight = QString::fromStdString(entry.second->value(v)).toDouble();
+//      if (entry.first == "OBJECT") metadata.object = QString::fromStdString(entry.second->value(v));
+//      if (entry.first == "INSTRUME") metadata.instrument = QString::fromStdString(entry.second->value(v));
+//      if (entry.first == "TELESCOP") metadata.telescope = QString::fromStdString(entry.second->value(v));
+//      if (entry.first == "OBSERVER") metadata.observer = QString::fromStdString(entry.second->value(v));
+//      if (entry.first == "EXPTIME") metadata.exposure = QString::fromStdString(entry.second->value(v)).toDouble();
+//      if (entry.first == "DATE-OBS") date = QString::fromStdString(entry.second->value(v));
+//      if (entry.first == "TIME-OBS") time = QString::fromStdString(entry.second->value(v));
+//      /* non standard keywords */
+//      if (entry.first == "PREFFTW") img->preFFTWidth = QString::fromStdString(entry.second->value(v)).toDouble();
+//      if (entry.first == "PREFFTH") img->preFFTHeight = QString::fromStdString(entry.second->value(v)).toDouble();
     }
-    if (!date.isEmpty() && !time.isEmpty())
-    {
-      QDate d = QDate::fromString(date,Qt::ISODate);
-      QTime t = QTime::fromString(time,Qt::ISODate);
-      metadata.date = QDateTime(d,t,Qt::UTC);
-    }
+//    if (!date.isEmpty() && !time.isEmpty())
+//    {
+//      QDate d = QDate::fromString(date,Qt::ISODate);
+//      QTime t = QTime::fromString(time,Qt::ISODate);
+//      metadata.date = QDateTime(d,t,Qt::UTC);
+//    }
     QString history = QString::fromStdString(fits.pHDU().history());
-    metadata.history = history.split("\n");
-    if (!metadata.history.empty() && metadata.history.back().trimmed().isEmpty())
-    {
-      metadata.history.pop_back();
-    }
+    metadata.setHistory(history.split("\n"));
+//    if (!metadata.history.empty() && metadata.history.back().trimmed().isEmpty())
+//    {
+//      metadata.history.pop_back();
+//    }
     img->setMetadata(metadata);
     /* special handling fpr starlight xpress which stores unsigned 16bit */
-    if (metadata.instrument.toLower().contains("starlight xpress") && fits.pHDU().bitpix() == 16)
+    if (metadata.getInstrument().toLower().contains("starlight xpress") && fits.pHDU().bitpix() == 16)
     {
       PixelIterator it = img->getPixelIterator();
       while (true)
@@ -162,19 +163,23 @@ bool FitsIO::write(QString filename, std::shared_ptr<FitsImage> img)
       first += axes[0] * axes[1];
     }
     const ImageMetadata& metadata = img->getMetadata();
-    if (!metadata.object.isEmpty()) fits->pHDU().addKey("OBJECT",metadata.object.toStdString().c_str(),"");
-    if (!metadata.instrument.isEmpty()) fits->pHDU().addKey("INSTRUME",metadata.instrument.toStdString().c_str(),"");
-    if (!metadata.telescope.isEmpty()) fits->pHDU().addKey("TELESCOP",metadata.telescope.toStdString().c_str(),"");
-    if (!metadata.observer.isEmpty()) fits->pHDU().addKey("OBSERVER",metadata.observer.toStdString().c_str(),"");
-    if (metadata.exposure > 0) fits->pHDU().addKey("EXPTIME",metadata.exposure,"");
-    if (!metadata.date.isNull())
+    for (const auto& entry : metadata.getEntries())
     {
-      fits->pHDU().addKey("DATE-OBS",metadata.date.date().toString(Qt::ISODate).toStdString().c_str(),"");
-      fits->pHDU().addKey("TIME-OBS",metadata.date.time().toString(Qt::ISODate).toStdString().c_str(),"");
+      fits->pHDU().addKey(entry.first.toStdString(),entry.second.value.toStdString(),entry.second.comment.toStdString());
     }
-    if (!metadata.history.isEmpty())
+//    if (!metadata.object.isEmpty()) fits->pHDU().addKey("OBJECT",metadata.object.toStdString().c_str(),"");
+//    if (!metadata.instrument.isEmpty()) fits->pHDU().addKey("INSTRUME",metadata.instrument.toStdString().c_str(),"");
+//    if (!metadata.telescope.isEmpty()) fits->pHDU().addKey("TELESCOP",metadata.telescope.toStdString().c_str(),"");
+//    if (!metadata.observer.isEmpty()) fits->pHDU().addKey("OBSERVER",metadata.observer.toStdString().c_str(),"");
+//    if (metadata.exposure > 0) fits->pHDU().addKey("EXPTIME",metadata.exposure,"");
+//    if (!metadata.date.isNull())
+//    {
+//      fits->pHDU().addKey("DATE-OBS",metadata.date.date().toString(Qt::ISODate).toStdString().c_str(),"");
+//      fits->pHDU().addKey("TIME-OBS",metadata.date.time().toString(Qt::ISODate).toStdString().c_str(),"");
+//    }
+    if (!metadata.getHistory().isEmpty())
     {
-      fits->pHDU().writeHistory(metadata.history.join("\n").toStdString());
+      fits->pHDU().writeHistory(metadata.getHistory().join("\n").toStdString());
     }
     /* non standard key words */
     if (img->preFFTHeight > 0 && img->preFFTWidth > 0)

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-02-28                                                         *
+ * modified: 2025-03-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -119,6 +119,26 @@ public:
   QString getInternalDirectory() const;
 
   QString getInternalPSFDirectory() const;
+
+  void setDatabase(QString name);
+
+  QString getDatabase() const;
+
+  void setDatabaseDriver(QString name);
+
+  QString getDatabaseDriver() const;
+
+  void setDatabaseHost(QString name);
+
+  QString getDatabaseHost() const;
+
+  void setDatabaseUser(QString name);
+
+  QString getDatabaseUser() const;
+
+  void setDatabasePassword(QString name);
+
+  QString getDatabasePassword() const;
 
 
   static const char* PATH_IMAGE;    //!< key for fits image path

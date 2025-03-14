@@ -48,7 +48,7 @@ set(ENV{PKG_CONFIG_PATH} "${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/usr/local
 find_package(PkgConfig REQUIRED)
 
 # check for Qt5
-find_package(Qt5 COMPONENTS Widgets Xml REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Xml Sql REQUIRED)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
