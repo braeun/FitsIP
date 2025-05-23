@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - xml file based logbook data storage                                 *
  *                                                                              *
- * modified: 2024-12-14                                                         *
+ * modified: 2025-04-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,14 +23,14 @@
 #ifndef XMLLOGBOOKSTORAGE_H
 #define XMLLOGBOOKSTORAGE_H
 
-#include "logbookstorage.h"
+#include "abstractlogbookstorage.h"
 #include <QDomDocument>
 #include <set>
 #include <map>
 
 class QFile;
 
-class XMLLogbookStorage: public LogbookStorage
+class XMLLogbookStorage: public AbstractLogbookStorage
 {
 public:
   XMLLogbookStorage(const QString& filename);
@@ -44,41 +44,15 @@ public:
 
   virtual void setTitle(const QString& title) override;
 
-  virtual QString getTitle() const override;
-
   virtual void setDescription(const QString& desc) override;
 
-  virtual QString getDescription() const override;
-
-  virtual std::vector<LogbookEntry> getEntries() const override;
-
-  virtual std::vector<LogbookEntry> getEntries(const LogbookFilter& filter) const override;
-
-  virtual const LogbookEntry& getLastEntry() const override;
-
-  virtual LogbookEntry getEntry(int64_t id) const override;
-
-  virtual std::set<QString> getImages() const override;
-
-  virtual std::set<QString> getProjects() const override;
-
-  virtual std::set<QString> getSteps(const QString& project) const override;
-
-  virtual void getTimeRange(QDateTime* begin, QDateTime* end) const override;
-
 private:
-  void read();
-  void write();
+  virtual void read() override;
+  virtual void write() override;
+  void writeXML();
 
   QDomDocument doc;
   QFile* file;
-  int64_t idcounter;
-  std::vector<LogbookEntry> entries;
-  std::set<QString> images;
-  std::set<QString> projects;
-  std::map<QString,std::set<QString>> steps;
-  QString title;
-  QString desc;
 };
 
 #endif // XMLLOGBOOKSTORAGE_H

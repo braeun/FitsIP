@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - vanCittert deconvolution dialog                                     *
  *                                                                              *
- * modified: 2022-11-25                                                         *
+ * modified: 2025-05-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,6 +37,8 @@ class VanCittertDeconvolutionDialog : public QDialog
 public:
   explicit VanCittertDeconvolutionDialog(QWidget *parent = nullptr);
   ~VanCittertDeconvolutionDialog();
+
+  void updatePSFList();
 
   QString getFunction() const;
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for logbook data storage                         *
  *                                                                              *
- * modified: 2022-11-29                                                         *
+ * modified: 2025-04-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,7 +25,6 @@
 
 LogbookStorage::LogbookStorage()
 {
-
 }
 
 void LogbookStorage::setId(LogbookEntry &entry, int64_t v)

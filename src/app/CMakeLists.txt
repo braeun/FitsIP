@@ -24,6 +24,8 @@
   dialogs/logbookfilter1dialog.h
   dialogs/logbookpropertiesdialog.h
   dialogs/logentryeditdialog.h
+  dialogs/psfmanagerdialog.h
+  dialogs/stardialog.h
 )
 
 add_executable(fits
@@ -56,6 +58,8 @@ add_executable(fits
   dialogs/logbookfilter1dialog.cpp dialogs/logbookfilter1dialog.ui
   dialogs/logbookpropertiesdialog.cpp dialogs/logbookpropertiesdialog.ui
   dialogs/logentryeditdialog.cpp dialogs/logentryeditdialog.ui
+  dialogs/psfmanagerdialog.cpp dialogs/psfmanagerdialog.ui
+  dialogs/stardialog.cpp dialogs/stardialog.ui
   ${private_header_list}
   )
 

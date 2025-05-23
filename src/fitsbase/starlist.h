@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - list of selected/detected stars                                     *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-03-15                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,8 @@
 #ifndef STARLIST_H
 #define STARLIST_H
 
+#include "fitsimage.h"
+#include "pixellist.h"
 #include "star.h"
 #include <QAbstractTableModel>
 #include <vector>
@@ -32,6 +34,8 @@ class StarList: public QAbstractTableModel
   Q_OBJECT
 public:
   explicit StarList(QObject* parent=nullptr);
+
+  StarList(FitsImage* img, ValueType sky, const PixelList* pixels, int box, QObject* parent=nullptr);
 
   void clear();
 

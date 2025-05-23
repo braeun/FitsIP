@@ -42,30 +42,39 @@ void OpFFTConvolution::bindPython(void* mod) const
 OpPlugin::ResultType OpFFTConvolution::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpFFTConvolutionDialog();
+  dlg->updatePSFList();
   if (dlg->exec())
   {
     const PSF* psf = PSFFactory::getInstance()->getPSF(dlg->getFunction());
     auto psfpar = dlg->getParameters();
     if (psf)
     {
-      profiler.start();
-      auto img = fftconvolution(image->getImage().get(),psf,psfpar);
-      image->setImage(img);
-      profiler.stop();
-      QString msg = "FFT deconvolution: ";
-      msg += psf->getName();
-      if (!psfpar.empty())
+      try
       {
-        msg += " par=";
-        for (size_t i=0;i<psfpar.size();++i)
+        profiler.start();
+        auto img = fftconvolution(image->getImage().get(),psf,psfpar);
+        image->setImage(img);
+        profiler.stop();
+        QString msg = "FFT deconvolution: ";
+        msg += psf->getName();
+        if (!psfpar.empty())
         {
-          if (i > 0) msg += ",";
-          msg += QString::asprintf("%.1f",psfpar[i]);
+          msg += " par=";
+          for (size_t i=0;i<psfpar.size();++i)
+          {
+            if (i > 0) msg += ",";
+            msg += QString::asprintf("%.1f",psfpar[i]);
+          }
         }
+        log(image,msg);
+        logProfiler(image);
+        return OK;
       }
-      log(image,msg);
-      logProfiler(image);
-      return OK;
+      catch (std::runtime_error& ex)
+      {
+        setError(ex.what());
+        return ERROR;
+      }
     }
     else
     {

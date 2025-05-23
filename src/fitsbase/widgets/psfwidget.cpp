@@ -30,16 +30,24 @@ PSFWidget::PSFWidget(QWidget *parent) :
   ui(new Ui::PSFWidget)
 {
   ui->setupUi(this);
-  for (const auto& psf : PSFFactory::getInstance()->getList())
-  {
-    ui->functionBox->addItem(psf->getName());
-  }
+  updatePSFList();
 }
 
 PSFWidget::~PSFWidget()
 {
   delete ui;
 }
+
+void PSFWidget::updatePSFList()
+{
+  ui->functionBox->clear();
+  for (const auto& psf : PSFFactory::getInstance()->getList())
+  {
+    ui->functionBox->addItem(psf->getName());
+  }
+}
+
+
 
 QString PSFWidget::getFunction() const
 {

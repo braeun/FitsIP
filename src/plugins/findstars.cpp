@@ -315,15 +315,7 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
       printf("%5d %7.2f   %7.2f   %7.2f   %6.3f    %6.3f   %6.3f \n",
           ++num_star, xc, yc,	conv_img->getConstPixelIterator(ix,iy).getAbs() - sky,
           fwhm, round, sharp);
-      Star star;
-      star.x = xc;
-      star.y = yc;
-      star.fwhm = fwhm;
-      star.xwidth = xwidth;
-      star.ywidth = ywidth;
-      star.round = round;
-      star.sharp = sharp;
-      star.hotness = hot_factor;
+      Star star(xc,yc,fwhm,xwidth,ywidth,round,sharp,hot_factor);
       stars.push_back(star);
       c_star++;
 

@@ -38,16 +38,19 @@ set(private_header_list
   io/iofactory.h
   io/iohandler.h
   io/qtimageio.h
+  logbook/abstractlogbookstorage.h
   logbook/logbook.h
   logbook/logbookentry.h
   logbook/logbookfilter.h
   logbook/logbookstorage.h
+  logbook/logbookutils.h
   logbook/xmllogbookstorage.h
   math/average.h
   math/fitpar.h
   math/gaussfit.h
   math/mathfunctions.h
   math/moments.h
+  math/utils.h
   math/filter/chebyshevfilter.h
   math/filter/filter.h
   math/filter/iirfilter.h
@@ -93,6 +96,7 @@ add_library(fitsbase
   rgbvalue.cpp
   scriptutilities.cpp
   settings.cpp
+  star.cpp
   starlist.cpp
   undostack.cpp
   dialogs/imageselectdialog.cpp
@@ -102,8 +106,7 @@ add_library(fitsbase
   dialogs/pluginfilelistreturndialog.cpp dialogs/pluginfilelistreturndialog.ui
   dialogs/progressdialog.cpp
   dialogs/progressdialog.ui
-  dialogs/psfdialog.cpp
-  dialogs/psfdialog.ui
+  dialogs/psfdialog.cpp dialogs/psfdialog.ui
   dialogs/textinfodialog.cpp
   dialogs/textinfodialog.ui
   dialogs/twovaluedialog.cpp
@@ -115,16 +118,19 @@ add_library(fitsbase
   io/iofactory.cpp
   io/iohandler.cpp
   io/qtimageio.cpp
+  logbook/abstractlogbookstorage.cpp
   logbook/logbook.cpp
   logbook/logbookentry.cpp
   logbook/logbookfilter.cpp
   logbook/logbookstorage.cpp
+  logbook/logbookutils.cpp
   logbook/xmllogbookstorage.cpp
   math/average.cpp
   math/fitpar.cpp
   math/gaussfit.cpp
   math/mathfunctions.cpp
   math/moments.cpp
+  math/utils.cpp
   math/filter/chebyshevfilter.cpp
   math/filter/filter.cpp
   math/filter/iirfilter.cpp
@@ -184,4 +190,10 @@ if (USE_PYTHON)
   # target_link_libraries(fitsbase
   #   PRIVATE pybind11::embed
   # )
+endif()
+
+if (nlohmann_json_FOUND)
+  target_link_libraries(fitsbase
+    PUBLIC nlohmann_json::nlohmann_json
+    )
 endif()

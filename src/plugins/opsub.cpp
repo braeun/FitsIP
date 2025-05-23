@@ -60,12 +60,12 @@ QIcon OpSub::getIcon() const
 void OpSub::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
-  m->def("add",[](std::shared_ptr<FitsObject> obj1, std::shared_ptr<FitsObject> obj2){
+  m->def("sub",[](std::shared_ptr<FitsObject> obj1, std::shared_ptr<FitsObject> obj2){
     *(obj1->getImage()) -= *(obj2->getImage());
     obj1->getImage()->log("Subtracted image "+obj2->getImage()->getName());
     return OK;
   },
-  "Subtract two images",py::arg("obj1"),py::arg("obj2"));
+  "Subtract the second image from the first",py::arg("obj1"),py::arg("obj2"));
 }
 #endif
 

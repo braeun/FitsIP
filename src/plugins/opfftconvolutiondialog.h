@@ -16,6 +16,8 @@ public:
   explicit OpFFTConvolutionDialog(QWidget *parent = nullptr);
   ~OpFFTConvolutionDialog();
 
+  void updatePSFList();
+
   QString getFunction() const;
 
   std::vector<ValueType> getParameters() const;

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Lucy Richardson deconvolution dialog                                *
  *                                                                              *
- * modified: 2023-02-03                                                         *
+ * modified: 2025-05-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -33,6 +33,11 @@ LucyRichardsonDeconvolutionDialog::LucyRichardsonDeconvolutionDialog(QWidget *pa
 LucyRichardsonDeconvolutionDialog::~LucyRichardsonDeconvolutionDialog()
 {
   delete ui;
+}
+
+void LucyRichardsonDeconvolutionDialog::updatePSFList()
+{
+  ui->psfWidget->updatePSFList();
 }
 
 QString LucyRichardsonDeconvolutionDialog::getFunction() const

@@ -61,6 +61,8 @@ pkg_check_modules(QWT IMPORTED_TARGET Qt5Qwt6)
 pkg_check_modules(cfitsio IMPORTED_TARGET REQUIRED cfitsio)
 pkg_check_modules(CCfits IMPORTED_TARGET REQUIRED CCfits)
 
+pkg_check_modules(EIGEN3 IMPORTED_TARGET REQUIRED eigen3)
+
 # find astro libraries
 # pkg_check_modules(LIBASTRO IMPORTED_TARGET libastro)
 
@@ -72,15 +74,6 @@ pkg_check_modules(FFTW IMPORTED_TARGET fftw3)
 
 #check for exif library
 pkg_check_modules(EXIV2 IMPORTED_TARGET exiv2)
-
-# find Lua+SOL2 for scripting
-pkg_check_modules(SOL2 sol2)
-if (SOL2_FOUND)
-  find_package(Lua)
-endif()
-if (LUA_FOUND)
-  set(USE_LUA ON)
-endif()
 
 find_package(Python3 COMPONENTS Interpreter Development)
 if (Python3_FOUND)
@@ -96,6 +89,15 @@ if (Python3_FOUND)
 else()
   message("python3 not found - not building python bindings")
 endif()
+
+# find the json package by nlohmann for I/O
+find_package(nlohmann_json)
+if (nlohmann_json_FOUND)
+  # find the inja template engine
+  find_package(inja)
+endif()
+
+
 
 
 #-----------------------------------------------------------------------------
@@ -134,12 +136,16 @@ if (USE_16BITRAW)
   list(APPEND FITS_DEF -DUSE_16BITRAW)
 endif()
 
-if (USE_LUA)
-  list(APPEND FITS_DEF -DUSE_LUA)
-endif()
-
 if (USE_PYTHON)
   list(APPEND FITS_DEF -DUSE_PYTHON)
+endif()
+
+if (nlohmann_json_FOUND)
+  list(APPEND FITS_DEF -DHAVE_JSON)
+endif()
+
+if (inja_FOUND)
+  list(APPEND FITS_DEF -DHAVE_INJA)
 endif()
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src)

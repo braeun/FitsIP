@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - vanCittert deconvolution                                            *
  *                                                                              *
- * modified: 2023-02-05                                                         *
+ * modified: 2025-05-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -58,6 +58,7 @@ QIcon VanCittertDeconvolution::getIcon() const
 OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new VanCittertDeconvolutionDialog();
+  dlg->updatePSFList();
   if (dlg->exec())
   {
     const PSF* psf = PSFFactory::getInstance()->getPSF(dlg->getFunction());

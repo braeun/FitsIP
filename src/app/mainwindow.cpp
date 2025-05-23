@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-03-14                                                         *
+ * modified: 2025-05-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -33,13 +33,16 @@
 #include "dialogs/configurationdialog.h"
 #include "dialogs/editmetadatadialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
+#include "dialogs/psfmanagerdialog.h"
+#include "dialogs/stardialog.h"
 #include <fitsbase/externaltoolslauncher.h>
 #include <fitsbase/filelist.h>
 #include <fitsbase/pixellist.h>
 #include <fitsbase/dialogs/pluginfilelistreturndialog.h>
+#include <fitsbase/dialogs/twovaluedialog.h>
 #include <fitsbase/io/db.h>
 #include <fitsbase/io/iofactory.h>
-#include <fitsbase/logbook/xmllogbookstorage.h>
+#include <fitsbase/logbook/logbookutils.h>
 #include <fitsbase/psf/psffactory.h>
 #include <fitsbase/pluginfactory.h>
 #include <fitsbase/widgets/previewoptions.h>
@@ -61,7 +64,8 @@
 MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui(new Ui::MainWindow),
   editMetadataDialog(nullptr),
-  selectionMode(None)
+  selectionMode(None),
+  psfManager(nullptr)
 {
   ui->setupUi(this);
   AppSettings settings;
@@ -69,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
 
   defaultPixelList = std::make_unique<PixelList>();
   ui->pixellistWidget->setPixelList(defaultPixelList.get());
+  connect(ui->pixellistWidget,&PixelListWidget::findStars,this,&MainWindow::getStarlistFromPixellist);
 
   defaultStarList = std::make_unique<StarList>();
   ui->starlistWidget->setStarList(defaultStarList.get());
@@ -85,16 +90,13 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
 
   QDockWidget *consoleDockWidget = new QDockWidget(tr("Console"), this);
-  consoleDockWidget->setObjectName("consle");
+  consoleDockWidget->setObjectName("console");
   consoleDockWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
   consoleWidget = new ConsoleWidget(consoleDockWidget);
   addDockWidget(Qt::BottomDockWidgetArea,consoleDockWidget);
   consoleDockWidget->setWidget(consoleWidget);
 
   imageWidget = new ImageWidget();
-  imageWidget->setBackgroundRole(QPalette::Base);
-  imageWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-  imageWidget->setZoom(0);
   connect(imageWidget,&ImageWidget::setPixel,this,&MainWindow::addPixel);
   connect(imageWidget,&ImageWidget::cursorMoved,this,&MainWindow::updateCursor);
   connect(imageWidget,&ImageWidget::cursorMoved,ui->profileWidget,&ProfileView::updateCursor);
@@ -540,22 +542,16 @@ void MainWindow::display(std::shared_ptr<FitsObject> file)
   {
     QFileInfo info(file->getFilename());
     ui->activeFileLabel->setText(info.fileName());
+    ui->pixellistWidget->setPixelList(file->getPixelList());
+    ui->starlistWidget->setStarList(file->getStarList());
   }
   else
   {
     ui->activeFileLabel->setText("");
   }
-  ui->pixellistWidget->setPixelList(file->getPixelList());
-  ui->starlistWidget->setStarList(file->getStarList());
   updateDisplay();
 //  updateOpenFileListSelection();
 }
-
-// void MainWindow::display(int id)
-// {
-//   auto obj = ImageCollection::getGlobal().getFile(id);
-//   if (obj) display(obj);
-// }
 
 void MainWindow::updateDisplay()
 {
@@ -666,7 +662,6 @@ void MainWindow::open(const QFileInfo &fileinfo)
   else
   {
     openExternal(fileinfo);
-//    QMessageBox::information(this,QApplication::applicationDisplayName(),"Don't know how to open file '"+fileinfo.fileName()+"'");
   }
 }
 
@@ -770,11 +765,18 @@ void MainWindow::openLogbook(const QString &name)
   AppSettings settings;
   try
   {
-    std::unique_ptr<LogbookStorage> s = std::make_unique<XMLLogbookStorage>(name);
-    logbook.open(s);
-    ui->logbookDockWidget->setWindowTitle("Logbook - "+logbook.getTitle());
-    ui->logbookWidget->setLogbook(&logbook);
-    settings.setLogbook(name);
+    std::unique_ptr<LogbookStorage> s = logbookutils::getLogboook(name);
+    if (s)
+    {
+      logbook.open(s);
+      ui->logbookDockWidget->setWindowTitle("Logbook - "+logbook.getTitle());
+      ui->logbookWidget->setLogbook(&logbook);
+      settings.setLogbook(name);
+    }
+    else
+    {
+      QMessageBox::warning(this,QApplication::applicationDisplayName(),"Unsupported logbook format!");
+    }
   }
   catch (std::exception& ex)
   {
@@ -966,11 +968,39 @@ bool MainWindow::save(std::shared_ptr<FitsObject> obj, const std::string& filena
   return true;
 }
 
-
 std::shared_ptr<FileList> MainWindow::getSelectedFileList() const
 {
   return selectedFileList;
 }
+
+void MainWindow::getStarlistFromPixellist()
+{
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
+  if (activeFile)
+  {
+    StarDialog d(this);
+    if (d.exec())
+    {
+      int box = d.getBoxSize();
+      ValueType sky = 0;
+      if (d.isUserSkyValue())
+      {
+        sky = d.getUserSkyValue();
+      }
+      else
+      {
+        Histogram hist = activeFile->getHistogram();
+//        hist.build(img.get());
+        AverageResult avg = hist.getAverage(0.75);
+        sky = avg.mean;
+      }
+      StarList list(activeFile->getImage().get(),sky,activeFile->getPixelList(),box);
+      activeFile->getStarList()->setStars(list.getStars());
+      updateDisplay();
+    }
+  }
+}
+
 
 
 
@@ -1145,10 +1175,11 @@ void MainWindow::on_actionClose_Image_triggered()
 
 void MainWindow::on_actionClose_All_Images_triggered()
 {
+  /* first remove image from various displays! */
+  display(std::shared_ptr<FitsObject>());
   ui->pixellistWidget->setPixelList(defaultPixelList.get());
   ui->starlistWidget->setStarList(defaultStarList.get());
   imageCollection->removeAll();
-  display(std::shared_ptr<FitsObject>());
 }
 
 void MainWindow::on_actionPreferences_triggered()
@@ -1169,7 +1200,7 @@ void MainWindow::on_actionPreferences_triggered()
 void MainWindow::on_actionOpen_Logbook_triggered()
 {
   AppSettings settings;
-  QString fn = settings.getOpenFilename(this,AppSettings::PATH_LOGBOOK,"Logbook (*.lbk *.log);;All files (*)");
+  QString fn = settings.getOpenFilename(this,AppSettings::PATH_LOGBOOK,logbookutils::getFilenameFilter());
   if (!fn.isNull())
   {
     openLogbook(fn);
@@ -1191,10 +1222,14 @@ void MainWindow::on_actionShow_Detected_Stars_toggled(bool flag)
 void MainWindow::on_actionNew_Logbook_triggered()
 {
   AppSettings settings;
-  QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOGBOOK,"Logbook (*.lbk *.log);;All files (*)");
+  QString filter;
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOGBOOK,logbookutils::getFilenameFilter(),&filter);
   if (!fn.isNull())
   {
-    fn = IOFactory::assertSuffix(fn,"Logbook (*.lbk *.log)");
+    if (!filter.startsWith("All"))
+    {
+      fn = IOFactory::assertSuffix(fn,filter);
+    }
     openLogbook(fn);
   }
 }
@@ -1311,5 +1346,13 @@ void MainWindow::on_actionSave_As_PSF_triggered()
       QMessageBox::critical(this,"Save as PSF","Failed to save image as PSF!");
     }
   }
+}
+
+
+void MainWindow::on_actionPSF_Manager_triggered()
+{
+  if (!psfManager) psfManager = new PSFManagerDialog();
+  psfManager->updatePSFList();
+  psfManager->show();
 }
 

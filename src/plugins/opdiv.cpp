@@ -65,7 +65,7 @@ void OpDiv::bindPython(void* mod) const
     obj1->getImage()->log("Divided by image "+obj2->getImage()->getName());
     return OK;
   },
-  "Divide two images",py::arg("obj1"),py::arg("obj2"));
+  "Divide the first image by the second one",py::arg("obj1"),py::arg("obj2"));
 }
 #endif
 

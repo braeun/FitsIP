@@ -73,4 +73,33 @@ void TwoValueDialog::setValue2(QString v)
   ui->value2Field->setText(v);
 }
 
+std::pair<QString,QString> TwoValueDialog::query(QWidget *parent, QString title, QString label1, QString label2, QString unit1, QString unit2, bool* ok)
+{
+  TwoValueDialog d(parent);
+  d.setTitle(title);
+  d.setValue1Label(label1,unit1);
+  d.setValue2Label(label2,unit2);
+  if (d.exec())
+  {
+    if (ok) *ok = true;
+    return std::make_pair(d.getValue1(),d.getValue2());
+  }
+  if (ok) *ok = false;
+  return std::make_pair("","");
+}
+
+std::pair<int,int> TwoValueDialog::queryInt(QWidget *parent, QString title, QString label1, QString label2, QString unit1, QString unit2, bool* ok)
+{
+  TwoValueDialog d(parent);
+  d.setTitle(title);
+  d.setValue1Label(label1,unit1);
+  d.setValue2Label(label2,unit2);
+  if (d.exec())
+  {
+    if (ok) *ok = true;
+    return std::make_pair(d.getValue1().toInt(),d.getValue2().toInt());
+  }
+  if (ok) *ok = false;
+  return std::make_pair(0,0);
+}
 

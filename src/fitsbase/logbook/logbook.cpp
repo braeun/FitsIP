@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2025-02-15                                                         *
+ * modified: 2025-04-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,6 +27,12 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#ifdef HAVE_JSON
+#include <nlohmann/json.hpp>
+#endif
+#ifdef HAVE_INJA
+#include <inja/inja.hpp>
+#endif
 
 Logbook::Logbook():QObject(),
   active(true),
@@ -228,6 +234,48 @@ bool Logbook::exportToFile(const QString &file)
   return exportPlainText(file);
 }
 
+#ifdef HAVE_INJA
+bool Logbook::exportToFile(const QString& file, QString templ)
+{
+  inja::Environment env;
+  nlohmann::json json = toJson();
+  std::string s = env.render(templ.toStdString(),json);
+  QFile f(file);
+  if (!f.open(QIODevice::WriteOnly)) return false;
+  QTextStream os(&f);
+  os << QString::fromStdString(s) << Qt::endl;
+  os.flush();
+  f.close();
+  return true;
+}
+#endif
+
+
+
+#ifdef HAVE_JSON
+nlohmann::json Logbook::toJson() const
+{
+  nlohmann::json json;
+  if (store)
+  {
+    json["title"] = store->getTitle().toStdString();
+    json["description"] = store->getDescription().toStdString();
+    nlohmann::json j;
+    for (const LogbookEntry& e : getEntries(false))
+    {
+      nlohmann::json je;
+      je["timestamp"] = e.getTimestamp().time().toString(Qt::ISODateWithMs).toStdString();
+      je["project"] = e.getProject().toStdString();
+      je["step"] = e.getStep().toStdString();
+      je["type"] = e.getTypeString().toStdString();
+      je["action"] = e.getText().toStdString();
+      j.push_back(je);
+    }
+    json["entries"] = j;
+  }
+  return json;
+}
+#endif
 
 
 

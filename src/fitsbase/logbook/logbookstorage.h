@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for logbook data storage                         *
  *                                                                              *
- * modified: 2022-11-29                                                         *
+ * modified: 2025-04-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,7 +27,6 @@
 #include <QString>
 #include <set>
 #include <vector>
-
 
 class LogbookEntry;
 class LogbookFilter;
@@ -69,6 +68,7 @@ public:
 //  virtual void assignProject(int64_t id, const QString& p) = 0;
 
 //  virtual void assignStep(int64_t id, const QString& s) = 0;
+
 
 protected:
   LogbookStorage();

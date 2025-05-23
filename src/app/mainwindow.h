@@ -48,6 +48,7 @@ class OpPlugin;
 class EditMetadataDialog;
 class FileList;
 class LogWidget;
+class PSFManagerDialog;
 
 struct PluginMenuEntry
 {
@@ -161,6 +162,8 @@ private slots:
 
   void on_actionSave_As_PSF_triggered();
 
+  void on_actionPSF_Manager_triggered();
+
 private:
 
   enum SelectionMode { None, SelectPixel };
@@ -186,6 +189,7 @@ private:
   void runScriptCmd(const QString& cmd);
   void runScriptFile(const QFileInfo& fileinfo);
   void setScriptOutput();
+  void getStarlistFromPixellist();
 
   Ui::MainWindow *ui;
   QMenu* openFileListMenu;
@@ -201,6 +205,7 @@ private:
   EditMetadataDialog* editMetadataDialog;
   Logbook logbook;
   SelectionMode selectionMode;
+  PSFManagerDialog* psfManager;
   std::unique_ptr<Script> script;
   QMetaObject::Connection scriptOutConnection;
   QMetaObject::Connection scriptErrConnection;

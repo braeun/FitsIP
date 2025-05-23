@@ -13,6 +13,11 @@ OpFFTConvolutionDialog::~OpFFTConvolutionDialog()
   delete ui;
 }
 
+void OpFFTConvolutionDialog::updatePSFList()
+{
+  ui->psfWidget->updatePSFList();
+}
+
 QString OpFFTConvolutionDialog::getFunction() const
 {
   return ui->psfWidget->getFunction();

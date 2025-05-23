@@ -51,6 +51,10 @@ public:
 
   void setValue2(QString v);
 
+  static std::pair<QString,QString> query(QWidget *parent, QString title, QString label1, QString label2, QString unit1="", QString unit2="", bool* ok=nullptr);
+
+  static std::pair<int,int> queryInt(QWidget *parent, QString title, QString label1, QString label2, QString unit1="", QString unit2="", bool* ok=nullptr);
+
 private:
   Ui::TwoValueDialog *ui;
 };

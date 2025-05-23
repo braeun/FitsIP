@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - iterator to iterate over an images pixels                           *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-04-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -56,14 +56,12 @@ class ConstPixelIterator {
   inline ConstPixelIterator& operator-=(int d);
 
 private:
-  bool color;
   int size;
   int index;
   std::vector<const ValueType*> layers;
 };
 
 inline ConstPixelIterator::ConstPixelIterator(int size, const std::vector<const ValueType*>& layers):
-  color(false),
   size(size),
   index(0),
   layers(layers)
@@ -178,8 +176,7 @@ inline ValueType ConstPixelIterator::getAbs() const
     case 1:
       return *layers[0];
     case 2:
-      // TODO: it seems the sqrt works on double???
-      return hypot(*layers[0],*layers[1]);
+      return std::hypot(*layers[0],*layers[1]);
     case 3:
       return (*layers[0] * 11 + *layers[1] * 16 + *layers[2] * 5) / 32;
   }
@@ -195,8 +192,7 @@ inline RGBValue ConstPixelIterator::getRGB(void) const
     case 1:
       return RGBValue(*layers[0]);
     case 2:
-      // TODO: it seems the sqrt works on double???
-      return RGBValue(static_cast<ValueType>(hypot(*layers[0],*layers[1])));
+      return RGBValue(static_cast<ValueType>(std::hypot(*layers[0],*layers[1])));
     case 3:
       return RGBValue(*layers[0],*layers[1],*layers[2]);
   }
@@ -254,14 +250,12 @@ class PixelIterator {
   inline PixelIterator& operator-=(int d);
 
  private:
-  bool color;
   int size;
   int index;
   std::vector<ValueType*> layers;
 };
 
 inline PixelIterator::PixelIterator(int size, const std::vector<ValueType*>& layers):
-  color(false),
   size(size),
   index(0),
   layers(layers)
@@ -390,8 +384,7 @@ inline RGBValue PixelIterator::getRGB(void) const
     case 1:
       return RGBValue(*layers[0]);
     case 2:
-      // TODO: it seems the sqrt works on double???
-      return RGBValue(static_cast<ValueType>(hypot(*layers[0],*layers[1])));
+      return RGBValue(static_cast<ValueType>(std::hypot(*layers[0],*layers[1])));
     case 3:
       return RGBValue(*layers[0],*layers[1],*layers[2]);
   }
@@ -402,7 +395,7 @@ inline ValueType PixelIterator::min() const
 {
   if (layers.size() == 1) return *layers[0];
   ValueType v = std::min(*layers[0],*layers[1]);
-  for (int i=2;i<layers.size();i++) v = std::min(v,*layers[i]);
+  for (size_t i=2;i<layers.size();i++) v = std::min(v,*layers[i]);
   return v;
 }
 
@@ -410,7 +403,7 @@ inline ValueType PixelIterator::max() const
 {
   if (layers.size() == 1) return *layers[0];
   ValueType v = std::max(*layers[0],*layers[1]);
-  for (int i=2;i<layers.size();i++) v = std::max(v,*layers[i]);
+  for (size_t i=2;i<layers.size();i++) v = std::max(v,*layers[i]);
   return v;
 }
 

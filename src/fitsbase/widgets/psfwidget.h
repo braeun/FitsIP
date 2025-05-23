@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - point spread function parameter widget                              *
  *                                                                              *
- * modified: 2025-01-31                                                         *
+ * modified: 2025-05-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,6 +37,8 @@ class PSFWidget : public QWidget
 public:
   explicit PSFWidget(QWidget *parent = nullptr);
   ~PSFWidget();
+
+  void updatePSFList();
 
   QString getFunction() const;
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - list of selected/detected stars                                     *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-03-15                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -31,6 +31,15 @@ std::vector<QString> StarList::headers{
 
 StarList::StarList(QObject* parent):QAbstractTableModel(parent)
 {
+}
+
+StarList::StarList(FitsImage* img, ValueType sky, const PixelList* pixels, int box, QObject* parent):QAbstractTableModel(parent)
+{
+  for (const Pixel& pixel : pixels->getPixels())
+  {
+    Star star = Star::fromPixel(img,sky,pixel,box);
+    stars.push_back(star);
+  }
 }
 
 void StarList::clear()
@@ -94,21 +103,21 @@ QVariant StarList::data(const QModelIndex &index, int role) const
   switch (index.column())
   {
     case 0:
-      return QVariant(star.x);
+      return QVariant(star.getX());
     case 1:
-      return QVariant(star.y);
+      return QVariant(star.getY());
     case 2:
-      return QVariant(star.fwhm);
+      return QVariant(star.getFWHM());
     case 3:
-      return QVariant(star.xwidth);
+      return QVariant(star.getXWidth());
     case 4:
-      return QVariant(star.ywidth);
+      return QVariant(star.getYWidth());
     case 5:
-      return QVariant(star.round);
+      return QVariant(star.getRoundness());
     case 6:
-      return QVariant(star.sharp);
+      return QVariant(star.getSharpness());
     case 7:
-      return QVariant(star.hotness);
+      return QVariant(star.getHotness());
   }
   return QVariant();
 }
@@ -118,8 +127,7 @@ void StarList::shift(double dx, double dy)
   emit layoutAboutToBeChanged();
   for (Star& star : stars)
   {
-    star.x += dx;
-    star.y += dy;
+    star.shift(dx,dy);
   }
   emit layoutChanged();
 }
@@ -132,10 +140,7 @@ void StarList::rotate(double xc, double yc, double a)
   double sa = sin(a);
   for (Star& star : stars)
   {
-    double xr = (star.x - xc) * ca - (star.y - yc) * sa;
-    double yr = (star.x - xc) * sa + (star.y - yc) * ca;
-    star.x = xr + xc;
-    star.y = yr + yc;
+    star.rotate(xc,yc,sa,ca);
   }
   emit layoutChanged();
 }
@@ -147,8 +152,9 @@ bool StarList::save(const QString &filename)
   QTextStream s(&file);
   for (const Star& star : stars)
   {
-    s << star.x << "," << star.y << "," << star.xwidth << "," << star.ywidth;
-    s << "," << star.fwhm << "," << star.round << "," << star.sharp << "," << star.hotness;
+    s << star.getX() << "," << star.getY() << ","
+      << star.getFWHM() << "," << star.getXWidth() << "," << star.getYWidth() << ","
+      << star.getRoundness() << "," << star.getSharpness() << "," << star.getHotness();
     s << "\n";
   }
   s.flush();
@@ -168,15 +174,8 @@ bool StarList::load(const QString &filename)
     QStringList tokens = line.split(",");
     if (tokens.size() >= 8)
     {
-      Star star;
-      star.x = tokens[0].toDouble();
-      star.y = tokens[1].toDouble();
-      star.xwidth = tokens[2].toDouble();
-      star.ywidth = tokens[3].toDouble();
-      star.fwhm = tokens[4].toDouble();
-      star.round = tokens[5].toDouble();
-      star.sharp = tokens[6].toDouble();
-      star.hotness = tokens[7].toDouble();
+      Star star(tokens[0].toDouble(),tokens[1].toDouble(),tokens[2].toDouble(),tokens[3].toDouble(),
+          tokens[4].toDouble(),tokens[5].toDouble(),tokens[6].toDouble(),tokens[7].toDouble());
       list.push_back(star);
     }
     line = s.readLine();

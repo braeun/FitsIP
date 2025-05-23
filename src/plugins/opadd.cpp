@@ -65,7 +65,7 @@ void OpAdd::bindPython(void* mod) const
     obj1->getImage()->log("Added image "+obj2->getImage()->getName());
     return OK;
   },
-  "Add two images",py::arg("obj1"),py::arg("obj2"));
+  "Add the second image to the first one",py::arg("obj1"),py::arg("obj2"));
 }
 #endif
 

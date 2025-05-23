@@ -56,6 +56,8 @@ void ImagePSF::init()
 
 std::shared_ptr<FitsImage> ImagePSF::createPSF(int w, int h, const std::vector<ValueType>& par) const
 {
+  if (w < img->getWidth()) w = img->getWidth();
+  if (h < img->getHeight()) h = img->getHeight();
   auto dst = std::make_shared<FitsImage>("",w,h,img->getDepth());
   int iw2 = img->getWidth() / 2;
   int iwodd = (img->getWidth() % 2);

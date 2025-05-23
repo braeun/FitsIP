@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - point spread function creation dialog                               *
  *                                                                              *
- * modified: 2022-11-25                                                         *
+ * modified: 2025-05-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -36,6 +36,8 @@ class PSFDialog : public QDialog
 public:
   explicit PSFDialog(QWidget *parent = nullptr);
   ~PSFDialog();
+
+  void updatePSFList();
 
   QString getFunction() const;
 

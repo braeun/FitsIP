@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - kernel filter                                                       *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2025-03-18                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -88,7 +88,7 @@ void OpKernel::convolve(std::shared_ptr<FitsImage> image, const Kernel& kernel) 
   it1 += hk2 * image->getWidth();
   for (uint32_t y0=hk2;y0<image->getHeight()-hk2;y0++)
   {
-    it1 += wk2;
+    it1 += wk2; /* start half kernel width from beginning of line */
     for (uint32_t x0=wk2;x0<image->getWidth()-wk2;x0++)
     {
       it1.clear();
@@ -108,7 +108,7 @@ void OpKernel::convolve(std::shared_ptr<FitsImage> image, const Kernel& kernel) 
       }
       ++it1;
     }
-    it1 += wk2;
+    it1 += wk2; /* skip half kernel width to end of line */
   }
 }
 

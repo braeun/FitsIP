@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2025-02-22                                                         *
+ * modified: 2025-04-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,10 @@
 #include <memory>
 #include <vector>
 #include <set>
+#ifdef HAVE_JSON
+#include <nlohmann/json_fwd.hpp>
+#endif
+
 
 class LogbookFilter;
 class LogbookStorage;
@@ -106,6 +110,14 @@ public:
 //  void assignStep(int64_t id, const QString& s);
 
   bool exportToFile(const QString& file);
+
+#ifdef HAVE_INJA
+  bool exportToFile(const QString& file, QString templ);
+#endif
+
+#ifdef HAVE_JSON
+  nlohmann::json toJson() const;
+#endif
 
 signals:
   void dataAdded();

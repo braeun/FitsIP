@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - xml file based logbook data storage                                 *
  *                                                                              *
- * modified: 2024-12-14                                                         *
+ * modified: 2025-04-12                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,7 +22,6 @@
 
 #include "xmllogbookstorage.h"
 #include "logbookentry.h"
-#include "logbookfilter.h"
 #include <QDomElement>
 #include <QDomText>
 #include <QFile>
@@ -30,12 +29,11 @@
 #include <stdexcept>
 
 XMLLogbookStorage::XMLLogbookStorage(const QString& filename):
-  file(new QFile(filename)),
-  desc("")
+  file(new QFile(filename))
 {
   QFileInfo info(filename);
-  title = info.baseName();
-  read();
+  AbstractLogbookStorage::setTitle(info.baseName());
+  XMLLogbookStorage::read();
 }
 
 XMLLogbookStorage::~XMLLogbookStorage()
@@ -49,11 +47,7 @@ XMLLogbookStorage::~XMLLogbookStorage()
 
 bool XMLLogbookStorage::add(LogbookEntry& entry)
 {
-  setId(entry,++idcounter);
-  entries.push_back(entry);
-  if (!entry.getImage().isEmpty()) images.insert(entry.getImage());
-  projects.insert(entry.getProject());
-  steps[entry.getProject()].insert(entry.getStep());
+  AbstractLogbookStorage::add(entry);
   QDomElement element = doc.createElement("entry");
   element.setAttribute("image",entry.getImage());
   element.setAttribute("timestamp",entry.getTimestamp().toString(Qt::ISODateWithMs));
@@ -64,20 +58,13 @@ bool XMLLogbookStorage::add(LogbookEntry& entry)
   QDomText text = doc.createTextNode(entry.getText());
   element.appendChild(text);
   doc.documentElement().appendChild(element);
-  write();
+  writeXML();
   return true;
 }
 
 bool XMLLogbookStorage::update(const LogbookEntry& entry)
 {
-  for (auto& e : entries)
-  {
-    if (e.getId() == entry.getId())
-    {
-      e = entry;
-      break;
-    }
-  }
+  AbstractLogbookStorage::update(entry);
   for (QDomNode n=doc.documentElement().firstChild();!n.isNull();n=n.nextSibling())
   {
     QDomElement element = n.toElement(); // try to convert the node to an element.
@@ -97,20 +84,13 @@ bool XMLLogbookStorage::update(const LogbookEntry& entry)
       }
     }
   }
-  write();
+  writeXML();
   return true;
 }
 
 bool XMLLogbookStorage::remove(int64_t id)
 {
-  for (size_t i=0;i<entries.size();++i)
-  {
-    if (entries[i].getId() == id)
-    {
-      entries.erase(entries.begin()+i);
-      break;
-    }
-  }
+  AbstractLogbookStorage::remove(id);
   for (QDomNode n=doc.documentElement().firstChild();!n.isNull();n=n.nextSibling())
   {
     QDomElement element = n.toElement(); // try to convert the node to an element.
@@ -126,7 +106,7 @@ bool XMLLogbookStorage::remove(int64_t id)
       }
     }
   }
-  write();
+  writeXML();
   return true;
 }
 
@@ -134,7 +114,7 @@ bool XMLLogbookStorage::remove(int64_t id)
 
 void XMLLogbookStorage::setTitle(const QString &t)
 {
-  title = t;
+  AbstractLogbookStorage::setTitle(t);
   QDomElement element = doc.documentElement().firstChildElement("title");
   if (element.isNull())
   {
@@ -145,19 +125,14 @@ void XMLLogbookStorage::setTitle(const QString &t)
   {
     element.removeChild(element.firstChild());
   }
-  QDomText text = doc.createTextNode(title);
+  QDomText text = doc.createTextNode(t);
   element.appendChild(text);
-  write();
-}
-
-QString XMLLogbookStorage::getTitle() const
-{
-  return title;
+  writeXML();
 }
 
 void XMLLogbookStorage::setDescription(const QString &d)
 {
-  desc = d;
+  AbstractLogbookStorage::setDescription(d);
   QDomElement element = doc.documentElement().firstChildElement("description");
   if (element.isNull())
   {
@@ -168,103 +143,23 @@ void XMLLogbookStorage::setDescription(const QString &d)
   {
     element.removeChild(element.firstChild());
   }
-  QDomText text = doc.createTextNode(desc);
+  QDomText text = doc.createTextNode(d);
   element.appendChild(text);
-  write();
+  writeXML();
 }
 
-QString XMLLogbookStorage::getDescription() const
-{
-  return desc;
-}
-
-std::vector<LogbookEntry> XMLLogbookStorage::getEntries() const
-{
-  return entries;
-}
-
-std::vector<LogbookEntry> XMLLogbookStorage::getEntries(const LogbookFilter& filter) const
-{
-  std::vector<LogbookEntry> list;
-  for (const auto& e : entries)
-  {
-    if (filter.check(e)) list.push_back(e);
-  }
-  return list;
-}
-
-const LogbookEntry& XMLLogbookStorage::getLastEntry() const
-{
-  if (!entries.empty()) return entries.back();
-  return LogbookEntry::invalid;
-}
-
-LogbookEntry XMLLogbookStorage::getEntry(int64_t id) const
-{
-  for (const auto& e : entries)
-  {
-    if (e.getId() == id) return e;
-  }
-  return LogbookEntry::invalid;
-}
-
-std::set<QString> XMLLogbookStorage::getImages() const
-{
-  return images;
-}
-
-std::set<QString> XMLLogbookStorage::getProjects() const
-{
-  return projects;
-}
-
-std::set<QString> XMLLogbookStorage::getSteps(const QString& project) const
-{
-  if (project.isEmpty())
-  {
-    std::set<QString> set;
-    for (const auto& entry : steps)
-    {
-      set.insert(entry.second.begin(),entry.second.end());
-      return set;
-    }
-  }
-  if (steps.find(project) == steps.end()) return std::set<QString>{"generic"};
-  return steps.at(project);
-}
-
-void XMLLogbookStorage::getTimeRange(QDateTime* begin, QDateTime* end) const
-{
-  if (entries.empty())
-  {
-    if (begin) *begin = QDateTime::currentDateTime();
-    if (end) *end = QDateTime::currentDateTime();
-  }
-  if (begin)
-  {
-    QDateTime t = entries.front().getTimestamp();
-    for (const auto& entry : entries)
-    {
-      if (entry.getTimestamp() < t) t = entry.getTimestamp();
-    }
-    *begin = t;
-  }
-  if (end)
-  {
-    *end = getLastEntry().getTimestamp();
-  }
-}
 
 
 
 void XMLLogbookStorage::read()
 {
-  idcounter = 0;
   if (file->exists())
   {
     if (!file->open(QIODevice::ReadOnly)) throw std::runtime_error("Failed to open logbook file");
-    if (!doc.setContent(file)) throw std::runtime_error("Failed to read logbook file");
-    entries.clear();
+    QDomDocument tmp;
+    if (!tmp.setContent(file)) throw std::runtime_error("Failed to read logbook file");
+    clear();
+    doc = tmp;
     for (QDomNode n=doc.documentElement().firstChild();!n.isNull();n=n.nextSibling())
     {
       QDomElement e = n.toElement(); // try to convert the node to an element.
@@ -280,20 +175,16 @@ void XMLLogbookStorage::read()
           QString txt = e.text();
           LogbookEntry::Type type = static_cast<LogbookEntry::Type>(e.attribute("type","0").toInt());
           LogbookEntry entry(type,project,step,image,txt,timestamp);
-          setId(entry,++idcounter);
+          AbstractLogbookStorage::add(entry);
           e.setAttribute("id",QString::number(entry.getId()));
-          entries.push_back(entry);
-          if (!image.isEmpty()) images.insert(image);
-          projects.insert(project);
-          steps[project].insert(step);
         }
         else if (e.tagName() == "title")
         {
-          title = e.text();
+          AbstractLogbookStorage::setTitle(e.text());
         }
         else if (e.tagName() == "description")
         {
-          desc = e.text();
+          AbstractLogbookStorage::setDescription(e.text());
         }
       }
     }
@@ -301,17 +192,24 @@ void XMLLogbookStorage::read()
   }
   else
   {
+    clear();
     doc.clear();
     QDomElement root = doc.createElement("logbook");
     doc.appendChild(root);
   }
-  if (projects.empty()) projects.insert("generic");
 }
 
-void XMLLogbookStorage::write()
+void XMLLogbookStorage::writeXML()
 {
   if (!file->open(QIODevice::WriteOnly)) throw std::runtime_error("Failed to open logbook file");
   file->write(doc.toString().toUtf8());
   file->close();
 }
 
+/*
+ * This funtion is calles by the base class. We do not do anything here
+ * as we use out own writeXML() function after changing the logbook
+ */
+void XMLLogbookStorage::write()
+{
+}

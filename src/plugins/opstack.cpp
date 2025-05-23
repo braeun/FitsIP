@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - stack images                                                        *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2025-03-15                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -228,9 +228,7 @@ OpPlugin::ResultType OpStack::prepareStarMatch(const QFileInfo &file, PixelList*
     std::vector<Star> stars;
     for (const Pixel& pixel : pixellist->getPixels())
     {
-      Star star;
-      star.x = pixel.x;
-      star.y = pixel.y;
+      Star star(pixel.x,pixel.y);
       stars.push_back(star);
     }
     starlist1.setStars(stars);
@@ -375,6 +373,8 @@ void OpStack::findStars(std::shared_ptr<FitsImage> image, StarList *starlist, in
   double sky = 0;
   if (!subtractSky)
   {
+    /* The sky background has not been subtracted yet.
+     * Set the mean value for the findStars function. */
     Histogram hist;
     hist.build(image.get());
     AverageResult avg = hist.getAverage(0.75);
@@ -383,7 +383,7 @@ void OpStack::findStars(std::shared_ptr<FitsImage> image, StarList *starlist, in
   std::vector<Star> list;
   for (const Star& star : starlist->getStars())
   {
-    Star s = findStar(image,sky,star.x,star.y,searchbox,starbox);
+    Star s = findStar(image,sky,star.getX(),star.getY(),searchbox,starbox);
     list.push_back(s);
   }
   starlist->setStars(list);
@@ -404,12 +404,7 @@ Star OpStack::findStar(std::shared_ptr<FitsImage> image, double sky, int x, int 
   double xwidth;
   double ywidth;
   starfinder.starAxes(image,sr,sky,&xc,&yc,&fwhm,&xwidth,&ywidth,maxiter);
-  Star star;
-  star.x = xc;
-  star.y = yc;
-  star.fwhm = fwhm;
-  star.xwidth = xwidth;
-  star.ywidth = ywidth;
+  Star star(xc,yc,fwhm,xwidth,ywidth,0,0,0);
 //  qDebug() << "findStar " << image->getName() << sky << x << y << r << xc << yc << xwidth << ywidth;
   return star;
 }
@@ -427,9 +422,9 @@ std::tuple<double,double> OpStack::getRotationAngle(const StarList &list1, const
   int n = std::min(s1.size(),s2.size()) - 1;
   for (int i=0;i<n;i++)
   {
-    double a1 = atan2(s1[i+1].y-s1[i].y,s1[i+1].x-s1[i].x);
+    double a1 = atan2(s1[i+1].getY()-s1[i].getY(),s1[i+1].getX()-s1[i].getX());
     if (a1 < 0) a1 += 2.0 * M_PI;
-    double a2 = atan2(s2[i+1].y-s2[i].y,s2[i+1].x-s2[i].x);
+    double a2 = atan2(s2[i+1].getY()-s2[i].getY(),s2[i+1].getX()-s2[i].getX());
     if (a2 < 0) a2 += 2.0 * M_PI;
     double a = a1 - a2;
     sum += a;
@@ -457,10 +452,10 @@ std::tuple<double,double,double,double> OpStack::getShift(const StarList& list1,
   double dy2 = 0;
   for (int i=0;i<n;i++)
   {
-    double d = s2[i].x - s1[i].x;
+    double d = s2[i].getX() - s1[i].getX();
     dx += d;
     dx2 += d * d;
-    d = s2[i].y - s1[i].y;
+    d = s2[i].getY() - s1[i].getY();
     dy += d;
     dy2 += d * d;
   }

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the actual image                                  *
  *                                                                              *
- * modified: 2025-03-07                                                         *
+ * modified: 2025-03-15                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -39,6 +39,9 @@ ImageWidget::ImageWidget(QWidget *parent): QWidget(parent),
   QPixmap p("://resources/cursors/crosshair.png");
   cursor = QCursor(p);
   setCursor(cursor);
+  setBackgroundRole(QPalette::Base);
+  setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+  setZoom(0);
 }
 
 int ImageWidget::heightForWidth(int w) const
@@ -245,8 +248,9 @@ void ImageWidget::drawStarList(QPainter& p)
   double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
   for (const Star& star :starlist->getStars())
   {
-    QPointF pt = QPointF(star.x,star.y) / scale * zoomFactor + imageRect.topLeft();
-    double r = star.fwhm / 2 / scale;
+    QPointF pt = QPointF(star.getX(),star.getY()) / scale * zoomFactor + imageRect.topLeft();
+    double r = star.getFWHM() / 2 / scale;
+    if (r < 1) r = 2;
     p.drawEllipse(pt,r,r);
   }
   p.restore();
