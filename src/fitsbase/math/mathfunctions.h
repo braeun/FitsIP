@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - often used mathematical functions                                   *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,10 +25,8 @@
 
 #include "../fitstypes.h"
 
-class MathFunctions
+namespace math_functions
 {
-public:
-
   /**
    * @brief Calculate the value of a one-dimensional gaussian function.
    * @param x the x value
@@ -37,7 +35,7 @@ public:
    * @param sigma the signam
    * @return the value of the gaussian
    */
-  static ValueType gaussian(ValueType x, ValueType ampl, ValueType center, ValueType sigma);
+  extern ValueType gaussian(ValueType x, ValueType ampl, ValueType center, ValueType sigma);
 
   /**
    * @brief Calculate the value of a two-dimensional gaussian function.
@@ -47,13 +45,27 @@ public:
    * @param centerx the center in x
    * @param sigmax the sigma in x
    * @param centery the center in y
-   * @param sigmay the signam in y
+   * @param sigmay the sigma in y
    * @return the value of the gaussian
    */
-  static ValueType gaussian(ValueType x, ValueType y, ValueType ampl, ValueType centerx, ValueType sigmax, ValueType centery, ValueType sigmay);
+  extern ValueType gaussian(ValueType x, ValueType y, ValueType ampl, ValueType centerx, ValueType sigmax, ValueType centery, ValueType sigmay);
 
-private:
-  MathFunctions();
-};
+  /**
+   * @brief Calculate the value of a two-dimensional box function.
+   *
+   * A box function is zero outside the box [centerx-width/2,centerx+width/2],[centery-height/2,centery+height/2].
+   * Inside the box its value is given by amplitude.
+   * @param x the x value
+   * @param y the y value
+   * @param ampl the amplitude
+   * @param centerx the center in x
+   * @param width the width in x
+   * @param centery the center in y
+   * @param height the height in y
+   * @return the value of the gaussian
+   */
+  extern ValueType box(ValueType x, ValueType y, ValueType ampl, ValueType centerx, ValueType width, ValueType centery, ValueType height);
+
+}
 
 #endif // MATHFUNCTIONS_H

@@ -29,6 +29,10 @@
 
 /**
  * @brief Pure virtual base class for point-spread-functions.
+ *
+ * When convolving, one often has a spatial-domain kernel with the origin
+ * in the middle (as for example in this recent question). In this case,
+ * one must shift the origin to the top-left before computing the DFT.
  */
 class PSF
 {

@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - gaussian shaped point-spread-functions                              *
+ * FitsIP - create box test image                                               *
  *                                                                              *
- * modified: 2022-11-25                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,29 +20,42 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "gaussianpsf.h"
-#include "../math/mathfunctions.h"
+#ifndef BOXTESTIMAGE_H
+#define BOXTESTIMAGE_H
 
-GaussianPSF::GaussianPSF():PSF()
+#include <fitsbase/opplugin.h>
+#include <QObject>
+
+#define QT_STATICPLUGIN
+#include <QtPlugin>
+
+class BoxTestImageDialog;
+
+
+class BoxTestImage: public OpPlugin
 {
-}
+  Q_OBJECT
+  Q_PLUGIN_METADATA(IID OpPlugin_iid)
+  Q_INTERFACES(OpPlugin)
+public:
+  BoxTestImage();
+  virtual ~BoxTestImage() override;
 
-GaussianPSF::~GaussianPSF()
-{
-}
+  virtual bool requiresImage() const override;
 
-QString GaussianPSF::getName() const
-{
-  return "Gaussian";
-}
+  virtual bool requiresFileList() const override;
 
-ValueType GaussianPSF::value(ValueType x, ValueType y, const std::vector<ValueType>& par) const
-{
-  return math_functions::gaussian(x,y,256,0,par[0],0,par[1]);
-}
+  virtual bool createsNewImage() const override;
 
-std::vector<QString> GaussianPSF::getParameterNames() const
-{
-  return std::vector<QString>{"Sigma X", "Sigma Y"};
-}
+  virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 
+  virtual QString getMenuEntry() const override;
+
+  virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
+
+private:
+  std::shared_ptr<FitsImage> img;
+  BoxTestImageDialog* dlg;
+};
+
+#endif // BOXTESTIMAGE_H

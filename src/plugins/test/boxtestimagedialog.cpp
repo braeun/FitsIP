@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - gaussian shaped point-spread-functions                              *
+ * FitsIP - dialog to create box test image                                     *
  *                                                                              *
- * modified: 2022-11-25                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,29 +20,53 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "gaussianpsf.h"
-#include "../math/mathfunctions.h"
+#include "boxtestimagedialog.h"
+#include "ui_boxtestimagedialog.h"
 
-GaussianPSF::GaussianPSF():PSF()
+BoxTestImageDialog::BoxTestImageDialog(QWidget *parent) :
+  QDialog(parent),
+  ui(new Ui::BoxTestImageDialog)
 {
+  ui->setupUi(this);
 }
 
-GaussianPSF::~GaussianPSF()
+BoxTestImageDialog::~BoxTestImageDialog()
 {
+  delete ui;
 }
 
-QString GaussianPSF::getName() const
+int BoxTestImageDialog::getWidth() const
 {
-  return "Gaussian";
+  return ui->widthBox->value();
 }
 
-ValueType GaussianPSF::value(ValueType x, ValueType y, const std::vector<ValueType>& par) const
+int BoxTestImageDialog::getHeight() const
 {
-  return math_functions::gaussian(x,y,256,0,par[0],0,par[1]);
+  return ui->heightBox->value();
 }
 
-std::vector<QString> GaussianPSF::getParameterNames() const
+double BoxTestImageDialog::getAmplitude() const
 {
-  return std::vector<QString>{"Sigma X", "Sigma Y"};
+  return ui->amplitudeField->text().toDouble();
+}
+
+int BoxTestImageDialog::getCenterX() const
+{
+  return ui->centerXBox->value();
+}
+
+int BoxTestImageDialog::getBoxWidth() const
+{
+  return ui->boxWidthBox->value();
+}
+
+int BoxTestImageDialog::getCenterY() const
+{
+  return ui->centerYBox->value();
+}
+
+int BoxTestImageDialog::getBoxHeight() const
+{
+  return ui->boxHeightBox->value();
 }
 

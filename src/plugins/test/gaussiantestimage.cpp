@@ -79,7 +79,7 @@ OpPlugin::ResultType GaussianTestImage::execute(std::shared_ptr<FitsObject> /*im
     {
       for (int x=0;x<img->getWidth();x++)
       {
-        it[0] = MathFunctions::gaussian(x,y,a,cx,sx,cy,sy);
+        it[0] = math_functions::gaussian(x,y,a,cx,sx,cy,sy);
         ++it;
       }
     }

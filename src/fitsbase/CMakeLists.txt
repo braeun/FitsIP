@@ -12,6 +12,7 @@ set(private_header_list
   kernel.h
   kernelrepository.h
   opplugin.h
+  opplugincollection.h
   pixel.h
   pixeliterator.h
   pixellist.h
@@ -88,6 +89,7 @@ add_library(fitsbase
   kernel.cpp
   kernelrepository.cpp
   opplugin.cpp
+  opplugincollection.cpp
   pixeliterator.cpp
   pixellist.cpp
   plugin.cpp

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to create gaussian test image                                *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -35,12 +35,12 @@ GaussianTestImageDialog::~GaussianTestImageDialog()
   delete ui;
 }
 
-int32_t GaussianTestImageDialog::getWidth() const
+int GaussianTestImageDialog::getWidth() const
 {
   return ui->widthBox->value();
 }
 
-int32_t GaussianTestImageDialog::getHeight() const
+int GaussianTestImageDialog::getHeight() const
 {
   return  ui->heightBox->value();
 }

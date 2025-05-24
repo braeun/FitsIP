@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to create gaussian test image                                *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -37,9 +37,9 @@ public:
   explicit GaussianTestImageDialog(QWidget *parent = nullptr);
   ~GaussianTestImageDialog();
 
-  int32_t getWidth() const;
+  int getWidth() const;
 
-  int32_t getHeight() const;
+  int getHeight() const;
 
   double getAmplitude() const;
 

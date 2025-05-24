@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - gaussian shaped point-spread-functions                              *
+ * FitsIP - create box test image                                               *
  *                                                                              *
- * modified: 2022-11-25                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,29 +20,72 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "gaussianpsf.h"
-#include "../math/mathfunctions.h"
+#include "boxtestimage.h"
+#include "boxtestimagedialog.h"
+#include <fitsbase/fitsimage.h>
+#include <fitsbase/math/mathfunctions.h>
 
-GaussianPSF::GaussianPSF():PSF()
+BoxTestImage::BoxTestImage():
+  dlg(nullptr)
 {
 }
 
-GaussianPSF::~GaussianPSF()
+BoxTestImage::~BoxTestImage()
 {
 }
 
-QString GaussianPSF::getName() const
+bool BoxTestImage::requiresImage() const
 {
-  return "Gaussian";
+  return false;
 }
 
-ValueType GaussianPSF::value(ValueType x, ValueType y, const std::vector<ValueType>& par) const
+bool BoxTestImage::requiresFileList() const
 {
-  return math_functions::gaussian(x,y,256,0,par[0],0,par[1]);
+  return false;
 }
 
-std::vector<QString> GaussianPSF::getParameterNames() const
+bool BoxTestImage::createsNewImage() const
 {
-  return std::vector<QString>{"Sigma X", "Sigma Y"};
+  return true;
+}
+
+std::vector<std::shared_ptr<FitsObject>> BoxTestImage::getCreatedImages() const
+{
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
+}
+
+
+QString BoxTestImage::getMenuEntry() const
+{
+  return "Image/Test Images/Box...";
+}
+
+OpPlugin::ResultType BoxTestImage::execute(std::shared_ptr<FitsObject> /*image*/, const OpPluginData& /*data*/)
+{
+  if (!dlg)
+  {
+    dlg = new BoxTestImageDialog();
+  }
+  if (dlg->exec())
+  {
+    img = std::make_shared<FitsImage>("Box",dlg->getWidth(),dlg->getHeight());
+    double a = dlg->getAmplitude();
+    int cx = dlg->getCenterX();
+    int sx = dlg->getBoxWidth();
+    int cy = dlg->getCenterY();
+    int sy = dlg->getBoxHeight();
+    PixelIterator it = img->getPixelIterator();
+    for (int y=0;y<img->getHeight();y++)
+    {
+      for (int x=0;x<img->getWidth();x++)
+      {
+        it[0] = math_functions::box(x,y,a,cx,sx,cy,sy);
+        ++it;
+      }
+    }
+    emit logOperation("New Image","Created box");
+    return OK;
+  }
+  return CANCELLED;
 }
 

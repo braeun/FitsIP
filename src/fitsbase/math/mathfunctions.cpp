@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - often used mathematical functions                                   *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,25 +23,26 @@
 #include "mathfunctions.h"
 #include <cmath>
 
-ValueType MathFunctions::gaussian(ValueType x, ValueType a, ValueType c, ValueType s)
+namespace math_functions
+{
+
+ValueType gaussian(ValueType x, ValueType a, ValueType c, ValueType s)
 {
   return a * exp(-(x-c)*(x-c)/2/s/s);
 }
 
-ValueType MathFunctions::gaussian(ValueType x, ValueType y, ValueType a, ValueType cx, ValueType sx, ValueType cy, ValueType sy)
+ValueType gaussian(ValueType x, ValueType y, ValueType a, ValueType cx, ValueType sx, ValueType cy, ValueType sy)
 {
   return a * exp(-((x-cx)*(x-cx)/2/sx/sx+(y-cy)*(y-cy)/2/sy/sy));
 }
 
-
-
-
-
-
-
-
-
-
-MathFunctions::MathFunctions()
+ValueType box(ValueType x, ValueType y, ValueType ampl, ValueType centerx, ValueType width, ValueType centery, ValueType height)
 {
+  if (x < centerx - width/2 || x > centerx + width/2) return 0;
+  if (y < centery - height/2 || y > centery + height/2) return 0;
+  return ampl;
 }
+
+
+} // namespace
+

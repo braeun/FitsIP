@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - create a test image from a PSF                                      *
  *                                                                              *
- * modified: 2025-03-01                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -66,6 +66,7 @@ OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsObject> /*image*/
   {
     dlg = new PSFTestImageDialog();
   }
+  dlg->updatePSFList();
   if (dlg->exec())
   {
     img = std::make_shared<FitsImage>(dlg->getFunction(),dlg->getWidth(),dlg->getHeight());

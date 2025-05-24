@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for point-spread-functions                       *
  *                                                                              *
- * modified: 2025-02-28                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *

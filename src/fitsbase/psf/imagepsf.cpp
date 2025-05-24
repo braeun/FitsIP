@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image based point-spread-function                                   *
  *                                                                              *
- * modified: 2025-03-01                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -72,5 +72,9 @@ std::shared_ptr<FitsImage> ImagePSF::createPSF(int w, int h, const std::vector<V
 
 std::shared_ptr<FitsImage> ImagePSF::createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const
 {
-  return img;//->resizedImage(w,h);
+  if (w < img->getWidth()) w = img->getWidth();
+  if (h < img->getHeight()) h = img->getHeight();
+  auto dst = std::make_shared<FitsImage>("",w,h,img->getDepth());
+  dst->blit(img.get(),0,0,img->getWidth(),img->getHeight(),(w-img->getWidth())/2,(h-img->getHeight())/2);
+  return dst;
 }

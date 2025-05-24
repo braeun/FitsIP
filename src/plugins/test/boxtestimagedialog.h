@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - gaussian shaped point-spread-functions                              *
+ * FitsIP - dialog to create box test image                                     *
  *                                                                              *
- * modified: 2022-11-25                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,29 +20,39 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "gaussianpsf.h"
-#include "../math/mathfunctions.h"
+#ifndef BOXTESTIMAGEDIALOG_H
+#define BOXTESTIMAGEDIALOG_H
 
-GaussianPSF::GaussianPSF():PSF()
-{
+#include <QDialog>
+
+namespace Ui {
+class BoxTestImageDialog;
 }
 
-GaussianPSF::~GaussianPSF()
+class BoxTestImageDialog : public QDialog
 {
-}
+  Q_OBJECT
 
-QString GaussianPSF::getName() const
-{
-  return "Gaussian";
-}
+public:
+  explicit BoxTestImageDialog(QWidget *parent = nullptr);
+  ~BoxTestImageDialog();
 
-ValueType GaussianPSF::value(ValueType x, ValueType y, const std::vector<ValueType>& par) const
-{
-  return math_functions::gaussian(x,y,256,0,par[0],0,par[1]);
-}
+  int getWidth() const;
 
-std::vector<QString> GaussianPSF::getParameterNames() const
-{
-  return std::vector<QString>{"Sigma X", "Sigma Y"};
-}
+  int getHeight() const;
 
+  double getAmplitude() const;
+
+  int getCenterX() const;
+
+  int getBoxWidth() const;
+
+  int getCenterY() const;
+
+  int getBoxHeight() const;
+
+private:
+  Ui::BoxTestImageDialog *ui;
+};
+
+#endif // BOXTESTIMAGEDIALOG_H

@@ -51,6 +51,7 @@ set(plugin_headers
   opunsharpmask.h
   psfimage.h
   synthesizebackground.h
+  test/boxtestimage.h
   test/gaussiantestimage.h
   test/psftestimage.h
   )
@@ -95,6 +96,7 @@ set(plugin_sources
   opunsharpmask.cpp
   psfimage.cpp
   synthesizebackground.cpp
+  test/boxtestimage.cpp
   test/gaussiantestimage.cpp
   test/psftestimage.cpp
   )
@@ -151,6 +153,7 @@ set(private_header_list
   opunsharpmaskdialog.h
   synthesizebackgrounddialog.h
   vancittertdeconvolutiondialog.h
+  test/boxtestimagedialog.h
   test/gaussiantestimagedialog.h
   test/psftestimagedialog.h
 )
@@ -182,6 +185,7 @@ add_library(fitsplugins
   pluginresources.qrc
   synthesizebackgrounddialog.cpp synthesizebackgrounddialog.ui
   vancittertdeconvolutiondialog.cpp vancittertdeconvolutiondialog.ui
+  test/boxtestimagedialog.cpp test/boxtestimagedialog.ui
   test/gaussiantestimagedialog.cpp test/gaussiantestimagedialog.ui
   test/psftestimagedialog.cpp test/psftestimagedialog.ui
   ${plugin_sources}

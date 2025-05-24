@@ -39,6 +39,8 @@ public:
   explicit PSFTestImageDialog(QWidget *parent = nullptr);
   ~PSFTestImageDialog();
 
+  void updatePSFList();
+
   QString getFunction() const;
 
   std::vector<ValueType> getParameters() const;

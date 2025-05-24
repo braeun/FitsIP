@@ -35,6 +35,11 @@ PSFTestImageDialog::~PSFTestImageDialog()
   delete ui;
 }
 
+void PSFTestImageDialog::updatePSFList()
+{
+  ui->psfWidget->updatePSFList();
+}
+
 QString PSFTestImageDialog::getFunction() const
 {
   return ui->psfWidget->getFunction();
