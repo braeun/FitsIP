@@ -59,7 +59,7 @@ std::vector<std::shared_ptr<FitsObject>> OpSplitChannels::getCreatedImages() con
 
 QString OpSplitChannels::getMenuEntry() const
 {
-  return "Color/Split";
+  return "Image/Color/Split";
 }
 
 #ifdef USE_PYTHON

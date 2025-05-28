@@ -42,7 +42,7 @@ OpToGray::~OpToGray()
 
 QString OpToGray::getMenuEntry() const
 {
-  return "Color/To Gray";
+  return "Image/Color/To Gray";
 }
 
 #ifdef USE_PYTHON

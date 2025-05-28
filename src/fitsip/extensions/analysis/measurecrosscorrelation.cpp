@@ -55,7 +55,7 @@ std::vector<std::shared_ptr<FitsObject>> MeasureCrossCorrelation::getCreatedImag
 
 QString MeasureCrossCorrelation::getMenuEntry() const
 {
-  return "Measure/Cross Correlation...";
+  return "Analyse/Cross Correlation...";
 }
 
 #ifdef USE_PYTHON

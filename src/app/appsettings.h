@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2025-02-01                                                         *
+ * modified: 2025-05-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -81,6 +81,10 @@ public:
   void setPalette(const QString& p);
 
   QString getPalette() const;
+
+  void setMenuOrder(const QStringList& list);
+
+  QStringList getMenuOrder() const;
 
   void setProfileStopTracking(bool flag);
 

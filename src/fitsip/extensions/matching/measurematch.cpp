@@ -59,7 +59,7 @@ MeasureMatch::~MeasureMatch()
 
 QString MeasureMatch::getMenuEntry() const
 {
-  return "Measure/Match...";
+  return "Analyse/Match...";
 }
 
 #ifdef USE_PYTHON

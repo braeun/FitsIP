@@ -60,7 +60,7 @@ std::vector<std::shared_ptr<FitsObject>> OpCombineChannels::getCreatedImages() c
 
 QString OpCombineChannels::getMenuEntry() const
 {
-  return "Color/Combine...";
+  return "Image/Color/Combine...";
 }
 
 #ifdef USE_PYTHON

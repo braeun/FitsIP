@@ -51,6 +51,7 @@ static const char* DISPLAY_IMAGE_SCALE_FORALL = "display/scaleforall";
 
 static const char* STYLE_STYLE = "style/style";
 static const char* STYLE_PALETTE = "style/palette";
+static const char* STYLE_MENU_ORDER = "style/menuorder";
 
 static const char* PROFILE_CLICK_STOPS_TRACK = "profile/clickstops";
 
@@ -175,6 +176,20 @@ QString AppSettings::getPalette() const
 {
   return settings.value(STYLE_PALETTE).toString();
 }
+
+void AppSettings::setMenuOrder(const QStringList& list)
+{
+  settings.setValue(STYLE_MENU_ORDER,list);
+}
+
+QStringList AppSettings::getMenuOrder() const
+{
+  QStringList def;
+  def << "Image" << "Math" << "Filter" << "Analyse";
+  return settings.value(STYLE_MENU_ORDER,def).toStringList();
+}
+
+
 
 void AppSettings::setProfileStopTracking(bool flag)
 {

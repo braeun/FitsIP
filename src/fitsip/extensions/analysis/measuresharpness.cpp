@@ -55,7 +55,7 @@ MeasureSharpness::~MeasureSharpness()
 
 QString MeasureSharpness::getMenuEntry() const
 {
-  return "Measure/Sharpness...";
+  return "Analyse/Sharpness...";
 }
 
 bool MeasureSharpness::requiresFileList() const

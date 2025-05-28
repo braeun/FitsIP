@@ -93,7 +93,7 @@ std::vector<std::shared_ptr<FitsObject>> FindStars::getCreatedImages() const
 
 QString FindStars::getMenuEntry() const
 {
-  return "Measure/Find Stars...";
+  return "Analyse/Find Stars...";
 }
 
 OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)

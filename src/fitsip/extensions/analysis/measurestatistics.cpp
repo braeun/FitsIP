@@ -42,7 +42,7 @@ MeasureStatistics::~MeasureStatistics()
 
 QString MeasureStatistics::getMenuEntry() const
 {
-  return "Measure/Image Statistics...";
+  return "Analyse/Image Statistics...";
 }
 
 OpPlugin::ResultType MeasureStatistics::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)

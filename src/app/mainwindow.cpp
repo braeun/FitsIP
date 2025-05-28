@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-05-28                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -62,6 +62,8 @@
 #include <QSettings>
 #include <QThread>
 #include <QDebug>
+
+static const char* last_menu = "Window";
 
 MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui(new Ui::MainWindow),
@@ -307,6 +309,7 @@ QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
     qWarning() << "Illegal menu entry provided for plugin";
     return nullptr;
   }
+  QStringList list = AppSettings().getMenuOrder();
   QMenu* menu = nullptr;
   QMenu* lastmenu = nullptr;
   QList<QAction*> actions = ui->menubar->actions();
@@ -323,11 +326,15 @@ QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
     if (menu == nullptr)
     {
       menu = new QMenu(entries[i]);
-      if (i == 0)
+      if (i == 0) /* add new toplevel menu */
       {
+        int index = 0;
+        while (index < list.size() && entries[i] != list[index]) ++index;
         for (QAction* a : actions)
         {
-          if (a->text() == "Window")
+          int next = index + 1;
+          while (next < list.size() && a->text() != list[next]) ++next;
+          if (next < list.size() || a->text() == last_menu)
           {
             ui->menubar->insertMenu(a,menu);
             break;
@@ -336,7 +343,23 @@ QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
       }
       else
       {
-        lastmenu->addMenu(menu);
+        bool inserted = false;
+        for (QAction* a : actions)
+        {
+          qDebug() << entries[i] << a->text();
+          if (a->text() > entries[i])
+          {
+            lastmenu->insertMenu(a,menu);
+            inserted = true;
+            qDebug() << "insert";
+            break;
+          }
+        }
+        if (!inserted)
+        {
+          lastmenu->addMenu(menu);
+          qDebug() << "add";
+        }
       }
     }
     actions = menu->actions();
@@ -344,7 +367,24 @@ QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
     menu = nullptr;
   }
   if (!lastmenu) return nullptr;
-  QAction* action = lastmenu->addAction(entries.last());
+  QAction* action = new QAction(entries.last());
+  bool inserted = false;
+  for (QAction* a : actions)
+  {
+    qDebug() << entries.last() << a->text();
+    if (a->text() > entries.last())
+    {
+      lastmenu->insertAction(a,action);
+      inserted = true;
+      qDebug() << "insert";
+      break;
+    }
+  }
+  if (!inserted)
+  {
+    lastmenu->addAction(action);
+    qDebug() << "add";
+  }
   if (!icon.isNull())
   {
     action->setIcon(icon);

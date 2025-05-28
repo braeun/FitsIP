@@ -35,7 +35,7 @@ MeasureDistance::~MeasureDistance()
 
 QString MeasureDistance::getMenuEntry() const
 {
-  return "Measure/Distance...";
+  return "Analyse/Distance...";
 }
 
 OpPlugin::ResultType MeasureDistance::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
