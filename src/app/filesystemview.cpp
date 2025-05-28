@@ -23,7 +23,7 @@
 #include "filesystemview.h"
 #include "ui_filesystemview.h"
 #include "appsettings.h"
-#include <fitsbase/io/iofactory.h>
+#include <fitsip/core/io/iofactory.h>
 #include <QSettings>
 #include <QDir>
 #include <QFileDialog>

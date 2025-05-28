@@ -1,0 +1,4 @@
+{
+  "name": "AnalysisPluginCollection",
+  "depends": "CorePluginCollection;FilterPluginCollection"
+}

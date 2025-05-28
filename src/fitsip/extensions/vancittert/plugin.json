@@ -1,0 +1,4 @@
+{
+  "name": "VanCittertPlugin",
+  "depends": "CorePluginCollection"
+}

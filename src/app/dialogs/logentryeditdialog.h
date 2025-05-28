@@ -1,7 +1,7 @@
 #ifndef LOGENTRYEDITDIALOG_H
 #define LOGENTRYEDITDIALOG_H
 
-#include <fitsbase/logbook/logbookentry.h>
+#include <fitsip/core/logbook/logbookentry.h>
 #include <QDialog>
 #include <QStringList>
 

@@ -41,10 +41,11 @@ class PythonScript: public Script
   Q_OBJECT
 public:
   PythonScript(ScriptInterface* intf, PluginFactory* plugins);
+  virtual ~PythonScript() override;
 
-  void runCmd(const QString& cmd);
+  virtual void runCmd(const QString& cmd) override;
 
-  void runFile(const QString& filename);
+  virtual void runFile(const QString& filename) override;
 
 private:
   void init(ScriptInterface* intf, PluginFactory* plugins);

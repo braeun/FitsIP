@@ -66,23 +66,24 @@ add_executable(fits
 target_compile_definitions(fits PRIVATE ${FITS_DEF})
 
 target_include_directories(fits
-  PRIVATE ${QWT_INCLUDE_DIRS}
-  )
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+    $<INSTALL_INTERFACE:include>
+)
+
+#target_link_options(fits PRIVATE -rdynamic)
 
 target_link_libraries(fits
-  PRIVATE fitsplugins
-  PRIVATE fitsip::fitsbase
+#  PRIVATE fitsip::coreplugins
+  PRIVATE fitsip::core
   PRIVATE PkgConfig::QWT
   PRIVATE Qt5::Xml
   PRIVATE Qt5::Widgets
 )
 
 if (FFTW_FOUND)
-#  target_include_directories(fits
-#    PRIVATE ${FFTW_INCLUDE_DIRS}
-#    )
   target_link_libraries(fits
-    PRIVATE PkgConfig::FFTW
+    PUBLIC PkgConfig::FFTW
   )
 endif()
 
@@ -93,9 +94,6 @@ if (LIBRAW_FOUND)
 endif()
 
 if (EXIV2_FOUND)
-#  target_include_directories(fits
-#    PRIVATE ${EXIV2_INCLUDE_DIRS}
-#    )
   target_link_libraries(fits
     PRIVATE PkgConfig::EXIV2
   )

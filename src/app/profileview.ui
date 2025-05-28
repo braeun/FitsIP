@@ -170,16 +170,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="ProfileChart" name="horizontalProfileWidget">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>1</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -211,16 +201,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="ProfileChart" name="verticalProfileWidget">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>1</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -229,14 +209,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ProfileChart</class>
-   <extends>QFrame</extends>
-   <header location="global">fitsbase/widgets/profilechart.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

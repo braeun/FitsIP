@@ -23,7 +23,7 @@
 #include "pixellistwidget.h"
 #include "ui_pixellistwidget.h"
 #include "appsettings.h"
-#include <fitsbase/pixellist.h>
+#include <fitsip/core/pixellist.h>
 #include <QMenu>
 
 PixelListWidget::PixelListWidget(QWidget *parent):QWidget(parent),

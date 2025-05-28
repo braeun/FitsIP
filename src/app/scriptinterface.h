@@ -23,8 +23,8 @@
 #ifndef SCRIPTINTERFACE_H
 #define SCRIPTINTERFACE_H
 
-#include <fitsbase/filelist.h>
-#include <fitsbase/fitsobject.h>
+#include <fitsip/core/filelist.h>
+#include <fitsip/core/fitsobject.h>
 #include <memory>
 
 class ScriptInterface

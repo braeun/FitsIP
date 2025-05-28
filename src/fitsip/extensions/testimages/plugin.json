@@ -1,0 +1,4 @@
+{
+  "name": "TestPluginCollection",
+  "depends": "CorePluginCollection"
+}

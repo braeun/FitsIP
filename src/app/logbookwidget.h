@@ -23,7 +23,7 @@
 #ifndef LOGBOOKWIDGET_H
 #define LOGBOOKWIDGET_H
 
-#include <fitsbase/logbook/logbookfilter.h>
+#include <fitsip/core/logbook/logbookfilter.h>
 #include <QWidget>
 #include <set>
 

@@ -26,10 +26,10 @@
 #include "imagewidget.h"
 #include "script.h"
 #include "scriptinterface.h"
-#include <fitsbase/fitsobject.h>
-#include <fitsbase/imagecollection.h>
-#include <fitsbase/logbook/logbook.h>
-#include <fitsbase/pluginfactory.h>
+#include <fitsip/core/fitsobject.h>
+#include <fitsip/core/imagecollection.h>
+#include <fitsip/core/logbook/logbook.h>
+#include <fitsip/core/pluginfactory.h>
 #include <QMainWindow>
 #include <QMenu>
 #include <vector>
@@ -45,6 +45,7 @@ class QListWidgetItem;
 class QFileInfo;
 class Plugin;
 class OpPlugin;
+class OpPluginData;
 class EditMetadataDialog;
 class FileList;
 class LogWidget;
@@ -67,7 +68,7 @@ public:
   /**
    * @brief Initialization after window is shown.
    */
-  void initialize();
+  void initialize(PluginFactory* factory);
 
   LogWidget* getLogWidget();
 
@@ -164,6 +165,8 @@ private slots:
 
   void on_actionPSF_Manager_triggered();
 
+  void on_actionPlugins_triggered();
+
 private:
 
   enum SelectionMode { None, SelectPixel };
@@ -195,7 +198,7 @@ private:
   QMenu* openFileListMenu;
   std::shared_ptr<FileList> selectedFileList;
   std::unique_ptr<ImageCollection> imageCollection;
-  std::unique_ptr<PluginFactory> pluginFactory;
+  PluginFactory* pluginFactory;
   std::vector<PluginMenuEntry> pluginMenus;
   std::map<QString,QToolBar*> pluginToolbars;
   std::unique_ptr<PixelList> defaultPixelList;

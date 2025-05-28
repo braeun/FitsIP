@@ -1,0 +1,4 @@
+{
+  "name": "FFTPluginCollection",
+  "depends": "CorePluginCollection"
+}

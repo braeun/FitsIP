@@ -1,7 +1,7 @@
 #ifndef CONSOLEWIDGET_H
 #define CONSOLEWIDGET_H
 
-#include <fitsbase/qconsolewidget/qconsolewidget.h>
+#include <fitsip/core/qconsolewidget/qconsolewidget.h>
 #include <QWidget>
 
 namespace Ui {
@@ -28,7 +28,9 @@ signals:
 
 private:
   void handleCommand(const QString& code);
+
   Ui::ConsoleWidget *ui;
+  QConsoleWidget* console;
 };
 
 #endif // CONSOLEWIDGET_H

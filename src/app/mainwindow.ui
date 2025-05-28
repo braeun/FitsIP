@@ -80,8 +80,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>727</width>
-             <height>474</height>
+             <width>761</width>
+             <height>470</height>
             </rect>
            </property>
           </widget>
@@ -249,7 +249,7 @@
      <x>0</x>
      <y>0</y>
      <width>1150</width>
-     <height>23</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -330,6 +330,8 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionPlugins"/>
+    <addaction name="separator"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
@@ -886,8 +888,7 @@
   </widget>
   <action name="actionOpen">
    <property name="icon">
-    <iconset theme="document-open">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="document-open"/>
    </property>
    <property name="text">
     <string>Open...</string>
@@ -898,8 +899,7 @@
   </action>
   <action name="actionOriginal_Size">
    <property name="icon">
-    <iconset theme="zoom-original">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="zoom-original"/>
    </property>
    <property name="text">
     <string>Original Size</string>
@@ -910,8 +910,7 @@
   </action>
   <action name="actionFit_Window">
    <property name="icon">
-    <iconset theme="zoom-fit-best">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="zoom-fit-best"/>
    </property>
    <property name="text">
     <string>Fit Window</string>
@@ -940,8 +939,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset theme="document-save">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="document-save"/>
    </property>
    <property name="text">
     <string>Save</string>
@@ -969,8 +967,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="edit-undo">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="edit-undo"/>
    </property>
    <property name="text">
     <string>Undo</string>
@@ -986,8 +983,7 @@
   </action>
   <action name="actionClose_Image">
    <property name="icon">
-    <iconset theme="document-close">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="document-close"/>
    </property>
    <property name="text">
     <string>Close Image</string>
@@ -1006,8 +1002,7 @@
   </action>
   <action name="actionPreferences">
    <property name="icon">
-    <iconset theme="configure">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="configure"/>
    </property>
    <property name="text">
     <string>Preferences...</string>
@@ -1080,8 +1075,7 @@
   </action>
   <action name="actionExport_Image">
    <property name="icon">
-    <iconset theme="document-export">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="document-export"/>
    </property>
    <property name="text">
     <string>Export Image...</string>
@@ -1089,8 +1083,7 @@
   </action>
   <action name="actionNext_Image">
    <property name="icon">
-    <iconset theme="go-next">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="go-next"/>
    </property>
    <property name="text">
     <string>Next Image</string>
@@ -1104,8 +1097,7 @@
   </action>
   <action name="actionPrevious_Image">
    <property name="icon">
-    <iconset theme="go-previous">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="go-previous"/>
    </property>
    <property name="text">
     <string>Previous Image</string>
@@ -1119,8 +1111,7 @@
   </action>
   <action name="actionAdd_Current_Image_to_List">
    <property name="icon">
-    <iconset theme="list-add">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="list-add"/>
    </property>
    <property name="text">
     <string>Add Current Image to List</string>
@@ -1245,8 +1236,7 @@
   </action>
   <action name="actionRun_Script">
    <property name="icon">
-    <iconset theme="system-run">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="system-run"/>
    </property>
    <property name="text">
     <string>Run Script...</string>
@@ -1268,6 +1258,11 @@
   <action name="actionPSF_Manager">
    <property name="text">
     <string>PSF Manager...</string>
+   </property>
+  </action>
+  <action name="actionPlugins">
+   <property name="text">
+    <string>Plugins...</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

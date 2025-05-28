@@ -24,12 +24,15 @@
 #include "logwidget.h"
 #include "palettefactory.h"
 #include "appsettings.h"
+#include <fitsip/core/pluginfactory.h>
 #include <QApplication>
 #include <QDebug>
 #include <QStyleFactory>
+#include <memory>
 
 static MainWindow* mainwindow = nullptr;
 static LogWidget* logwidget = nullptr;
+static std::unique_ptr<PluginFactory> pluginFactory;
 
 static void msgHandler(const QtMsgType type, const QMessageLogContext& context, const QString &message)
 {
@@ -66,8 +69,9 @@ int main(int argc, char* argv[])
   mainwindow = new MainWindow;
   mainwindow->setWindowTitle("");
   mainwindow->showMaximized();
-  mainwindow->initialize();
   logwidget = mainwindow->getLogWidget();
+  pluginFactory = std::make_unique<PluginFactory>();
+  mainwindow->initialize(pluginFactory.get());
   int32_t ret = a.exec();
   qInstallMessageHandler(nullptr);
   delete  mainwindow;

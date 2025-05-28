@@ -23,7 +23,8 @@
 #include "histogramview.h"
 #include "ui_histogramview.h"
 #include "appsettings.h"
-#include <fitsbase/fitsobject.h>
+#include <fitsip/core/fitsobject.h>
+#include <fitsip/core/qxt/qxtspanslider.h>
 #include <qwt_scale_engine.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_zoomer.h>
@@ -40,12 +41,18 @@ HistogramView::HistogramView(QWidget *parent):QWidget(parent),
   histmax(0)
 {
   ui->setupUi(this);
-  ui->scalingSlider->setMinimum(0);
-  ui->scalingSlider->setMaximum(sliderrange);
-  ui->scalingSlider->setHandleMovementMode(QxtSpanSlider::NoCrossing);
-  ui->scalingSlider->setTickInterval(sliderrange/10);
-  ui->scalingSlider->setTickPosition(QSlider::TicksBelow);
-  connect(ui->scalingSlider,&QxtSpanSlider::spanChanged,this,&HistogramView::spanChanged);
+  scalingSlider = new QxtSpanSlider(ui->controlFrame);
+  scalingSlider->setObjectName(QString::fromUtf8("scalingSlider"));
+  scalingSlider->setOrientation(Qt::Horizontal);
+
+  ui->gridLayout->addWidget(scalingSlider, 1, 1, 1, 3);
+
+  scalingSlider->setMinimum(0);
+  scalingSlider->setMaximum(sliderrange);
+  scalingSlider->setHandleMovementMode(QxtSpanSlider::NoCrossing);
+  scalingSlider->setTickInterval(sliderrange/10);
+  scalingSlider->setTickPosition(QSlider::TicksBelow);
+  connect(scalingSlider,&QxtSpanSlider::spanChanged,this,&HistogramView::spanChanged);
 
   ui->forAllButton->setChecked(AppSettings().isImageScaleForAll());
   connect(ui->forAllButton,&QCheckBox::clicked,this,[](bool flag){AppSettings().setImageScaleForAll(flag);});
@@ -118,8 +125,8 @@ void HistogramView::setImage(std::shared_ptr<FitsObject> obj)
     ui->imageMaxIntensity->setText(QString::number(max));
 //    ui->scalingSlider->setMinimum(std::min((double)hist.getMin(),min));
 //    ui->scalingSlider->setMaximum(std::max((double)hist.getMax(),max));
-    ui->scalingSlider->setLowerValue(toSlider(min));
-    ui->scalingSlider->setUpperValue(toSlider(max));
+    scalingSlider->setLowerValue(toSlider(min));
+    scalingSlider->setUpperValue(toSlider(max));
   }
   ui->chartWidget->setAxisAutoScale(QwtPlot::yLeft,true);
   ui->chartWidget->setAxisAutoScale(QwtPlot::xBottom,true);
@@ -192,8 +199,8 @@ void HistogramView::changeIntensity()
   updating = true;
   double min = ui->imageMinIntensity->text().toDouble();
   double max = ui->imageMaxIntensity->text().toDouble();
-  ui->scalingSlider->setLowerValue(toSlider(min));
-  ui->scalingSlider->setUpperValue(toSlider(max));
+  scalingSlider->setLowerValue(toSlider(min));
+  scalingSlider->setUpperValue(toSlider(max));
   minMarker->setXValue(min);
   maxMarker->setXValue(max);
   ui->chartWidget->replot();

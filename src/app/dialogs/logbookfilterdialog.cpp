@@ -22,8 +22,8 @@
 
 #include "logbookfilterdialog.h"
 #include "ui_logbookfilterdialog.h"
-#include <fitsbase/logbook/logbook.h>
-#include <fitsbase/logbook/logbookfilter.h>
+#include <fitsip/core/logbook/logbook.h>
+#include <fitsip/core/logbook/logbookfilter.h>
 #include <QDebug>
 
 LogbookFilterDialog::LogbookFilterDialog(const Logbook* logbook, const LogbookFilter& filter, QWidget *parent): QDialog(parent),

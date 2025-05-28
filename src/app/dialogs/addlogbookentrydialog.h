@@ -23,7 +23,7 @@
 #ifndef ADDLOGBOOKENTRYDIALOG_H
 #define ADDLOGBOOKENTRYDIALOG_H
 
-#include <fitsbase/logbook/logbookentry.h>
+#include <fitsip/core/logbook/logbookentry.h>
 #include <QDialog>
 #include <set>
 

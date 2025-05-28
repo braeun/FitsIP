@@ -22,7 +22,7 @@
 
 #include "addlogbookentrydialog.h"
 #include "ui_addlogbookentrydialog.h"
-#include <fitsbase/logbook/logbook.h>
+#include <fitsip/core/logbook/logbook.h>
 
 AddLogbookEntryDialog::AddLogbookEntryDialog(const Logbook* logbook, QWidget *parent) :
   QDialog(parent),

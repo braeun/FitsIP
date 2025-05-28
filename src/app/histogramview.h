@@ -32,6 +32,7 @@ class FitsObject;
 class QwtPlotGrid;
 class QwtPlotPicker;
 class QwtPlotZoomer;
+class QxtSpanSlider;
 
 namespace Ui {
   class HistogramView;
@@ -70,6 +71,7 @@ private:
   double fromSlider(int v);
 
   Ui::HistogramView *ui;
+  QxtSpanSlider* scalingSlider;
   std::shared_ptr<FitsObject> image;
   QwtPlotCurve* grayCurve;
   QwtPlotMarker* minMarker;

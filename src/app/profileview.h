@@ -23,12 +23,13 @@
 #ifndef PROFILEVIEW_H
 #define PROFILEVIEW_H
 
-#include <fitsbase/profile.h>
+#include <fitsip/core/profile.h>
 #include <QMenu>
 #include <QWidget>
 #include <memory>
 
 class FitsObject;
+class ProfileChart;
 
 namespace Ui {
 class ProfileView;
@@ -63,6 +64,8 @@ private:
   void save();
 
   Ui::ProfileView *ui;
+  ProfileChart *horizontalProfileWidget;
+  ProfileChart *verticalProfileWidget;
   std::shared_ptr<FitsObject> image;
   QPoint cursor;
   Profile horizontal;

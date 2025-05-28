@@ -53,7 +53,8 @@ void LogWidget::add(const QtMsgType type, const QMessageLogContext &context, con
   switch (type)
   {
     case QtMsgType::QtInfoMsg:
-      ui->logBrowser->append("<b>"+message+"</b>");
+//      ui->logBrowser->append("<b>"+message+"</b>");
+      ui->logBrowser->append(message);
       break;
     case QtMsgType::QtWarningMsg:
       ui->logBrowser->append("<b><span style=\"color:darkorange\">"+message+"</span></b>");

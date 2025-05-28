@@ -1,8 +1,8 @@
 #include "psfmanagerdialog.h"
 #include "ui_psfmanagerdialog.h"
-#include <fitsbase/imagestatistics.h>
-#include <fitsbase/psf/psffactory.h>
-#include <fitsbase/widgets/psfwidget.h>
+#include <fitsip/core/imagestatistics.h>
+#include <fitsip/core/psf/psffactory.h>
+#include <fitsip/core/widgets/psfwidget.h>
 #include <QAbstractButton>
 
 PSFManagerDialog::PSFManagerDialog(QWidget *parent) :

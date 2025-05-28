@@ -23,7 +23,7 @@
 #ifndef APPSETTINGS_H
 #define APPSETTINGS_H
 
-#include <fitsbase/settings.h>
+#include <fitsip/core/settings.h>
 #include <QByteArray>
 #include <QStringList>
 

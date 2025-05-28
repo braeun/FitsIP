@@ -22,8 +22,8 @@
 
 #include "imagewidget.h"
 #include "appsettings.h"
-#include <fitsbase/pixellist.h>
-#include <fitsbase/starlist.h>
+#include <fitsip/core/pixellist.h>
+#include <fitsip/core/starlist.h>
 #include <QPixmap>
 #include <QPaintEvent>
 #include <QResizeEvent>

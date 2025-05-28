@@ -23,7 +23,8 @@
 #include "profileview.h"
 #include "ui_profileview.h"
 #include "appsettings.h"
-#include <fitsbase/fitsobject.h>
+#include <fitsip/core/fitsobject.h>
+#include <fitsip/core/widgets/profilechart.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_grid.h>
 #include <qwt_scale_engine.h>
@@ -43,6 +44,17 @@ ProfileView::ProfileView(QWidget *parent):QWidget(parent),
   clickEndsTracking(AppSettings().isProfileStopTracking())
 {
   ui->setupUi(this);
+  QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  horizontalProfileWidget = new ProfileChart(ui->widget_4);
+  horizontalProfileWidget->setObjectName(QString::fromUtf8("horizontalProfileWidget"));
+  sizePolicy.setHeightForWidth(horizontalProfileWidget->sizePolicy().hasHeightForWidth());
+  horizontalProfileWidget->setSizePolicy(sizePolicy);
+  ui->verticalLayout_3->addWidget(horizontalProfileWidget);
+  verticalProfileWidget = new ProfileChart(ui->widget_3);
+  verticalProfileWidget->setObjectName(QString::fromUtf8("verticalProfileWidget"));
+  sizePolicy.setHeightForWidth(verticalProfileWidget->sizePolicy().hasHeightForWidth());
+  verticalProfileWidget->setSizePolicy(sizePolicy);
+  ui->verticalLayout_2->addWidget(verticalProfileWidget);
 
   connect(ui->logYBox,&QCheckBox::toggled,this,&ProfileView::logYToggled);
   connect(ui->rangeBox,&QCheckBox::toggled,this,[this](bool){settingsChanged();});
@@ -87,8 +99,8 @@ void ProfileView::setImage(std::shared_ptr<FitsObject> obj)
     horizontal = Profile();
     vertical = Profile();
   }
-  ui->horizontalProfileWidget->plot(horizontal,false);
-  ui->verticalProfileWidget->plot(vertical,true);
+  horizontalProfileWidget->plot(horizontal,false);
+  verticalProfileWidget->plot(vertical,true);
 }
 
 void ProfileView::updateCursor(QPoint p)
@@ -169,14 +181,14 @@ void ProfileView::redraw()
     image->setXProfile(horizontal);
     image->setYProfile(vertical);
   }
-  ui->horizontalProfileWidget->plot(horizontal,false);
-  ui->verticalProfileWidget->plot(vertical,true);
+  horizontalProfileWidget->plot(horizontal,false);
+  verticalProfileWidget->plot(vertical,true);
 }
 
 void ProfileView::logYToggled(bool checked)
 {
-  ui->horizontalProfileWidget->setLogScale(checked);
-  ui->verticalProfileWidget->setLogScale(checked);
+  horizontalProfileWidget->setLogScale(checked);
+  verticalProfileWidget->setLogScale(checked);
   QSettings().setValue(PROFILEVIEW_LOGY,checked);
 }
 

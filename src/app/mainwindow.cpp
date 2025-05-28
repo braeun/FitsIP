@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-05-23                                                         *
+ * modified: 2025-05-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -35,17 +35,19 @@
 #include "dialogs/logbookpropertiesdialog.h"
 #include "dialogs/psfmanagerdialog.h"
 #include "dialogs/stardialog.h"
-#include <fitsbase/externaltoolslauncher.h>
-#include <fitsbase/filelist.h>
-#include <fitsbase/pixellist.h>
-#include <fitsbase/dialogs/pluginfilelistreturndialog.h>
-#include <fitsbase/dialogs/twovaluedialog.h>
-#include <fitsbase/io/db.h>
-#include <fitsbase/io/iofactory.h>
-#include <fitsbase/logbook/logbookutils.h>
-#include <fitsbase/psf/psffactory.h>
-#include <fitsbase/pluginfactory.h>
-#include <fitsbase/widgets/previewoptions.h>
+#include <fitsip/core/externaltoolslauncher.h>
+#include <fitsip/core/filelist.h>
+#include <fitsip/core/pixellist.h>
+#include <fitsip/core/dialogs/pluginfilelistreturndialog.h>
+#include <fitsip/core/dialogs/plugininfodialog.h>
+#include <fitsip/core/dialogs/twovaluedialog.h>
+#include <fitsip/core/io/db.h>
+#include <fitsip/core/io/iofactory.h>
+#include <fitsip/core/logbook/logbookutils.h>
+#include <fitsip/core/opplugin.h>
+#include <fitsip/core/psf/psffactory.h>
+#include <fitsip/core/pluginfactory.h>
+#include <fitsip/core/widgets/previewoptions.h>
 #include <QActionGroup>
 #include <QCloseEvent>
 #include <QDir>
@@ -71,21 +73,6 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   AppSettings settings;
   db::configure(settings);
 
-  defaultPixelList = std::make_unique<PixelList>();
-  ui->pixellistWidget->setPixelList(defaultPixelList.get());
-  connect(ui->pixellistWidget,&PixelListWidget::findStars,this,&MainWindow::getStarlistFromPixellist);
-
-  defaultStarList = std::make_unique<StarList>();
-  ui->starlistWidget->setStarList(defaultStarList.get());
-
-  pluginFactory = std::make_unique<PluginFactory>();
-  imageCollection = std::make_unique<ImageCollection>();
-//  scriptInterface = std::make_unique<ScriptInterface>();
-  selectedFileList = std::make_shared<FileList>();
-
-  ui->fileListWidget->setFileList(selectedFileList);
-
-  ui->openFileList->setModel(imageCollection.get());
   openFileListMenu = new QMenu;
   openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
 
@@ -106,7 +93,6 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->scrollArea->setWidgetResizable(true);
   ui->scrollArea->setBackgroundRole(QPalette::Shadow);
   connect(ui->histogramWidget,&HistogramView::imageScaleChanged,this,&MainWindow::onImageScaleChanged);
-  loadPlugins();
 
   connect(ui->fileSystemView,&FileSystemView::openFile,this,[this](QString file){open(QFileInfo(file));});
   connect(ui->fileSystemView,&FileSystemView::runFile,this,[this](QString file){run(QFileInfo(file));});
@@ -180,7 +166,6 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   if (!settings.getLogbook().isEmpty() && settings.isLogbookOpenLast()) openLogbook(settings.getLogbook());
   ui->logbookWidget->setLogbook(&logbook);
 
-  connect(pluginFactory.get(),&PluginFactory::logOperation,this,&MainWindow::logPluginOperation);
   connect(ui->actionActive,&QAction::toggled,&logbook,&Logbook::activate);
 
   connect(ui->actionLoad_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::load);
@@ -191,7 +176,6 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->actionLoad_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::load);
   connect(ui->actionSave_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::save);
 
-  connect(pluginFactory.get(),&PluginFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
   connect(IOFactory::getInstance(),&IOFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
 
   QActionGroup* grp = new QActionGroup(this);
@@ -232,15 +216,6 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->actionShow_Detected_Stars->setChecked(settings.isShowStarlist());
 
   ui->actionRun_Script->setEnabled(false);
-#ifdef USE_PYTHON
-  script = std::make_unique<PythonScript>(this,pluginFactory.get());
-#endif
-  if (script)
-  {
-    ui->actionRun_Script->setEnabled(true);
-    connect(consoleWidget,&ConsoleWidget::consoleCommand,this,&MainWindow::runScriptCmd);
-    setScriptOutput();
-  }
 }
 
 MainWindow::~MainWindow()
@@ -251,8 +226,31 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
-void MainWindow::initialize()
+void MainWindow::initialize(PluginFactory* factory)
 {
+  pluginFactory = factory;
+  defaultPixelList = std::make_unique<PixelList>();
+  ui->pixellistWidget->setPixelList(defaultPixelList.get());
+  connect(ui->pixellistWidget,&PixelListWidget::findStars,this,&MainWindow::getStarlistFromPixellist);
+  defaultStarList = std::make_unique<StarList>();
+  ui->starlistWidget->setStarList(defaultStarList.get());
+  imageCollection = std::make_unique<ImageCollection>();
+  //  scriptInterface = std::make_unique<ScriptInterface>();
+  selectedFileList = std::make_shared<FileList>();
+  ui->fileListWidget->setFileList(selectedFileList);
+  ui->openFileList->setModel(imageCollection.get());
+  connect(pluginFactory,&PluginFactory::logOperation,this,&MainWindow::logPluginOperation);
+  connect(pluginFactory,&PluginFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
+  loadPlugins();
+#ifdef USE_PYTHON
+  script = std::make_unique<PythonScript>(this,pluginFactory);
+#endif
+  if (script)
+  {
+    ui->actionRun_Script->setEnabled(true);
+    connect(consoleWidget,&ConsoleWidget::consoleCommand,this,&MainWindow::runScriptCmd);
+    setScriptOutput();
+  }
 }
 
 LogWidget* MainWindow::getLogWidget()
@@ -276,11 +274,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::loadPlugins()
 {
-  QObjectList list = pluginFactory->getPlugins();
-  for (QObject* o : list)
+  auto list = pluginFactory->getOpPlugins();
+  for (OpPlugin* p : list)
   {
-    OpPlugin* op = dynamic_cast<OpPlugin*>(o);
-    if (op != nullptr) addOpPlugin(op);
+    addOpPlugin(p);
   }
 }
 
@@ -1094,7 +1091,7 @@ void MainWindow::on_actionLoad_Plugin_triggered()
   QString fn = settings.getOpenFilename(this,AppSettings::PATH_PLUGIN);
   if (!fn.isNull())
   {
-    Plugin* plugin = pluginFactory->loadPlugin(fn);
+    QObject* plugin = pluginFactory->loadPlugin(fn);
     if (plugin)
     {
       OpPlugin* op = dynamic_cast<OpPlugin*>(plugin);
@@ -1354,5 +1351,13 @@ void MainWindow::on_actionPSF_Manager_triggered()
   if (!psfManager) psfManager = new PSFManagerDialog();
   psfManager->updatePSFList();
   psfManager->show();
+}
+
+
+void MainWindow::on_actionPlugins_triggered()
+{
+  PluginInfoDialog* d = new PluginInfoDialog(pluginFactory,this);
+  d->exec();
+  d->deleteLater();
 }
 

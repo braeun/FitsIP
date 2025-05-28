@@ -22,14 +22,14 @@
 
 #include "pythonscript.h"
 #include "scriptinterface.h"
-#include <fitsbase/filelist.h>
-#include <fitsbase/fitsobject.h>
-#include <fitsbase/imagestatistics.h>
-#include <fitsbase/kernel.h>
-#include <fitsbase/kernelrepository.h>
-#include <fitsbase/opplugin.h>
-#include <fitsbase/pluginfactory.h>
-#include <fitsbase/scriptutilities.h>
+#include <fitsip/core/filelist.h>
+#include <fitsip/core/fitsobject.h>
+#include <fitsip/core/imagestatistics.h>
+#include <fitsip/core/kernel.h>
+#include <fitsip/core/kernelrepository.h>
+#include <fitsip/core/opplugin.h>
+#include <fitsip/core/pluginfactory.h>
+#include <fitsip/core/scriptutilities.h>
 #include <iostream>
 #include <functional>
 #include <QApplication>
@@ -61,6 +61,10 @@ void PythonScript::runFile(const QString& filename)
 PythonScript::PythonScript(ScriptInterface *intf, PluginFactory* plugins)
 {
   init(intf,plugins);
+}
+
+PythonScript::~PythonScript()
+{
 }
 
 void PythonScript::init(ScriptInterface* intf, PluginFactory* plugins)

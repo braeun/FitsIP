@@ -23,7 +23,7 @@
 #include "filelistwidget.h"
 #include "ui_filelistwidget.h"
 #include "appsettings.h"
-#include <fitsbase/filelist.h>
+#include <fitsip/core/filelist.h>
 #include <QClipboard>
 #include <QDebug>
 #include <QDir>
@@ -66,6 +66,7 @@ FileListWidget::FileListWidget(QWidget *parent) :
 
 FileListWidget::~FileListWidget()
 {
+  delete contextMenu;
   delete ui;
 }
 

@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+﻿cmake_minimum_required(VERSION 3.23 FATAL_ERROR)
 
 project(FitsIP VERSION 0.5.0 LANGUAGES CXX)
 
@@ -154,8 +154,9 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src)
 # BUILD ALL COMPONENTS
 #-----------------------------------------------------------------------------
 
-add_subdirectory(src/fitsbase)
-add_subdirectory(src/plugins)
+add_subdirectory(src/fitsip/core)
+add_subdirectory(src/fitsip/coreplugins)
+add_subdirectory(src/fitsip/extensions)
 
 if (USE_PYTHON)
 endif()

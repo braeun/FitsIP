@@ -22,7 +22,7 @@
 
 #include "editmetadatadialog.h"
 #include "ui_editmetadatadialog.h"
-#include <fitsbase/imagemetadata.h>
+#include <fitsip/core/imagemetadata.h>
 
 EditMetadataDialog::EditMetadataDialog(QWidget *parent) :
   QDialog(parent),

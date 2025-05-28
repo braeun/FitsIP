@@ -1,7 +1,7 @@
 #ifndef STARDIALOG_H
 #define STARDIALOG_H
 
-#include <fitsbase/fitstypes.h>
+#include <fitsip/core/fitstypes.h>
 #include <QDialog>
 
 namespace Ui {
