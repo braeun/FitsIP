@@ -78,7 +78,7 @@ void OpInvFFT::bindPython(void* mod) const
 
 OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
-  if (image->getImage()->getDepth() != 2 || image->getImage()->preFFTHeight == 0 || image->getImage()->preFFTWidth == 0)
+  if (image->getImage()->getDepth() != 2)
   {
     setError("Input is not a complex image");
     img = std::shared_ptr<FitsImage>();
@@ -99,9 +99,11 @@ OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, const 
 
 std::shared_ptr<FitsImage> OpInvFFT::invfft(std::shared_ptr<FitsImage> image) const
 {
+  int preFFTWidth = (image->getWidth() - 1) * 2;
+  int preFFTHeight = image->getHeight();
   fftw_complex* in = new fftw_complex[image->getHeight()*image->getWidth()];
-  double *out = new double[image->preFFTHeight*image->preFFTWidth];
-  fftw_plan f = fftw_plan_dft_c2r_2d(image->preFFTHeight,image->preFFTWidth,in,out,FFTW_ESTIMATE);
+  double *out = new double[preFFTHeight*preFFTWidth];
+  fftw_plan f = fftw_plan_dft_c2r_2d(preFFTHeight,preFFTWidth,in,out,FFTW_ESTIMATE);
   ConstPixelIterator it = image->getConstPixelIterator();
   fftw_complex* cptr = in;
   for (int i=0;i<image->getHeight()*image->getWidth();i++)
@@ -112,7 +114,7 @@ std::shared_ptr<FitsImage> OpInvFFT::invfft(std::shared_ptr<FitsImage> image) co
     ++cptr;
   }
   fftw_execute(f);
-  auto fftimg = std::make_shared<FitsImage>(image->getName()+"_INVFFT",image->preFFTWidth,image->preFFTHeight,1);
+  auto fftimg = std::make_shared<FitsImage>(image->getName()+"_INVFFT",preFFTWidth,preFFTHeight,1);
   PixelIterator it2 = fftimg->getPixelIterator();
   double* ptr = out;
   for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)

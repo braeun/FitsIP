@@ -1,4 +1,5 @@
 {
   "name": "StackingPluginCollection",
+  "version": "1.0.0",
   "depends": "CorePluginCollection;MatchingPluginCollection"
 }

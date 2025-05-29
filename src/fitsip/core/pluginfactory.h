@@ -34,6 +34,7 @@ class QPluginLoader;
 struct LibraryInfo
 {
   QString name;
+  QString version;
   QString filename;
 };
 
@@ -67,6 +68,7 @@ private:
   {
     QString name; // Plugin name as defined by metadata
     QString filename;
+    QString version;
     QStringList dependencies;
     QObject* instance = nullptr;
     std::shared_ptr<QPluginLoader> loader;
@@ -77,6 +79,7 @@ private:
   void loadPlugins();
   std::vector<QString> findPlugins(QString path);
   LibraryData initLibrary(QString filename);
+  int compareVersion(const std::string& v1, const std::string& v2);
 
   std::map<QString,LibraryData> libraryObjects;
 #ifdef USE_PYTHON

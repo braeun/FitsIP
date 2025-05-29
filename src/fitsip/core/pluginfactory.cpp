@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin factory                                                      *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -32,6 +32,7 @@
 #include <QDebug>
 #include <utility>
 #include <dlfcn.h>
+#include <sstream>
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -142,6 +143,7 @@ std::vector<LibraryInfo> PluginFactory::getLibraryInfo() const
   {
     LibraryInfo info;
     info.name = entry.second.name;
+    info.version = entry.second.version;
     info.filename = entry.second.filename;
     list.push_back(info);
   }
@@ -158,7 +160,7 @@ QStringList PluginFactory::getSearchPath() const
 
 QObject* PluginFactory::loadPlugin(LibraryData& lib)
 {
-  std::cout << "Load plugin: " << lib.name.toStdString() << std::endl;
+//  std::cout << "Load plugin: " << lib.name.toStdString() << std::endl;
   if (lib.instance)
   {
     return lib.instance;
@@ -223,7 +225,7 @@ void PluginFactory::initPlugin(QObject* o)
 
 void PluginFactory::loadPlugins()
 {
-  std::cout << pathList << std::endl;
+//  std::cout << pathList << std::endl;
   QStringList pathlist = QString(pathList).split(";");
   for (const QString& path : pathlist)
   {
@@ -273,7 +275,11 @@ std::vector<QString> PluginFactory::findPlugins(QString path)
         }
         else
         {
-          qWarning() << "multiple libraries found for " << lib.name;
+          if (compareVersion(lib.version.toStdString(),libraryObjects.at(lib.name).version.toStdString()) > 0)
+          {
+            libraryObjects.at(lib.name) = lib;
+          }
+          qWarning() << "multiple libraries found for " << lib.name << " Using newest version.";
         }
       }
     }
@@ -292,8 +298,37 @@ PluginFactory::LibraryData PluginFactory::initLibrary(QString filename)
     QJsonValue name = metadata.value("name");
     if (!name.isUndefined()) lib.name = name.toString();
     QJsonValue dep = metadata.value("depends");
-    lib.dependencies = dep.toString().split(";",Qt::SkipEmptyParts);
+    if (!dep.isUndefined()) lib.dependencies = dep.toString().split(";",Qt::SkipEmptyParts);
+    QJsonValue version = metadata.value("version");
+    if (!version.isUndefined()) lib.version = version.toString();
   }
   return lib;
 }
+
+int PluginFactory::compareVersion(const std::string& v1, const std::string& v2)
+{
+  std::vector<int> version1, version2;
+  std::istringstream is1(v1);
+  std::istringstream is2(v2);
+  std::string token;
+
+  // Split the versions by dot and store in vectors
+  while (getline(is1,token,'.'))
+  {
+    version1.push_back(std::stoi(token));
+  }
+  while (getline(is2,token,'.'))
+  {
+    version2.push_back(std::stoi(token));
+  }
+  for (std::size_t i=0;i<std::max(version1.size(), version2.size());i++)
+  {
+    int num1 = (i < version1.size()) ? version1[i] : 0;
+    int num2 = (i < version2.size()) ? version2[i] : 0;
+    if (num1 > num2) return 1;
+    if (num2 > num1) return -1;
+  }
+  return 0;
+}
+
 

@@ -13,7 +13,8 @@ PluginInfoDialog::PluginInfoDialog(PluginFactory* factory, QWidget *parent):QDia
   for (size_t row=0;row<libs.size();++row)
   {
     ui->libraryTableWidget->setItem(row,0,new QTableWidgetItem(libs[row].name));
-    ui->libraryTableWidget->setItem(row,1,new QTableWidgetItem(libs[row].filename));
+    ui->libraryTableWidget->setItem(row,1,new QTableWidgetItem(libs[row].version));
+    ui->libraryTableWidget->setItem(row,2,new QTableWidgetItem(libs[row].filename));
   }
 }
 

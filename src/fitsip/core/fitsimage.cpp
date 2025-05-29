@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-03-14                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -97,8 +97,6 @@ void Layer::blit(Layer* layer, int x, int y, int w, int h, int xd, int yd)
 
 
 FitsImage::FitsImage():
-  preFFTWidth(0),
-  preFFTHeight(0),
   name(""),
   width(0),
   height(0),
@@ -107,8 +105,6 @@ FitsImage::FitsImage():
 }
 
 FitsImage::FitsImage(const QString& name, int w, int h, int d):
-  preFFTWidth(0),
-  preFFTHeight(0),
   name(name),
   width(w),
   height(h),
@@ -121,8 +117,6 @@ FitsImage::FitsImage(const QString& name, int w, int h, int d):
 }
 
 FitsImage::FitsImage(const FitsImage& img):
-  preFFTWidth(img.preFFTWidth),
-  preFFTHeight(img.preFFTHeight),
   name(img.name),
   width(img.width),
   height(img.height),
@@ -136,8 +130,6 @@ FitsImage::FitsImage(const FitsImage& img):
 }
 
 FitsImage::FitsImage(FitsImage&& img):
-  preFFTWidth(img.preFFTWidth),
-  preFFTHeight(img.preFFTHeight),
   name(img.name),
   width(img.width),
   height(img.height),
@@ -148,8 +140,6 @@ FitsImage::FitsImage(FitsImage&& img):
 }
 
 FitsImage::FitsImage(const QString& name, const FitsImage& img):
-  preFFTWidth(img.preFFTWidth),
-  preFFTHeight(img.preFFTHeight),
   name(name),
   width(img.width),
   height(img.height),
@@ -317,6 +307,25 @@ std::shared_ptr<FitsImage> FitsImage::resizedImage(int w, int h) const
   return img;
 }
 
+std::shared_ptr<FitsImage> FitsImage::paddedImage(int w, int h) const
+{
+  if (w < width) w = width;
+  if (h < height) h = height;
+  auto img = std::make_shared<FitsImage>(name,w,h,getDepth());
+  for (int d=0;d<getDepth();d++)
+  {
+    ValueType* dst = img->getLayer(d)->getData();
+    ValueType* src = getLayer(d)->getData();
+    for (int i=0;i<height;++i)
+    {
+      memcpy(dst,src,width*sizeof(ValueType));
+      dst += w;
+      src += width;
+    }
+  }
+  return img;
+}
+
 void FitsImage::blit(FitsImage* src, int x, int y, int w, int h, int xd, int yd)
 {
   for (int d=0;d<getDepth();++d)
@@ -449,16 +458,38 @@ FitsImage& FitsImage::operator-=(ValueType v)
 FitsImage& FitsImage::operator*=(const FitsImage& img)
 {
   if (!isCompatible(img)) throw std::runtime_error("Incompatible fits image");
-  for (int d=0;d<getDepth();d++)
+  if (getDepth() == 2) /* assume complex data from FFT */
   {
-    ValueType *p = getLayer(d)->getData();
-    ValueType *p1 = img.getLayer(d)->getData();
+    ValueType *p0 = getLayer(0)->getData();
+    ValueType *p1 = getLayer(1)->getData();
+    ValueType *f0 = img.getLayer(0)->getData();
+    ValueType *f1 = img.getLayer(1)->getData();
     int n = width * height;
     while (n-- > 0)
     {
-      *p *= *p1;
-      ++p;
+      double re = *p0 * *f0 - *p1 * *f1;
+      double im = *p0 * *f1 + *p1 * *f0;
+      *p0 = re;
+      *p1 = im;
+      ++p0;
       ++p1;
+      ++f0;
+      ++f1;
+    }
+  }
+  else
+  {
+    for (int d=0;d<getDepth();d++)
+    {
+      ValueType *p = getLayer(d)->getData();
+      ValueType *p1 = img.getLayer(d)->getData();
+      int n = width * height;
+      while (n-- > 0)
+      {
+        *p *= *p1;
+        ++p;
+        ++p1;
+      }
     }
   }
   return *this;
@@ -482,16 +513,42 @@ FitsImage& FitsImage::operator*=(ValueType v)
 FitsImage& FitsImage::operator/=(const FitsImage& img)
 {
   if (!isCompatible(img)) throw std::runtime_error("Incompatible fits image");
-  for (int d=0;d<getDepth();d++)
+  if (getDepth() == 2) /* assume complex data from FFT */
   {
-    ValueType *p = getLayer(d)->getData();
-    ValueType *p1 = img.getLayer(d)->getData();
+    ValueType *p0 = getLayer(0)->getData();
+    ValueType *p1 = getLayer(1)->getData();
+    ValueType *f0 = img.getLayer(0)->getData();
+    ValueType *f1 = img.getLayer(1)->getData();
     int n = width * height;
     while (n-- > 0)
     {
-      if (fabs(*p1) > 1.0E-20) *p /= *p1;
-      ++p;
+      double a = *f0 * *f0 + *f1 * *f1;
+      if (fabs(a) > 1.0E-20)
+      {
+        double re = *p0 * *f0 - *p1 * *f1;
+        double im = *p0 * *f1 - *p1 * *f0;
+        *p0 = re / a;
+        *p1 = im / a;
+      }
+      ++p0;
       ++p1;
+      ++f0;
+      ++f1;
+    }
+  }
+  else
+  {
+    for (int d=0;d<getDepth();d++)
+    {
+      ValueType *p = getLayer(d)->getData();
+      ValueType *p1 = img.getLayer(d)->getData();
+      int n = width * height;
+      while (n-- > 0)
+      {
+        if (fabs(*p1) > 1.0E-20) *p /= *p1;
+        ++p;
+        ++p1;
+      }
     }
   }
   return *this;
@@ -524,8 +581,6 @@ FitsImage& FitsImage::operator=(const FitsImage& img)
   {
     layers.push_back(std::make_shared<Layer>(*img.layers[i]));
   }
-  preFFTHeight = img.preFFTHeight;
-  preFFTWidth = img.preFFTWidth;
   return *this;
 }
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-03-01                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -170,7 +170,7 @@ public:
   /**
    * @brief Return this image resized to the new width and height.
    *
-   * If the new width /height are larger than the current one, a empty border
+   * If the new width / height are larger than the current one, a empty border
    * will be created. If they are smaller, the image will be cropped. In any
    * case the center of the new image corresponds to the center of the original
    * image.
@@ -179,6 +179,20 @@ public:
    * @return the resized image
    */
   std::shared_ptr<FitsImage> resizedImage(int w, int h) const;
+
+  /**
+   * @brief Return this image padded to the new width and height.
+   *
+   * If the new width / height are larger than the current one,
+   * the image will be padded towards the right and bottom.
+   * If they are smaller the original width or height will be
+   * used. In any case, the top-left corner of the original image
+   * corresponds to the top-left corner of the new image.
+   * @param w the new width
+   * @param h the new height
+   * @return the padded image
+   */
+  std::shared_ptr<FitsImage> paddedImage(int w, int h) const;
 
   void blit(FitsImage* src, int x, int y, int w, int h, int xd, int yd);
 
@@ -214,9 +228,6 @@ public:
   FitsImage& operator/=(ValueType v);
 
   FitsImage& operator=(const FitsImage&);
-
-  int preFFTWidth;
-  int preFFTHeight;
 
 private:
   QImage toQImageLin(ValueType min, ValueType max) const;

@@ -81,9 +81,6 @@ std::shared_ptr<FitsImage> FitsIO::read(QString filename)
 //      if (entry.first == "EXPTIME") metadata.exposure = QString::fromStdString(entry.second->value(v)).toDouble();
 //      if (entry.first == "DATE-OBS") date = QString::fromStdString(entry.second->value(v));
 //      if (entry.first == "TIME-OBS") time = QString::fromStdString(entry.second->value(v));
-//      /* non standard keywords */
-//      if (entry.first == "PREFFTW") img->preFFTWidth = QString::fromStdString(entry.second->value(v)).toDouble();
-//      if (entry.first == "PREFFTH") img->preFFTHeight = QString::fromStdString(entry.second->value(v)).toDouble();
     }
 //    if (!date.isEmpty() && !time.isEmpty())
 //    {
@@ -98,7 +95,7 @@ std::shared_ptr<FitsImage> FitsIO::read(QString filename)
 //      metadata.history.pop_back();
 //    }
     img->setMetadata(metadata);
-    /* special handling fpr starlight xpress which stores unsigned 16bit */
+    /* special handling for starlight xpress which stores unsigned 16bit */
     if (metadata.getInstrument().toLower().contains("starlight xpress") && fits.pHDU().bitpix() == 16)
     {
       PixelIterator it = img->getPixelIterator();
@@ -180,12 +177,6 @@ bool FitsIO::write(QString filename, std::shared_ptr<FitsImage> img)
     if (!metadata.getHistory().isEmpty())
     {
       fits->pHDU().writeHistory(metadata.getHistory().join("\n").toStdString());
-    }
-    /* non standard key words */
-    if (img->preFFTHeight > 0 && img->preFFTWidth > 0)
-    {
-      fits->pHDU().addKey("PREFFTW",img->preFFTWidth,"");
-      fits->pHDU().addKey("PREFFTH",img->preFFTHeight,"");
     }
     delete fits;
     profiler.stop();

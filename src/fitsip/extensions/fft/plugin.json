@@ -1,4 +1,5 @@
 {
   "name": "FFTPluginCollection",
+  "version": "1.0.0",
   "depends": "CorePluginCollection"
 }
