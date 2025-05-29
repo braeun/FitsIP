@@ -7,6 +7,7 @@ add_library(fitsvancittert SHARED
   vancittertdeconvolution.h vancittertdeconvolution.cpp
   vancittertdeconvolutiondialog.h vancittertdeconvolutiondialog.cpp vancittertdeconvolutiondialog.ui
   plugin.json
+  vcresources.qrc
   )
 
 target_include_directories(fitsvancittert

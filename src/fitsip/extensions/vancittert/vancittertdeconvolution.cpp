@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - vanCittert deconvolution                                            *
  *                                                                              *
- * modified: 2025-05-28                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,7 @@
 #include <fitsip/core/imagestatistics.h>
 #include <fitsip/core/fitsimage.h>
 #include <fitsip/core/dialogs/progressdialog.h>
+#include <fitsip/core/io/iofactory.h>
 #include <fitsip/core/psf/psf.h>
 #include <fitsip/core/psf/psffactory.h>
 #include <QApplication>
@@ -50,7 +51,7 @@ QString VanCittertDeconvolution::getMenuEntry() const
 
 QIcon VanCittertDeconvolution::getIcon() const
 {
-  return QIcon(":/pluginicons/resources/icons/vc.png");
+  return QIcon(":/vancittert/resources/icons/vc.png");
 }
 
 OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
@@ -70,7 +71,7 @@ OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsObject
       parameter = dlg->getParameter();
       auto psfpar = dlg->getParameters();
       profiler.start();
-      deconvolve(image->getImage(),psf,psfpar,dlg->getIterationCount(),true);
+      deconvolve(image->getImage(),psf,psfpar,dlg->getIterationCount(),true,dlg->isStoreIntermediate());
       profiler.stop();
       QString msg = "van Cittert deconvolution: ";
       msg += psf->getName() + " par=";
@@ -104,7 +105,8 @@ OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsObject
   return CANCELLED;
 }
 
-void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf, const std::vector<ValueType>& par, int niter, bool progress)
+void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf, const std::vector<ValueType>& par,
+                                         int niter, bool progress, bool storeintermediate, QString path)
 {
   ProgressDialog* prog = progress && (niter > 2) ? new ProgressDialog() : nullptr;
   if (prog)
@@ -130,7 +132,8 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
   fftw_complex* offt3 = new fftw_complex[fftsize];
   ImageStatistics stat;
   std::shared_ptr<FitsImage> c;
-  while (niter-- > 0)
+  int remain = niter;
+  while (remain-- > 0)
   {
     if (image->getDepth() == 1)
     {
@@ -169,10 +172,20 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
     {
       o->cut(basestat.getGlobalStatistics().minValue,basestat.getGlobalStatistics().maxValue);
     }
-    qInfo() << "remaining" << niter << " stddev=" << stat.getGlobalStatistics().stddev;
+    if (storeintermediate)
+    {
+      QString fnc = path + "/c_" + QString::number(niter-remain) + ".fts";
+      IOHandler *io = IOFactory::getInstance()->getHandler(fnc);
+      io->write(fnc,c);
+      QString fns = path + "/s_" + QString::number(niter-remain) + ".fts";
+      io->write(fns,s);
+      QString fno = path + "/o_" + QString::number(niter-remain) + ".fts";
+      io->write(fno,o);
+    }
+    qInfo() << "remaining" << remain << " stddev=" << stat.getGlobalStatistics().stddev;
     if (prog)
     {
-      prog->setProgress(niter);
+      prog->setProgress(remain);
       prog->appendMessage(QString::asprintf("stddev=%f",stat.getGlobalStatistics().stddev));
       QApplication::processEvents();
       if (prog->isCancelled()) break;
@@ -193,7 +206,7 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
 
 
 
-fftw_complex* VanCittertDeconvolution::fft(const FitsImage &image, int channel)
+void VanCittertDeconvolution::fft(const FitsImage &image, int channel)
 {
   ConstPixelIterator it = image.getConstPixelIterator();
   double* ptr = rinout;
@@ -203,7 +216,6 @@ fftw_complex* VanCittertDeconvolution::fft(const FitsImage &image, int channel)
     ++it;
   }
   fftw_execute(r2c);
-  return cinout;
 }
 
 std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c, int w, int h)

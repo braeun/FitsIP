@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - convolve an image using FFT                                         *
+ * FitsIP - test image with a ruloer                                            *
  *                                                                              *
- * modified: 2025-03-01                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,52 +20,62 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef OPFFTCONVOLUTION_H
-#define OPFFTCONVOLUTION_H
+#include "rulerblackonwhitetestimage.h"
+#include <fitsip/core/io/iofactory.h>
 
-#include <fitsip/core/opplugin.h>
-#include <QObject>
-#include <fftw3.h>
+static const char* image_file = ":/testimages/images/ruler.512_black_on_white.png";
 
-class PSF;
-class OpFFTConvolutionDialog;
-
-class OpFFTConvolution: public OpPlugin
+RulerBlackOnWhiteTestImage::RulerBlackOnWhiteTestImage()
 {
-  Q_OBJECT
-  Q_INTERFACES(OpPlugin)
-public:
-  OpFFTConvolution();
-  virtual ~OpFFTConvolution() override;
+}
 
-  virtual QString getMenuEntry() const override;
+RulerBlackOnWhiteTestImage::~RulerBlackOnWhiteTestImage()
+{
+}
 
-#ifdef USE_PYTHON
-  virtual void bindPython(void* m) const override;
-#endif
+bool RulerBlackOnWhiteTestImage::requiresImage() const
+{
+  return false;
+}
 
-  virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
+bool RulerBlackOnWhiteTestImage::requiresFileList() const
+{
+  return false;
+}
 
-  std::shared_ptr<FitsImage> fftconvolution(FitsImage* img, const PSF* psf, const std::vector<ValueType>& par) const;
+bool RulerBlackOnWhiteTestImage::createsNewImage() const
+{
+  return true;
+}
 
-private:
-  struct fftdata
+std::vector<std::shared_ptr<FitsObject>> RulerBlackOnWhiteTestImage::getCreatedImages() const
+{
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
+}
+
+
+QString RulerBlackOnWhiteTestImage::getMenuEntry() const
+{
+  return "Image/Test Images/Ruler (black on white)";
+}
+
+OpPlugin::ResultType RulerBlackOnWhiteTestImage::execute(std::shared_ptr<FitsObject> /*image*/, const OpPluginData& /*data*/)
+{
+  IOHandler* handler = IOFactory::getInstance()->getHandler(image_file);
+  if (handler)
   {
-    int fftsize;
-    double* rinout;
-    fftw_complex* cinout;
-    fftw_plan r2c;
-    fftw_plan c2r;
-  };
+    try
+    {
+    img = handler->read(image_file);
+    return OK;
+    }
+    catch (std::exception& ex)
+    {
+      setError("Internal Error: "+QString(ex.what()));
+      return ERROR;
+    }
+  }
+  setError("Internal Error: No handler found");
+  return ERROR;
+}
 
-  void fft(const fftdata& data, const FitsImage &image, int channel) const;
-  std::shared_ptr<FitsImage> invfft(const struct fftdata& data, fftw_complex* c, int w, int h) const;
-  std::shared_ptr<FitsImage> invfft(const struct fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h) const;
-  /* calculate a*b overwriting a */
-  void mul(fftw_complex* a, fftw_complex* b, int n) const;
-
-  OpFFTConvolutionDialog* dlg;
-
-};
-
-#endif // OPFFTCONVOLUTION_H

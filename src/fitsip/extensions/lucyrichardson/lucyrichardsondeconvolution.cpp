@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Lucy Richardson deconvolution                                       *
  *                                                                              *
- * modified: 2025-05-28                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,7 @@
 #include <fitsip/core/imagestatistics.h>
 #include <fitsip/core/fitsimage.h>
 #include <fitsip/core/dialogs/progressdialog.h>
+#include <fitsip/core/io/iofactory.h>
 #include <fitsip/core/psf/psf.h>
 #include <fitsip/core/psf/psffactory.h>
 #include <QApplication>
@@ -36,7 +37,6 @@ LucyRichardsonDeconvolution::LucyRichardsonDeconvolution():
   parameter(1),
   dlg(nullptr)
 {
-  Q_INIT_RESOURCE(pluginresources);
   profiler = SimpleProfiler("LucyRichardsonDeconvolution");
 }
 
@@ -51,7 +51,7 @@ QString LucyRichardsonDeconvolution::getMenuEntry() const
 
 QIcon LucyRichardsonDeconvolution::getIcon() const
 {
-  return QIcon(":/pluginicons/resources/icons/lr.png");
+  return QIcon(":/lucyrichardson/resources/icons/lr.png");
 }
 
 OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
@@ -71,7 +71,7 @@ OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsOb
       parameter = dlg->getParameter();
       auto psfpar = dlg->getParameters();
       profiler.start();
-      deconvolve(image->getImage(),psf,psfpar,dlg->getIterationCount(),true);
+      deconvolve(image->getImage(),psf,psfpar,dlg->getIterationCount(),true,dlg->isStoreIntermediate());
       profiler.stop();
       QString msg = "Lucy Richardson deconvolution: ";
       msg += psf->getName() + " par=";
@@ -105,7 +105,9 @@ OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsOb
   return CANCELLED;
 }
 
-void LucyRichardsonDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf, const std::vector<ValueType>& par, int niter, bool progress)
+void LucyRichardsonDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf,
+                                             const std::vector<ValueType>& par, int niter,
+                                             bool progress, bool storeintermediate)
 {
   ProgressDialog* prog = progress && (niter > 2) ? new ProgressDialog() : nullptr;
   if (prog)
@@ -119,29 +121,40 @@ void LucyRichardsonDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, c
   fftwidth = image->getWidth() / 2 + 1;
   fftheight = image->getHeight();
   fftsize = fftwidth * fftheight;
-  fftw_complex* hfft = fft(*h,0);
+  cinout = new fftw_complex[fftsize];
+  rinout = new double[image->getHeight()*image->getWidth()];
+  r2c = fftw_plan_dft_r2c_2d(image->getHeight(),image->getWidth(),rinout,cinout,FFTW_ESTIMATE);
+  c2r = fftw_plan_dft_c2r_2d(image->getHeight(),image->getWidth(),cinout,rinout,FFTW_ESTIMATE);
+  fft(*h,0);
+  fftw_complex* hfft = new fftw_complex[fftsize];
+  memcpy(hfft,cinout,fftsize*sizeof(fftw_complex));
+  fftw_complex* offt1 = new fftw_complex[fftsize];
+  fftw_complex* offt2 = new fftw_complex[fftsize];
+  fftw_complex* offt3 = new fftw_complex[fftsize];
   std::shared_ptr<FitsImage> c;
-  while (niter-- > 0)
+  int remain = niter;
+  while (remain-- > 0)
   {
+    /* blur the current iteration image */
     if (image->getDepth() == 1)
     {
-      fftw_complex* offt = fft(*o,0);
-      mul(offt,hfft,fftsize);
-      c = invfft(offt,image->getWidth(),image->getHeight());
-      delete [] offt;
+      fft(*o,0);
+      memcpy(offt1,cinout,fftsize*sizeof(fftw_complex));
+      mul(offt1,hfft,fftsize);
+      c = invfft(offt1,image->getWidth(),image->getHeight());
     }
     else if (image->getDepth() == 3)
     {
-      fftw_complex* offt1 = fft(*o,0);
-      fftw_complex* offt2 = fft(*o,1);
-      fftw_complex* offt3 = fft(*o,2);
+      fft(*o,0);
+      memcpy(offt1,cinout,fftsize*sizeof(fftw_complex));
+      fft(*o,1);
+      memcpy(offt2,cinout,fftsize*sizeof(fftw_complex));
+      fft(*o,2);
+      memcpy(offt3,cinout,fftsize*sizeof(fftw_complex));
       mul(offt1,hfft,fftsize);
       mul(offt2,hfft,fftsize);
       mul(offt3,hfft,fftsize);
       c = invfft(offt1,offt2,offt3,image->getWidth(),image->getHeight());
-      delete [] offt1;
-      delete [] offt2;
-      delete [] offt3;
     }
     auto s = std::make_shared<FitsImage>(*image);
     *s /= *c;
@@ -161,13 +174,30 @@ void LucyRichardsonDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, c
     {
       o->cut(basestat.getGlobalStatistics().minValue,basestat.getGlobalStatistics().maxValue);
     }
+    if (storeintermediate)
+    {
+      QString fnc = "c_" + QString::number(niter-remain) + ".fts";
+      IOHandler *io = IOFactory::getInstance()->getHandler(fnc);
+      io->write(fnc,c);
+      QString fns = "s_" + QString::number(niter-remain) + ".fts";
+      io->write(fns,s);
+      QString fno = "o_" + QString::number(niter-remain) + ".fts";
+      io->write(fno,o);
+    }
     if (prog)
     {
-      prog->setProgress(niter);
+      prog->setProgress(remain);
       QApplication::processEvents();
       if (prog->isCancelled()) break;
     }
   }
+  fftw_destroy_plan(r2c);
+  fftw_destroy_plan(c2r);
+  delete [] rinout;
+  delete [] cinout;
+  delete [] offt1;
+  delete [] offt2;
+  delete [] offt3;
   delete [] hfft;
   *image = *o;
   if (prog) prog->deleteLater();
@@ -176,41 +206,31 @@ void LucyRichardsonDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, c
 
 
 
-fftw_complex* LucyRichardsonDeconvolution::fft(const FitsImage &image, int channel)
+void LucyRichardsonDeconvolution::fft(const FitsImage &image, int channel)
 {
-  fftw_complex *s2c = new fftw_complex[fftsize];
-  double *in = new double[image.getHeight()*image.getWidth()];
-  fftw_plan f = fftw_plan_dft_r2c_2d(image.getHeight(),image.getWidth(),in,s2c,FFTW_ESTIMATE);
   ConstPixelIterator it = image.getConstPixelIterator();
-  double* ptr = in;
+  double* ptr = rinout;
   for (int i=0;i<image.getHeight()*image.getWidth();i++)
   {
     *ptr++ = it[channel];
     ++it;
   }
-  fftw_execute(f);
-  fftw_destroy_plan(f);
-  delete [] in;
-  return s2c;
+  fftw_execute(r2c);
 }
 
 std::shared_ptr<FitsImage> LucyRichardsonDeconvolution::invfft(fftw_complex* c, int w, int h)
 {
-  fftw_complex* in = c;
-  double *out = new double[w*h];
-  fftw_plan f = fftw_plan_dft_c2r_2d(h,w,in,out,FFTW_ESTIMATE);
-  fftw_execute(f);
+  memmove(cinout,c,fftsize*sizeof(fftw_complex));
+  fftw_execute(c2r);
   auto fftimg = std::make_shared<FitsImage>("tmp",w,h,1);
   PixelIterator it2 = fftimg->getPixelIterator();
-  double* ptr = out;
+  double* ptr = rinout;
   for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
   {
     it2[0] = *ptr;
     ++ptr;
     ++it2;
   }
-  fftw_destroy_plan(f);
-  delete [] out;
   *fftimg /= fftimg->getHeight() * fftimg->getWidth();
   return fftimg;
 }
@@ -218,47 +238,42 @@ std::shared_ptr<FitsImage> LucyRichardsonDeconvolution::invfft(fftw_complex* c, 
 std::shared_ptr<FitsImage> LucyRichardsonDeconvolution::invfft(fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h)
 {
   auto fftimg = std::make_shared<FitsImage>("tmp",w,h,3);
-  double *out = new double[w*h];
   {
-    fftw_plan f = fftw_plan_dft_c2r_2d(h,w,c1,out,FFTW_ESTIMATE);
-    fftw_execute(f);
+    memmove(cinout,c1,fftsize*sizeof(fftw_complex));
+    fftw_execute(c2r);
     PixelIterator it2 = fftimg->getPixelIterator();
-    double* ptr = out;
+    double* ptr = rinout;
     for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[0] = *ptr;
       ++ptr;
       ++it2;
     }
-    fftw_destroy_plan(f);
   }
   {
-    fftw_plan f = fftw_plan_dft_c2r_2d(h,w,c2,out,FFTW_ESTIMATE);
-    fftw_execute(f);
+    memmove(cinout,c2,fftsize*sizeof(fftw_complex));
+    fftw_execute(c2r);
     PixelIterator it2 = fftimg->getPixelIterator();
-    double* ptr = out;
+    double* ptr = rinout;
     for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[1] = *ptr;
       ++ptr;
       ++it2;
     }
-    fftw_destroy_plan(f);
   }
   {
-    fftw_plan f = fftw_plan_dft_c2r_2d(h,w,c3,out,FFTW_ESTIMATE);
-    fftw_execute(f);
+    memmove(cinout,c3,fftsize*sizeof(fftw_complex));
+    fftw_execute(c2r);
     PixelIterator it2 = fftimg->getPixelIterator();
-    double* ptr = out;
+    double* ptr = rinout;
     for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[2] = *ptr;
       ++ptr;
       ++it2;
     }
-    fftw_destroy_plan(f);
   }
-  delete [] out;
   *fftimg /= fftimg->getHeight() * fftimg->getWidth();
   return fftimg;
 }

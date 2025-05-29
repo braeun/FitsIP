@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - convolve an image using FFT                                         *
+ * FitsIP - test image with a ruler                                             *
  *                                                                              *
- * modified: 2025-03-01                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,52 +20,35 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef OPFFTCONVOLUTION_H
-#define OPFFTCONVOLUTION_H
+#ifndef RULERWHITEONBLACKTESTIMAGE_H
+#define RULERWHITEONBLACKTESTIMAGE_H
 
 #include <fitsip/core/opplugin.h>
 #include <QObject>
-#include <fftw3.h>
 
-class PSF;
-class OpFFTConvolutionDialog;
-
-class OpFFTConvolution: public OpPlugin
+class RulerWhiteOnBlackTestImage: public OpPlugin
 {
   Q_OBJECT
   Q_INTERFACES(OpPlugin)
 public:
-  OpFFTConvolution();
-  virtual ~OpFFTConvolution() override;
+  RulerWhiteOnBlackTestImage();
+  virtual ~RulerWhiteOnBlackTestImage() override;
+
+  virtual bool requiresImage() const override;
+
+  virtual bool requiresFileList() const override;
+
+  virtual bool createsNewImage() const override;
+
+  virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 
   virtual QString getMenuEntry() const override;
 
-#ifdef USE_PYTHON
-  virtual void bindPython(void* m) const override;
-#endif
-
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  std::shared_ptr<FitsImage> fftconvolution(FitsImage* img, const PSF* psf, const std::vector<ValueType>& par) const;
-
 private:
-  struct fftdata
-  {
-    int fftsize;
-    double* rinout;
-    fftw_complex* cinout;
-    fftw_plan r2c;
-    fftw_plan c2r;
-  };
-
-  void fft(const fftdata& data, const FitsImage &image, int channel) const;
-  std::shared_ptr<FitsImage> invfft(const struct fftdata& data, fftw_complex* c, int w, int h) const;
-  std::shared_ptr<FitsImage> invfft(const struct fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h) const;
-  /* calculate a*b overwriting a */
-  void mul(fftw_complex* a, fftw_complex* b, int n) const;
-
-  OpFFTConvolutionDialog* dlg;
-
+  std::shared_ptr<FitsImage> img;
 };
 
-#endif // OPFFTCONVOLUTION_H
+
+#endif // RULERWHITEONBLACKTESTIMAGE_H

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Lucy Richardson deconvolution dialog                                *
  *                                                                              *
- * modified: 2025-05-28                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,11 @@
 #include "lucyrichardsondeconvolutiondialog.h"
 #include "ui_lucyrichardsondeconvolutiondialog.h"
 #include <fitsip/core/widgets/psfwidget.h>
+#include <QDir>
+#include <QFileDialog>
+#include <QSettings>
+
+static const char* path_setting = "lucyrichardson/path";
 
 LucyRichardsonDeconvolutionDialog::LucyRichardsonDeconvolutionDialog(QWidget *parent) :
   QDialog(parent),
@@ -32,6 +37,10 @@ LucyRichardsonDeconvolutionDialog::LucyRichardsonDeconvolutionDialog(QWidget *pa
   psfWidget = new PSFWidget(ui->groupBox);
   psfWidget->setObjectName(QString::fromUtf8("psfWidget"));
   ui->verticalLayout_2->addWidget(psfWidget);
+  connect(ui->browseButton,&QPushButton::clicked,this,[this](){browse();});
+  QSettings settings;
+  QString path = settings.value(path_setting,QDir::homePath()).toString();
+  ui->pathField->setText(path);
 }
 
 LucyRichardsonDeconvolutionDialog::~LucyRichardsonDeconvolutionDialog()
@@ -74,10 +83,36 @@ bool LucyRichardsonDeconvolutionDialog::isConstMultFunction() const
   return ui->valueRelaxationBox->isChecked();
 }
 
+bool LucyRichardsonDeconvolutionDialog::isStoreIntermediate() const
+{
+  return ui->storeIntermediateBox->isChecked();
+}
+
+QString LucyRichardsonDeconvolutionDialog::getPath() const
+{
+  QString p = ui->pathField->text();
+  QDir dir(p);
+  if (!dir.exists())
+  {
+    dir.mkpath(p);
+  }
+  return p;
+}
+
 ValueType LucyRichardsonDeconvolutionDialog::getParameter() const
 {
   if (isSineFunction())
     return ui->sineValueBox->value();
   return ui->singleValueBox->value();
 }
+
+void LucyRichardsonDeconvolutionDialog::browse()
+{
+  QSettings settings;
+  QString rootpath = settings.value(path_setting,QDir::homePath()).toString();
+  QString dir = QFileDialog::getExistingDirectory(this,QApplication::applicationDisplayName(),rootpath);
+  ui->pathField->setText(dir);
+  settings.setValue(path_setting,dir);
+}
+
 

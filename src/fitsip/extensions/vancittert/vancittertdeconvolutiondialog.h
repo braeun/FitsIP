@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - vanCittert deconvolution dialog                                     *
  *                                                                              *
- * modified: 2025-05-28                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -54,9 +54,15 @@ public:
 
   bool isConstMultFunction() const;
 
+  bool isStoreIntermediate() const;
+
+  QString getPath() const;
+
   ValueType getParameter() const;
 
 private:
+  void browse();
+
   Ui::VanCittertDeconvolutionDialog *ui;
   PSFWidget *psfWidget;
 };

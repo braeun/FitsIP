@@ -45,7 +45,7 @@ std::shared_ptr<FitsImage> QtImageIO::read(QString filename)
 {
   profiler.start();
   QImage i(filename);
-  if (i.isNull()) throw std::runtime_error("Failed to load image");
+  if (i.isNull()) throw std::runtime_error("Failed to load image: "+filename.toStdString());
   QFileInfo info(filename);
   std::shared_ptr<FitsImage> img;
   if (i.depth() == 8)
@@ -171,6 +171,8 @@ void QtImageIO::writeMetadata(QString filename, const ImageMetadata& data)
 
 void QtImageIO::readExif(QString filename, ImageMetadata* data)
 {
+  /* cannot handle files inside the Qt resource system */
+  if (filename.startsWith(":")) return;
   Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filename.toStdString());
   if (image.get() == nullptr) return;
   image->readMetadata();

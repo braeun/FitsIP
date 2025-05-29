@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/lucyrichardson">
+        <file>resources/icons/lr.png</file>
+    </qresource>
+</RCC>

@@ -346,19 +346,16 @@ QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
         bool inserted = false;
         for (QAction* a : actions)
         {
-          qDebug() << entries[i] << a->text();
           if (a->text() > entries[i])
           {
             lastmenu->insertMenu(a,menu);
             inserted = true;
-            qDebug() << "insert";
             break;
           }
         }
         if (!inserted)
         {
           lastmenu->addMenu(menu);
-          qDebug() << "add";
         }
       }
     }
@@ -371,19 +368,16 @@ QAction* MainWindow::addMenuEntry(QString entry, QIcon icon)
   bool inserted = false;
   for (QAction* a : actions)
   {
-    qDebug() << entries.last() << a->text();
     if (a->text() > entries.last())
     {
       lastmenu->insertAction(a,action);
       inserted = true;
-      qDebug() << "insert";
       break;
     }
   }
   if (!inserted)
   {
     lastmenu->addAction(action);
-    qDebug() << "add";
   }
   if (!icon.isNull())
   {

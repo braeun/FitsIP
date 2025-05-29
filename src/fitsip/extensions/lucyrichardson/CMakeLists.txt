@@ -7,6 +7,7 @@ add_library(fitslucyrichardson SHARED
   lucyrichardsondeconvolution.cpp lucyrichardsondeconvolution.h
   lucyrichardsondeconvolutiondialog.cpp lucyrichardsondeconvolutiondialog.h lucyrichardsondeconvolutiondialog.ui
   plugin.json
+  lrresources.qrc
   )
 
 target_include_directories(fitslucyrichardson

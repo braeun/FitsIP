@@ -87,41 +87,69 @@ OpPlugin::ResultType OpFFTConvolution::execute(std::shared_ptr<FitsObject> image
 
 std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(FitsImage* img, const PSF* psf, const std::vector<ValueType>& par) const
 {
-  int fftsize = img->getWidth() * (img->getHeight() / 2 + 1);
+  fftdata data;
+  data.fftsize = img->getWidth() * (img->getHeight() / 2 + 1);
   auto h = psf->createPSF(img->getWidth(),img->getHeight(),par);
-  fftw_complex *cout = new fftw_complex[fftsize];
-  double *rin = new double[img->getHeight()*img->getWidth()];
-  fftw_plan r2c = fftw_plan_dft_r2c_2d(img->getHeight(),img->getWidth(),rin,cout,FFTW_ESTIMATE);
+  data.cinout = new fftw_complex[data.fftsize];
+  data.rinout = new double[img->getHeight()*img->getWidth()];
+  data.r2c = fftw_plan_dft_r2c_2d(img->getHeight(),img->getWidth(),data.rinout,data.cinout,FFTW_ESTIMATE);
+  data.c2r = fftw_plan_dft_c2r_2d(img->getHeight(),img->getWidth(),data.cinout,data.rinout,FFTW_ESTIMATE);
+  fft(data,*h,0);
+  fftw_complex* hfft = new fftw_complex[data.fftsize];
+  memcpy(hfft,data.cinout,data.fftsize*sizeof(fftw_complex));
+  std::shared_ptr<FitsImage> fftimage;
+  if (img->getDepth() == 1)
   {
-    ConstPixelIterator it = h->getConstPixelIterator();
-    double* ptr = rin;
-    for (int i=0;i<img->getHeight()*img->getWidth();i++)
-    {
-      *ptr++ = it.getAbs();
-      ++it;
-    }
-    fftw_execute(r2c);
+    fft(data,*img,0);
+    mul(data.cinout,hfft,data.fftsize);
+    fftimage = invfft(data,data.cinout,img->getWidth(),img->getHeight());
   }
-  fftw_complex *ch = new fftw_complex[fftsize];
-  memcpy(ch,cout,fftsize*sizeof(fftw_complex));
+  else if (img->getDepth() == 3)
   {
-    ConstPixelIterator it = img->getConstPixelIterator();
-    double* ptr = rin;
-    for (int i=0;i<img->getHeight()*img->getWidth();i++)
-    {
-      *ptr++ = it.getAbs();
-      ++it;
-    }
-    fftw_execute(r2c);
+    fftw_complex* offt1 = new fftw_complex[data.fftsize];
+    fftw_complex* offt2 = new fftw_complex[data.fftsize];
+    fftw_complex* offt3 = new fftw_complex[data.fftsize];
+    fft(data,*img,0);
+    memcpy(offt1,data.cinout,data.fftsize*sizeof(fftw_complex));
+    fft(data,*img,1);
+    memcpy(offt2,data.cinout,data.fftsize*sizeof(fftw_complex));
+    fft(data,*img,2);
+    memcpy(offt3,data.cinout,data.fftsize*sizeof(fftw_complex));
+    mul(offt1,hfft,data.fftsize);
+    mul(offt2,hfft,data.fftsize);
+    mul(offt3,hfft,data.fftsize);
+    fftimage = invfft(data,offt1,offt2,offt3,img->getWidth(),img->getHeight());
+    delete [] offt1;
+    delete [] offt2;
+    delete [] offt3;
   }
-  fftw_destroy_plan(r2c);
-  mul(ch,cout,fftsize);
-  fftw_plan c2r = fftw_plan_dft_c2r_2d(img->getHeight(),img->getWidth(),cout,rin,FFTW_ESTIMATE);
-  memcpy(cout,ch,fftsize*sizeof(fftw_complex));
-  fftw_execute(c2r);
-  auto fftimg = std::make_shared<FitsImage>("tmp",img->getWidth(),img->getHeight(),1);
+  fftw_destroy_plan(data.r2c);
+  fftw_destroy_plan(data.c2r);
+  delete [] data.rinout;
+  delete [] data.cinout;
+  delete [] hfft;
+  return fftimage;
+}
+
+void OpFFTConvolution::fft(const fftdata& data, const FitsImage &image, int channel) const
+{
+  ConstPixelIterator it = image.getConstPixelIterator();
+  double* ptr = data.rinout;
+  for (int i=0;i<image.getHeight()*image.getWidth();i++)
+  {
+    *ptr++ = it[channel];
+    ++it;
+  }
+  fftw_execute(data.r2c);
+}
+
+std::shared_ptr<FitsImage> OpFFTConvolution::invfft(const fftdata& data, fftw_complex* c, int w, int h) const
+{
+  memmove(data.cinout,c,data.fftsize*sizeof(fftw_complex));
+  fftw_execute(data.c2r);
+  auto fftimg = std::make_shared<FitsImage>("tmp",w,h,1);
   PixelIterator it2 = fftimg->getPixelIterator();
-  double* ptr = rin;
+  double* ptr = data.rinout;
   for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
   {
     it2[0] = *ptr;
@@ -129,12 +157,52 @@ std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(FitsImage* img, cons
     ++it2;
   }
   *fftimg /= fftimg->getHeight() * fftimg->getWidth();
-  fftw_destroy_plan(c2r);
-  delete [] rin;
-  delete [] cout;
-  delete [] ch;
   return fftimg;
 }
+
+std::shared_ptr<FitsImage> OpFFTConvolution::invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h) const
+{
+  auto fftimg = std::make_shared<FitsImage>("tmp",w,h,3);
+  {
+    memmove(data.cinout,c1,data.fftsize*sizeof(fftw_complex));
+    fftw_execute(data.c2r);
+    PixelIterator it2 = fftimg->getPixelIterator();
+    double* ptr = data.rinout;
+    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    {
+      it2[0] = *ptr;
+      ++ptr;
+      ++it2;
+    }
+  }
+  {
+    memmove(data.cinout,c2,data.fftsize*sizeof(fftw_complex));
+    fftw_execute(data.c2r);
+    PixelIterator it2 = fftimg->getPixelIterator();
+    double* ptr = data.rinout;
+    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    {
+      it2[1] = *ptr;
+      ++ptr;
+      ++it2;
+    }
+  }
+  {
+    memmove(data.cinout,c3,data.fftsize*sizeof(fftw_complex));
+    fftw_execute(data.c2r);
+    PixelIterator it2 = fftimg->getPixelIterator();
+    double* ptr = data.rinout;
+    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    {
+      it2[2] = *ptr;
+      ++ptr;
+      ++it2;
+    }
+  }
+  *fftimg /= fftimg->getHeight() * fftimg->getWidth();
+  return fftimg;
+}
+
 
 void OpFFTConvolution::mul(fftw_complex *a, fftw_complex *b, int n) const
 {

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Lucy Richardson deconvolution                                       *
  *                                                                              *
- * modified: 2025-05-28                                                         *
+ * modified: 2025-05-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -56,11 +56,11 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  void deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf, const std::vector<ValueType>& par, int niter, bool progress=false);
+  void deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf, const std::vector<ValueType>& par, int niter, bool progress=false, bool storeintermediate=false);
 
 private:
 //  std::shared_ptr<FitsImage> createPSF(uint32_t w, uint32_t h, const PSF* psf, const std::vector<ValueType>& par) const;
-  fftw_complex* fft(const FitsImage &image, int channel);
+  void fft(const FitsImage &image, int channel);
   std::shared_ptr<FitsImage> invfft(fftw_complex* c, int w, int h);
   std::shared_ptr<FitsImage> invfft(fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h);
   /* calculate a*b overwriting a */
@@ -73,6 +73,10 @@ private:
   int fftsize;
   int fftwidth;
   int fftheight;
+  double* rinout;
+  fftw_complex* cinout;
+  fftw_plan r2c;
+  fftw_plan c2r;
   LucyRichardsonDeconvolutionDialog* dlg;
 
 };

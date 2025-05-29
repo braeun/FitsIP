@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/vancittert">
+        <file>resources/icons/vc.png</file>
+    </qresource>
+</RCC>

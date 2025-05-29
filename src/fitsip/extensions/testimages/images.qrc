@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/testimages">
+        <file>images/ruler.512_black_on_white.png</file>
+        <file>images/ruler.512_white_on_black.png</file>
+        <file>images/readme.md</file>
+    </qresource>
+</RCC>

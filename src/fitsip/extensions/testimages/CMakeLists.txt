@@ -8,6 +8,9 @@ add_library(fitstestimages SHARED
   gaussiantestimagedialog.h gaussiantestimagedialog.cpp gaussiantestimagedialog.ui
   psftestimagedialog.h psftestimagedialog.cpp psftestimagedialog.ui
   plugin.json
+  rulerblackonwhitetestimage.h rulerblackonwhitetestimage.cpp
+  rulerwhiteonblacktestimage.h rulerwhiteonblacktestimage.cpp
+  images.qrc
 )
 
 target_include_directories(fitstestimages
