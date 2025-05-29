@@ -1,8 +1,7 @@
 #include "opfftconvolution.h"
 #include "opfftconvolutiondialog.h"
-#include "opfft.h"
-#include "opinvfft.h"
 #include <fitsip/core/psf/psffactory.h>
+#include <fftw3.h>
 
 #ifdef USE_PYTHON
 #undef SLOT
@@ -88,12 +87,66 @@ OpPlugin::ResultType OpFFTConvolution::execute(std::shared_ptr<FitsObject> image
 
 std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(FitsImage* img, const PSF* psf, const std::vector<ValueType>& par) const
 {
+  int fftsize = img->getWidth() * (img->getHeight() / 2 + 1);
   auto h = psf->createPSF(img->getWidth(),img->getHeight(),par);
-  auto psffft = OpFFT().fft(*h);
-  auto imgfft = OpFFT().fft(*img);
-  *imgfft *= *psffft;
-  auto cimg = OpInvFFT().invfft(imgfft);
-  return cimg;
+  fftw_complex *cout = new fftw_complex[fftsize];
+  double *rin = new double[img->getHeight()*img->getWidth()];
+  fftw_plan r2c = fftw_plan_dft_r2c_2d(img->getHeight(),img->getWidth(),rin,cout,FFTW_ESTIMATE);
+  {
+    ConstPixelIterator it = h->getConstPixelIterator();
+    double* ptr = rin;
+    for (int i=0;i<img->getHeight()*img->getWidth();i++)
+    {
+      *ptr++ = it.getAbs();
+      ++it;
+    }
+    fftw_execute(r2c);
+  }
+  fftw_complex *ch = new fftw_complex[fftsize];
+  memcpy(ch,cout,fftsize*sizeof(fftw_complex));
+  {
+    ConstPixelIterator it = img->getConstPixelIterator();
+    double* ptr = rin;
+    for (int i=0;i<img->getHeight()*img->getWidth();i++)
+    {
+      *ptr++ = it.getAbs();
+      ++it;
+    }
+    fftw_execute(r2c);
+  }
+  fftw_destroy_plan(r2c);
+  mul(ch,cout,fftsize);
+  fftw_plan c2r = fftw_plan_dft_c2r_2d(img->getHeight(),img->getWidth(),cout,rin,FFTW_ESTIMATE);
+  memcpy(cout,ch,fftsize*sizeof(fftw_complex));
+  fftw_execute(c2r);
+  auto fftimg = std::make_shared<FitsImage>("tmp",img->getWidth(),img->getHeight(),1);
+  PixelIterator it2 = fftimg->getPixelIterator();
+  double* ptr = rin;
+  for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+  {
+    it2[0] = *ptr;
+    ++ptr;
+    ++it2;
+  }
+  *fftimg /= fftimg->getHeight() * fftimg->getWidth();
+  fftw_destroy_plan(c2r);
+  delete [] rin;
+  delete [] cout;
+  delete [] ch;
+  return fftimg;
+}
+
+void OpFFTConvolution::mul(fftw_complex *a, fftw_complex *b, int n) const
+{
+  while (n-- > 0)
+  {
+    double re = (*a)[0] * (*b)[0] - (*a)[1] * (*b)[1];
+    double im = (*a)[0] * (*b)[1] + (*a)[1] * (*b)[0];
+    (*a)[0] = re;
+    (*a)[1] = im;
+    ++a;
+    ++b;
+  }
 }
 
 

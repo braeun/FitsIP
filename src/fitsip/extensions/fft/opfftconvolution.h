@@ -25,6 +25,7 @@
 
 #include <fitsip/core/opplugin.h>
 #include <QObject>
+#include <fftw3.h>
 
 class PSF;
 class OpFFTConvolutionDialog;
@@ -48,6 +49,8 @@ public:
   std::shared_ptr<FitsImage> fftconvolution(FitsImage* img, const PSF* psf, const std::vector<ValueType>& par) const;
 
 private:
+  void mul(fftw_complex* a, fftw_complex* b, int n) const;
+
   OpFFTConvolutionDialog* dlg;
 
 };

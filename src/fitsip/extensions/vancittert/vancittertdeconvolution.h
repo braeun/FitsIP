@@ -72,6 +72,10 @@ private:
   int fftsize;
   int fftwidth;
   int fftheight;
+  double* rinout;
+  fftw_complex* cinout;
+  fftw_plan r2c;
+  fftw_plan c2r;
   VanCittertDeconvolutionDialog* dlg;
 
 };

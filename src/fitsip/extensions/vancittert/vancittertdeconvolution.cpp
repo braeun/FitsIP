@@ -118,30 +118,39 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
   fftwidth = image->getWidth() / 2 + 1;
   fftheight = image->getHeight();
   fftsize = fftwidth * fftheight;
-  fftw_complex* hfft = fft(*h,0);
+  cinout = new fftw_complex[fftsize];
+  rinout = new double[image->getHeight()*image->getWidth()];
+  r2c = fftw_plan_dft_r2c_2d(image->getHeight(),image->getWidth(),rinout,cinout,FFTW_ESTIMATE);
+  c2r = fftw_plan_dft_c2r_2d(image->getHeight(),image->getWidth(),cinout,rinout,FFTW_ESTIMATE);
+  fft(*h,0);
+  fftw_complex* hfft = new fftw_complex[fftsize];
+  memcpy(hfft,cinout,fftsize*sizeof(fftw_complex));
+  fftw_complex* offt1 = new fftw_complex[fftsize];
+  fftw_complex* offt2 = new fftw_complex[fftsize];
+  fftw_complex* offt3 = new fftw_complex[fftsize];
   ImageStatistics stat;
   std::shared_ptr<FitsImage> c;
   while (niter-- > 0)
   {
     if (image->getDepth() == 1)
     {
-      fftw_complex* offt = fft(*o,0);
-      mul(offt,hfft,fftsize);
-      c = invfft(offt,image->getWidth(),image->getHeight());
-      delete [] offt;
+      fft(*o,0);
+      memcpy(offt1,cinout,fftsize*sizeof(fftw_complex));
+      mul(offt1,hfft,fftsize);
+      c = invfft(offt1,image->getWidth(),image->getHeight());
     }
     else if (image->getDepth() == 3)
     {
-      fftw_complex* offt1 = fft(*o,0);
-      fftw_complex* offt2 = fft(*o,1);
-      fftw_complex* offt3 = fft(*o,2);
+      fft(*o,0);
+      memcpy(offt1,cinout,fftsize*sizeof(fftw_complex));
+      fft(*o,1);
+      memcpy(offt2,cinout,fftsize*sizeof(fftw_complex));
+      fft(*o,2);
+      memcpy(offt3,cinout,fftsize*sizeof(fftw_complex));
       mul(offt1,hfft,fftsize);
       mul(offt2,hfft,fftsize);
       mul(offt3,hfft,fftsize);
       c = invfft(offt1,offt2,offt3,image->getWidth(),image->getHeight());
-      delete [] offt1;
-      delete [] offt2;
-      delete [] offt3;
     }
     auto s = std::make_shared<FitsImage>(*image);
     *s -= *c;
@@ -169,6 +178,13 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
       if (prog->isCancelled()) break;
     }
   }
+  fftw_destroy_plan(r2c);
+  fftw_destroy_plan(c2r);
+  delete [] rinout;
+  delete [] cinout;
+  delete [] offt1;
+  delete [] offt2;
+  delete [] offt3;
   delete [] hfft;
   *image = *o;
   if (prog) prog->deleteLater();
@@ -179,39 +195,30 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
 
 fftw_complex* VanCittertDeconvolution::fft(const FitsImage &image, int channel)
 {
-  fftw_complex *s2c = new fftw_complex[fftsize];
-  double *in = new double[image.getHeight()*image.getWidth()];
-  fftw_plan f = fftw_plan_dft_r2c_2d(image.getHeight(),image.getWidth(),in,s2c,FFTW_ESTIMATE);
   ConstPixelIterator it = image.getConstPixelIterator();
-  double* ptr = in;
+  double* ptr = rinout;
   for (int i=0;i<image.getHeight()*image.getWidth();i++)
   {
     *ptr++ = it[channel];
     ++it;
   }
-  fftw_execute(f);
-  fftw_destroy_plan(f);
-  delete [] in;
-  return s2c;
+  fftw_execute(r2c);
+  return cinout;
 }
 
 std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c, int w, int h)
 {
-  fftw_complex* in = c;
-  double *out = new double[w*h];
-  fftw_plan f = fftw_plan_dft_c2r_2d(h,w,in,out,FFTW_ESTIMATE);
-  fftw_execute(f);
+  memmove(cinout,c,fftsize*sizeof(fftw_complex));
+  fftw_execute(c2r);
   auto fftimg = std::make_shared<FitsImage>("tmp",w,h,1);
   PixelIterator it2 = fftimg->getPixelIterator();
-  double* ptr = out;
+  double* ptr = rinout;
   for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
   {
     it2[0] = *ptr;
     ++ptr;
     ++it2;
   }
-  fftw_destroy_plan(f);
-  delete [] out;
   *fftimg /= fftimg->getHeight() * fftimg->getWidth();
   return fftimg;
 }
@@ -219,47 +226,42 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c, int 
 std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h)
 {
   auto fftimg = std::make_shared<FitsImage>("tmp",w,h,3);
-  double *out = new double[w*h];
   {
-    fftw_plan f = fftw_plan_dft_c2r_2d(h,w,c1,out,FFTW_ESTIMATE);
-    fftw_execute(f);
+    memmove(cinout,c1,fftsize*sizeof(fftw_complex));
+    fftw_execute(c2r);
     PixelIterator it2 = fftimg->getPixelIterator();
-    double* ptr = out;
+    double* ptr = rinout;
     for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[0] = *ptr;
       ++ptr;
       ++it2;
     }
-    fftw_destroy_plan(f);
   }
   {
-    fftw_plan f = fftw_plan_dft_c2r_2d(h,w,c2,out,FFTW_ESTIMATE);
-    fftw_execute(f);
+    memmove(cinout,c2,fftsize*sizeof(fftw_complex));
+    fftw_execute(c2r);
     PixelIterator it2 = fftimg->getPixelIterator();
-    double* ptr = out;
+    double* ptr = rinout;
     for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[1] = *ptr;
       ++ptr;
       ++it2;
     }
-    fftw_destroy_plan(f);
   }
   {
-    fftw_plan f = fftw_plan_dft_c2r_2d(h,w,c3,out,FFTW_ESTIMATE);
-    fftw_execute(f);
+    memmove(cinout,c3,fftsize*sizeof(fftw_complex));
+    fftw_execute(c2r);
     PixelIterator it2 = fftimg->getPixelIterator();
-    double* ptr = out;
+    double* ptr = rinout;
     for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[2] = *ptr;
       ++ptr;
       ++it2;
     }
-    fftw_destroy_plan(f);
   }
-  delete [] out;
   *fftimg /= fftimg->getHeight() * fftimg->getWidth();
   return fftimg;
 }

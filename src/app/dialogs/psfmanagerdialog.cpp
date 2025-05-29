@@ -34,7 +34,11 @@ void PSFManagerDialog::preview()
   auto psfpar = psfWidget->getParameters();
   if (psf)
   {
-    auto img = psf->createPSF(w,h,psfpar);
+    std::shared_ptr<FitsImage> img;
+    if (ui->fftInputBox->isChecked())
+      img = psf->createPSF(w,h,psfpar);
+    else
+      img = psf->createPSFForDisplay(w,h,psfpar);
     ImageStatistics stat(*img);
     auto qimg = img->toQImage(stat.getGlobalStatistics().minValue,stat.getGlobalStatistics().maxValue,FitsImage::LOG);
     ui->previewLabel->setPixmap(QPixmap::fromImage(qimg));
