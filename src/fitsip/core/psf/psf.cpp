@@ -31,10 +31,6 @@ PSF::~PSF()
 {
 }
 
-void PSF::init()
-{
-}
-
 ValueType PSF::value(ValueType x, ValueType y, const std::vector<ValueType>& par) const
 {
   return 0;
@@ -82,4 +78,18 @@ std::vector<QString> PSF::getParameterNames() const
   return std::vector<QString>();
 }
 
+bool PSF::isFixedSize() const
+{
+  return false;
+}
+
+int PSF::getWidth() const
+{
+  return 0;
+}
+
+int PSF::getHeight() const
+{
+  return 0;
+}
 

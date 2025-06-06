@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to select an image from memory or filesystem                 *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2025-06-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -30,6 +30,7 @@ namespace Ui {
 class ImageSelectDialog;
 }
 
+class ImageSelectWidget;
 class ImageCollection;
 class FitsObject;
 
@@ -51,6 +52,7 @@ public:
 
 private:
   Ui::ImageSelectDialog *ui;
+  ImageSelectWidget *imageSelectWidget;
   ImageCollection* collection;
 };
 

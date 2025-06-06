@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - dialog to create a test image fom a PSF                             *
+ * FitsIP - PSF manager dialog                                                  *
  *                                                                              *
- * modified: 2025-06-01                                                         *
+ * modified: 2025-06-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,63 +20,40 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "psftestimagedialog.h"
-#include "ui_psftestimagedialog.h"
-#include <fitsip/core/psf/psffactory.h>
+#ifndef PSFMANAGERDIALOG_H
+#define PSFMANAGERDIALOG_H
 
-PSFTestImageDialog::PSFTestImageDialog(QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::PSFTestImageDialog)
-{
-  ui->setupUi(this);
-  psfWidget = new PSFWidget(ui->groupBox);
-  psfWidget->setObjectName(QString::fromUtf8("psfWidget"));
-  ui->verticalLayout_2->insertWidget(0,psfWidget);
+#include <QDialog>
+
+namespace Ui {
+class PSFManagerDialog;
 }
 
-PSFTestImageDialog::~PSFTestImageDialog()
+class ImageCollection;
+class PreviewWidget;
+class PSFWidget;
+
+class PSFManagerDialog : public QDialog
 {
-  delete ui;
-}
+  Q_OBJECT
 
-void PSFTestImageDialog::updatePSFList()
-{
-  psfWidget->updatePSFList();
-}
+public:
+  explicit PSFManagerDialog(ImageCollection* collection, QWidget *parent = nullptr);
+  ~PSFManagerDialog();
 
-QString PSFTestImageDialog::getFunction() const
-{
-  return psfWidget->getFunction();
-}
+  void updatePSFList();
 
-std::vector<ValueType> PSFTestImageDialog::getParameters() const
-{
-  return psfWidget->getParameters();
-}
+private:
+  void functionSelected(QString text);
+  void preview();
+  void addImagePSF();
+  void deletePSF();
+  void renamePSF();
 
-int PSFTestImageDialog::getWidth() const
-{
-  return ui->widthBox->value();
-}
+  Ui::PSFManagerDialog *ui;
+  PreviewWidget* previewWidget;
+  PSFWidget* psfWidget;
+  ImageCollection* collection;
+};
 
-int PSFTestImageDialog::getHeight() const
-{
-  return  ui->heightBox->value();
-}
-
-double PSFTestImageDialog::getAmplitude() const
-{
-  return ui->amplitudeField->text().toDouble();
-}
-
-void PSFTestImageDialog::functionSelected(QString name)
-{
-  const PSF* psf = PSFFactory::getInstance()->getPSF(name);
-  if (psf->isFixedSize())
-  {
-  }
-  ui->widthBox->setEnabled(!psf->isFixedSize());
-  ui->heightBox->setEnabled(!psf->isFixedSize());
-}
-
-
+#endif // PSFMANAGERDIALOG_H

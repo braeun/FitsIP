@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - vanCittert deconvolution                                            *
  *                                                                              *
- * modified: 2025-05-29                                                         *
+ * modified: 2025-06-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -114,48 +114,51 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
     prog->setMaximum(niter);
     prog->show();
   }
+  int w0 = image->getWidth() + psf->getWidth();
+  w0 += w0 % 2;
+  int h0 = image->getHeight() + psf->getHeight();
   ImageStatistics basestat(*image);
-  auto o = std::make_shared<FitsImage>(*image);
-  auto h = psf->createPSF(image->getWidth(),image->getHeight(),par);
-  fftwidth = image->getWidth() / 2 + 1;
-  fftheight = image->getHeight();
-  fftsize = fftwidth * fftheight;
-  cinout = new fftw_complex[fftsize];
-  rinout = new double[image->getHeight()*image->getWidth()];
-  r2c = fftw_plan_dft_r2c_2d(image->getHeight(),image->getWidth(),rinout,cinout,FFTW_ESTIMATE);
-  c2r = fftw_plan_dft_c2r_2d(image->getHeight(),image->getWidth(),cinout,rinout,FFTW_ESTIMATE);
-  fft(*h,0);
-  fftw_complex* hfft = new fftw_complex[fftsize];
-  memcpy(hfft,cinout,fftsize*sizeof(fftw_complex));
-  fftw_complex* offt1 = new fftw_complex[fftsize];
-  fftw_complex* offt2 = new fftw_complex[fftsize];
-  fftw_complex* offt3 = new fftw_complex[fftsize];
+  auto imgpadded = image->paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
+  auto o = std::make_shared<FitsImage>(*imgpadded);
+  auto h = psf->createPSF(w0,h0,par);
+  fftdata data;
+  data.fftsize = (w0 / 2 + 1) * h0;
+  data.cinout = new fftw_complex[data.fftsize];
+  data.rinout = new double[h0*w0];
+  data.r2c = fftw_plan_dft_r2c_2d(h0,w0,data.rinout,data.cinout,FFTW_ESTIMATE);
+  data.c2r = fftw_plan_dft_c2r_2d(h0,w0,data.cinout,data.rinout,FFTW_ESTIMATE);
+  fft(data,*h,0);
+  fftw_complex* hfft = new fftw_complex[data.fftsize];
+  memcpy(hfft,data.cinout,data.fftsize*sizeof(fftw_complex));
+  fftw_complex* offt1 = new fftw_complex[data.fftsize];
+  fftw_complex* offt2 = new fftw_complex[data.fftsize];
+  fftw_complex* offt3 = new fftw_complex[data.fftsize];
   ImageStatistics stat;
   std::shared_ptr<FitsImage> c;
   int remain = niter;
   while (remain-- > 0)
   {
-    if (image->getDepth() == 1)
+    if (imgpadded->getDepth() == 1)
     {
-      fft(*o,0);
-      memcpy(offt1,cinout,fftsize*sizeof(fftw_complex));
-      mul(offt1,hfft,fftsize);
-      c = invfft(offt1,image->getWidth(),image->getHeight());
+      fft(data,*o,0);
+      memcpy(offt1,data.cinout,data.fftsize*sizeof(fftw_complex));
+      mul(offt1,hfft,data.fftsize);
+      c = invfft(data,offt1,w0,h0);
     }
-    else if (image->getDepth() == 3)
+    else if (imgpadded->getDepth() == 3)
     {
-      fft(*o,0);
-      memcpy(offt1,cinout,fftsize*sizeof(fftw_complex));
-      fft(*o,1);
-      memcpy(offt2,cinout,fftsize*sizeof(fftw_complex));
-      fft(*o,2);
-      memcpy(offt3,cinout,fftsize*sizeof(fftw_complex));
-      mul(offt1,hfft,fftsize);
-      mul(offt2,hfft,fftsize);
-      mul(offt3,hfft,fftsize);
-      c = invfft(offt1,offt2,offt3,image->getWidth(),image->getHeight());
+      fft(data,*o,0);
+      memcpy(offt1,data.cinout,data.fftsize*sizeof(fftw_complex));
+      fft(data,*o,1);
+      memcpy(offt2,data.cinout,data.fftsize*sizeof(fftw_complex));
+      fft(data,*o,2);
+      memcpy(offt3,data.cinout,data.fftsize*sizeof(fftw_complex));
+      mul(offt1,hfft,data.fftsize);
+      mul(offt2,hfft,data.fftsize);
+      mul(offt3,hfft,data.fftsize);
+      c = invfft(data,offt1,offt2,offt3,w0,h0);
     }
-    auto s = std::make_shared<FitsImage>(*image);
+    auto s = std::make_shared<FitsImage>(*imgpadded);
     *s -= *c;
     stat = ImageStatistics(*s);
     switch (func)
@@ -191,14 +194,16 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
       if (prog->isCancelled()) break;
     }
   }
-  fftw_destroy_plan(r2c);
-  fftw_destroy_plan(c2r);
-  delete [] rinout;
-  delete [] cinout;
+  fftw_destroy_plan(data.r2c);
+  fftw_destroy_plan(data.c2r);
+  delete [] data.rinout;
+  delete [] data.cinout;
   delete [] offt1;
   delete [] offt2;
   delete [] offt3;
   delete [] hfft;
+  /* crop to original size */
+  o = o->subImage(QRect(0,0,image->getWidth(),image->getHeight()));
   *image = *o;
   if (prog) prog->deleteLater();
 }
@@ -206,25 +211,25 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
 
 
 
-void VanCittertDeconvolution::fft(const FitsImage &image, int channel)
+void VanCittertDeconvolution::fft(const fftdata& data, const FitsImage &image, int channel)
 {
   ConstPixelIterator it = image.getConstPixelIterator();
-  double* ptr = rinout;
+  double* ptr = data.rinout;
   for (int i=0;i<image.getHeight()*image.getWidth();i++)
   {
     *ptr++ = it[channel];
     ++it;
   }
-  fftw_execute(r2c);
+  fftw_execute(data.r2c);
 }
 
-std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c, int w, int h)
+std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(const fftdata& data, fftw_complex* c, int w, int h)
 {
-  memmove(cinout,c,fftsize*sizeof(fftw_complex));
-  fftw_execute(c2r);
+  memmove(data.cinout,c,data.fftsize*sizeof(fftw_complex));
+  fftw_execute(data.c2r);
   auto fftimg = std::make_shared<FitsImage>("tmp",w,h,1);
   PixelIterator it2 = fftimg->getPixelIterator();
-  double* ptr = rinout;
+  double* ptr = data.rinout;
   for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
   {
     it2[0] = *ptr;
@@ -235,14 +240,14 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c, int 
   return fftimg;
 }
 
-std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h)
+std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h)
 {
   auto fftimg = std::make_shared<FitsImage>("tmp",w,h,3);
   {
-    memmove(cinout,c1,fftsize*sizeof(fftw_complex));
-    fftw_execute(c2r);
+    memmove(data.cinout,c1,data.fftsize*sizeof(fftw_complex));
+    fftw_execute(data.c2r);
     PixelIterator it2 = fftimg->getPixelIterator();
-    double* ptr = rinout;
+    double* ptr = data.rinout;
     for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[0] = *ptr;
@@ -251,10 +256,10 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c1, fft
     }
   }
   {
-    memmove(cinout,c2,fftsize*sizeof(fftw_complex));
-    fftw_execute(c2r);
+    memmove(data.cinout,c2,data.fftsize*sizeof(fftw_complex));
+    fftw_execute(data.c2r);
     PixelIterator it2 = fftimg->getPixelIterator();
-    double* ptr = rinout;
+    double* ptr = data.rinout;
     for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[1] = *ptr;
@@ -263,10 +268,10 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(fftw_complex* c1, fft
     }
   }
   {
-    memmove(cinout,c3,fftsize*sizeof(fftw_complex));
-    fftw_execute(c2r);
+    memmove(data.cinout,c3,data.fftsize*sizeof(fftw_complex));
+    fftw_execute(data.c2r);
     PixelIterator it2 = fftimg->getPixelIterator();
-    double* ptr = rinout;
+    double* ptr = data.rinout;
     for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
     {
       it2[2] = *ptr;

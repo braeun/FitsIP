@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widgets for previews in dialogs                                     *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-05-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -42,6 +42,8 @@ public:
   ~PreviewWidget();
 
   void setOptions(const PreviewOptions& opt);
+
+  void setSourceImage(std::shared_ptr<FitsImage> image);
 
   void setSourceImage(std::shared_ptr<FitsImage> image, QRect selection);
 

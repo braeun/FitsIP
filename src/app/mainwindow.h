@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2025-05-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -183,6 +183,7 @@ private:
   void run(const QFileInfo& fileinfo);
   void open(const QFileInfo& fileinfo);
   void openExternal(const QFileInfo& fileinfo);
+  void copyImage();
   void openImage(const QFileInfo& fileinfo);
   void openSelection();
   void copySelectionToList();

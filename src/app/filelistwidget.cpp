@@ -24,6 +24,7 @@
 #include "ui_filelistwidget.h"
 #include "appsettings.h"
 #include <fitsip/core/filelist.h>
+#include <QAbstractItemView>
 #include <QClipboard>
 #include <QDebug>
 #include <QDir>
@@ -37,8 +38,8 @@ FileListWidget::FileListWidget(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  connect(ui->fileList,&QListView::customContextMenuRequested,this,&FileListWidget::contextMenuRequested);
-  connect(ui->fileList,&QListView::doubleClicked,this,&FileListWidget::doubleClicked);
+  connect(ui->fileList,&QAbstractItemView::customContextMenuRequested,this,&FileListWidget::contextMenuRequested);
+  connect(ui->fileList,&QAbstractItemView::doubleClicked,this,&FileListWidget::doubleClicked);
   contextMenu = new QMenu();
   QAction* open = contextMenu->addAction("Open Selected");
   connect(open,&QAction::triggered,this,[this](){emit openSelected();});

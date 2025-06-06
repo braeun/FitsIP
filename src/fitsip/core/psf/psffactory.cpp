@@ -57,7 +57,6 @@ const PSF* PSFFactory::getPSF(const QString &name) const
   {
     if (psf->getName() == name)
     {
-      psf->init();
       return psf.get();
     }
   }
@@ -84,6 +83,64 @@ bool PSFFactory::addPSF(const std::shared_ptr<FitsImage>& img, const QString fil
     list.push_back(std::make_shared<ImagePSF>(file.absoluteFilePath()));
   }
   return ret;
+}
+
+bool PSFFactory::deletePSF(const QString& name)
+{
+  const PSF* psf = getPSF(name);
+  const ImagePSF* imgpsf = dynamic_cast<const ImagePSF*>(psf);
+  if (imgpsf)
+  {
+    QString filename = imgpsf->getFilename();
+    if (!QFile::remove(filename)) return false;
+    for (auto it=list.begin();it!= list.end();++it)
+    {
+      if ((*it)->getName() == name)
+      {
+        list.erase(it);
+        break;
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+bool PSFFactory::renamePSF(const QString& name, const QString& newname)
+{
+  const PSF* psf = getPSF(name);
+  const ImagePSF* imgpsf = dynamic_cast<const ImagePSF*>(psf);
+  if (imgpsf)
+  {
+    QString filename = imgpsf->getFilename();
+    QFileInfo info(filename);
+    QString newfilename = info.absolutePath() + "/" + newname + "." + info.suffix();
+    if (!QFile::rename(filename,newfilename)) return false;
+    for (auto it=list.begin();it!= list.end();++it)
+    {
+      if ((*it)->getName() == name)
+      {
+        *it = std::make_shared<ImagePSF>(newfilename);
+        break;
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+bool PSFFactory::canRename(const QString& name) const
+{
+  const PSF* psf = getPSF(name);
+  const ImagePSF* imgpsf = dynamic_cast<const ImagePSF*>(psf);
+  return imgpsf != nullptr;
+}
+
+bool PSFFactory::canDelete(const QString& name) const
+{
+  const PSF* psf = getPSF(name);
+  const ImagePSF* imgpsf = dynamic_cast<const ImagePSF*>(psf);
+  return imgpsf != nullptr;
 }
 
 

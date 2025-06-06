@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - file object containing the image and other data                     *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-05-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -87,13 +87,13 @@ public:
   bool isUndoAvailable() const;
 
   /**
-   * @brief Create a clone of this fits object with a new id.
+   * @brief Create a copy of this fits object with a new id.
    *
-   * Note: the undo stack is not cloned.
+   * Note: the undo stack is not copied.
    * @param filename the new filename
    * @return shared pointer to the new cloned fits object
    */
-  std::shared_ptr<FitsObject> clone(const std::string& filename) const;
+  std::shared_ptr<FitsObject> copy(const std::string& filename) const;
 
 private:
   const int id;

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - python scripting                                                    *
  *                                                                              *
- * modified: 2025-02-19                                                         *
+ * modified: 2025-05-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -151,8 +151,8 @@ void PythonScript::bind(py::module_& m, ScriptInterface* intf)
       .export_values()
       ;
 
-  m.def("clone",[](std::shared_ptr<FitsObject> obj, const std::string& filename){return obj->clone(filename);},
-      "Clone an image",py::arg("obj"),py::arg("filename"));
+  m.def("copy",[](std::shared_ptr<FitsObject> obj, const std::string& filename){return obj->copy(filename);},
+      "Copy an image",py::arg("obj"),py::arg("filename"));
 }
 
 void PythonScript::bindLists(py::module_& m, ScriptInterface* intf)

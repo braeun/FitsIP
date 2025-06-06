@@ -24,19 +24,13 @@ add_library(fitscore SHARED
   star.cpp
   starlist.cpp
   undostack.cpp
-  dialogs/imageselectdialog.cpp
-  dialogs/imageselectdialog.ui
-  dialogs/imageselectwidget.cpp
-  dialogs/imageselectwidget.ui
+  dialogs/imageselectdialog.cpp dialogs/imageselectdialog.ui
   dialogs/pluginfilelistreturndialog.cpp dialogs/pluginfilelistreturndialog.ui
   dialogs/plugininfodialog.cpp dialogs/plugininfodialog.ui
-  dialogs/progressdialog.cpp
-  dialogs/progressdialog.ui
+  dialogs/progressdialog.cpp dialogs/progressdialog.ui
   dialogs/psfdialog.cpp dialogs/psfdialog.ui
-  dialogs/textinfodialog.cpp
-  dialogs/textinfodialog.ui
-  dialogs/twovaluedialog.cpp
-  dialogs/twovaluedialog.ui
+  dialogs/textinfodialog.cpp dialogs/textinfodialog.ui
+  dialogs/twovaluedialog.cpp dialogs/twovaluedialog.ui
   io/astroimageio.cpp
   io/cookbookio.cpp
   io/db.cpp
@@ -68,17 +62,20 @@ add_library(fitscore SHARED
   psf/imagepsf.cpp
   psf/psf.cpp
   psf/psffactory.cpp
+  psf/psfmanagerdialog.cpp psf/psfmanagerdialog.ui
   profiling/profilerentry.cpp
   profiling/simpleprofiler.cpp
   qconsolewidget/qconsoleiodevice.cpp
   qconsolewidget/qconsolewidget.cpp
   qxt/qxtglobal.cpp
   qxt/qxtspanslider.cpp
+  widgets/imageselectwidget.cpp widgets/imageselectwidget.ui
   widgets/previewwidget.cpp widgets/previewwidget.ui
   widgets/previewoptions.cpp
   widgets/profilechart.cpp
   widgets/psfwidget.cpp widgets/psfwidget.ui
   )
+add_library(fitsip::core ALIAS fitscore)
 
 target_sources(fitscore PUBLIC
   FILE_SET HEADERS TYPE HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../.." FILES
@@ -108,7 +105,6 @@ target_sources(fitscore PUBLIC
   starlist.h
   undostack.h
   dialogs/imageselectdialog.h
-  dialogs/imageselectwidget.h
   dialogs/pluginfilelistreturndialog.h
   dialogs/plugininfodialog.h
   dialogs/progressdialog.h
@@ -146,6 +142,7 @@ target_sources(fitscore PUBLIC
   psf/imagepsf.h
   psf/psf.h
   psf/psffactory.h
+  psf/psfmanagerdialog.h
   profiling/profilerentry.h
   profiling/simpleprofiler.h
   qconsolewidget/qconsoleiodevice.h
@@ -153,14 +150,13 @@ target_sources(fitscore PUBLIC
   qxt/qxtglobal.h
   qxt/qxtspanslider.h
   qxt/qxtspanslider_p.h
+  widgets/imageselectwidget.h
   widgets/previewoptions.h
   widgets/previewwidget.h
   widgets/profilechart.h
   widgets/psfwidget.h
   )
 
-
-add_library(fitsip::core ALIAS fitscore)
 
 if (LIBRAW_FOUND)
   target_sources(fitscore
@@ -173,7 +169,7 @@ if (LIBRAW_FOUND)
   )
 endif()
 
-target_include_directories(fitscore PRIVATE ${CFITSIO_INCLUDE_DIR})
+#target_include_directories(fitscore PRIVATE ${CFITSIO_INCLUDE_DIR})
 
 target_compile_definitions(fitscore PRIVATE ${FITS_DEF} -DPLUGIN_DIR=${CMAKE_BINARY_DIR}/src/fitsip)
 
@@ -206,6 +202,16 @@ if (nlohmann_json_FOUND)
     PUBLIC nlohmann_json::nlohmann_json
     )
 endif()
+
+set_target_properties(fitscore
+    PROPERTIES
+      VERSION
+        ${CMAKE_PROJECT_VERSION}
+      SOVERSION
+        ${CMAKE_PROJECT_VERSION_MAJOR} #.${CMAKE_PROJECT_VERSION_MINOR}
+      DEFINE_SYMBOL
+        LIBIMCACORE
+)
 
 install(TARGETS fitscore
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

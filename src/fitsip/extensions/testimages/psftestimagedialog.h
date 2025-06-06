@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to create a test image fom a PSF                             *
  *                                                                              *
- * modified: 2023-02-03                                                         *
+ * modified: 2025-06-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -53,6 +53,8 @@ public:
   double getAmplitude() const;
 
 private:
+  void functionSelected(QString text);
+
   Ui::PSFTestImageDialog *ui;
   PSFWidget *psfWidget;
 };

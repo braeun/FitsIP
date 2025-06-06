@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to select an image from memory or filesystem                 *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2025-06-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #include "ui_imageselectdialog.h"
 #include "../imagecollection.h"
 #include "../fitsobject.h"
+#include "../widgets/imageselectwidget.h"
 #include <QSettings>
 #include <QFileDialog>
 #include <QDebug>
@@ -34,6 +35,14 @@ ImageSelectDialog::ImageSelectDialog(QWidget *parent) :
   collection(nullptr)
 {
   ui->setupUi(this);
+  imageSelectWidget = new ImageSelectWidget(this);
+  imageSelectWidget->setObjectName(QString::fromUtf8("imageSelectWidget"));
+  QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  sizePolicy.setHorizontalStretch(0);
+  sizePolicy.setVerticalStretch(1);
+  sizePolicy.setHeightForWidth(imageSelectWidget->sizePolicy().hasHeightForWidth());
+  imageSelectWidget->setSizePolicy(sizePolicy);
+  ui->verticalLayout->insertWidget(ui->verticalLayout->indexOf(ui->buttonBox),imageSelectWidget);
 }
 
 ImageSelectDialog::~ImageSelectDialog()
@@ -53,10 +62,10 @@ void ImageSelectDialog::setPrompt(QString txt)
 
 void ImageSelectDialog::setImageCollection(ImageCollection* c)
 {
-  ui->imageSelectWidget->setImageCollection(c);
+  imageSelectWidget->setImageCollection(c);
 }
 
 std::shared_ptr<FitsObject> ImageSelectDialog::getImage()
 {
-  return ui->imageSelectWidget->getImage();
+  return imageSelectWidget->getImage();
 }

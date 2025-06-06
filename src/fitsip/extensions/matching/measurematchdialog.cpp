@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog for plugin to match two images                               *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-06-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,7 +22,7 @@
 
 #include "measurematchdialog.h"
 #include "ui_measurematchdialog.h"
-#include <fitsip/core/dialogs/imageselectwidget.h>
+#include <fitsip/core/widgets/imageselectwidget.h>
 
 MeasureMatchDialog::MeasureMatchDialog(QWidget *parent):QDialog(parent),
   ui(new Ui::MeasureMatchDialog)

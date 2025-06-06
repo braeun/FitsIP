@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - factory for point-spread-functions                                  *
  *                                                                              *
- * modified: 2025-02-28                                                         *
+ * modified: 2025-05-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -40,6 +40,14 @@ public:
   const std::vector<std::shared_ptr<PSF>>& getList() const;
 
   bool addPSF(const std::shared_ptr<FitsImage>& img, const QString filename);
+
+  bool deletePSF(const QString& name);
+
+  bool renamePSF(const QString& name, const QString& newname);
+
+  bool canRename(const QString& name) const;
+
+  bool canDelete(const QString& name) const;
 
   static PSFFactory* getInstance();
 

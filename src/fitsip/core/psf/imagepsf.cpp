@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image based point-spread-function                                   *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-06-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -27,6 +27,7 @@
 ImagePSF::ImagePSF(QString filename):PSF(),
   filename(filename)
 {
+  init();
 }
 
 ImagePSF::~ImagePSF()
@@ -36,6 +37,11 @@ ImagePSF::~ImagePSF()
 QString ImagePSF::getName() const
 {
   return QFileInfo(filename).baseName();
+}
+
+QString ImagePSF::getFilename() const
+{
+  return filename;
 }
 
 void ImagePSF::init()
@@ -49,7 +55,7 @@ void ImagePSF::init()
     }
     if (!img)
     {
-      img = std::make_shared<FitsImage>(getName(),50,50);
+      img = std::make_shared<FitsImage>(ImagePSF::getName(),50,50);
     }
   }
 }
@@ -78,3 +84,19 @@ std::shared_ptr<FitsImage> ImagePSF::createPSFForDisplay(int w, int h, const std
   dst->blit(img.get(),0,0,img->getWidth(),img->getHeight(),(w-img->getWidth())/2,(h-img->getHeight())/2);
   return dst;
 }
+
+bool ImagePSF::isFixedSize() const
+{
+  return true;
+}
+
+int ImagePSF::getWidth() const
+{
+  return img->getWidth();
+}
+
+int ImagePSF::getHeight() const
+{
+  return img->getHeight();
+}
+

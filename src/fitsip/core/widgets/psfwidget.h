@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - point spread function parameter widget                              *
  *                                                                              *
- * modified: 2025-05-23                                                         *
+ * modified: 2025-05-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -44,10 +44,12 @@ public:
 
   std::vector<ValueType> getParameters() const;
 
-private slots:
-  void on_functionBox_currentTextChanged(const QString &text);
+signals:
+  void functionSelected(QString name);
 
 private:
+  void selectionChanged(const QString &text);
+
   Ui::PSFWidget *ui;
 };
 

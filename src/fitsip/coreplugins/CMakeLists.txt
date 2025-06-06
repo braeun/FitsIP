@@ -27,6 +27,7 @@ add_library(fitscoreplugins SHARED
   coreplugincollection.h coreplugincollection.cpp
   plugin.json
 )
+add_library(fitsip::coreplugins ALIAS fitscoreplugins)
 
 target_sources(fitscoreplugins PUBLIC
   FILE_SET HEADERS TYPE HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../.." FILES
@@ -49,8 +50,6 @@ target_sources(fitscoreplugins PUBLIC
   opsub.h
   optogray.h
 )
-
-add_library(fitsip::coreplugins ALIAS fitscoreplugins)
 
 target_include_directories(fitscoreplugins
   PUBLIC

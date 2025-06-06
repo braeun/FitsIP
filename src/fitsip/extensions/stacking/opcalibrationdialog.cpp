@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog for image calibration with flatfield and dark image          *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2025-06-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,7 +23,7 @@
 #include "opcalibrationdialog.h"
 #include "ui_opcalibrationdialog.h"
 #include <fitsip/core/settings.h>
-#include <fitsip/core/dialogs/imageselectwidget.h>
+#include <fitsip/core/widgets/imageselectwidget.h>
 #include <QSettings>
 #include <QFileDialog>
 

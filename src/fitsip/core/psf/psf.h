@@ -42,8 +42,6 @@ public:
 
   virtual QString getName() const = 0;
 
-  virtual void init();
-
   virtual ValueType value(ValueType x, ValueType y, const std::vector<ValueType>& par) const;
 
   /**
@@ -63,14 +61,44 @@ public:
    * @brief Create a fits image with the point-spread-function suitable for display.
    *
    * In this case the point-spread-function is centered in the middle of the image.
-   * @param w width of the resulting image
-   * @param h height of the resulting image
+   * @param w width of the resulting image (might be ignored)
+   * @param h height of the resulting image (might be ignored)
    * @param par parameters for the psf
    * @return the image
    */
   virtual std::shared_ptr<FitsImage> createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const;
 
+  /**
+   * @brief Return a vector with all parameter names.
+   * @return vector of parameter names
+   */
   virtual std::vector<QString> getParameterNames() const;
+
+  /**
+   * @brief Return if the PSF has a fixed size (typical for image based PSF).
+   * @return true if the PSF is a fixed size
+   */
+  virtual bool isFixedSize() const;
+
+  /**
+   * @brief Return the width of the PSF.
+   *
+   * Only PSFs with a fixed size are expected to return their width. Other PSFs
+   * should return 0. The value returned here can be used for example in
+   * FFT deconvolution to pad the image and PSF to a combined size.
+   * @return the width
+   */
+  virtual int getWidth() const;
+
+  /**
+   * @brief Return the height of the PSF.
+   *
+   * Only PSFs with a fixed size are expected to return their height. Other PSFs
+   * should return 0. The value returned here can be used for example in
+   * FFT deconvolution to pad the image and PSF to a combined size.
+   * @return the height
+   */
+  virtual int getHeight() const;
 
 };
 

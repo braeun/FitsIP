@@ -33,7 +33,6 @@
 #include "dialogs/configurationdialog.h"
 #include "dialogs/editmetadatadialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
-#include "dialogs/psfmanagerdialog.h"
 #include "dialogs/stardialog.h"
 #include <fitsip/core/externaltoolslauncher.h>
 #include <fitsip/core/filelist.h>
@@ -46,6 +45,7 @@
 #include <fitsip/core/logbook/logbookutils.h>
 #include <fitsip/core/opplugin.h>
 #include <fitsip/core/psf/psffactory.h>
+#include "fitsip/core/psf/psfmanagerdialog.h"
 #include <fitsip/core/pluginfactory.h>
 #include <fitsip/core/widgets/previewoptions.h>
 #include <QActionGroup>
@@ -76,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   db::configure(settings);
 
   openFileListMenu = new QMenu;
+  openFileListMenu->addAction("Copy",this,[=](){copyImage();});
+  openFileListMenu->addSeparator();
   openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
 
   QDockWidget *consoleDockWidget = new QDockWidget(tr("Console"), this);
@@ -704,6 +706,15 @@ void MainWindow::openExternal(const QFileInfo& file)
   }
 }
 
+void MainWindow::copyImage()
+{
+  if (ui->openFileList->currentIndex().isValid())
+  {
+    auto obj = imageCollection->getActiveFile();
+    auto newobj = obj->copy("");
+    imageCollection->addFile(newobj);
+  }
+}
 
 void MainWindow::openImage(const QFileInfo &fileinfo)
 {
@@ -1382,7 +1393,7 @@ void MainWindow::on_actionSave_As_PSF_triggered()
 
 void MainWindow::on_actionPSF_Manager_triggered()
 {
-  if (!psfManager) psfManager = new PSFManagerDialog();
+  if (!psfManager) psfManager = new PSFManagerDialog(imageCollection.get());
   psfManager->updatePSFList();
   psfManager->show();
 }

@@ -42,6 +42,12 @@ void PreviewWidget::setOptions(const PreviewOptions& opt)
   options = opt;
 }
 
+void PreviewWidget::setSourceImage(std::shared_ptr<FitsImage> image)
+{
+  sourceImage = std::make_shared<FitsImage>(*image.get());
+  updatePreview(sourceImage);
+}
+
 void PreviewWidget::setSourceImage(std::shared_ptr<FitsImage> image, QRect selection)
 {
   if (selection.isEmpty())

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - fits object containing the image and other data                     *
  *                                                                              *
- * modified: 2025-02-01                                                         *
+ * modified: 2025-05-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -185,7 +185,7 @@ bool FitsObject::isUndoAvailable() const
   return undostack.isUndoAvailable();
 }
 
-std::shared_ptr<FitsObject> FitsObject::clone(const std::string& filename) const
+std::shared_ptr<FitsObject> FitsObject::copy(const std::string& filename) const
 {
   auto img = std::make_shared<FitsImage>(*image.get());
   auto obj = std::make_shared<FitsObject>(img,filename);

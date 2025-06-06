@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image based point-spread-function                                   *
  *                                                                              *
- * modified: 2025-02-28                                                         *
+ * modified: 2025-06-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,15 +34,24 @@ public:
 
   virtual QString getName() const override;
 
-  virtual void init() override;
+  QString getFilename() const;
 
   virtual std::shared_ptr<FitsImage> createPSF(int w, int h, const std::vector<ValueType>& par) const override;
 
   virtual std::shared_ptr<FitsImage> createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const override;
 
+  virtual bool isFixedSize() const override;
+
+  virtual int getWidth() const override;
+
+  virtual int getHeight() const override;
+
 private:
+  void init();
+
   QString filename;
   std::shared_ptr<FitsImage> img;
+
 };
 
 #endif // IMAGEPSF_H

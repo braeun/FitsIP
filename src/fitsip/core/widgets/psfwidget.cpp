@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - point spread function parameter widget                              *
  *                                                                              *
- * modified: 2022-11-25                                                         *
+ * modified: 2025-05-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -30,6 +30,7 @@ PSFWidget::PSFWidget(QWidget *parent) :
   ui(new Ui::PSFWidget)
 {
   ui->setupUi(this);
+  connect(ui->functionBox,&QComboBox::currentTextChanged,this,[this](const QString& text){selectionChanged(text);});
   updatePSFList();
 }
 
@@ -67,7 +68,7 @@ std::vector<ValueType> PSFWidget::getParameters() const
 
 
 
-void PSFWidget::on_functionBox_currentTextChanged(const QString &text)
+void PSFWidget::selectionChanged(const QString &text)
 {
   ui->parameterTableWidget->clearContents();
   const PSF *psf = PSFFactory::getInstance()->getPSF(text);
@@ -82,6 +83,7 @@ void PSFWidget::on_functionBox_currentTextChanged(const QString &text)
       ui->parameterTableWidget->setItem(i,0,item);
       ui->parameterTableWidget->setItem(i,1,new QTableWidgetItem("0.0"));
     }
+    emit functionSelected(text);
   }
 }
 
