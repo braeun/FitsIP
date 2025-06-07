@@ -26,13 +26,13 @@
 #include <tuple>
 #include <cstdint>
 
-#include <fitsip/core/fitsvaluetype.h>
+#include <fitsip/core/fitsconfig.h>
 
-//#ifdef USE_FLOAT
-//using ValueType = float;
-//#else
-//using ValueType = double;
-//#endif
+#ifdef USE_FLOAT
+using ValueType = float;
+#else
+using ValueType = double;
+#endif
 
 struct AverageResult
 {

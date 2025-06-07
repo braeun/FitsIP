@@ -23,6 +23,7 @@
 #ifndef QTIMAGEIO_H
 #define QTIMAGEIO_H
 
+#include <fitsip/core/fitsconfig.h>
 #include "iohandler.h"
 #include "../imagemetadata.h"
 

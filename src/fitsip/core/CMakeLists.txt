@@ -1,4 +1,6 @@
 ﻿
+# generate the configuration file
+configure_file(fitsconfig.h.in fitsconfig.h @ONLY)
 
 add_library(fitscore SHARED
   externaltoolslauncher.cpp
@@ -155,9 +157,8 @@ target_sources(fitscore PUBLIC
   widgets/previewwidget.h
   widgets/profilechart.h
   widgets/psfwidget.h
-  ${CMAKE_CURRENT_BINARY_DIR}/fitsvaluetype.h
+  ${CMAKE_CURRENT_BINARY_DIR}/fitsconfig.h
   )
-
 
 if (LIBRAW_FOUND)
   target_sources(fitscore
@@ -218,8 +219,6 @@ set_target_properties(fitscore
       DEFINE_SYMBOL
         LIBIMCACORE
 )
-
-configure_file(fitsvaluetype.h.in fitsvaluetype.h @ONLY)
 
 install(TARGETS fitscore
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
