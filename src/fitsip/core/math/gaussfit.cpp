@@ -129,7 +129,7 @@ void GaussFit::setMaxIteration(int max)
   maxIter = max;
 }
 
-int GaussFit::fit(ValueType *x, ValueType *y, ValueType *sig, int ndata)
+int GaussFit::fit(const ValueType *x, const ValueType *y, const ValueType *sig, int ndata)
 {
   if (ndata < 3)
   {
@@ -303,10 +303,16 @@ int GaussFit::fit(ValueType *x, ValueType *y, ValueType *sig, int ndata)
   chisq = chi;
 
   return 0;
-
 }
 
-int GaussFit::fastFit(ValueType *x, ValueType *y, int ndata)
+int GaussFit::fit(const std::vector<ValueType>& x, const std::vector<ValueType>& y, const std::vector<ValueType>& sig)
+{
+  std::vector<ValueType> s = sig;
+  if (s.empty()) s = std::vector<ValueType>(x.size(),1.0);
+  return fit(x.data(),y.data(),s.data(),x.size());
+}
+
+int GaussFit::fastFit(const ValueType *x, const ValueType *y, int ndata)
 {
   /*
    * allocate space for local arrays
@@ -593,12 +599,19 @@ int GaussFit::fastFit(ValueType *x, ValueType *y, int ndata)
   return 0;
 }
 
+int GaussFit::fastFit(const std::vector<ValueType>& x, const std::vector<ValueType>& y)
+{
+  return fastFit(x.data(),y.data(),x.size());
+}
+
+
+
 double GaussFit::getCenter() const
 {
   return center;
 }
 
-double GaussFit::getWidth() const
+double GaussFit::getSigma() const
 {
   return width;
 }
@@ -618,7 +631,7 @@ double GaussFit::getChiSq() const
 
 
 
-void GaussFit::guess_params(ValueType *x, ValueType *y, int ndata, ValueType *amp, ValueType *center, ValueType *width)
+void GaussFit::guess_params(const ValueType *x, const ValueType *y, int ndata, ValueType *amp, ValueType *center, ValueType *width)
 {
   /* guess that the amplitude is (min - max) */
   ValueType min = y[0];
@@ -668,7 +681,7 @@ void GaussFit::guess_params(ValueType *x, ValueType *y, int ndata, ValueType *am
    "sigflag" argument is zero, though, actually square each element
    of the "sig" array.  Slower, but necessary if we couldn't allocate
    space for the "sig2" array */
-ValueType GaussFit::find_chisq(ValueType *x, ValueType *y, ValueType *sig, ValueType *sig2, int ndata, ValueType amp, ValueType center, ValueType width)
+ValueType GaussFit::find_chisq(const ValueType *x, const ValueType *y, const ValueType *sig, const ValueType *sig2, int ndata, ValueType amp, ValueType center, ValueType width)
 {
 
 #ifdef DEBUG3
@@ -684,7 +697,7 @@ ValueType GaussFit::find_chisq(ValueType *x, ValueType *y, ValueType *sig, Value
    */
   if (fabs(width) < TINY) width = TINY;
 
-  if (!sig2)
+  if (sig2)
   {
     for (int i=0;i<ndata;i++)
     {

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - chart to display a profile                                          *
  *                                                                              *
- * modified: 2025-01-12                                                         *
+ * modified: 2025-06-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -39,6 +39,8 @@ public:
 
   void plot(const Profile& profile, bool vertical);
 
+  void plotOverlay(const QVector<QPointF>& data);
+
   void setLogScale(bool flag);
 
 protected:
@@ -46,6 +48,7 @@ protected:
 
 private:
   QwtPlotCurve* profile;
+  QwtPlotCurve* overlay;
   QwtPlotMarker* marker;
   QwtPlotGrid* grid;
   QwtPlotPicker* picker;

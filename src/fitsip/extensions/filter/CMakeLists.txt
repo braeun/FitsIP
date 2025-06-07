@@ -19,9 +19,9 @@ add_library(fitsfilter SHARED
 add_library(fitsip::filter ALIAS fitsfilter)
 
 target_include_directories(fitsfilter
-  PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-    $<INSTALL_INTERFACE:include>
+PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src>
+  $<INSTALL_INTERFACE:include>
 )
 
 target_compile_definitions(fitsfilter PRIVATE ${FITS_DEF})
@@ -44,13 +44,6 @@ if (USE_PYTHON)
     PRIVATE pybind11::embed
   )
 endif()
-
-install(TARGETS fitsfilter
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  FILE_SET HEADERS DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
 
 install(TARGETS fitsfilter
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/fits

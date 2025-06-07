@@ -16,9 +16,9 @@ add_library(fitsanalysis SHARED
 )
 
 target_include_directories(fitsanalysis
-  PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-    $<INSTALL_INTERFACE:include>
+PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src>
+  $<INSTALL_INTERFACE:include>
 )
 
 target_compile_definitions(fitsanalysis PRIVATE ${FITS_DEF})

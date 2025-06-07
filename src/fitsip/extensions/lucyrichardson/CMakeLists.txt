@@ -11,9 +11,9 @@ add_library(fitslucyrichardson SHARED
   )
 
 target_include_directories(fitslucyrichardson
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-    $<INSTALL_INTERFACE:include>
+PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src>
+  $<INSTALL_INTERFACE:include>
 )
 
 target_compile_definitions(fitslucyrichardson PRIVATE ${FITS_DEF})

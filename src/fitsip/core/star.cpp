@@ -332,7 +332,7 @@ void Star::star_axes(FitsImage* image, int tsx, int tsy, int w, int h, double sk
   if (gauss.fit(x,y,sig,h) == 0)
   {
     yc_ax = gauss.getCenter();
-    *ywidth = 2.35 * gauss.getWidth();  /* convert to FWHM */
+    *ywidth = 2.35 * gauss.getSigma();  /* convert to FWHM */
   }
   else
   {
@@ -374,7 +374,7 @@ void Star::star_axes(FitsImage* image, int tsx, int tsy, int w, int h, double sk
   if (gauss.fit(x,y,sig,w) == 0)
   {
     xc_ax = gauss.getCenter();
-    *xwidth = 2.35 * gauss.getWidth();  /* convert to FWHM */
+    *xwidth = 2.35 * gauss.getSigma();  /* convert to FWHM */
   }
   else
   {

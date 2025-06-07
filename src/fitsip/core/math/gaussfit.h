@@ -20,6 +20,7 @@
 #define GAUSSFIT_H
 
 #include "../fitstypes.h"
+#include <vector>
 
 class GaussFit
 {
@@ -52,8 +53,16 @@ public:
    *         the parameters don't converge within the maximum number of
    *         iterations.  If there is convergence, return 0
    */
-  int fit(ValueType x[], ValueType y[], ValueType sig[], int ndata);
+  int fit(const ValueType x[], const ValueType y[], const ValueType sig[], int ndata);
 
+  /**
+   * @brief Oberloaded function for the Gauss fit using vectors.
+   * @param x vector of x values
+   * @param y vector of y values
+   * @param sig vector of weights (maybe empty)
+   * @return
+   */
+  int fit(const std::vector<ValueType>& x, const std::vector<ValueType>& y, const std::vector<ValueType>& sig=std::vector<ValueType>());
 
   /**
    * @brief Fast analytical fit
@@ -89,11 +98,13 @@ public:
    * @param ndata number of elements in x, y
    * @return 0 if ok or 1 on error
    */
-  int fastFit(ValueType x[], ValueType y[], int ndata);
+  int fastFit(const ValueType x[], const ValueType y[], int ndata);
+
+  int fastFit(const std::vector<ValueType>& x, const std::vector<ValueType>& y);
 
   double getCenter() const;
 
-  double getWidth() const;
+  double getSigma() const;
 
   double getAmplitude() const;
 
@@ -101,8 +112,8 @@ public:
 
 private:
 
-  void guess_params(ValueType* x, ValueType* y, int ndata, ValueType *amp, ValueType *center, ValueType *width);
-  ValueType find_chisq(ValueType* x, ValueType* y, ValueType* sig, ValueType* sig2, int ndata, ValueType amp, ValueType center, ValueType width);
+  void guess_params(const ValueType* x, const ValueType* y, int ndata, ValueType *amp, ValueType *center, ValueType *width);
+  ValueType find_chisq(const ValueType* x, const ValueType* y, const ValueType* sig, const ValueType* sig2, int ndata, ValueType amp, ValueType center, ValueType width);
 
   bool pixelCenter;
   int maxIter;

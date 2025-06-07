@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to analyse a profile                                         *
  *                                                                              *
- * modified: 2025-01-12                                                         *
+ * modified: 2025-06-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,6 +26,7 @@
 #include <QDialog>
 
 class FitsObject;
+class Profile;
 class ProfileChart;
 
 namespace Ui {
@@ -45,6 +46,10 @@ public:
   virtual void done(int r);
 
 private:
+  double getBackground(const Profile& profile);
+  void updateMoments();
+  void fitGauss();
+
   Ui::AnalyseProfileDialog *ui;
   ProfileChart *verticalProfileChart;
   ProfileChart *horizontalProfileChart;

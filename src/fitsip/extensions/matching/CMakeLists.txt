@@ -12,7 +12,7 @@ add_library(fitsip::matching ALIAS fitsmatching)
 
 target_include_directories(fitsmatching
   PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src>
     $<INSTALL_INTERFACE:include>
 )
 

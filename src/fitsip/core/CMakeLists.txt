@@ -78,7 +78,7 @@ add_library(fitscore SHARED
 add_library(fitsip::core ALIAS fitscore)
 
 target_sources(fitscore PUBLIC
-  FILE_SET HEADERS TYPE HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../.." FILES
+  FILE_SET HEADERS TYPE HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../.." "${CMAKE_CURRENT_BINARY_DIR}/../.." FILES
   externaltoolslauncher.h
   filelist.h
   fitsimage.h
@@ -155,6 +155,7 @@ target_sources(fitscore PUBLIC
   widgets/previewwidget.h
   widgets/profilechart.h
   widgets/psfwidget.h
+  ${CMAKE_CURRENT_BINARY_DIR}/fitsvaluetype.h
   )
 
 
@@ -170,6 +171,11 @@ if (LIBRAW_FOUND)
 endif()
 
 #target_include_directories(fitscore PRIVATE ${CFITSIO_INCLUDE_DIR})
+target_include_directories(fitscore
+PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src>
+  $<INSTALL_INTERFACE:include>
+)
 
 target_compile_definitions(fitscore PRIVATE ${FITS_DEF} -DPLUGIN_DIR=${CMAKE_BINARY_DIR}/src/fitsip)
 
@@ -212,6 +218,8 @@ set_target_properties(fitscore
       DEFINE_SYMBOL
         LIBIMCACORE
 )
+
+configure_file(fitsvaluetype.h.in fitsvaluetype.h @ONLY)
 
 install(TARGETS fitscore
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

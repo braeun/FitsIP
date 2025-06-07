@@ -9,9 +9,9 @@ add_library(fitsfft SHARED
 )
 
 target_include_directories(fitsfft
-  PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-    $<INSTALL_INTERFACE:include>
+PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src>
+  $<INSTALL_INTERFACE:include>
 )
 
 target_compile_definitions(fitsfft PRIVATE ${FITS_DEF})

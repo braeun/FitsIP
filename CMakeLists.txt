@@ -128,8 +128,10 @@ if (EXIV2_FOUND)
   list(APPEND FITS_DEF -DHAVE_EXIV2)
 endif()
 
+set(FITS_VALUETYPE double)
 if (USE_FLOAT)
   list(APPEND FITS_DEF -DUSE_FLOAT)
+  set(FITS_VALUETYPE float)
 endif()
 
 if (USE_16BITRAW)
@@ -162,6 +164,8 @@ if (USE_PYTHON)
 endif()
 
 add_subdirectory(src/app)
+
+add_subdirectory(tests)
 
 
 #-----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - moments of a distribution                                           *
  *                                                                              *
- * modified: 2025-01-12                                                         *
+ * modified: 2025-06-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,9 +23,9 @@
 #include "moments.h"
 #include <cmath>
 
-Moments::Moments(const QVector<QPointF>& dist)
+Moments::Moments(const QVector<QPointF>& dist, double threshold)
 {
-  calculate(dist);
+  calculate(dist,threshold);
 }
 
 double Moments::getIntegral() const
@@ -62,7 +62,7 @@ double Moments::getKurtosis() const
 
 
 
-void Moments::calculate(const QVector<QPointF>& dist)
+void Moments::calculate(const QVector<QPointF>& dist, double threshold)
 {
   integral = 0;
   center = 0;
@@ -71,18 +71,24 @@ void Moments::calculate(const QVector<QPointF>& dist)
   kurtosis = 0;
   for (QPointF p : dist)
   {
-    integral += std::abs(p.y());
-    center += p.x() * std::abs(p.y());
+    if (p.y() >= threshold)
+    {
+      integral += std::abs(p.y());
+      center += p.x() * std::abs(p.y());
+    }
   }
   if (integral > 0)
   {
     center /= integral;
     for (QPointF p : dist)
     {
-      double v = p.x() - center;
-      variance += v * v * std::abs(p.y());
-      skewness += v * v * v * std::abs(p.y());
-      kurtosis += v * v * v * v * std::abs(p.y());
+      if (p.y() >= threshold)
+      {
+        double v = p.x() - center;
+        variance += v * v * std::abs(p.y());
+        skewness += v * v * v * std::abs(p.y());
+        kurtosis += v * v * v * v * std::abs(p.y());
+      }
     }
     variance /= integral;
     double sigma = std::sqrt(variance);

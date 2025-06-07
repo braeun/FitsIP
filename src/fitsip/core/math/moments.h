@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - moments of a distribution                                           *
  *                                                                              *
- * modified: 2025-02-15                                                         *
+ * modified: 2025-06-07                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,7 +29,7 @@
 class Moments
 {
 public:
-  Moments(const QVector<QPointF>& dist);
+  Moments(const QVector<QPointF>& dist, double threshold=0);
 
   double getIntegral() const;
 
@@ -44,7 +44,7 @@ public:
   double getKurtosis() const;
 
 protected:
-  void calculate(const QVector<QPointF>& dist);
+  void calculate(const QVector<QPointF>& dist, double threshold);
 
 private:
   double integral;

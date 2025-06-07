@@ -609,7 +609,7 @@ printf("into star_axes: tsx=%d tsy=%d w=%d h=%d\n", tsx, tsy, w, h);
   if (gauss.fit(x,y,sig,h) == 0)
   {
     yc_ax = gauss.getCenter();
-    *ywidth = 2.35 * gauss.getWidth();  /* convert to FWHM */
+    *ywidth = 2.35 * gauss.getSigma();  /* convert to FWHM */
   }
   else
   {
@@ -651,7 +651,7 @@ printf("into star_axes: tsx=%d tsy=%d w=%d h=%d\n", tsx, tsy, w, h);
   if (gauss.fit(x,y,sig,w) == 0)
   {
     xc_ax = gauss.getCenter();
-    *xwidth = 2.35 * gauss.getWidth();  /* convert to FWHM */
+    *xwidth = 2.35 * gauss.getSigma();  /* convert to FWHM */
   }
   else
   {

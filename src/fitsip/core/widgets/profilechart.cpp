@@ -35,6 +35,10 @@ ProfileChart::ProfileChart(QWidget* parent):QwtPlot(parent)
   profile->setPen(palette().color(QPalette::WindowText));
   profile->attach(this);
 
+  overlay = new QwtPlotCurve("Overlay");
+  overlay->setPen(palette().color(QPalette::Link));
+//  overlay->attach(this);
+
   marker = new QwtPlotMarker();
   marker->setLineStyle(QwtPlotMarker::VLine);
   marker->setLinePen(Qt::blue,2.0,Qt::DashLine);
@@ -58,6 +62,13 @@ void ProfileChart::plot(const Profile& profile, bool vertical)
 {
   this->profile->setSamples(profile);
   marker->setXValue(vertical?profile.getCursorY():profile.getCursorX());
+  replot();
+}
+
+void ProfileChart::plotOverlay(const QVector<QPointF>& data)
+{
+  overlay->setSamples(data);
+  overlay->attach(this);
   replot();
 }
 

@@ -66,9 +66,9 @@ add_executable(fits
 target_compile_definitions(fits PRIVATE ${FITS_DEF})
 
 target_include_directories(fits
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-    $<INSTALL_INTERFACE:include>
+PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src>
+  $<INSTALL_INTERFACE:include>
 )
 
 #target_link_options(fits PRIVATE -rdynamic)

@@ -1,0 +1,3 @@
+
+
+using ValueType = @FITS_VALUETYPE@;

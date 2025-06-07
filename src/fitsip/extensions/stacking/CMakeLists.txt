@@ -12,7 +12,7 @@ add_library(fitsstacking SHARED
 
 target_include_directories(fitsstacking
   PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src>
     $<INSTALL_INTERFACE:include>
 )
 

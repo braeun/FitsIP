@@ -15,7 +15,7 @@ add_library(fitstestimages SHARED
 
 target_include_directories(fitstestimages
   PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src  ${PROJECT_BINARY_DIR}/src>
     $<INSTALL_INTERFACE:include>
 )
 
