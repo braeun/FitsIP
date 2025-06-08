@@ -54,6 +54,7 @@ add_executable(fits
   dialogs/addlogbookentrydialog.cpp dialogs/addlogbookentrydialog.ui
   dialogs/configurationdialog.cpp dialogs/configurationdialog.ui
   dialogs/editmetadatadialog.cpp dialogs/editmetadatadialog.ui
+  dialogs/logbookexportdialog.h dialogs/logbookexportdialog.cpp dialogs/logbookexportdialog.ui
   dialogs/logbookfilterdialog.cpp dialogs/logbookfilterdialog.ui
   dialogs/logbookfilter1dialog.cpp dialogs/logbookfilter1dialog.ui
   dialogs/logbookpropertiesdialog.cpp dialogs/logbookpropertiesdialog.ui

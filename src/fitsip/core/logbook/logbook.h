@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2025-04-13                                                         *
+ * modified: 2025-06-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,7 +29,7 @@
 #include <memory>
 #include <vector>
 #include <set>
-#ifdef HAVE_JSON
+#ifdef HAVE_INJA
 #include <nlohmann/json_fwd.hpp>
 #endif
 
@@ -113,11 +113,10 @@ public:
 
 #ifdef HAVE_INJA
   bool exportToFile(const QString& file, QString templ);
-#endif
-
-#ifdef HAVE_JSON
   nlohmann::json toJson() const;
 #endif
+
+  static std::vector<QString> getTemplates();
 
 signals:
   void dataAdded();
@@ -133,10 +132,15 @@ public slots:
 private:
   bool exportPlainText(const QString& file);
 
+  static std::vector<QString> findTemplates();
+  static std::vector<QString> findTemplates(QString path);
+
   bool active;
   std::unique_ptr<LogbookStorage> store;
   QString project;
   QString step;
+
+  static std::vector<QString> templates;
 
 };
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2025-04-13                                                         *
+ * modified: 2025-06-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,14 +25,20 @@
 #include "logbookstorage.h"
 #include <QDateTime>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QTextStream>
-#ifdef HAVE_JSON
-#include <nlohmann/json.hpp>
-#endif
 #ifdef HAVE_INJA
 #include <inja/inja.hpp>
+#include <nlohmann/json.hpp>
 #endif
+
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
+static const char* pathList = TOSTRING(SHARE_DIR) ";/usr/share/fits;/usr/local/share/fits";
+
+std::vector<QString> Logbook::templates;
 
 Logbook::Logbook():QObject(),
   active(true),
@@ -237,6 +243,7 @@ bool Logbook::exportToFile(const QString &file)
 #ifdef HAVE_INJA
 bool Logbook::exportToFile(const QString& file, QString templ)
 {
+  if (!store) return false;
   inja::Environment env;
   nlohmann::json json = toJson();
   std::string s = env.render(templ.toStdString(),json);
@@ -248,11 +255,7 @@ bool Logbook::exportToFile(const QString& file, QString templ)
   f.close();
   return true;
 }
-#endif
 
-
-
-#ifdef HAVE_JSON
 nlohmann::json Logbook::toJson() const
 {
   nlohmann::json json;
@@ -264,7 +267,14 @@ nlohmann::json Logbook::toJson() const
     for (const LogbookEntry& e : getEntries(false))
     {
       nlohmann::json je;
-      je["timestamp"] = e.getTimestamp().time().toString(Qt::ISODateWithMs).toStdString();
+      je["timestamp"] = e.getTimestamp().toString(Qt::ISODateWithMs).toStdString();
+      je["timestamp_year"] = e.getTimestamp().date().year();
+      je["timestamp_month"] = e.getTimestamp().date().month();
+      je["timestamp_day"] = e.getTimestamp().date().day();
+      je["timestamp_hour"] = e.getTimestamp().time().hour();
+      je["timestamp_minute"] = e.getTimestamp().time().minute();
+      je["timestamp_second"] = e.getTimestamp().time().second();
+      je["timestamp_millis"] = e.getTimestamp().time().msec();
       je["project"] = e.getProject().toStdString();
       je["step"] = e.getStep().toStdString();
       je["type"] = e.getTypeString().toStdString();
@@ -277,6 +287,15 @@ nlohmann::json Logbook::toJson() const
 }
 #endif
 
+std::vector<QString> Logbook::getTemplates()
+{
+  if (templates.empty())
+  {
+    templates = findTemplates();
+  }
+  return templates;
+}
+
 
 
 void Logbook::activate(bool flag)
@@ -284,7 +303,6 @@ void Logbook::activate(bool flag)
   active = flag;
   emit activated(flag);
 }
-
 
 
 
@@ -322,5 +340,42 @@ bool Logbook::exportPlainText(const QString &file)
   return true;
 }
 
+std::vector<QString> Logbook::findTemplates()
+{
+  std::vector<QString> list;
+  QStringList pathlist = QString(pathList).split(";");
+  for (const QString& path : pathlist)
+  {
+    auto v = findTemplates(path+"/logbook/templates");
+    list.insert(list.end(),v.begin(),v.end());
+  }
+  return list;
+}
 
+std::vector<QString> Logbook::findTemplates(QString path)
+{
+  std::vector<QString> list;
+  QDir d(path);
+  if (!d.exists())
+  {
+    std::cout << path.toStdString() << " does not exist" << std::endl;
+    return list;
+  }
+  auto entries = d.entryInfoList(QDir::NoDotAndDotDot|QDir::Files|QDir::Dirs);
+//  std::cout << "entries: " << entries.size() << std::endl;
+  for (const auto& entry : entries)
+  {
+//    std::cout << entry.absoluteFilePath().toStdString() << std::endl;
+    if (entry.isDir())
+    {
+      auto list1 = findTemplates(d.absoluteFilePath(entry.fileName()));
+      list.insert(list.end(),list1.begin(),list1.end());
+    }
+    else if (entry.isFile())
+    {
+      list.push_back(entry.absoluteFilePath());
+    }
+  }
+  return list;
+}
 

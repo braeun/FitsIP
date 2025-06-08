@@ -37,7 +37,7 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
-const char* pathList = TOSTRING(PLUGIN_DIR) ";/usr/lib/fits;/usr/local/lib/fits";
+static const char* pathList = TOSTRING(PLUGIN_DIR) ";/usr/lib/fits;/usr/local/lib/fits";
 //const char* pathList = "/usr/local/lib";
 
 PluginFactory::PluginFactory()

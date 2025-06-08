@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the histogram and associated controls             *
  *                                                                              *
- * modified: 2025-02-09                                                         *
+ * modified: 2025-06-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -64,6 +64,7 @@ protected:
   void changeEvent(QEvent* event);
 
 private:
+  void reset();
   void handleZoomed(const QRectF &rect);
   void spanChanged(int min, int max);
   void changeIntensity();

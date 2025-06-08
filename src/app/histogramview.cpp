@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the histogram and associated controls             *
  *                                                                              *
- * modified: 2025-02-12                                                         *
+ * modified: 2025-06-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -87,6 +87,7 @@ HistogramView::HistogramView(QWidget *parent):QWidget(parent),
   connect(ui->imageMinIntensity,&QLineEdit::returnPressed,this,&HistogramView::changeIntensity);
   connect(ui->imageMaxIntensity,&QLineEdit::returnPressed,this,&HistogramView::changeIntensity);
   connect(ui->imageScaleBox,&QComboBox::currentTextChanged,this,&HistogramView::changeIntensity);
+  connect(ui->resetButton,&QPushButton::pressed,this,&HistogramView::reset);
 }
 
 HistogramView::~HistogramView()
@@ -178,6 +179,12 @@ void HistogramView::changeEvent(QEvent *event)
 }
 
 
+
+void HistogramView::reset()
+{
+  ui->forAllButton->setChecked(false);
+  setImage(image);
+}
 
 void HistogramView::handleZoomed(const QRectF &rect)
 {

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-05-28                                                         *
+ * modified: 2025-06-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -32,6 +32,7 @@
 #include "dialogs/aboutdialog.h"
 #include "dialogs/configurationdialog.h"
 #include "dialogs/editmetadatadialog.h"
+#include "dialogs/logbookexportdialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
 #include "dialogs/stardialog.h"
 #include <fitsip/core/externaltoolslauncher.h>
@@ -1317,12 +1318,25 @@ void MainWindow::on_actionAdd_Current_Image_to_List_triggered()
 
 void MainWindow::on_actionExport_Logbook_triggered()
 {
+#ifdef HAVE_INJA
+  LogbookExportDialog d(this);
+  if (d.exec())
+  {
+    QString templ = d.getTemplate();
+    QString file = d.getFilename();
+    if (!(file.isEmpty() || templ.isEmpty()))
+    {
+      logbook.exportToFile(file,templ);
+    }
+  }
+#else
   AppSettings settings;
-  QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOG,"Plain Text (*.txt);;HTML (*.html)");
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOG,"Plain Text (*.txt)");
   if (!fn.isNull())
   {
     logbook.exportToFile(fn);
   }
+#endif
 }
 
 void MainWindow::on_actionClose_Logbook_triggered()

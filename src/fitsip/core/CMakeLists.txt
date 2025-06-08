@@ -178,7 +178,12 @@ PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 
-target_compile_definitions(fitscore PRIVATE ${FITS_DEF} -DPLUGIN_DIR=${CMAKE_BINARY_DIR}/src/fitsip)
+target_compile_definitions(fitscore
+  PRIVATE
+    ${FITS_DEF}
+    -DPLUGIN_DIR=${CMAKE_BINARY_DIR}/src/fitsip
+    -DSHARE_DIR=${PROJECT_SOURCE_DIR}/share
+  )
 
 target_compile_options(fitscore PRIVATE -fPIC)
 

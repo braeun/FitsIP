@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
-# This Pyhton files scans the script directory, loads all images with the
-# extension CR2 and saves them as FITS images
+# This Python files scans the script directory, loads all images with the
+# extension CR2 or CRW and saves them as FITS images
 
 import fits
 import os
@@ -14,7 +14,7 @@ obj = os.scandir(path)
 for entry in obj:
     if entry.is_file():
         filename, extension = os.path.splitext(entry.name)
-        if extension.lower() == '.cr2':
+        if extension.lower() == '.cr2' or extension.lower() == '.crw':
           img = fits.load(entry.name)
           newname = filename + ".fts"
           ret = fits.save(img,newname)
