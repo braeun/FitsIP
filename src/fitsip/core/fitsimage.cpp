@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-05-29                                                         *
+ * modified: 2025-08-15                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -43,6 +43,21 @@ Layer::Layer(const Layer& l):
 Layer::~Layer()
 {
   if (data) delete [] data;
+}
+
+int Layer::getWidth() const
+{
+  return width;
+}
+
+int Layer::getHeight() const
+{
+  return height;
+}
+
+size_t Layer::size() const
+{
+  return width * height;
 }
 
 void Layer::setData(std::valarray<ValueType> &d)
@@ -149,6 +164,23 @@ FitsImage::FitsImage(const QString& name, const FitsImage& img):
   for (int i=0;i<depth;i++)
   {
     layers.push_back(std::make_shared<Layer>(*img.layers[i]));
+  }
+}
+
+FitsImage::FitsImage(const QString& name, std::vector<Layer*>& layers):
+  name(name),
+  width(0),
+  height(0),
+  depth(layers.size())
+{
+  if (!layers.empty())
+  {
+    width = layers.front()->getWidth();
+    height = layers.front()->getHeight();
+    for (size_t i=0;i<layers.size();++i)
+    {
+      this->layers.push_back(std::make_shared<Layer>(*layers[i]));
+    }
   }
 }
 
@@ -363,6 +395,31 @@ std::shared_ptr<FitsImage> FitsImage::toGray()
     ++dest;
   }
   return gray;
+}
+
+void FitsImage::scaleIntensity(ValueType min, ValueType max)
+{
+  ValueType imin = std::numeric_limits<ValueType>::max();
+  ValueType imax = std::numeric_limits<ValueType>::min();
+  ConstPixelIterator src = getConstPixelIterator();
+  while (src.hasNext())
+  {
+    imin = std::min(imin,src.getAbs());
+    imax = std::max(imax,src.getAbs());
+    ++src;
+  }
+  ValueType offset = min - imin;
+  ValueType scale = (max - min) / (imax - imin);
+  for (int d=0;d<getDepth();d++)
+  {
+    ValueType *p = getLayer(d)->getData();
+    int n = width * height;
+    while (n-- > 0)
+    {
+      *p = (*p - offset) * scale;
+      ++p;
+    }
+  }
 }
 
 

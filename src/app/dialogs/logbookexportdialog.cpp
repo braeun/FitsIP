@@ -11,12 +11,14 @@ LogbookExportDialog::LogbookExportDialog(QWidget *parent) :
 {
   ui->setupUi(this);
   templates = Logbook::getTemplates();
-  for (QString t : templates)
+  for (const QString& t : templates)
   {
     QFileInfo info(t);
     ui->templateBox->addItem(info.baseName());
   }
   connect(ui->browseButton,&QPushButton::clicked,this,[this](){browse();});
+  connect(ui->templateBrowseButton,&QPushButton::clicked,this,[this](){browseTemplate();});
+  connect(ui->templateBox,&QComboBox::currentTextChanged,this,[this](){ui->predefinedButton->setChecked(true);});
 }
 
 LogbookExportDialog::~LogbookExportDialog()
@@ -31,15 +33,26 @@ QString LogbookExportDialog::getFilename() const
 
 QString LogbookExportDialog::getTemplate() const
 {
-  int index = ui->templateBox->currentIndex();
-  if (index < 0) return "";
   QString s = "";
-  QFile file(templates[index]);
-  if (file.open(QFile::ReadOnly | QFile::Text))
+  QString filename = "";
+  if (ui->predefinedButton->isChecked())
   {
-    s = file.readAll();
+    int index = ui->templateBox->currentIndex();
+    if (index >= 0) filename = templates[index];
   }
-  file.close();
+  else
+  {
+    filename = ui->templateFilenameField->text();
+  }
+  if (!filename.isEmpty())
+  {
+    QFile file(filename);
+    if (file.open(QFile::ReadOnly | QFile::Text))
+    {
+      s = file.readAll();
+    }
+    file.close();
+  }
   return s;
 }
 
@@ -48,17 +61,31 @@ QString LogbookExportDialog::getTemplate() const
 void LogbookExportDialog::browse()
 {
   AppSettings settings;
-  QString filter = "Plain Text (*.txt)";
-  int index = ui->templateBox->currentIndex();
-  if (index >= 0)
-  {
-    QFileInfo info(templates[index]);
-    filter = info.baseName() + " (*." + info.suffix() + ")";
-  }
+  QString filter;
+//  int index = ui->templateBox->currentIndex();
+//  if (index >= 0)
+//  {
+//    QFileInfo info(templates[index]);
+//    filter = info.baseName() + " (*." + info.suffix() + ")";
+//  }
   QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOG,filter);
   if (!fn.isNull())
   {
     ui->filenameField->setText(fn);
   }
-
 }
+
+
+void LogbookExportDialog::browseTemplate()
+{
+  AppSettings settings;
+  QString filter;
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOG,filter);
+  if (!fn.isNull())
+  {
+    ui->templateFilenameField->setText(fn);
+    ui->fromFileButton->setChecked(true);
+  }
+}
+
+

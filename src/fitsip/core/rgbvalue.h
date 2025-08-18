@@ -165,7 +165,9 @@ inline ValueType RGBValue::blue(void) const
 
 inline ValueType RGBValue::gray(void) const
 {
-  return (r * 11 + g * 16 + b * 5) / 32;
+//  return (r * 11 + g * 16 + b * 5) / 32;
+  return 0.2989 * r + 0.5870 * g + 0.1140 * b;
+//  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
 inline uint32_t RGBValue::toUInt() const

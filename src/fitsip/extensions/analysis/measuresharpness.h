@@ -46,7 +46,7 @@ struct SharpnessData
 /**
  * @brief This plugin ranks images by sharpness.
  *
- * The sharpness value is determines by applying the Laplacian kernel to the
+ * The sharpness value is determined by applying the Laplacian kernel to the
  * image and than calculating the overall standard deviation.
  */
 class MeasureSharpness: public OpPlugin

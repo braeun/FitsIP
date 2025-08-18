@@ -36,7 +36,7 @@
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <widget class="QWidget" name="widget" native="true">
        <property name="sizePolicy">
@@ -59,31 +59,54 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QScrollArea" name="scrollArea">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>100</height>
-           </size>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>761</width>
-             <height>470</height>
-            </rect>
-           </property>
+         <widget class="QStackedWidget" name="displayWidget">
+          <widget class="QWidget" name="imagePage">
+           <layout class="QVBoxLayout" name="verticalLayout_15">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QScrollArea" name="scrollArea">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="widgetResizable">
+               <bool>true</bool>
+              </property>
+              <widget class="QWidget" name="scrollAreaWidgetContents">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>727</width>
+                 <height>474</height>
+                </rect>
+               </property>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="chartPage">
+           <layout class="QVBoxLayout" name="chartPageLayout"/>
           </widget>
          </widget>
         </item>
@@ -117,7 +140,7 @@
               </size>
              </property>
              <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+              <enum>QFrame::Shape::StyledPanel</enum>
              </property>
              <property name="text">
               <string/>
@@ -139,7 +162,7 @@
               </size>
              </property>
              <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+              <enum>QFrame::Shape::StyledPanel</enum>
              </property>
              <property name="text">
               <string/>
@@ -169,7 +192,7 @@
            <item row="0" column="5">
             <spacer name="horizontalSpacer">
              <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -189,10 +212,10 @@
            <item row="0" column="2">
             <spacer name="horizontalSpacer_4">
              <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
              <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
+              <enum>QSizePolicy::Policy::Fixed</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -211,7 +234,7 @@
               </sizepolicy>
              </property>
              <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+              <enum>QFrame::Shape::StyledPanel</enum>
              </property>
              <property name="text">
               <string>---</string>
@@ -227,7 +250,7 @@
               </size>
              </property>
              <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+              <enum>QFrame::Shape::StyledPanel</enum>
              </property>
              <property name="text">
               <string>0,0 0x0</string>
@@ -249,7 +272,7 @@
      <x>0</x>
      <y>0</y>
      <width>1150</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -321,6 +344,7 @@
     <addaction name="separator"/>
     <addaction name="actionShow_Selected_Pixels"/>
     <addaction name="actionShow_Detected_Stars"/>
+    <addaction name="actionShow_XY_Charts"/>
     <addaction name="separator"/>
     <addaction name="actionClear_AOI"/>
     <addaction name="separator"/>
@@ -424,6 +448,7 @@
    <addaction name="actionAdd_Current_Image_to_List"/>
    <addaction name="actionOriginal_Size"/>
    <addaction name="actionFit_Window"/>
+   <addaction name="actionShow_XY_Charts"/>
   </widget>
   <widget class="QDockWidget" name="openFilesDockWidget">
    <property name="windowTitle">
@@ -455,16 +480,16 @@
         </sizepolicy>
        </property>
        <property name="contextMenuPolicy">
-        <enum>Qt::CustomContextMenu</enum>
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
        </property>
        <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
+        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
        </property>
        <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectRows</enum>
+        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
        </property>
        <property name="gridStyle">
-        <enum>Qt::DotLine</enum>
+        <enum>Qt::PenStyle::DotLine</enum>
        </property>
        <property name="wordWrap">
         <bool>false</bool>
@@ -675,7 +700,7 @@
      <item>
       <widget class="QTableWidget" name="metadataTable">
        <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
+        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
        </property>
        <property name="columnCount">
         <number>1</number>
@@ -776,7 +801,7 @@
      <item>
       <widget class="QTableWidget" name="historyTable">
        <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
+        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
        </property>
        <property name="columnCount">
         <number>1</number>
@@ -1278,6 +1303,17 @@
   <action name="actionPlugins">
    <property name="text">
     <string>Plugins...</string>
+   </property>
+  </action>
+  <action name="actionShow_XY_Charts">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="x-office-spreadsheet"/>
+   </property>
+   <property name="text">
+    <string>Show XY Charts</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

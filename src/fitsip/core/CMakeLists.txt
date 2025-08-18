@@ -26,6 +26,7 @@ add_library(fitscore SHARED
   star.cpp
   starlist.cpp
   undostack.cpp
+  xydata.cpp
   dialogs/imageselectdialog.cpp dialogs/imageselectdialog.ui
   dialogs/pluginfilelistreturndialog.cpp dialogs/pluginfilelistreturndialog.ui
   dialogs/plugininfodialog.cpp dialogs/plugininfodialog.ui
@@ -50,6 +51,7 @@ add_library(fitscore SHARED
   math/average.cpp
   math/fitpar.cpp
   math/gaussfit.cpp
+  math/linearregression.cpp
   math/mathfunctions.cpp
   math/moments.cpp
   math/utils.cpp
@@ -59,6 +61,7 @@ add_library(fitscore SHARED
   math/filter/simplebandpassfilter.cpp
   math/filter/simplehighpassfilter.cpp
   math/filter/simplelowpassfilter.cpp
+  math/window/hanningwindow.cpp
   psf/cosinebellpsf.cpp
   psf/gaussianpsf.cpp
   psf/imagepsf.cpp
@@ -76,6 +79,7 @@ add_library(fitscore SHARED
   widgets/previewoptions.cpp
   widgets/profilechart.cpp
   widgets/psfwidget.cpp widgets/psfwidget.ui
+  widgets/xychartswidget.cpp widgets/xychartswidget.ui
   )
 add_library(fitsip::core ALIAS fitscore)
 
@@ -106,6 +110,7 @@ target_sources(fitscore PUBLIC
   star.h
   starlist.h
   undostack.h
+  xydata.h
   dialogs/imageselectdialog.h
   dialogs/pluginfilelistreturndialog.h
   dialogs/plugininfodialog.h
@@ -130,6 +135,7 @@ target_sources(fitscore PUBLIC
   math/average.h
   math/fitpar.h
   math/gaussfit.h
+  math/linearregression.h
   math/mathfunctions.h
   math/moments.h
   math/utils.h
@@ -139,6 +145,7 @@ target_sources(fitscore PUBLIC
   math/filter/simplebandpassfilter.h
   math/filter/simplehighpassfilter.h
   math/filter/simplelowpassfilter.h
+  math/window/hanningwindow.h
   psf/cosinebellpsf.h
   psf/gaussianpsf.h
   psf/imagepsf.h
@@ -157,6 +164,7 @@ target_sources(fitscore PUBLIC
   widgets/previewwidget.h
   widgets/profilechart.h
   widgets/psfwidget.h
+  widgets/xychartswidget.h
   ${CMAKE_CURRENT_BINARY_DIR}/fitsconfig.h
   )
 

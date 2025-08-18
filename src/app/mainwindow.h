@@ -50,6 +50,7 @@ class EditMetadataDialog;
 class FileList;
 class LogWidget;
 class PSFManagerDialog;
+class XYChartsWidget;
 
 struct PluginMenuEntry
 {
@@ -194,6 +195,7 @@ private:
   void runScriptFile(const QFileInfo& fileinfo);
   void setScriptOutput();
   void getStarlistFromPixellist();
+  void toggleXYChartDisplay(bool flag);
 
   Ui::MainWindow *ui;
   QMenu* openFileListMenu;
@@ -205,6 +207,7 @@ private:
   std::unique_ptr<PixelList> defaultPixelList;
   std::unique_ptr<StarList> defaultStarList;
   ImageWidget* imageWidget;
+  XYChartsWidget* chartsWidget;
   ConsoleWidget* consoleWidget;
   EditMetadataDialog* editMetadataDialog;
   Logbook logbook;

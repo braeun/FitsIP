@@ -244,6 +244,10 @@ bool Logbook::exportToFile(const QString &file)
 bool Logbook::exportToFile(const QString& file, QString templ)
 {
   if (!store) return false;
+  if (templ.isEmpty())
+  {
+    return exportPlainText(file);
+  }
   inja::Environment env;
   nlohmann::json json = toJson();
   std::string s = env.render(templ.toStdString(),json);

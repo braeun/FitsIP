@@ -21,6 +21,7 @@ public:
 
 private:
   void browse();
+  void browseTemplate();
 
   Ui::LogbookExportDialog *ui;
   std::vector<QString> templates;

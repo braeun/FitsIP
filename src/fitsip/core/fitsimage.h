@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-05-29                                                         *
+ * modified: 2025-08-17                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,7 +28,6 @@
 #include "pixel.h"
 #include "pixeliterator.h"
 #include <QImage>
-#include <cstdint>
 #include <memory>
 #include <vector>
 #include <valarray>
@@ -44,6 +43,12 @@ public:
   Layer(const Layer& l);
   ~Layer();
 
+  int getWidth() const;
+
+  int getHeight() const;
+
+  size_t size() const;
+
   void setData(std::valarray<ValueType>& d);
 
   ValueType* getData();
@@ -51,6 +56,10 @@ public:
   const ValueType* getData() const;
 
   void blit(Layer* layer, int x, int y, int w, int h, int xd, int yd);
+
+  inline const ValueType& operator()(int x, int y) const { return data[y*width+x];}
+
+  inline ValueType& operator()(int x, int y) { return data[y*width+x];}
 
 private:
   int width;
@@ -81,6 +90,7 @@ public:
   FitsImage(const FitsImage& img);
   FitsImage(FitsImage&& img);
   FitsImage(const QString& name, const FitsImage& img);
+  FitsImage(const QString& name, std::vector<Layer*>& layers);
 
   bool isNull() const;
 
@@ -208,6 +218,8 @@ public:
    * @return gray scale image
    */
   std::shared_ptr<FitsImage> toGray();
+
+  void scaleIntensity(ValueType min, ValueType max);
 
   Pixel getBrightestPixel(const QRect& r) const;
 

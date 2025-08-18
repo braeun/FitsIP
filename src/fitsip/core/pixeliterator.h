@@ -25,7 +25,6 @@
 
 #include "fitstypes.h"
 #include "rgbvalue.h"
-#include <cstdint>
 #include <cmath>
 #include <vector>
 #include <stdexcept>

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - file object containing the image and other data                     *
  *                                                                              *
- * modified: 2025-05-30                                                         *
+ * modified: 2025-08-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,7 @@
 #include "profile.h"
 #include "starlist.h"
 #include "undostack.h"
+#include "xydata.h"
 #include <memory>
 #include <string>
 
@@ -76,8 +77,30 @@ public:
 
   StarList* getStarList() const;
 
+  void addXYData(const XYData& data);
+
+  void addXYData(const std::vector<XYData>& data);
+
+  void resetXYData();
+
+  const std::vector<XYData>& getXYData();
+
+  /**
+   * @brief Save the image under a new filename.
+   *
+   * Note: Only the image is saved!
+   * @param filename the filename
+   * @return true on success
+   */
   bool save(const QString& filename);
 
+  /**
+   * @brief Save the image under a new filename.
+   *
+   * Note: Only the image is saved!
+   * @param filename the filename
+   * @return true on success
+   */
   bool save(const std::string& filename);
 
   void pushUndo();
@@ -105,6 +128,7 @@ private:
   Profile yprofile;
   std::unique_ptr<PixelList> pixelList;
   std::unique_ptr<StarList> starList;
+  std::vector<XYData> xydata;
   UndoStack undostack;
 
   static int idCounter;

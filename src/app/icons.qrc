@@ -30,5 +30,6 @@
         <file>resources/icons/go-next.png</file>
         <file>resources/icons/go-previous.png</file>
         <file>resources/icons/view-refresh.png</file>
+        <file>resources/icons/office-chart-scatter.png</file>
     </qresource>
 </RCC>

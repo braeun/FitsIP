@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-06-08                                                         *
+ * modified: 2025-08-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -49,6 +49,7 @@
 #include "fitsip/core/psf/psfmanagerdialog.h"
 #include <fitsip/core/pluginfactory.h>
 #include <fitsip/core/widgets/previewoptions.h>
+#include <fitsip/core/widgets/xychartswidget.h>
 #include <QActionGroup>
 #include <QCloseEvent>
 #include <QDir>
@@ -81,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   openFileListMenu->addSeparator();
   openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
 
-  QDockWidget *consoleDockWidget = new QDockWidget(tr("Console"), this);
+  QDockWidget *consoleDockWidget = new QDockWidget(tr("Script Console"), this);
   consoleDockWidget->setObjectName("console");
   consoleDockWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
   consoleWidget = new ConsoleWidget(consoleDockWidget);
@@ -98,6 +99,9 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->scrollArea->setWidgetResizable(true);
   ui->scrollArea->setBackgroundRole(QPalette::Shadow);
   connect(ui->histogramWidget,&HistogramView::imageScaleChanged,this,&MainWindow::onImageScaleChanged);
+
+  chartsWidget = new XYChartsWidget();
+  ui->chartPageLayout->addWidget(chartsWidget);
 
   connect(ui->fileSystemView,&FileSystemView::openFile,this,[this](QString file){open(QFileInfo(file));});
   connect(ui->fileSystemView,&FileSystemView::runFile,this,[this](QString file){run(QFileInfo(file));});
@@ -119,6 +123,8 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->actionClear_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::clear);
   connect(ui->actionClear_Pixel_List,&QAction::triggered,ui->pixellistWidget,&PixelListWidget::clear);
   connect(ui->actionClear_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::clear);
+
+  connect(ui->actionShow_XY_Charts,&QAction::toggled,this,&MainWindow::toggleXYChartDisplay);
 
   ui->menuWindow->addAction(ui->fileSystemDockWidget->toggleViewAction());
   ui->fileSystemDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F1));
@@ -145,9 +151,9 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->menuWindow->addAction(ui->consoleDockWidget->toggleViewAction());
   ui->consoleDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F11));
   ui->menuWindow->addAction(ui->profilerDockWidget->toggleViewAction());
-  ui->profilerDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F12));
+//  ui->profilerDockWidget->toggleViewAction()->setShortcut(QKeySequence());
   ui->menuWindow->addAction(consoleDockWidget->toggleViewAction());
-  consoleDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_Alt+Qt::Key_C));
+  consoleDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F12));
 
   ui->fileListDockWidget->close();
   ui->profilesDockWidget->close();
@@ -623,6 +629,7 @@ void MainWindow::updateDisplay()
     imageWidget->setImage(QImage(),nullptr,nullptr);
   }
   updateMetadata();
+  chartsWidget->setFitsObject(activeFile);
   profiler.stop();
   if (activeFile)
   {
@@ -1044,6 +1051,14 @@ void MainWindow::getStarlistFromPixellist()
   }
 }
 
+
+void MainWindow::toggleXYChartDisplay(bool flag)
+{
+  if (flag)
+    ui->displayWidget->setCurrentWidget(ui->chartPage);
+  else
+    ui->displayWidget->setCurrentWidget(ui->imagePage);
+}
 
 
 

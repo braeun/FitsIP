@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - fits object containing the image and other data                     *
  *                                                                              *
- * modified: 2025-05-30                                                         *
+ * modified: 2025-08-16                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -132,6 +132,26 @@ PixelList* FitsObject::getPixelList() const
 StarList* FitsObject::getStarList() const
 {
   return starList.get();
+}
+
+void FitsObject::addXYData(const XYData& data)
+{
+  xydata.push_back(data);
+}
+
+void FitsObject::addXYData(const std::vector<XYData>& data)
+{
+  xydata.insert(xydata.begin(),data.begin(),data.end());
+}
+
+void FitsObject::resetXYData()
+{
+  xydata.clear();
+}
+
+const std::vector<XYData>& FitsObject::getXYData()
+{
+  return xydata;
 }
 
 bool FitsObject::save(const QString& fn)

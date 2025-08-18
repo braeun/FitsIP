@@ -10,6 +10,8 @@ add_library(fitsanalysis SHARED
   measuresharpness.h measuresharpness.cpp
   measuresharpnessresultdialog.cpp measuresharpnessresultdialog.h measuresharpnessresultdialog.ui
   measurestatistics.h measurestatistics.cpp
+  s3sharpness.h s3sharpness.cpp
+  s3sharpnessresultdialog.h s3sharpnessresultdialog.cpp s3sharpnessresultdialog.ui
   synthesizebackground.cpp synthesizebackground.h
   synthesizebackgrounddialog.cpp synthesizebackgrounddialog.h synthesizebackgrounddialog.ui
   plugin.json
