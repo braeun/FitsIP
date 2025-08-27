@@ -33,8 +33,6 @@ public:
   S3Sharpness();
   virtual ~S3Sharpness();
 
-  virtual bool createsNewImage() const override;
-
   virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 
   virtual QString getMenuEntry() const override;
@@ -50,19 +48,25 @@ public:
   virtual ResultType execute(const std::vector<std::shared_ptr<FitsObject>>& list, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  S3SharpnessData evaluate(const QFileInfo info);
-  S3SharpnessData calculateSharpness(FitsImage* img, int m) const;
-  std::pair<Layer*,std::vector<XYData>> calculateSpectralSharpness(Layer* layer, int m) const;
+  S3SharpnessData evaluate(const QFileInfo info, QRect selection);
+  S3SharpnessData calculateSharpness(FitsImage* img, double t1, double t2) const;
+  std::pair<Layer*,std::vector<XYData>> calculateSpectralSharpness(Layer* layer, double t1, double t2) const;
   std::pair<LinearRegression,XYData> getSlope(fftw_complex* c, int m) const;
-  Layer* calculateSpatialSharpness(Layer* layer, int m) const;
-  std::unique_ptr<Layer> calculateContrast(Layer* layer, int m) const;
+  Layer* calculateSpatialSharpness(Layer* layer) const;
+  std::unique_ptr<Layer> calculateContrast(Layer* layer, int m, double t1, double t2) const;
   void copyToLog();
 
-  int blocksize;
-  int overlap;
   std::vector<std::shared_ptr<FitsObject>> images;
   std::vector<S3SharpnessData> results;
   S3SharpnessResultDialog* resultDialog;
+  int spectralBlocksize;
+  int spectralOverlap;
+  int spatialBlocksize;
+  double sigmoid_t1;
+  double sigmoid_t2;
+  double contrast_t1;
+  double contrast_t2;
+  ValueType alpha;
 
 };
 

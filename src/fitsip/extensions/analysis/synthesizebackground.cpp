@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - synthesize background from image                                    *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,11 +41,6 @@ SynthesizeBackground::~SynthesizeBackground()
 QString SynthesizeBackground::getMenuEntry() const
 {
   return "Analyse/Synthesize Background...";
-}
-
-bool SynthesizeBackground::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> SynthesizeBackground::getCreatedImages() const

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - factory for I/O handlers                                            *
  *                                                                              *
- * modified: 2025-01-31                                                         *
+ * modified: 2025-08-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,12 +28,17 @@
 #ifdef HAVE_LIBRAW
 #include "rawio.h"
 #endif
-#include <iostream>
 #include <QByteArray>
 #include <QDebug>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QTextStream>
+
+const char* IOFactory::filelist_filter = "File List (*.lst)";
+
+const char* IOFactory::csv_filter = "Comma Separated Values (*.csv)";;
+
+const char* IOFactory::all_files_filter = "ALL Files (*)";;
 
 IOFactory* IOFactory::instance = nullptr;
 

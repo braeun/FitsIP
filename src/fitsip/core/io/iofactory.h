@@ -24,7 +24,6 @@
 #define IOFACTORY_H
 
 #include "iohandler.h"
-#include <memory>
 #include <map>
 
 class IOFactory: public QObject
@@ -46,6 +45,12 @@ public:
   static IOFactory* getInstance();
 
   static QString assertSuffix(const QString& fn, QString filter);
+
+  static const char* filelist_filter;
+
+  static const char* csv_filter;
+
+  static const char* all_files_filter;
 
 signals:
   void logProfilerResult(QString profiler, QString image, int w, int h, int64_t t, QString notes);

@@ -167,7 +167,7 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<std::shared_ptr
 
 
 
-SharpnessData MeasureSharpness::evaluate(const QFileInfo info, QRect selection)
+SharpnessData MeasureSharpness::evaluate(const QFileInfo info, QRect selection) const
 {
   IOHandler* handler = IOFactory::getInstance()->getHandler(info.absoluteFilePath());
   if (!handler) return SharpnessData();

@@ -155,7 +155,7 @@ bool StarList::save(const QString &filename)
     s << star.getX() << "," << star.getY() << ","
       << star.getFWHM() << "," << star.getXWidth() << "," << star.getYWidth() << ","
       << star.getRoundness() << "," << star.getSharpness() << "," << star.getHotness();
-    s << "\n";
+    s << Qt::endl;
   }
   s.flush();
   file.close();

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - general purpose file list                                          *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2025-08-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -133,6 +133,11 @@ bool FileList::append(const QString &filename)
   QString line = s.readLine();
   while (!line.isNull())
   {
+    int pos = line.indexOf(',');
+    if (pos >= 0)
+    {
+      line = line.left(pos);
+    }
     list.push_back(QFileInfo(line));
     line = s.readLine();
   }

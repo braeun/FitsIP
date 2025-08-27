@@ -144,7 +144,7 @@ bool PixelList::save(const QString &filename)
   {
     s << pixel.x << "," << pixel.y;
     for (ValueType i : pixel.i) s << "," << i;
-    s << "\n";
+    s << Qt::endl;
   }
   s.flush();
   file.close();

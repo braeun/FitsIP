@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the selected/detected star list                   *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-08-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #include "ui_starlistwidget.h"
 #include "appsettings.h"
 #include <fitsip/core/starlist.h>
+#include <fitsip/core/io/iofactory.h>
 #include <QMenu>
 
 StarListWidget::StarListWidget(QWidget *parent) :
@@ -69,9 +70,11 @@ void StarListWidget::load()
 void StarListWidget::save()
 {
   AppSettings settings;
-  QString fn = settings.getSaveFilename(this,AppSettings::PATH_STARLIST,"File list (*.lst);;All files (*)");
+  QString filter;
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_STARLIST,IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter,&filter);
   if (!fn.isNull())
   {
+    fn = IOFactory::assertSuffix(fn,filter);
     starlist->save(fn);
   }
 }

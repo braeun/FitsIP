@@ -25,7 +25,6 @@
 #include <fitsip/coreplugins/opshift.h>
 #include <fitsip/core/io/iofactory.h>
 #include <fitsip/core/dialogs/progressdialog.h>
-#include <algorithm>
 #include <QApplication>
 #include <QDebug>
 #include <QDir>

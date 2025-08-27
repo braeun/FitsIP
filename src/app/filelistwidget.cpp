@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing a file list                                       *
  *                                                                              *
- * modified: 2025-02-22                                                         *
+ * modified: 2025-08-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #include "ui_filelistwidget.h"
 #include "appsettings.h"
 #include <fitsip/core/filelist.h>
+#include <fitsip/core/io/iofactory.h>
 #include <QAbstractItemView>
 #include <QClipboard>
 #include <QDebug>
@@ -92,7 +93,7 @@ void FileListWidget::load()
   if (fileList)
   {
     AppSettings settings;
-    QString fn = settings.getOpenFilename(this,AppSettings::PATH_FILELIST,"File list (*.lst);;All files (*)");
+    QString fn = settings.getOpenFilename(this,AppSettings::PATH_FILELIST,IOFactory::filelist_filter+QString(";;")+IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter);
     if (!fn.isNull())
     {
       fileList->load(fn);
@@ -105,7 +106,7 @@ void FileListWidget::append()
   if (fileList)
   {
     AppSettings settings;
-    QString fn = settings.getOpenFilename(this,AppSettings::PATH_FILELIST,"File list (*.lst);;All files (*)");
+    QString fn = settings.getOpenFilename(this,AppSettings::PATH_FILELIST,IOFactory::filelist_filter+QString(";;")+IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter);
     if (!fn.isNull())
     {
       fileList->append(fn);
@@ -118,9 +119,11 @@ void FileListWidget::save()
   if (fileList)
   {
     AppSettings settings;
-    QString fn = settings.getSaveFilename(this,AppSettings::PATH_FILELIST,"File list (*.lst);;All files (*)");
+    QString filter;
+    QString fn = settings.getSaveFilename(this,AppSettings::PATH_FILELIST,IOFactory::filelist_filter+QString(";;")+IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter,&filter);
     if (!fn.isNull())
     {
+      fn = IOFactory::assertSuffix(fn,filter);
       fileList->save(fn);
     }
   }

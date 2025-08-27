@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - perform cross carrelation                                           *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,8 +41,6 @@ class MeasureCrossCorrelation: public OpPlugin
 public:
   MeasureCrossCorrelation();
   virtual ~MeasureCrossCorrelation() override;
-
-  virtual bool createsNewImage() const override;
 
   virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 

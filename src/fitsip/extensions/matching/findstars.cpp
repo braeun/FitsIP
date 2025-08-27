@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - star detection class                                                *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-08-27                                                         *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.                                           *
  ********************************************************************************
@@ -79,11 +79,6 @@ FindStars::FindStars():OpPlugin(),
 
 FindStars::~FindStars()
 {
-}
-
-bool FindStars::createsNewImage() const
-{
-  return false;
 }
 
 std::vector<std::shared_ptr<FitsObject>> FindStars::getCreatedImages() const

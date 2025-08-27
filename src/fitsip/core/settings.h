@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-03-13                                                         *
+ * modified: 2025-08-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,7 +25,6 @@
 
 #include <QSettings>
 #include <QString>
-#include <cstdint>
 
 class QWidget;
 

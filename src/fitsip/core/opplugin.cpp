@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - base class for operation plugins                                    *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,11 +46,6 @@ bool OpPlugin::requiresFileList() const
   return false;
 }
 
-bool OpPlugin::createsNewImage() const
-{
-  return false;
-}
-
 std::vector<std::shared_ptr<FitsObject>> OpPlugin::getCreatedImages() const
 {
   return std::vector<std::shared_ptr<FitsObject>>();
@@ -58,11 +53,13 @@ std::vector<std::shared_ptr<FitsObject>> OpPlugin::getCreatedImages() const
 
 OpPlugin::ResultType OpPlugin::execute(std::shared_ptr<FitsObject> /*image*/, const OpPluginData& /*data*/)
 {
+  log("OpPlugin::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data) - not implemented");
   return CANCELLED;
 }
 
 OpPlugin::ResultType OpPlugin::execute(const std::vector<QFileInfo>& /*list*/, const OpPluginData& /*data*/)
 {
+  log("OpPlugin::execute(const std::vector<QFileInfo>& list, const OpPluginData& data) - not implemented");
   return CANCELLED;
 }
 

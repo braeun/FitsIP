@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - create an average of several images                                 *
  *                                                                              *
- * modified: 2022-12-01                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,8 +34,6 @@ class OpAverage:  public OpPlugin
 public:
   OpAverage();
   virtual ~OpAverage() override;
-
-  virtual bool createsNewImage() const override;
 
   virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 

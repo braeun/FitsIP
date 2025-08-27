@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - create box test image                                               *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -42,11 +42,6 @@ bool BoxTestImage::requiresImage() const
 bool BoxTestImage::requiresFileList() const
 {
   return false;
-}
-
-bool BoxTestImage::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> BoxTestImage::getCreatedImages() const

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - combine RGB channels                                                *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,11 +46,6 @@ OpCombineChannels::~OpCombineChannels()
 bool OpCombineChannels::requiresImage() const
 {
   return false;
-}
-
-bool OpCombineChannels::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> OpCombineChannels::getCreatedImages() const

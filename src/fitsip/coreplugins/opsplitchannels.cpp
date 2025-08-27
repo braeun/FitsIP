@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - split channels of a multilayer image                                *
  *                                                                              *
- * modified: 2025-02-07                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -39,11 +39,6 @@ OpSplitChannels::OpSplitChannels()
 
 OpSplitChannels::~OpSplitChannels()
 {
-}
-
-bool OpSplitChannels::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> OpSplitChannels::getCreatedImages() const

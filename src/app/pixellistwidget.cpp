@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the selected pixel list                           *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2025-08-19                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #include "ui_pixellistwidget.h"
 #include "appsettings.h"
 #include <fitsip/core/pixellist.h>
+#include <fitsip/core/io/iofactory.h>
 #include <QMenu>
 
 PixelListWidget::PixelListWidget(QWidget *parent):QWidget(parent),
@@ -72,7 +73,7 @@ void PixelListWidget::clear()
 void PixelListWidget::load()
 {
   AppSettings settings;
-  QString fn = settings.getOpenFilename(this,AppSettings::PATH_PIXELLIST,"File list (*.lst);;All files (*)");
+  QString fn = settings.getOpenFilename(this,AppSettings::PATH_PIXELLIST,IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter);
   if (!fn.isNull())
   {
     pixellist->load(fn);
@@ -82,9 +83,11 @@ void PixelListWidget::load()
 void PixelListWidget::save()
 {
   AppSettings settings;
-  QString fn = settings.getSaveFilename(this,AppSettings::PATH_PIXELLIST,"File list (*.lst);;All files (*)");
+  QString filter;
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_PIXELLIST,IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter,&filter);
   if (!fn.isNull())
   {
+    fn = IOFactory::assertSuffix(fn,filter);
     pixellist->save(fn);
   }
 }

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - create a test image from a PSF                                      *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -42,11 +42,6 @@ bool PSFTestImage::requiresImage() const
 bool PSFTestImage::requiresFileList() const
 {
   return false;
-}
-
-bool PSFTestImage::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> PSFTestImage::getCreatedImages() const

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - create an average of several images                                 *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,7 +24,6 @@
 #include <fitsip/core/fitsimage.h>
 #include <fitsip/core/dialogs/progressdialog.h>
 #include <fitsip/core/io/iofactory.h>
-#include <algorithm>
 #include <QApplication>
 #include <QDebug>
 
@@ -35,11 +34,6 @@ OpAverage::OpAverage()
 
 OpAverage::~OpAverage()
 {
-}
-
-bool OpAverage::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> OpAverage::getCreatedImages() const

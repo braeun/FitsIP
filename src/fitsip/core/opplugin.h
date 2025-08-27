@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - base class for operation plugins                                    *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -63,12 +63,6 @@ public:
   virtual bool requiresImage() const;
 
   virtual bool requiresFileList() const;
-
-  /**
-   * @brief Returns whether the plugin creates a new fits image.
-   * @return true if a new image is created
-   */
-  virtual bool createsNewImage() const;
 
   /**
    * @brief Return the newly created images.

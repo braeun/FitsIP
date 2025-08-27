@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - create a test image from a PSF                                      *
  *                                                                              *
- * modified: 2023-02-03                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -39,8 +39,6 @@ public:
   virtual bool requiresImage() const override;
 
   virtual bool requiresFileList() const override;
-
-  virtual bool createsNewImage() const override;
 
   virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 

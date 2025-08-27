@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - stack images                                                        *
  *                                                                              *
- * modified: 2025-03-15                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,11 +46,6 @@ OpStack::OpStack():
 OpStack::~OpStack()
 {
   if (dlg) delete dlg;
-}
-
-bool OpStack::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> OpStack::getCreatedImages() const

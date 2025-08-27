@@ -70,7 +70,7 @@ public:
   virtual ResultType execute(const std::vector<std::shared_ptr<FitsObject>>& list, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  SharpnessData evaluate(const QFileInfo info, QRect selection);
+  SharpnessData evaluate(const QFileInfo info, QRect selection) const;
   SharpnessData calculateSharpness(std::shared_ptr<FitsImage> img, QRect selection=QRect()) const;
   void copyToLog();
 

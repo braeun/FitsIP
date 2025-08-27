@@ -71,7 +71,7 @@ void S3SharpnessResultDialog::removeRows()
 void S3SharpnessResultDialog::save()
 {
   QString filter;
-  QString fn = Settings().getSaveFilename(this,Settings::PATH_IMAGE,"Text files (*.txt)",&filter);
+  QString fn = Settings().getSaveFilename(this,Settings::PATH_IMAGE,IOFactory::filelist_filter+QString(";;")+IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter,&filter);
   if (!fn.isEmpty())
   {
     fn = IOFactory::assertSuffix(fn,filter);
@@ -79,9 +79,19 @@ void S3SharpnessResultDialog::save()
     if (file.open(QIODevice::WriteOnly))
     {
       QTextStream s(&file);
-      for (const S3SharpnessData& entry : entries)
+      if (filter == IOFactory::filelist_filter)
       {
-        s << entry.info.absoluteFilePath() << "," << entry.s3 << Qt::endl;
+        for (const S3SharpnessData& entry : entries)
+        {
+          s << entry.info.absoluteFilePath() << Qt::endl;
+        }
+      }
+      else
+      {
+        for (const S3SharpnessData& entry : entries)
+        {
+          s << entry.info.absoluteFilePath() << "," << entry.s3 << Qt::endl;
+        }
       }
       s.flush();
       file.close();

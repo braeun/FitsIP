@@ -457,9 +457,10 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
             break;
         }
       }
-      if (op->createsNewImage())
+      auto list = op->getCreatedImages();
+      if (!list.empty())
       {
-        for (auto img : op->getCreatedImages())
+        for (auto img : list)
         {
 //            std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
           imageCollection->addFile(img);
@@ -530,9 +531,10 @@ void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, 
   OpPlugin::ResultType ret = op->execute(img,data);
   if (ret == OpPlugin::OK)
   {
-    if (op->createsNewImage())
+    auto list = op->getCreatedImages();
+    if (!list.empty())
     {
-      for (const auto& img : op->getCreatedImages())
+      for (const auto& img : list)
       {
 //        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>("",img);
         imageCollection->addFile(img);

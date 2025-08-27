@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - calculate the FFT of an image                                       *
  *                                                                              *
- * modified: 2025-02-06                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,11 +46,6 @@ OpFFT::OpFFT()
 
 OpFFT::~OpFFT()
 {
-}
-
-bool OpFFT::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> OpFFT::getCreatedImages() const

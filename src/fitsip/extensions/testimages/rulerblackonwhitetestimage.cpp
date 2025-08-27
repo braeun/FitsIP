@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - test image with a ruloer                                            *
+ * FitsIP - test image with a ruler                                             *
  *                                                                              *
- * modified: 2025-05-29                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,11 +41,6 @@ bool RulerBlackOnWhiteTestImage::requiresImage() const
 bool RulerBlackOnWhiteTestImage::requiresFileList() const
 {
   return false;
-}
-
-bool RulerBlackOnWhiteTestImage::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> RulerBlackOnWhiteTestImage::getCreatedImages() const

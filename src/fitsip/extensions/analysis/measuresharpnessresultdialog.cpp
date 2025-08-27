@@ -95,7 +95,7 @@ void MeasureSharpnessResultDialog::on_removeRowsButton_clicked()
 void MeasureSharpnessResultDialog::on_saveButton_clicked()
 {
   QString filter;
-  QString fn = Settings().getSaveFilename(this,Settings::PATH_IMAGE,"Text files (*.txt)",&filter);
+  QString fn = Settings().getSaveFilename(this,Settings::PATH_IMAGE,IOFactory::filelist_filter+QString(";;")+IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter,&filter);
   if (!fn.isEmpty())
   {
     fn = IOFactory::assertSuffix(fn,filter);
@@ -103,9 +103,19 @@ void MeasureSharpnessResultDialog::on_saveButton_clicked()
     if (file.open(QIODevice::WriteOnly))
     {
       QTextStream s(&file);
-      for (const SharpnessData& entry : entries)
+      if (filter == IOFactory::filelist_filter)
       {
-        s << entry.info.absoluteFilePath() << "," << entry.min << "," << entry.max << "," << entry.mean << "," << entry.variance << "," << entry.minPixel << "," << entry.maxPixel << "," << entry.normalizedVariance << Qt::endl;
+        for (const SharpnessData& entry : entries)
+        {
+          s << entry.info.absoluteFilePath() << Qt::endl;
+        }
+      }
+      else
+      {
+        for (const SharpnessData& entry : entries)
+        {
+          s << entry.info.absoluteFilePath() << "," << entry.min << "," << entry.max << "," << entry.mean << "," << entry.variance << "," << entry.minPixel << "," << entry.maxPixel << "," << entry.normalizedVariance << Qt::endl;
+        }
       }
       s.flush();
       file.close();

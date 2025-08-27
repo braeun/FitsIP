@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - calculate the inverse FFT                                           *
  *                                                                              *
- * modified: 2025-02-06                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -33,8 +33,6 @@ class OpInvFFT: public OpPlugin
 public:
   OpInvFFT();
   ~OpInvFFT();
-
-  virtual bool createsNewImage() const override;
 
   virtual std::vector<std::shared_ptr<FitsObject>> getCreatedImages() const override;
 

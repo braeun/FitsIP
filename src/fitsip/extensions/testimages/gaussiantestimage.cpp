@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - create gaussian test image                                          *
  *                                                                              *
- * modified: 2023-02-03                                                         *
+ * modified: 2025-08-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -42,11 +42,6 @@ bool GaussianTestImage::requiresImage() const
 bool GaussianTestImage::requiresFileList() const
 {
   return false;
-}
-
-bool GaussianTestImage::createsNewImage() const
-{
-  return true;
 }
 
 std::vector<std::shared_ptr<FitsObject>> GaussianTestImage::getCreatedImages() const

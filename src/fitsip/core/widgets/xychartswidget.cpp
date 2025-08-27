@@ -25,9 +25,12 @@ void XYChartsWidget::setFitsObject(const std::shared_ptr<FitsObject>& o)
 {
   obj = o;
   ui->dataListWidget->clear();
-  for (const XYData& data : o->getXYData())
+  if (o)
   {
-    ui->dataListWidget->addItem(data.getTitle());
+    for (const XYData& data : o->getXYData())
+    {
+      ui->dataListWidget->addItem(data.getTitle());
+    }
   }
 }
 
