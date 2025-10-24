@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - FITS image format reader and writer                                 *
  *                                                                              *
- * modified: 2025-03-14                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,7 +24,6 @@
 #include "../fitstypes.h"
 #include "../fitsimage.h"
 #include "../settings.h"
-#include <CCfits/CCfits>
 #include <CCfits/FITSUtil.h>
 #include <QDate>
 #include <QFileInfo>
@@ -43,70 +42,50 @@ FitsIO::~FitsIO()
 {
 }
 
-std::shared_ptr<FitsImage> FitsIO::read(QString filename)
+std::vector<std::shared_ptr<FitsImage>> FitsIO::read(QString filename)
 {
   QFileInfo info(filename);
   try
   {
     profiler.start();
     CCfits::FITS fits(filename.toStdString());
-    long w = fits.pHDU().axis(0);
-    long h = fits.pHDU().axis(1);
-    long depth = 1;
-    if (fits.pHDU().axes() > 2) depth = fits.pHDU().axis(2);
-    auto img = std::make_shared<FitsImage>(info.baseName(),static_cast<int>(w),static_cast<int>(h),static_cast<int>(depth));
-    int64_t first = 1;
-    std::valarray<ValueType> a;
-    for (long i=0;i<depth;i++)
-    {
-      fits.pHDU().read(a,first,w*h);
-      img->getLayer(i)->setData(a);
-      first += w * h;
-    }
-
     ImageMetadata metadata;
     fits.pHDU().readAllKeys();
     const std::map<std::string,CCfits::Keyword*>& keywords = fits.pHDU().keyWord();
     std::string v;
-//    QString date = "";
-//    QString time = "";
+    //    QString date = "";
+    //    QString time = "";
     for (const auto& entry : keywords)
     {
-      metadata.addEntry(QString::fromStdString(entry.first),QString::fromStdString(entry.second->value(v)));
-//      qDebug() << entry.first.c_str() << ": " << entry.second->value(v).c_str();
-//      if (entry.first == "OBJECT") metadata.object = QString::fromStdString(entry.second->value(v));
-//      if (entry.first == "INSTRUME") metadata.instrument = QString::fromStdString(entry.second->value(v));
-//      if (entry.first == "TELESCOP") metadata.telescope = QString::fromStdString(entry.second->value(v));
-//      if (entry.first == "OBSERVER") metadata.observer = QString::fromStdString(entry.second->value(v));
-//      if (entry.first == "EXPTIME") metadata.exposure = QString::fromStdString(entry.second->value(v)).toDouble();
-//      if (entry.first == "DATE-OBS") date = QString::fromStdString(entry.second->value(v));
-//      if (entry.first == "TIME-OBS") time = QString::fromStdString(entry.second->value(v));
+      if (entry.second->keytype() == CCfits::Tlogical)
+      {
+        bool flag;
+        flag = entry.second->value(flag);
+        metadata.addEntry(QString::fromStdString(entry.first),flag?"T":"F",QString::fromStdString(entry.second->comment()));
+      }
+      else
+      {
+        metadata.addEntry(QString::fromStdString(entry.first),QString::fromStdString(entry.second->value(v)),QString::fromStdString(entry.second->comment()));
+      }
     }
-//    if (!date.isEmpty() && !time.isEmpty())
-//    {
-//      QDate d = QDate::fromString(date,Qt::ISODate);
-//      QTime t = QTime::fromString(time,Qt::ISODate);
-//      metadata.date = QDateTime(d,t,Qt::UTC);
-//    }
     QString history = QString::fromStdString(fits.pHDU().history());
     metadata.setHistory(history.split("\n"));
-//    if (!metadata.history.empty() && metadata.history.back().trimmed().isEmpty())
-//    {
-//      metadata.history.pop_back();
-//    }
-    img->setMetadata(metadata);
-    /* special handling for starlight xpress which stores unsigned 16bit */
-    if (metadata.getInstrument().toLower().contains("starlight xpress") && fits.pHDU().bitpix() == 16)
+
+    std::vector<std::shared_ptr<FitsImage>> list;
+    if (fits.pHDU().axes() >= 2)
     {
-      PixelIterator it = img->getPixelIterator();
-      while (true)
+      auto img = load(&fits.pHDU(),info.baseName(),metadata);
+      if (img) list.push_back(img);
+    }
+    if (fits.pHDU().extend())
+    {
+      for (size_t i=1;i<=fits.extension().size();++i)
       {
-        for (long i=0;i<depth;i++)
-        {
-          if (it[i] < 0) it[i] += 0x10000;
-        }
-        if (!it.hasNext()) break;
-        ++it;
+        std::string v;
+        fits.extension(i).readKey("XTENSION",v);
+        if (v.find("IMAGE") == std::string::npos) continue;
+        auto img = load(&fits.extension(i),info.baseName(),metadata);
+        if (img) list.push_back(img);
       }
     }
 
@@ -123,8 +102,8 @@ std::shared_ptr<FitsImage> FitsIO::read(QString filename)
 //      qDebug() << fits.pHDU().axis(i);
 //    }
     profiler.stop();
-    logProfiler(img,"read");
-    return img;
+    logProfiler(info.baseName(),"read");
+    return list;
   }
   catch (CCfits::FitsException& ex)
   {
@@ -191,3 +170,77 @@ bool FitsIO::write(QString filename, std::shared_ptr<FitsImage> img)
   return true;
 }
 
+std::shared_ptr<FitsImage> FitsIO::load(CCfits::HDU* hdu, QString basename, const ImageMetadata& basedata)
+{
+  if (hdu->axes() < 2) return {};
+  QString name = basename;
+  if (dynamic_cast<CCfits::ExtHDU*>(hdu))
+  {
+    name += " [" + QString::fromStdString(dynamic_cast<CCfits::ExtHDU*>(hdu)->name()) + "]";
+  }
+  long w = hdu->axis(0);
+  long h = hdu->axis(1);
+  long depth = 1;
+  if (hdu->axes() > 2) depth = hdu->axis(2);
+  auto img = std::make_shared<FitsImage>(name,static_cast<int>(w),static_cast<int>(h),static_cast<int>(depth));
+  int64_t first = 1;
+  std::valarray<ValueType> a;
+  for (long i=0;i<depth;i++)
+  {
+    if (dynamic_cast<CCfits::PHDU*>(hdu))
+      dynamic_cast<CCfits::PHDU*>(hdu)->read(a,first,w*h);
+    else if (dynamic_cast<CCfits::ExtHDU*>(hdu))
+      dynamic_cast<CCfits::ExtHDU*>(hdu)->read(a,first,w*h);
+    else
+      return std::shared_ptr<FitsImage>();
+    img->getLayer(i)->setData(a);
+    first += w * h;
+  }
+
+  if (dynamic_cast<CCfits::ExtHDU*>(hdu))
+  {
+    ImageMetadata metadata;
+    hdu->readAllKeys();
+    const std::map<std::string,CCfits::Keyword*>& keywords = hdu->keyWord();
+    std::string v;
+    if (keywords.find("INHERIT") != keywords.end())
+    {
+      bool flag;
+      if (keywords.at("INHERIT")->value(flag))
+      {
+        metadata = basedata;
+      }
+    }
+    for (const auto& entry : keywords)
+    {
+      if (entry.second->keytype() == CCfits::Tlogical)
+      {
+        bool flag;
+        flag = entry.second->value(flag);
+        metadata.addEntry(QString::fromStdString(entry.first),flag?"T":"F",QString::fromStdString(entry.second->comment()));
+      }
+      else
+      {
+        metadata.addEntry(QString::fromStdString(entry.first),QString::fromStdString(entry.second->value(v)),QString::fromStdString(entry.second->comment()));
+      }
+    }
+    QString history = QString::fromStdString(hdu->history());
+    metadata.setHistory(history.split("\n"));
+    img->setMetadata(metadata);
+    /* special handling for starlight xpress which stores unsigned 16bit */
+    if (metadata.getInstrument().toLower().contains("starlight xpress") && hdu->bitpix() == 16)
+    {
+      PixelIterator it = img->getPixelIterator();
+      while (true)
+      {
+        for (long i=0;i<depth;i++)
+        {
+          if (it[i] < 0) it[i] += 0x10000;
+        }
+        if (!it.hasNext()) break;
+        ++it;
+      }
+    }
+  }
+  return img;
+}

@@ -201,7 +201,9 @@ QString Settings::getInternalDirectory() const
   QString path = settings.value(PATH_INTERNAL,"").toString();
   if (path.isEmpty())
   {
-    path = QDir::home().absoluteFilePath(".fitsip");
+    path = qEnvironmentVariable("XDG_DATA_HOME");
+    if (path.isEmpty()) path = QDir::home().absoluteFilePath(".local/share");
+    path += "/fitsip";
   }
   QFileInfo info(path);
   if (info.exists())

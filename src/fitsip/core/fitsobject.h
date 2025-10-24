@@ -23,6 +23,7 @@
 #ifndef FITSOBJECT_H
 #define FITSOBJECT_H
 
+#include "annotations.h"
 #include "fitsimage.h"
 #include "histogram.h"
 #include "pixellist.h"
@@ -77,6 +78,8 @@ public:
 
   StarList* getStarList() const;
 
+  Annotations* getAnnotations() const;
+
   void addXYData(const XYData& data);
 
   void addXYData(const std::vector<XYData>& data);
@@ -128,6 +131,7 @@ private:
   Profile yprofile;
   std::unique_ptr<PixelList> pixelList;
   std::unique_ptr<StarList> starList;
+  std::unique_ptr<Annotations> annotations;
   std::vector<XYData> xydata;
   UndoStack undostack;
 

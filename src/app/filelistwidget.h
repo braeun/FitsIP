@@ -41,9 +41,11 @@ public:
   explicit FileListWidget(QWidget *parent = nullptr);
   ~FileListWidget();
 
-  std::shared_ptr<FileList> getFileList();
+  void setWorkingDir(const QString& dir);
 
-  void setFileList(std::shared_ptr<FileList>& list);
+  FileList* getFileList();
+
+  void setFileList(FileList* list);
 
   void clear();
 
@@ -69,9 +71,11 @@ private:
   void search();
   void copySelectionToClipboard();
   void copyFiles();
+  void relocate();
 
   Ui::FileListWidget *ui;
-  std::shared_ptr<FileList> fileList;
+  QString workingDir;
+  FileList* fileList;
   QMenu* contextMenu;
 };
 

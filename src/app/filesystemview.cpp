@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing the filesystem view and associated controls       *
  *                                                                              *
- * modified: 2025-02-23                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -201,10 +201,10 @@ void FileSystemView::newFolder()
 
 void FileSystemView::rename()
 {
-  QString name = QInputDialog::getText(this,QApplication::applicationDisplayName(),"New name:");
+  QFileInfo info(filesystemModel->filePath(contextIndex));
+  QString name = QInputDialog::getText(this,QApplication::applicationDisplayName(),"New name:",QLineEdit::Normal,info.fileName());
   if (!name.isEmpty())
   {
-    QFileInfo info(filesystemModel->filePath(contextIndex));
     bool ok = info.absoluteDir().rename(info.fileName(),name);
     if (!ok)
     {

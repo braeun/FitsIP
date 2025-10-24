@@ -35,6 +35,7 @@ FitsObject::FitsObject(std::shared_ptr<FitsImage> img, const QString&  fn):
 {
   pixelList = std::make_unique<PixelList>();
   starList = std::make_unique<StarList>();
+  annotations = std::make_unique<Annotations>();
 //  QFileInfo info(filename);
 //  histogram.build(image.get());
 }
@@ -132,6 +133,11 @@ PixelList* FitsObject::getPixelList() const
 StarList* FitsObject::getStarList() const
 {
   return starList.get();
+}
+
+Annotations* FitsObject::getAnnotations() const
+{
+  return annotations.get();
 }
 
 void FitsObject::addXYData(const XYData& data)

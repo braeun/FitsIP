@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for image I/O handlers                           *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -38,7 +38,7 @@ public:
   IOHandler(QObject* parent=nullptr);
   virtual ~IOHandler();
 
-  virtual std::shared_ptr<FitsImage> read(QString filename) = 0;
+  virtual std::vector<std::shared_ptr<FitsImage>> read(QString filename) = 0;
 
   virtual bool write(QString filename, std::shared_ptr<FitsImage> img) = 0;
 

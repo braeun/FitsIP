@@ -3,6 +3,8 @@
 configure_file(fitsconfig.h.in fitsconfig.h @ONLY)
 
 add_library(fitscore SHARED
+  annotation.cpp
+  annotations.cpp
   externaltoolslauncher.cpp
   filelist.cpp
   fitsimage.cpp
@@ -85,6 +87,8 @@ add_library(fitsip::core ALIAS fitscore)
 
 target_sources(fitscore PUBLIC
   FILE_SET HEADERS TYPE HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../.." "${CMAKE_CURRENT_BINARY_DIR}/../.." FILES
+  annotation.h
+  annotations.h
   externaltoolslauncher.h
   filelist.h
   fitsimage.h

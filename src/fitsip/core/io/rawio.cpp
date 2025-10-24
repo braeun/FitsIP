@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - DSLR raw image format reader                                        *
  *                                                                              *
- * modified: 2025-03-14                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,7 +41,7 @@ bool RawIO::handlesFile(const QString &filename)
   return err == LIBRAW_SUCCESS;
 }
 
-std::shared_ptr<FitsImage> RawIO::read(QString filename)
+std::vector<std::shared_ptr<FitsImage>> RawIO::read(QString filename)
 {
   QFileInfo info(filename);
   profiler.start();
@@ -99,7 +99,7 @@ std::shared_ptr<FitsImage> RawIO::read(QString filename)
     img->setMetadata(meta);
     profiler.stop();
     logProfiler(img,"read");
-    return img;
+    return {img};
   }
   else
     throw std::runtime_error("Failed to load image");

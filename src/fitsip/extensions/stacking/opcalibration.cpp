@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image calibration with flatfield and dark image                     *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -120,7 +120,7 @@ std::shared_ptr<FitsImage> OpCalibration::calibrate(const QFileInfo& info, std::
 {
   IOHandler* handler = IOFactory::getInstance()->getHandler(info.absoluteFilePath());
   if (!handler) return std::shared_ptr<FitsImage>();
-  auto img = handler->read(info.absoluteFilePath());
+  auto img = handler->read(info.absoluteFilePath()).front();
   if (darkframe)
   {
     *img -= *darkframe->getImage();

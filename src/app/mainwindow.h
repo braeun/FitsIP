@@ -87,7 +87,7 @@ public:
 
   virtual void display(std::shared_ptr<FitsObject> obj) override;
 
-  virtual std::shared_ptr<FileList> getSelectedFileList() const override;
+  virtual FileList* getSelectedFileList() const override;
 
 protected:
 
@@ -103,6 +103,8 @@ private slots:
   void updateCursor(QPoint p);
 
   void updateAOI(QRect r);
+
+  void showImageContextMenu(QPoint mouse, QPoint pixel);
 
   void on_actionMetadata_triggered();
 
@@ -199,7 +201,7 @@ private:
 
   Ui::MainWindow *ui;
   QMenu* openFileListMenu;
-  std::shared_ptr<FileList> selectedFileList;
+  std::unique_ptr<FileList> selectedFileList;
   std::unique_ptr<ImageCollection> imageCollection;
   PluginFactory* pluginFactory;
   std::vector<PluginMenuEntry> pluginMenus;

@@ -1,4 +1,5 @@
 ﻿set(private_header_list
+  annotationswidget.h
   appsettings.h
   consolewidget.h
   filelistwidget.h
@@ -29,6 +30,7 @@
 )
 
 add_executable(fits
+  annotationswidget.cpp
   appsettings.cpp
   consolewidget.cpp consolewidget.ui
   cursors.qrc

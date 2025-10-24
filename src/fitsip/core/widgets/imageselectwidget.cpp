@@ -69,7 +69,7 @@ std::shared_ptr<FitsObject> ImageSelectWidget::getImage()
       IOHandler* handler = IOFactory::getInstance()->getHandler(fn);
       if (handler)
       {
-        std::shared_ptr<FitsImage> image = handler->read(fn);
+        std::shared_ptr<FitsImage> image = handler->read(fn).front();
         std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fn);
         return file;
       }

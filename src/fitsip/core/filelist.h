@@ -41,6 +41,8 @@ public:
 
   void addFiles(const std::vector<QFileInfo> list);
 
+  void relocate(const QString& rootpath);
+
   const std::vector<QFileInfo>& getFiles() const;
 
   QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;

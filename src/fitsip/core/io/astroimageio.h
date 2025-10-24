@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - astro image format reader and writer                                *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,7 +34,7 @@ public:
   AstroImageIO();
   ~AstroImageIO() override;
 
-  virtual std::shared_ptr<FitsImage> read(QString filename) override;
+  virtual std::vector<std::shared_ptr<FitsImage>> read(QString filename) override;
 
   virtual bool write(QString filename, std::shared_ptr<FitsImage> img) override;
 

@@ -46,7 +46,7 @@ public:
 
   virtual void display(std::shared_ptr<FitsObject> obj) = 0;
 
-  virtual std::shared_ptr<FileList> getSelectedFileList() const = 0;
+  virtual FileList* getSelectedFileList() const = 0;
 
 };
 

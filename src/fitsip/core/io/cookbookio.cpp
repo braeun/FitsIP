@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Cookbook CCD image reader                                           *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -39,11 +39,11 @@ CookbookIO::~CookbookIO()
 {
 }
 
-std::shared_ptr<FitsImage> CookbookIO::read(QString filename)
+std::vector<std::shared_ptr<FitsImage>> CookbookIO::read(QString filename)
 {
   QString suffix = QFileInfo(filename).suffix().toLower();
-  if (suffix.endsWith("a")) return readPA(filename);
-  return readP1(filename);
+  if (suffix.endsWith("a")) return {readPA(filename)};
+  return {readP1(filename)};
 }
 
 bool CookbookIO::write(QString /*filename*/, std::shared_ptr<FitsImage> /*img*/)

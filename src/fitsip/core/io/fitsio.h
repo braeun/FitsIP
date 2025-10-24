@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - FITS image format reader and writer                                 *
  *                                                                              *
- * modified: 2022-11-22                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,9 @@
 #define FITSIO_H
 
 #include "iohandler.h"
+#include <CCfits/CCfits>
+
+class ImageMetadata;
 
 class FitsIO: public IOHandler
 {
@@ -31,13 +34,14 @@ public:
   FitsIO();
   ~FitsIO() override;
 
-  virtual std::shared_ptr<FitsImage> read(QString filename) override;
+  virtual std::vector<std::shared_ptr<FitsImage>> read(QString filename) override;
 
   virtual bool write(QString filename, std::shared_ptr<FitsImage> img) override;
 
   static const char* FILENAME_FILTER;
 
 private:
+  std::shared_ptr<FitsImage> load(CCfits::HDU* hdu, QString basename, const ImageMetadata& basedata);
 
 };
 

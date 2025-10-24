@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the actual image                                  *
  *                                                                              *
- * modified: 2025-03-15                                                         *
+ * modified: 2025-10-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,6 +24,7 @@
 #include "appsettings.h"
 #include <fitsip/core/pixellist.h>
 #include <fitsip/core/starlist.h>
+#include <QContextMenuEvent>
 #include <QPixmap>
 #include <QPaintEvent>
 #include <QResizeEvent>
@@ -201,6 +202,17 @@ void ImageWidget::mouseMoveEvent(QMouseEvent *event)
     }
     QPoint p = (event->pos() - imageRect.topLeft()) * scale / zoomFactor;
     emit cursorMoved(p);
+  }
+}
+
+void ImageWidget::contextMenuEvent(QContextMenuEvent *event)
+{
+  qInfo() << "contextMenuEvent" << event->reason();
+  if (event->reason() == QContextMenuEvent::Mouse && !image.isNull() && imageRect.contains(event->pos()))
+  {
+    double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
+    QPoint p = (event->pos() - imageRect.topLeft()) * scale / zoomFactor;
+    emit contextMenuRequested(event->pos(),p);
   }
 }
 

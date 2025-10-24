@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - create an average of several images                                 *
  *                                                                              *
- * modified: 2025-08-27                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -98,11 +98,11 @@ OpPlugin::ResultType OpAverage::add(const QFileInfo& file)
   {
     if (!img)
     {
-      img = std::make_shared<FitsImage>("average",*handler->read(file.absoluteFilePath()));
+      img = std::make_shared<FitsImage>("average",*handler->read(file.absoluteFilePath()).front());
     }
     else
     {
-      *img += *handler->read(file.absoluteFilePath());
+      *img += *handler->read(file.absoluteFilePath()).front();
     }
     log(img,"Added image "+file.fileName());
   }

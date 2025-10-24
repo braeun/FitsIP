@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - reader and writer for image formats handled by Qt                   *
  *                                                                              *
- * modified: 2025-03-14                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,7 +41,7 @@ QtImageIO::~QtImageIO()
 {
 }
 
-std::shared_ptr<FitsImage> QtImageIO::read(QString filename)
+std::vector<std::shared_ptr<FitsImage>> QtImageIO::read(QString filename)
 {
   profiler.start();
   QImage i(filename);
@@ -89,7 +89,7 @@ std::shared_ptr<FitsImage> QtImageIO::read(QString filename)
   img->setMetadata(data);
   profiler.stop();
   logProfiler(img,"read");
-  return img;
+  return {img};
 }
 
 bool QtImageIO::write(QString filename, std::shared_ptr<FitsImage> img)

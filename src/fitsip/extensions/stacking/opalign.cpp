@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - plugin to align images                                              *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -111,7 +111,7 @@ OpPlugin::ResultType OpAlign::prepare(const QFileInfo& file, QRect aoi)
   std::shared_ptr<FitsImage> img;
   try
   {
-    img = handler->read(file.absoluteFilePath());
+    img = handler->read(file.absoluteFilePath()).front();
     save(img,outputPath,file,"aligned");
   }
   catch (std::exception& ex)
@@ -142,7 +142,7 @@ OpPlugin::ResultType OpAlign::align(const QFileInfo &file)
   }
   try
   {
-    std::shared_ptr<FitsImage> img1 = handler->read(file.absoluteFilePath());
+    std::shared_ptr<FitsImage> img1 = handler->read(file.absoluteFilePath()).front();
     matcher.computeMatch(img1);
     OpShift shift;
     shift.shift(img1,-matcher.getDx(),-matcher.getDy());

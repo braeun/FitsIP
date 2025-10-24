@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - test image with a ruler                                             *
  *                                                                              *
- * modified: 2025-08-27                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -61,7 +61,7 @@ OpPlugin::ResultType RulerWhiteOnBlackTestImage::execute(std::shared_ptr<FitsObj
   {
     try
     {
-    img = handler->read(image_file);
+    img = handler->read(image_file).front();
     return OK;
     }
     catch (std::exception& ex)

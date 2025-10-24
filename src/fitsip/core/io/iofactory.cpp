@@ -36,9 +36,9 @@
 
 const char* IOFactory::filelist_filter = "File List (*.lst)";
 
-const char* IOFactory::csv_filter = "Comma Separated Values (*.csv)";;
+const char* IOFactory::csv_filter = "Comma Separated Values (*.csv)";
 
-const char* IOFactory::all_files_filter = "ALL Files (*)";;
+const char* IOFactory::all_files_filter = "ALL Files (*)";
 
 IOFactory* IOFactory::instance = nullptr;
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-08-16                                                         *
+ * modified: 2025-10-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -91,6 +91,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
 
   imageWidget = new ImageWidget();
   connect(imageWidget,&ImageWidget::setPixel,this,&MainWindow::addPixel);
+  connect(imageWidget,&ImageWidget::contextMenuRequested,this,&MainWindow::showImageContextMenu);
   connect(imageWidget,&ImageWidget::cursorMoved,this,&MainWindow::updateCursor);
   connect(imageWidget,&ImageWidget::cursorMoved,ui->profileWidget,&ProfileView::updateCursor);
   connect(imageWidget,&ImageWidget::cursorSet,ui->profileWidget,&ProfileView::setCursor);
@@ -107,6 +108,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->fileSystemView,&FileSystemView::runFile,this,[this](QString file){run(QFileInfo(file));});
   connect(ui->fileSystemView,&FileSystemView::openSelection,this,[this]{openSelection();});
   connect(ui->fileSystemView,&FileSystemView::copySelectionToFilelist,this,[this]{copySelectionToList();});
+  connect(ui->fileSystemView,&FileSystemView::workingDirChanged,ui->fileListWidget,&FileListWidget::setWorkingDir);
 
   connect(ui->fileListWidget,&FileListWidget::openSelected,this,&MainWindow::fileListOpenSelected);
 
@@ -227,6 +229,8 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->actionShow_Detected_Stars->setChecked(settings.isShowStarlist());
 
   ui->actionRun_Script->setEnabled(false);
+
+  ui->fileListWidget->setWorkingDir(ui->fileSystemView->getRoot());
 }
 
 MainWindow::~MainWindow()
@@ -247,8 +251,8 @@ void MainWindow::initialize(PluginFactory* factory)
   ui->starlistWidget->setStarList(defaultStarList.get());
   imageCollection = std::make_unique<ImageCollection>();
   //  scriptInterface = std::make_unique<ScriptInterface>();
-  selectedFileList = std::make_shared<FileList>();
-  ui->fileListWidget->setFileList(selectedFileList);
+  selectedFileList = std::make_unique<FileList>();
+  ui->fileListWidget->setFileList(selectedFileList.get());
   ui->openFileList->setModel(imageCollection.get());
   connect(pluginFactory,&PluginFactory::logOperation,this,&MainWindow::logPluginOperation);
   connect(pluginFactory,&PluginFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
@@ -745,15 +749,22 @@ void MainWindow::openImage(const QFileInfo &fileinfo)
     try
     {
       QApplication::setOverrideCursor(Qt::BusyCursor);
-      std::shared_ptr<FitsImage> image = handler->read(fileinfo.absoluteFilePath());
-      std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absoluteFilePath());
-      imageCollection->addFile(file);
-      ui->openFileList->selectionModel()->clearSelection();
-      ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
-//      ui->scrollArea->setWidgetResizable(false);
-      display(file);
-      if (AppSettings().isLogbookLogOpen())
-        logbook.add(LogbookEntry::Op,image->getName(),"Loaded from file "+fileinfo.absoluteFilePath());
+      auto images = handler->read(fileinfo.absoluteFilePath());
+      if (images.empty())
+      {
+        QMessageBox::warning(this,QApplication::applicationDisplayName(),"The file contains no images!");
+      }
+      for (const std::shared_ptr<FitsImage>& image : images)
+      {
+        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absoluteFilePath());
+        imageCollection->addFile(file);
+        ui->openFileList->selectionModel()->clearSelection();
+        ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
+  //      ui->scrollArea->setWidgetResizable(false);
+        display(file);
+        if (AppSettings().isLogbookLogOpen())
+          logbook.add(LogbookEntry::Op,image->getName(),"Loaded from file "+fileinfo.absoluteFilePath());
+      }
       QApplication::restoreOverrideCursor();
     }
     catch (std::exception& ex)
@@ -890,6 +901,11 @@ void MainWindow::updateAOI(QRect r)
   }
 }
 
+void MainWindow::showImageContextMenu(QPoint mouse, QPoint pixel)
+{
+  qInfo() << mouse << pixel;
+}
+
 void MainWindow::runScriptCmd(const QString& cmd)
 {
   try
@@ -984,7 +1000,9 @@ std::shared_ptr<FitsObject> MainWindow::load(const std::string& filename)
   {
     try
     {
-      std::shared_ptr<FitsImage> image = handler->read(fileinfo.absoluteFilePath());
+      auto images = handler->read(fileinfo.absoluteFilePath());
+      /* TODO: Handle multiple images loaded from a single file */
+      std::shared_ptr<FitsImage> image = images.front();
       std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absoluteFilePath());
       return file;
     }
@@ -1020,9 +1038,9 @@ bool MainWindow::save(std::shared_ptr<FitsObject> obj, const std::string& filena
   return true;
 }
 
-std::shared_ptr<FileList> MainWindow::getSelectedFileList() const
+FileList* MainWindow::getSelectedFileList() const
 {
-  return selectedFileList;
+  return selectedFileList.get();
 }
 
 void MainWindow::getStarlistFromPixellist()

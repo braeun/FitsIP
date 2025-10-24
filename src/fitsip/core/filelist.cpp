@@ -64,6 +64,15 @@ void FileList::addFiles(const std::vector<QFileInfo> list)
   endInsertRows();
 }
 
+void FileList::relocate(const QString& rootpath)
+{
+  for (QFileInfo& info : files)
+  {
+    info = QFileInfo(rootpath+"/"+info.fileName());
+  }
+  emit dataChanged(createIndex(0,0),createIndex(files.size()-1,0));
+}
+
 const std::vector<QFileInfo>& FileList::getFiles() const
 {
   return files;

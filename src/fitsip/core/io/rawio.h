@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - DSLR raw image format reader                                        *
  *                                                                              *
- * modified: 2024-12-12                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,7 +34,7 @@ public:
 
   bool handlesFile(const QString& filename);
 
-  virtual std::shared_ptr<FitsImage> read(QString filename) override;
+  virtual std::vector<std::shared_ptr<FitsImage>> read(QString filename) override;
 
   virtual bool write(QString filename, std::shared_ptr<FitsImage> img) override;
 

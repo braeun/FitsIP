@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Cookbook CCD image reader                                           *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -31,7 +31,7 @@ public:
   CookbookIO();
   ~CookbookIO() override;
 
-  virtual std::shared_ptr<FitsImage> read(QString filename) override;
+  virtual std::vector<std::shared_ptr<FitsImage>> read(QString filename) override;
 
   virtual bool write(QString filename, std::shared_ptr<FitsImage> img) override;
 

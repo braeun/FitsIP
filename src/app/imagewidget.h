@@ -54,12 +54,10 @@ public:
   QRect getAOI() const;
 
 signals:
+  void contextMenuRequested(QPoint mousepos, QPoint pixel);
   void cursorMoved(QPoint p);
-
   void cursorSet(QPoint p);
-
   void aoiChanged(QRect r);
-
   void setPixel(QPoint p);
 
 public slots:
@@ -69,6 +67,7 @@ protected:
   virtual void mousePressEvent(QMouseEvent *event) override;
   virtual void mouseReleaseEvent(QMouseEvent *event) override;
   virtual void mouseMoveEvent(QMouseEvent *event) override;
+  virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
 //  void drawRectangle(QPainter& p, QPoint start, QPoint stop);

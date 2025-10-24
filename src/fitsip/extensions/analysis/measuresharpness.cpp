@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - measure the sharpness of images                                     *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -173,7 +173,7 @@ SharpnessData MeasureSharpness::evaluate(const QFileInfo info, QRect selection) 
   if (!handler) return SharpnessData();
   try
   {
-    auto img = handler->read(info.absoluteFilePath());
+    auto img = handler->read(info.absoluteFilePath()).front();
     SharpnessData data = calculateSharpness(img,selection);
     data.info = info;
     data.filename = info.absoluteFilePath().toStdString();

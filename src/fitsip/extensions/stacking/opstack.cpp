@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - stack images                                                        *
  *                                                                              *
- * modified: 2025-08-27                                                         *
+ * modified: 2025-10-24                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -166,7 +166,7 @@ OpPlugin::ResultType OpStack::prepare(const QFileInfo& file, bool subsky)
   }
   try
   {
-    img = std::make_shared<FitsImage>("stack",*handler->read(file.absoluteFilePath()));
+    img = std::make_shared<FitsImage>("stack",*handler->read(file.absoluteFilePath()).front());
     if (subtractSky)
     {
       Histogram hist;
@@ -242,7 +242,7 @@ OpPlugin::ResultType OpStack::stack(const QFileInfo &file)
   }
   try
   {
-    auto img1 = handler->read(file.absoluteFilePath());
+    auto img1 = handler->read(file.absoluteFilePath()).front();
     if (subtractSky)
     {
       Histogram hist;
@@ -272,7 +272,7 @@ OpPlugin::ResultType OpStack::stackTemplate(const QFileInfo &file)
   }
   try
   {
-    auto img1 = handler->read(file.absoluteFilePath());
+    auto img1 = handler->read(file.absoluteFilePath()).front();
     if (subtractSky)
     {
       Histogram hist;
@@ -305,7 +305,7 @@ OpPlugin::ResultType OpStack::stackStarMatch(const QFileInfo &file)
   }
   try
   {
-    auto img1 = handler->read(file.absoluteFilePath());
+    auto img1 = handler->read(file.absoluteFilePath()).front();
     if (subtractSky)
     {
       Histogram hist;

@@ -61,7 +61,7 @@ OpPlugin::ResultType RulerBlackOnWhiteTestImage::execute(std::shared_ptr<FitsObj
   {
     try
     {
-    img = handler->read(image_file);
+    img = handler->read(image_file).front();
     return OK;
     }
     catch (std::exception& ex)

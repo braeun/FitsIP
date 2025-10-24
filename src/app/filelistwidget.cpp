@@ -55,6 +55,8 @@ FileListWidget::FileListWidget(QWidget *parent) :
   connect(append,&QAction::triggered,this,&FileListWidget::append);
   QAction* save = contextMenu->addAction("Save...");
   connect(save,&QAction::triggered,this,&FileListWidget::save);
+  QAction* relocate = contextMenu->addAction("Relocate");
+  connect(relocate,&QAction::triggered,this,&FileListWidget::relocate);
   contextMenu->addSeparator();
   QAction* search = contextMenu->addAction("Search...");
   connect(search,&QAction::triggered,this,&FileListWidget::search);
@@ -72,15 +74,22 @@ FileListWidget::~FileListWidget()
   delete ui;
 }
 
-std::shared_ptr<FileList> FileListWidget::getFileList()
+void FileListWidget::setWorkingDir(const QString &dir)
+{
+  workingDir = dir;
+}
+
+FileList* FileListWidget::getFileList()
 {
   return fileList;
 }
 
-void FileListWidget::setFileList(std::shared_ptr<FileList>& list)
+void FileListWidget::setFileList(FileList* list)
 {
   fileList = list;
-  ui->fileList->setModel(list.get());
+  QItemSelectionModel *m = ui->fileList->selectionModel();
+  ui->fileList->setModel(list);
+  delete m;
 }
 
 void FileListWidget::clear()
@@ -241,3 +250,12 @@ void FileListWidget::copyFiles()
     }
   }
 }
+
+void FileListWidget::relocate()
+{
+  if (!workingDir.isEmpty())
+  {
+    fileList->relocate(workingDir);
+  }
+}
+
