@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-10-23                                                         *
+ * modified: 2025-10-25                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,7 +34,6 @@
 #include "dialogs/editmetadatadialog.h"
 #include "dialogs/logbookexportdialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
-#include "dialogs/stardialog.h"
 #include <fitsip/core/externaltoolslauncher.h>
 #include <fitsip/core/filelist.h>
 #include <fitsip/core/pixellist.h>
@@ -246,7 +245,7 @@ void MainWindow::initialize(PluginFactory* factory)
   pluginFactory = factory;
   defaultPixelList = std::make_unique<PixelList>();
   ui->pixellistWidget->setPixelList(defaultPixelList.get());
-  connect(ui->pixellistWidget,&PixelListWidget::findStars,this,&MainWindow::getStarlistFromPixellist);
+//  connect(ui->pixellistWidget,&PixelListWidget::findStars,this,&MainWindow::getStarlistFromPixellist);
   defaultStarList = std::make_unique<StarList>();
   ui->starlistWidget->setStarList(defaultStarList.get());
   imageCollection = std::make_unique<ImageCollection>();
@@ -1043,33 +1042,33 @@ FileList* MainWindow::getSelectedFileList() const
   return selectedFileList.get();
 }
 
-void MainWindow::getStarlistFromPixellist()
-{
-  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
-  if (activeFile)
-  {
-    StarDialog d(this);
-    if (d.exec())
-    {
-      int box = d.getBoxSize();
-      ValueType sky = 0;
-      if (d.isUserSkyValue())
-      {
-        sky = d.getUserSkyValue();
-      }
-      else
-      {
-        Histogram hist = activeFile->getHistogram();
-//        hist.build(img.get());
-        AverageResult avg = hist.getAverage(0.75);
-        sky = avg.mean;
-      }
-      StarList list(activeFile->getImage().get(),sky,activeFile->getPixelList(),box);
-      activeFile->getStarList()->setStars(list.getStars());
-      updateDisplay();
-    }
-  }
-}
+// void MainWindow::getStarlistFromPixellist()
+// {
+//   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
+//   if (activeFile)
+//   {
+//     StarDialog d(this);
+//     if (d.exec())
+//     {
+//       int box = d.getBoxSize();
+//       ValueType sky = 0;
+//       if (d.isUserSkyValue())
+//       {
+//         sky = d.getUserSkyValue();
+//       }
+//       else
+//       {
+//         Histogram hist = activeFile->getHistogram();
+// //        hist.build(img.get());
+//         AverageResult avg = hist.getAverage(0.75);
+//         sky = avg.mean;
+//       }
+//       StarList list(activeFile->getImage().get(),sky,activeFile->getPixelList(),box);
+//       activeFile->getStarList()->setStars(list.getStars());
+//       updateDisplay();
+//     }
+//   }
+// }
 
 
 void MainWindow::toggleXYChartDisplay(bool flag)

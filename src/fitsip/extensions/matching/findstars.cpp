@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - star detection class                                                *
  *                                                                              *
- * modified: 2025-08-27                                                         *
+ * modified: 2025-10-25                                                         *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.                                           *
  ********************************************************************************
@@ -32,6 +32,7 @@
 
 #include "findstars.h"
 #include "findstarsdialog.h"
+#include "stardialog.h"
 #include <fitsip/coreplugins/optogray.h>
 #include <fitsip/core/fitsimage.h>
 #include <fitsip/core/histogram.h>
@@ -83,7 +84,8 @@ FindStars::~FindStars()
 
 std::vector<std::shared_ptr<FitsObject>> FindStars::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(conv_img)};
+//  if (conv_img) return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(conv_img)};
+  return {};
 }
 
 QString FindStars::getMenuEntry() const
@@ -93,81 +95,10 @@ QString FindStars::getMenuEntry() const
 
 OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
-  Histogram hist;
-  hist.build(image->getImage().get());
-  AverageResult avg = hist.getAverage(0.75);
-  FindStarsDialog d;
-  d.setSkyMean(avg.mean);
-  d.setSkySigma(avg.sigma);
-  d.setSkyMinSigma(minsig);
-  d.setFWHMMin(minfwhm);
-  d.setFWHMMax(maxfwhm);
-  d.setRoundnessMin(minround);
-  d.setRoundnessMax(maxround);
-  d.setSharpnessMin(minsharp);
-  d.setSharpnessMax(maxsharp);
-  d.setHotnessMin(minhot);
-  d.setHotnessMax(maxhot);
-  d.setTinyboxSize(tinysize);
-  d.setMoveMax(movemax);
-  d.setBlur(!quickflag);
-  d.setIterations(maxiter);
-  if (d.exec())
-  {
-    sky = d.getSkyMean();
-    skysig = d.getSkySigma();
-    minsig = d.getSkyMinSigma();
-    minfwhm = d.getFWHMMin();
-    maxfwhm = d.getFWHMMax();
-    minround = d.getRoundnessMin();
-    maxround = d.getRoundnessMax();
-    minsharp = d.getSharpnessMin();
-    maxsharp = d.getSharpnessMax();
-    minhot = d.getHotnessMin();
-    maxhot = d.getHotnessMax();
-    tinysize = d.getTinyboxSize();
-    movemax = d.getMoveMax();
-    quickflag = !d.isBlur();
-    maxiter = d.getIterations();
-    profiler.start();
-    auto img = image->getImage();
-    if (!data.aoi.isEmpty())
-    {
-      img = img->subImage(data.aoi);
-    }
-//    if (image->getDepth() > 1)
-//    {
-      image = OpToGray().toGray(image);
-//    }
-    c_biton = 0;
-    c_abovesig = 0;
-    c_peak = 0;
-    c_1validfwhm = 0;
-    c_2validfwhm = 0;
-    c_movedaway = 0;
-    c_round = 0;
-    c_sharp = 0;
-    c_hot = 0;
-    c_star = 0;
-    std::vector<Star> stars = findStars(img);
-    data.starlist->setStars(stars);
-    data.starlist->shift(data.aoi.x(),data.aoi.y());
-    profiler.stop();
-    logProfiler(image->getName());
-    qDebug() << "FindStars:";
-    qDebug() << "  c_abovesig" << c_abovesig;
-    qDebug() << "  c_peak" << c_peak;
-    qDebug() << "  c_1validfwhm" << c_1validfwhm;
-    qDebug() << "  c_biton" << c_biton;
-    qDebug() << "  c_2validfwhm" << c_2validfwhm;
-    qDebug() << "  c_movedaway" << c_movedaway;
-    qDebug() << "  c_round" << c_round;
-    qDebug() << "  c_sharp" << c_sharp;
-    qDebug() << "  c_hot" << c_hot;
-    qDebug() << "  c_star" << c_star;
-    return OK;
-  }
-  return CANCELLED;
+  conv_img.reset();
+  if (!data.pixellist || data.pixellist->empty())
+    return execute1(image,data);
+  return execute2(image,data);
 }
 
 std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
@@ -176,6 +107,17 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
   int htiny = tinysize;
   int wtiny = tinysize;
   int num_star = 0;
+
+  c_biton = 0;
+  c_abovesig = 0;
+  c_peak = 0;
+  c_1validfwhm = 0;
+  c_2validfwhm = 0;
+  c_movedaway = 0;
+  c_round = 0;
+  c_sharp = 0;
+  c_hot = 0;
+  c_star = 0;
 
   /* first, create and initialize to zero the bit map */
   bitmap = std::vector<uint8_t>(image->getWidth()*image->getHeight(),0);
@@ -323,6 +265,33 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
   return stars;
 }
 
+std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image, PixelList* pixels, ValueType sky, int box)
+{
+  std::vector<Star> stars;
+  for (const Pixel& pixel : pixels->getPixels())
+  {
+    QRect sr(pixel.x-box/2,pixel.y-box/2,box,box);
+    sr = image->getOverlap(sr);
+    int maxiter = 20;
+    double xc;
+    double yc;
+    double fwhm;
+    double xwidth;
+    double ywidth;
+    star_axes(image,sr.x(),sr.y(),sr.width(),sr.height(),sky,&xc,&yc,&fwhm,&xwidth,&ywidth,maxiter);
+    int iy = (int)(yc + 0.5);
+    if (iy >= image->getHeight()) iy = image->getHeight() - 1;
+    int ix = (int)(xc + 0.5);
+    if (ix >= image->getWidth()) ix = image->getWidth() - 1;
+    double round = 2.0 * ((xwidth - ywidth) / (xwidth + ywidth));
+    double sharp = sharpness(image,ix,iy);
+    double hot_factor = hotness(image,ix,iy);
+    Star star(xc,yc,fwhm,xwidth,ywidth,round,sharp,hot_factor);
+    stars.push_back(star);
+  }
+  return stars;
+}
+
 void FindStars::starAxes(std::shared_ptr<FitsImage> image, const QRect &box, double sky, double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter)
 {
   star_axes(image,box.x(),box.y(),box.width(),box.height(),sky,xc,yc,fwhm,xwidth,ywidth,maxiter);
@@ -332,6 +301,110 @@ void FindStars::starAxes(std::shared_ptr<FitsImage> image, const QRect &box, dou
 
 
 
+
+
+
+
+OpPlugin::ResultType FindStars::execute1(std::shared_ptr<FitsObject> image, const OpPluginData& data)
+{
+  Histogram hist;
+  hist.build(image->getImage().get());
+  AverageResult avg = hist.getAverage(0.75);
+  FindStarsDialog d;
+  d.setSkyMean(avg.mean);
+  d.setSkySigma(avg.sigma);
+  d.setSkyMinSigma(minsig);
+  d.setFWHMMin(minfwhm);
+  d.setFWHMMax(maxfwhm);
+  d.setRoundnessMin(minround);
+  d.setRoundnessMax(maxround);
+  d.setSharpnessMin(minsharp);
+  d.setSharpnessMax(maxsharp);
+  d.setHotnessMin(minhot);
+  d.setHotnessMax(maxhot);
+  d.setTinyboxSize(tinysize);
+  d.setMoveMax(movemax);
+  d.setBlur(!quickflag);
+  d.setIterations(maxiter);
+  if (d.exec())
+  {
+    sky = d.getSkyMean();
+    skysig = d.getSkySigma();
+    minsig = d.getSkyMinSigma();
+    minfwhm = d.getFWHMMin();
+    maxfwhm = d.getFWHMMax();
+    minround = d.getRoundnessMin();
+    maxround = d.getRoundnessMax();
+    minsharp = d.getSharpnessMin();
+    maxsharp = d.getSharpnessMax();
+    minhot = d.getHotnessMin();
+    maxhot = d.getHotnessMax();
+    tinysize = d.getTinyboxSize();
+    movemax = d.getMoveMax();
+    quickflag = !d.isBlur();
+    maxiter = d.getIterations();
+
+    profiler.start();
+    auto img = image->getImage();
+    if (!data.aoi.isEmpty())
+    {
+      img = img->subImage(data.aoi);
+    }
+    //    if (image->getDepth() > 1)
+    //    {
+    image = OpToGray().toGray(image);
+    //    }
+    std::vector<Star> stars = findStars(img);
+    data.starlist->setStars(stars);
+    data.starlist->shift(data.aoi.x(),data.aoi.y());
+    profiler.stop();
+    logProfiler(image->getName());
+    qDebug() << "FindStars:";
+    qDebug() << "  c_abovesig" << c_abovesig;
+    qDebug() << "  c_peak" << c_peak;
+    qDebug() << "  c_1validfwhm" << c_1validfwhm;
+    qDebug() << "  c_biton" << c_biton;
+    qDebug() << "  c_2validfwhm" << c_2validfwhm;
+    qDebug() << "  c_movedaway" << c_movedaway;
+    qDebug() << "  c_round" << c_round;
+    qDebug() << "  c_sharp" << c_sharp;
+    qDebug() << "  c_hot" << c_hot;
+    qDebug() << "  c_star" << c_star;
+    return OK;
+  }
+  return CANCELLED;
+}
+
+OpPlugin::ResultType FindStars::execute2(std::shared_ptr<FitsObject> image, const OpPluginData& data)
+{
+  Histogram hist;
+  hist.build(image->getImage().get());
+  AverageResult avg = hist.getAverage(0.75);
+  StarDialog d;
+  d.setImageSkyValue(avg.mean);
+  if (d.exec())
+  {
+    int box = d.getBoxSize();
+    ValueType sky = 0;
+    if (d.isUserSkyValue())
+    {
+      sky = d.getUserSkyValue();
+    }
+    else
+    {
+      sky = avg.mean;
+    }
+    profiler.start();
+    auto img = image->getImage();
+    image = OpToGray().toGray(image);
+    std::vector<Star> stars = findStars(img,data.pixellist,sky,box);
+    data.starlist->setStars(stars);
+    profiler.stop();
+    logProfiler(image->getName());
+    return OK;
+  }
+  return CANCELLED;
+}
 
 std::shared_ptr<FitsImage> FindStars::convolve(std::shared_ptr<FitsImage> image, double fwhm)
 {

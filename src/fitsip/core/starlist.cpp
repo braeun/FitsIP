@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - list of selected/detected stars                                     *
  *                                                                              *
- * modified: 2025-03-15                                                         *
+ * modified: 2025-10-25                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -33,13 +33,18 @@ StarList::StarList(QObject* parent):QAbstractTableModel(parent)
 {
 }
 
-StarList::StarList(FitsImage* img, ValueType sky, const PixelList* pixels, int box, QObject* parent):QAbstractTableModel(parent)
+// StarList::StarList(FitsImage* img, ValueType sky, const PixelList* pixels, int box, QObject* parent):QAbstractTableModel(parent)
+// {
+//   for (const Pixel& pixel : pixels->getPixels())
+//   {
+//     Star star = Star::fromPixel(img,sky,pixel,box);
+//     stars.push_back(star);
+//   }
+// }
+
+bool StarList::empty() const
 {
-  for (const Pixel& pixel : pixels->getPixels())
-  {
-    Star star = Star::fromPixel(img,sky,pixel,box);
-    stars.push_back(star);
-  }
+  return stars.empty();
 }
 
 void StarList::clear()

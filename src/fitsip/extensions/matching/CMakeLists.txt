@@ -2,6 +2,7 @@
 add_library(fitsmatching SHARED
   findstars.h findstars.cpp
   findstarsdialog.h findstarsdialog.cpp findstarsdialog.ui
+  stardialog.h stardialog.cpp stardialog.ui
   matchingplugincollection.h matchingplugincollection.cpp
   measurematch.h measurematch.cpp
   measurematchdialog.h measurematchdialog.cpp measurematchdialog.ui

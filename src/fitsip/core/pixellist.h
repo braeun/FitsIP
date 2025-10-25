@@ -33,6 +33,8 @@ class PixelList: public QAbstractTableModel
 public:
   explicit PixelList(QObject* parent=nullptr);
 
+  bool empty() const;
+
   void clear();
 
   void addPixel(const Pixel& pixel);

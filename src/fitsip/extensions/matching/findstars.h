@@ -55,6 +55,9 @@ public:
 
   std::vector<Star> findStars(std::shared_ptr<FitsImage> image);
 
+  std::vector<Star> findStars(std::shared_ptr<FitsImage> image, PixelList* pixels, ValueType sky, int box);
+
+  [[deprecated]]
   void starAxes(std::shared_ptr<FitsImage> image, const QRect& box, double sky,
                 double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter);
 
@@ -73,6 +76,8 @@ private:
     double gnum;		/* denominator of expression for H */
   };
 
+  ResultType execute1(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData());
+  ResultType execute2(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData());
   std::shared_ptr<FitsImage> convolve(std::shared_ptr<FitsImage> image, double fwhm);
   double do_gauss(std::shared_ptr<FitsImage> image, uint32_t x, uint32_t y, const Gaussian& gauss);
   double find_skysig(std::shared_ptr<FitsImage> image, double rough_sig);

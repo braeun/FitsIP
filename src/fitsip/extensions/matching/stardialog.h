@@ -16,6 +16,8 @@ public:
   explicit StarDialog(QWidget *parent = nullptr);
   ~StarDialog();
 
+  void setImageSkyValue(double v);
+
   int getBoxSize() const;
 
   bool isUserSkyValue() const;

@@ -42,9 +42,9 @@ PixelListWidget::PixelListWidget(QWidget *parent):QWidget(parent),
   connect(removeAction,&QAction::triggered,this,&PixelListWidget::removeRows);
   QAction* clearAction = contextMenu->addAction("Clear");
   connect(clearAction,&QAction::triggered,this,&PixelListWidget::clear);
-  contextMenu->addSeparator();
-  QAction* findStarsAction = contextMenu->addAction("Find Stars...");
-  connect(findStarsAction,&QAction::triggered,this,[this](){ emit findStars(); });
+  // contextMenu->addSeparator();
+  // QAction* findStarsAction = contextMenu->addAction("Find Stars...");
+  // connect(findStarsAction,&QAction::triggered,this,[this](){ emit findStars(); });
 }
 
 PixelListWidget::~PixelListWidget()

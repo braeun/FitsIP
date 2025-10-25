@@ -48,8 +48,8 @@ public:
 
   void load();
 
-signals:
-  void findStars();
+// signals:
+//   void findStars();
 
 private slots:
   void on_pixellistTable_customContextMenuRequested(const QPoint &pos);

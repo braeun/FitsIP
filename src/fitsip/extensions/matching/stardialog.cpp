@@ -13,6 +13,12 @@ StarDialog::~StarDialog()
   delete ui;
 }
 
+void StarDialog::setImageSkyValue(double v)
+{
+  ui->imageSkyLabel->setText(QString::number(v));
+  ui->userSkyField->setText(QString::number(v));
+}
+
 int StarDialog::getBoxSize() const
 {
   return ui->starBoxSpinner->value();

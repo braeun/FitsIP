@@ -347,8 +347,6 @@
     <addaction name="actionShow_XY_Charts"/>
     <addaction name="separator"/>
     <addaction name="actionClear_AOI"/>
-    <addaction name="separator"/>
-    <addaction name="actionSelect_Pixel"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -376,6 +374,7 @@
     <addaction name="actionMetadata"/>
     <addaction name="menuLists"/>
     <addaction name="separator"/>
+    <addaction name="actionSelect_Pixel"/>
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
    </widget>

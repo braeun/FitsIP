@@ -29,7 +29,6 @@
 #include <cmath>
 #include <algorithm>
 #include <limits>
-#include <iostream>
 #include <QDebug>
 
 #ifdef USE_PYTHON

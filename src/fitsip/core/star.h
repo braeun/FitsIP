@@ -56,14 +56,15 @@ public:
 
   void rotate(double xc, double yc, double sa, double ca);
 
-  static Star fromPixel(FitsImage* img, ValueType sky, const Pixel& pixel, int box);
+  // [[deprecated]]
+  // static Star fromPixel(FitsImage* img, ValueType sky, const Pixel& pixel, int box);
 
 private:
   Star();
 
-  static std::pair<double, double> getCenter(FitsImage* img, ValueType sky, int x0, int y0, int w, int h);
-  static void star_axes(FitsImage* image, int tsx, int tsy, int w, int h, double sky, double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter);
-  static double do_fwhm(FitsImage* image, int sx, int sy, int w, int h, double xc, double yc, double sky);
+  // static std::pair<double, double> getCenter(FitsImage* img, ValueType sky, int x0, int y0, int w, int h);
+  // static void star_axes(FitsImage* image, int tsx, int tsy, int w, int h, double sky, double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter);
+  // static double do_fwhm(FitsImage* image, int sx, int sy, int w, int h, double xc, double yc, double sky);
 
   double x;         /* x position of center */
   double y;         /* y position of center */

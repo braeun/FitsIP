@@ -32,6 +32,11 @@ PixelList::PixelList(QObject* parent):QAbstractTableModel(parent)
 {
 }
 
+bool PixelList::empty() const
+{
+  return pixels.empty();
+}
+
 void PixelList::clear()
 {
   if (!pixels.empty())
