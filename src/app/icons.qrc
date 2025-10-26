@@ -31,5 +31,6 @@
         <file>resources/icons/go-previous.png</file>
         <file>resources/icons/view-refresh.png</file>
         <file>resources/icons/office-chart-scatter.png</file>
+        <file>resources/icons/format-add-node.png</file>
     </qresource>
 </RCC>

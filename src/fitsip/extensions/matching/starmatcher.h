@@ -1,6 +1,6 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - plugins to match images                                             *
+ * FitsIP - plugin to match two images based on stars                           *
  *                                                                              *
  * modified: 2025-10-26                                                         *
  *                                                                              *
@@ -20,28 +20,64 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "matchingplugincollection.h"
+#ifndef STARMATCHER_H
+#define STARMATCHER_H
+
 #include "findstars.h"
-#include "measurematch.h"
-#include "starmatcher.h"
+#include <fitsip/core/fitstypes.h>
+#include <fitsip/core/opplugin.h>
+#include <QObject>
+#include <vector>
 
-MatchingPluginCollection::MatchingPluginCollection()
+class StarMatcherDialog;
+
+class StarMatcher: public OpPlugin
 {
-  plugins.push_back(new FindStars());
-  plugins.push_back(new MeasureMatch());
-  plugins.push_back(new StarMatcher());
-}
+  Q_OBJECT
+  Q_INTERFACES(OpPlugin)
+public:
+  StarMatcher();
+  ~StarMatcher();
 
-MatchingPluginCollection::~MatchingPluginCollection()
-{
-  // for (OpPlugin* p : plugins) delete p;
-  // plugins.clear();
-}
+  virtual QString getMenuEntry() const override;
 
-std::vector<OpPlugin*> MatchingPluginCollection::getPlugins() const
-{
-  return plugins;
-}
+  virtual ResultType execute(std::shared_ptr<FitsObject> list, const OpPluginData& data=OpPluginData()) override;
 
+  ResultType prepare(std::shared_ptr<FitsImage> image, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove);
 
+  ResultType match(std::shared_ptr<FitsImage> image);
 
+  double getAngle() const;
+
+  double getAngleSigma() const;
+
+  double getDx() const;
+
+  double getSigmadx() const;
+
+  double getDy() const;
+
+  double getSigmady() const;
+
+private:
+  std::tuple<double,double> getRotationAngle(const StarList& list1, const StarList& list2);
+  std::tuple<double,double,double,double> getShift(const StarList& list1, const StarList& list2);
+
+  StarMatcherDialog* dlg;
+  bool subsky;
+  int searchbox;
+  int starbox;
+  double maxmove;
+  bool rotate;
+  FindStars starfinder;
+  StarList starlist1;
+  StarList starlist2;
+  double angle;
+  double angleSigma;
+  double dx;
+  double sigmadx;
+  double dy;
+  double sigmady;
+};
+
+#endif // STARMATCHER_H

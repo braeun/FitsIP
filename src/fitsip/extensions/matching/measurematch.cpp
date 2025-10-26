@@ -156,9 +156,9 @@ void MeasureMatch::setTemplate(std::shared_ptr<FitsImage> image, QRect a)
   {
     R.push_back(std::vector<ValueType>(aoi.width(),0.0));
   }
-  for (int32_t i=0;i<aoi.width();i++)
+  for (int i=0;i<aoi.width();i++)
   {
-    for (int32_t j=0;j<aoi.height();j++)
+    for (int j=0;j<aoi.height();j++)
     {
       {
         double v = img->getConstPixelIterator(i+aoi.x(),j+aoi.y()).getAbs();
@@ -232,42 +232,42 @@ bool MeasureMatch::isMatchFull() const
   return matchFull;
 }
 
-void MeasureMatch::setMatchRange(int32_t r)
+void MeasureMatch::setMatchRange(int r)
 {
   matchRange = r;
 }
 
-int32_t MeasureMatch::getMatchRange() const
+int MeasureMatch::getMatchRange() const
 {
   return matchRange;
 }
 
-void MeasureMatch::setFirstPassDelta(int32_t d)
+void MeasureMatch::setFirstPassDelta(int d)
 {
   firstPassDelta = d;
 }
 
-int32_t MeasureMatch::getFirstPassDelta() const
+int MeasureMatch::getFirstPassDelta() const
 {
   return firstPassDelta;
 }
 
-void MeasureMatch::setSubsample(int32_t s)
+void MeasureMatch::setSubsample(int s)
 {
   subsample = s;
 }
 
-int32_t MeasureMatch::getSubsample() const
+int MeasureMatch::getSubsample() const
 {
   return subsample;
 }
 
-void MeasureMatch::setFactor(int32_t f)
+void MeasureMatch::setFactor(int f)
 {
   factor = f;
 }
 
-int32_t MeasureMatch::getFactor() const
+int MeasureMatch::getFactor() const
 {
   return factor;
 }
@@ -324,8 +324,8 @@ void MeasureMatch::createI(std::shared_ptr<FitsImage> image)
   {
     offsetX = std::max(aoi.x()-matchRange,0);
     offsetY = std::max(aoi.y()-matchRange,0);
-    height = std::min(aoi.height()+2*matchRange,static_cast<int32_t>(img->getHeight())-offsetY);
-    width = std::min(aoi.width()+2*matchRange,static_cast<int32_t>(img->getWidth())-offsetX);
+    height = std::min(aoi.height()+2*matchRange,static_cast<int>(img->getHeight())-offsetY);
+    width = std::min(aoi.width()+2*matchRange,static_cast<int>(img->getWidth())-offsetX);
   }
   I.clear();// = hmath::Matrix(height,width);
   for (int iy=0;iy<height;iy++)

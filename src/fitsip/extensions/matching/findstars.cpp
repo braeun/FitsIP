@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - star detection class                                                *
  *                                                                              *
- * modified: 2025-10-25                                                         *
+ * modified: 2025-10-26                                                         *
  ********************************************************************************
  * Copyright (C) by Harald Braeuning.                                           *
  ********************************************************************************
@@ -42,7 +42,7 @@
 #include <algorithm>
 #include <QDebug>
 
-#define DEBUG
+#undef DEBUG
 
 FindStars::FindStars():OpPlugin(),
   c_biton(0),
@@ -249,9 +249,11 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
 //      else {
 //        width_value = 0.5*(xwidth + ywidth);
 //      }
+#ifdef DEBUG
       printf("%5d %7.2f   %7.2f   %7.2f   %6.3f    %6.3f   %6.3f \n",
           ++num_star, xc, yc,	conv_img->getConstPixelIterator(ix,iy).getAbs() - sky,
           fwhm, round, sharp);
+#endif
       Star star(xc,yc,fwhm,xwidth,ywidth,round,sharp,hot_factor);
       stars.push_back(star);
       c_star++;

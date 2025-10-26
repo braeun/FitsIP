@@ -1,67 +1,36 @@
-﻿set(private_header_list
-  annotationswidget.h
-  appsettings.h
-  consolewidget.h
-  filelistwidget.h
-  filesystemview.h
-  histogramview.h
-  imagewidget.h
-  logbookwidget.h
-  logwidget.h
-  mainwindow.h
-  palettefactory.h
-  pixellistwidget.h
-  profilertablemodel.h
-  profilerwidget.h
-  profileview.h
-  script.h
-  scriptinterface.h
-  starlistwidget.h
-  dialogs/aboutdialog.h
-  dialogs/addlogbookentrydialog.h
-  dialogs/configurationdialog.h
-  dialogs/editmetadatadialog.h
-  dialogs/logbookfilterdialog.h
-  dialogs/logbookfilter1dialog.h
-  dialogs/logbookpropertiesdialog.h
-  dialogs/logentryeditdialog.h
-#  dialogs/psfmanagerdialog.h
-)
-
-add_executable(fits
-  annotationswidget.cpp
-  appsettings.cpp
-  consolewidget.cpp consolewidget.ui
+﻿add_executable(fits
+  annotationswidget.h annotationswidget.cpp
+  appsettings.h appsettings.cpp
+  consolewidget.h consolewidget.cpp consolewidget.ui
   cursors.qrc
-  filelistwidget.cpp filelistwidget.ui
-  filesystemview.cpp filesystemview.ui
-  histogramview.cpp histogramview.ui
+  filelistwidget.h filelistwidget.cpp filelistwidget.ui
+  filesystemview.h filesystemview.cpp filesystemview.ui
+  histogramview.h histogramview.cpp histogramview.ui
   icons.qrc
-  imagewidget.cpp
-  logbookwidget.cpp logbookwidget.ui
-  logwidget.cpp logwidget.ui
+  imagewidget.h imagewidget.cpp
+  logbookwidget.h logbookwidget.cpp logbookwidget.ui
+  logbookwidget.h logwidget.cpp logwidget.ui
   main.cpp
-  mainwindow.cpp mainwindow.ui
-  palettefactory.cpp
-  pixellistwidget.cpp pixellistwidget.ui
-  profilertablemodel.cpp
-  profilerwidget.cpp profilerwidget.ui
-  profileview.cpp profileview.ui
-  script.cpp
-  scriptinterface.cpp
-  starlistwidget.cpp starlistwidget.ui
+  mainwindow.h mainwindow.cpp mainwindow.ui
+  palettefactory.h palettefactory.cpp
+  pixellistwidget.h pixellistwidget.cpp pixellistwidget.ui
+  profilertablemodel.h profilertablemodel.cpp
+  profilerwidget.h profilerwidget.cpp profilerwidget.ui
+  profileview.h profileview.cpp profileview.ui
+  script.h script.cpp
+  scriptinterface.h scriptinterface.cpp
+  starlistwidget.h starlistwidget.cpp starlistwidget.ui
   staticplugins.cpp
-  dialogs/aboutdialog.cpp dialogs/aboutdialog.ui
-  dialogs/addlogbookentrydialog.cpp dialogs/addlogbookentrydialog.ui
-  dialogs/configurationdialog.cpp dialogs/configurationdialog.ui
-  dialogs/editmetadatadialog.cpp dialogs/editmetadatadialog.ui
-  dialogs/logbookexportdialog.h dialogs/logbookexportdialog.cpp dialogs/logbookexportdialog.ui
-  dialogs/logbookfilterdialog.cpp dialogs/logbookfilterdialog.ui
-  dialogs/logbookfilter1dialog.cpp dialogs/logbookfilter1dialog.ui
-  dialogs/logbookpropertiesdialog.cpp dialogs/logbookpropertiesdialog.ui
-  dialogs/logentryeditdialog.cpp dialogs/logentryeditdialog.ui
+  dialogs/aboutdialog.h dialogs/aboutdialog.cpp dialogs/aboutdialog.ui
+  dialogs/addlogbookentrydialog.h dialogs/addlogbookentrydialog.cpp dialogs/addlogbookentrydialog.ui
+  dialogs/configurationdialog.h dialogs/configurationdialog.cpp dialogs/configurationdialog.ui
+  dialogs/editmetadatadialog.h dialogs/editmetadatadialog.cpp dialogs/editmetadatadialog.ui
+  dialogs/logbookexportdialog.h dialogs/logbookexportdialog.h dialogs/logbookexportdialog.cpp dialogs/logbookexportdialog.ui
+  dialogs/logbookfilterdialog.h dialogs/logbookfilterdialog.cpp dialogs/logbookfilterdialog.ui
+  dialogs/logbookfilter1dialog.h dialogs/logbookfilter1dialog.cpp dialogs/logbookfilter1dialog.ui
+  dialogs/logbookpropertiesdialog.h dialogs/logbookpropertiesdialog.cpp dialogs/logbookpropertiesdialog.ui
+  dialogs/logentryeditdialog.h dialogs/logentryeditdialog.cpp dialogs/logentryeditdialog.ui
 #  dialogs/psfmanagerdialog.cpp dialogs/psfmanagerdialog.ui
-  ${private_header_list}
   )
 
 target_compile_definitions(fits PRIVATE ${FITS_DEF})

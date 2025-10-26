@@ -442,6 +442,8 @@
    <addaction name="separator"/>
    <addaction name="actionUndo"/>
    <addaction name="separator"/>
+   <addaction name="actionSelect_Pixel"/>
+   <addaction name="separator"/>
    <addaction name="actionPrevious_Image"/>
    <addaction name="actionNext_Image"/>
    <addaction name="actionAdd_Current_Image_to_List"/>
@@ -1268,6 +1270,10 @@
   <action name="actionSelect_Pixel">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/resources/icons/format-add-node.png</normaloff>:/resources/icons/format-add-node.png</iconset>
    </property>
    <property name="text">
     <string>Select Pixel</string>

@@ -61,21 +61,21 @@ public:
 
   bool isMatchFull() const;
 
-  void setMatchRange(int32_t r);
+  void setMatchRange(int r);
 
-  int32_t getMatchRange() const;
+  int getMatchRange() const;
 
-  void setFirstPassDelta(int32_t d);
+  void setFirstPassDelta(int d);
 
-  int32_t getFirstPassDelta() const;
+  int getFirstPassDelta() const;
 
-  void setSubsample(int32_t s);
+  void setSubsample(int s);
 
-  int32_t getSubsample() const;
+  int getSubsample() const;
 
-  void setFactor(int32_t f);
+  void setFactor(int f);
 
-  int32_t getFactor() const;
+  int getFactor() const;
 
   double getX() const;
 
@@ -99,30 +99,30 @@ public:
 
 private:
   void createI(std::shared_ptr<FitsImage> image);
-  double getMatchValue(int32_t r, int32_t s, int32_t n);
+  double getMatchValue(int r, int s, int n);
 
   bool matchFull;
-  int32_t matchRange;
-  int32_t subsample;
-  int32_t firstPassDelta;
-  int32_t factor;
+  int matchRange;
+  int subsample;
+  int firstPassDelta;
+  int factor;
   std::vector<std::vector<ValueType>> R;
   std::vector<std::vector<ValueType>> I;
   double meanR;
   double sigmaR;
   double max;
-  int32_t x;
-  int32_t y;
-  int32_t dx;
-  int32_t dy;
-  int32_t offsetX;
-  int32_t offsetY;
-  int32_t height;
-  int32_t width;
+  int x;
+  int y;
+  int dx;
+  int dy;
+  int offsetX;
+  int offsetY;
+  int height;
+  int width;
   QRect aoi;            // AOI to use
   QRect initialAOI;     // initial AOI
-  int32_t aoiShiftX;
-  int32_t aoiShiftY;
+  int aoiShiftX;
+  int aoiShiftY;
   MeasureMatchDialog* dlg;
 
 };

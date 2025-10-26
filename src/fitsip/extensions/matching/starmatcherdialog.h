@@ -1,6 +1,6 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - plugins to match images                                             *
+ * FitsIP - dialog for plugin to match two images by stars                      *
  *                                                                              *
  * modified: 2025-10-26                                                         *
  *                                                                              *
@@ -20,28 +20,44 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "matchingplugincollection.h"
-#include "findstars.h"
-#include "measurematch.h"
-#include "starmatcher.h"
+#ifndef STARMATCHERDIALOG_H
+#define STARMATCHERDIALOG_H
 
-MatchingPluginCollection::MatchingPluginCollection()
-{
-  plugins.push_back(new FindStars());
-  plugins.push_back(new MeasureMatch());
-  plugins.push_back(new StarMatcher());
+#include <QDialog>
+
+namespace Ui {
+class StarMatcherDialog;
 }
 
-MatchingPluginCollection::~MatchingPluginCollection()
+class ImageCollection;
+class ImageSelectWidget;
+class FitsObject;
+
+class StarMatcherDialog : public QDialog
 {
-  // for (OpPlugin* p : plugins) delete p;
-  // plugins.clear();
-}
+  Q_OBJECT
 
-std::vector<OpPlugin*> MatchingPluginCollection::getPlugins() const
-{
-  return plugins;
-}
+public:
+  explicit StarMatcherDialog(QWidget *parent = nullptr);
+  ~StarMatcherDialog();
 
+  void setImageCollection(ImageCollection* collection);
 
+  std::shared_ptr<FitsObject> getImage();
 
+  bool isSubtractSky() const;
+
+  bool isAllowRotation() const;
+
+  int getSearchBoxSize() const;
+
+  int getStarBoxSize() const;
+
+  int getStarMaxMovement() const;
+
+private:
+  Ui::StarMatcherDialog *ui;
+  ImageSelectWidget *imageSelectWidget;
+};
+
+#endif // STARMATCHERDIALOG_H

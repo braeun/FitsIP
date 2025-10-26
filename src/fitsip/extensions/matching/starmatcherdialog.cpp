@@ -1,6 +1,6 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - plugins to match images                                             *
+ * FitsIP - dialog for plugin to match two images by stars                      *
  *                                                                              *
  * modified: 2025-10-26                                                         *
  *                                                                              *
@@ -20,28 +20,56 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "matchingplugincollection.h"
-#include "findstars.h"
-#include "measurematch.h"
-#include "starmatcher.h"
+#include "starmatcherdialog.h"
+#include "ui_starmatcherdialog.h"
+#include <fitsip/core/widgets/imageselectwidget.h>
 
-MatchingPluginCollection::MatchingPluginCollection()
+StarMatcherDialog::StarMatcherDialog(QWidget *parent):QDialog(parent),
+  ui(new Ui::StarMatcherDialog)
 {
-  plugins.push_back(new FindStars());
-  plugins.push_back(new MeasureMatch());
-  plugins.push_back(new StarMatcher());
+  ui->setupUi(this);
+  imageSelectWidget = new ImageSelectWidget(ui->groupBox);
+  imageSelectWidget->setObjectName(QString::fromUtf8("imageSelectWidget"));
+  ui->verticalLayout_2->addWidget(imageSelectWidget);
 }
 
-MatchingPluginCollection::~MatchingPluginCollection()
+StarMatcherDialog::~StarMatcherDialog()
 {
-  // for (OpPlugin* p : plugins) delete p;
-  // plugins.clear();
+  delete ui;
 }
 
-std::vector<OpPlugin*> MatchingPluginCollection::getPlugins() const
+void StarMatcherDialog::setImageCollection(ImageCollection* c)
 {
-  return plugins;
+  imageSelectWidget->setImageCollection(c);
 }
 
+std::shared_ptr<FitsObject> StarMatcherDialog::getImage()
+{
+  return imageSelectWidget->getImage();
+}
 
+bool StarMatcherDialog::isSubtractSky() const
+{
+  return ui->subtractSkyBox->isChecked();
+}
+
+bool StarMatcherDialog::isAllowRotation() const
+{
+  return ui->allowRotationBox->isChecked();
+}
+
+int StarMatcherDialog::getStarBoxSize() const
+{
+  return ui->starboxSizeField->text().toInt();
+}
+
+int StarMatcherDialog::getSearchBoxSize() const
+{
+  return ui->searchboxSizeField->text().toInt();
+}
+
+int StarMatcherDialog::getStarMaxMovement() const
+{
+  return ui->maxMovementField->text().toInt();
+}
 

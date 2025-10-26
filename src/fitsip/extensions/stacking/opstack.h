@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - stack images                                                        *
  *                                                                              *
- * modified: 2025-08-27                                                         *
+ * modified: 2025-10-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,7 @@
 
 #include <fitsip/extensions/matching/measurematch.h>
 #include <fitsip/extensions/matching/findstars.h>
+#include <fitsip/extensions/matching/starmatcher.h>
 #include <fitsip/core/opplugin.h>
 #include <fitsip/core/pixellist.h>
 #include <fitsip/core/starlist.h>

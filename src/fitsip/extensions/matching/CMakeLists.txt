@@ -7,6 +7,8 @@ add_library(fitsmatching SHARED
   measurematch.h measurematch.cpp
   measurematchdialog.h measurematchdialog.cpp measurematchdialog.ui
   plugin.json
+  starmatcher.h starmatcher.cpp
+  starmatcherdialog.h starmatcherdialog.cpp starmatcherdialog.ui
 )
 
 add_library(fitsip::matching ALIAS fitsmatching)
