@@ -31,7 +31,6 @@
 #include <fitsip/core/starlist.h>
 #include <QObject>
 #include <vector>
-#include <tuple>
 
 class OpStackDialog;
 
@@ -60,22 +59,13 @@ private:
   ResultType stack(const QFileInfo& file);
   ResultType stackTemplate(const QFileInfo& file);
   ResultType stackStarMatch(const QFileInfo& file);
-  void findStars(std::shared_ptr<FitsImage> image, StarList* starlist, int searchbox, int starbox);
-  Star findStar(std::shared_ptr<FitsImage> image, double sky, int x, int y, int searchbox, int starbox);
-  std::tuple<double,double> getRotationAngle(const StarList& list1, const StarList& list2);
-  std::tuple<double,double,double,double> getShift(const StarList& list1, const StarList& list2);
 
   OpStackDialog* dlg;
   std::shared_ptr<FitsImage> img;
   bool subtractSky;
   MeasureMatch matcher;
-  int searchbox;
-  int starbox;
-  double maxmove;
+  StarMatcher starmatcher;
   bool rotate;
-  FindStars starfinder;
-  StarList starlist1;
-  StarList starlist2;
 };
 
 #endif // OPSTACK_H

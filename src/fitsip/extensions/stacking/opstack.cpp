@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - stack images                                                        *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-10-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,16 +28,15 @@
 #include <fitsip/core/histogram.h>
 #include <fitsip/core/dialogs/progressdialog.h>
 #include <fitsip/core/io/iofactory.h>
-#include <algorithm>
 #include <QApplication>
 #include <QDebug>
 
 OpStack::OpStack():
   dlg(nullptr),
   subtractSky(true),
-  searchbox(100),
-  starbox(20),
-  maxmove(20),
+  // searchbox(100),
+  // starbox(20),
+  // maxmove(20),
   rotate(false)
 {
   profiler = SimpleProfiler("OpStack");
@@ -112,6 +111,7 @@ OpPlugin::ResultType OpStack::execute(const std::vector<QFileInfo>& list, const 
         ret = prepareTemplate(list[0],dlg->isSubtractSky(),data.aoi,dlg->isFullTemplateMatch(),dlg->getTemplateMatchRange());
         break;
       case Align::StarMatch:
+        rotate = dlg->isAllowRotation();
         ret = prepareStarMatch(list[0],data.pixellist,dlg->isSubtractSky(),dlg->getSearchBoxSize(),dlg->getStarBoxSize(),dlg->isAllowRotation(),dlg->getStarMaxMovement());
         break;
     }
@@ -197,37 +197,10 @@ OpPlugin::ResultType OpStack::prepareTemplate(const QFileInfo &file, bool subsky
 
 OpPlugin::ResultType OpStack::prepareStarMatch(const QFileInfo &file, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove)
 {
-  if (pixellist->getPixels().empty())
-  {
-    qWarning() << "No stars selected for star matching";
-    return ERROR;
-  }
-  if (searchbox <= 0)
-  {
-    qWarning() << "searchbox size must be >0";
-    return ERROR;
-  }
-  this->searchbox = searchbox;
-  if (starbox <= 0)
-  {
-    qWarning() << "starbox size must be >0";
-    return ERROR;
-  }
-  this->starbox = starbox;
-  this->rotate = rotate;
-  this->maxmove = maxmove;
   OpPlugin::ResultType res = prepare(file,subsky);
   if (res == OK)
   {
-    std::vector<Star> stars;
-    for (const Pixel& pixel : pixellist->getPixels())
-    {
-      Star star(pixel.x,pixel.y);
-      stars.push_back(star);
-    }
-    starlist1.setStars(stars);
-    findStars(img,&starlist1,searchbox,starbox);
-    starlist2.setStars(starlist1.getStars());
+    res = starmatcher.prepare(img,pixellist,false,searchbox,starbox,rotate,maxmove);
   }
   return res;
 }
@@ -313,46 +286,34 @@ OpPlugin::ResultType OpStack::stackStarMatch(const QFileInfo &file)
       AverageResult avg = hist.getAverage(0.75);
       *img1 -= avg.mean;
     }
-    /* save starlist of last image */
-    StarList last;
-    last.setStars(starlist2.getStars());
-    /* get stars for current image */
-    findStars(img1,&starlist2,searchbox,starbox);
-    StarList tmp;
-    tmp.setStars(starlist2.getStars());
-    double angle = 0;
-    double angleSigma = 0;
-    if (rotate && starlist1.getStars().size() > 1 && starlist2.getStars().size())
+    ResultType res = starmatcher.match(img1);
+    if (res == OK)
     {
-      auto a = getRotationAngle(starlist1,starlist2);
-      std::tie(angle,angleSigma) = a;
-      if (fabs(angle) > 0.001)
+      if (rotate)
       {
-        OpRotate rot;
-        rot.rotate(img1,angle,true);
-        int32_t xc = static_cast<int32_t>(img1->getWidth()) / 2;
-        int32_t yc = static_cast<int32_t>(img1->getHeight()) / 2;
-        tmp.rotate(xc,yc,angle);
+        double angle = starmatcher.getAngle();
+        if (fabs(angle) > 0.001 && fabs(angle) < starmatcher.getAngleSigma()/2)
+        {
+          OpRotate rot;
+          rot.rotate(img1,angle,true);
+        }
       }
+      OpShift shift;
+      shift.shift(img1,-starmatcher.getDx(),-starmatcher.getDy());
+      *img += *img1;
+      if (rotate)
+        log(img,QString::asprintf("stacked %s rotated by %.3f°+-%.3f° shifted by [%.1f+-%.2f,%.1f+-%.2f]",img1->getName().toUtf8().data(),
+                                   starmatcher.getAngle(),starmatcher.getAngleSigma(),
+                                   -starmatcher.getDx(),starmatcher.getSigmadx(),-starmatcher.getDy(),starmatcher.getSigmady()));
+      else
+        log(img,QString::asprintf("stacked %s shifted by [%.1f+-%.2f,%.1f+-%.2f]",img1->getName().toUtf8().data(),
+                                   -starmatcher.getDx(),starmatcher.getSigmadx(),-starmatcher.getDy(),starmatcher.getSigmady()));
+      qInfo() << "Stacked: " << img1->getName();
     }
-    double dx,sigmadx,dy,sigmady;
-    /* get shift to last image to check againt maxmove */
-    std::tie(dx,sigmadx,dy,sigmady) = getShift(last,starlist2);
-    if (fabs(dx) > maxmove || fabs(dy) > maxmove)
-    {
-      qWarning() << img->getName() << " shift " << dx << dy << "exceeds max move value" << maxmove;
-      return ERROR;
-    }
-    /* using the new rotated starlist, get shift to first image for stacking */
-    std::tie(dx,sigmadx,dy,sigmady) = getShift(starlist1,tmp);
-    OpShift shift;
-    shift.shift(img1,-dx,-dy);
-    *img += *img1;
-    if (rotate)
-      log(img,QString::asprintf("stacked %s rotated by %.3f°+-%.3f° shifted by [%.1f+-%.2f,%.1f+-%.2f]",img1->getName().toUtf8().data(),angle,angleSigma,-dx,sigmadx,-dy,sigmady));
     else
-      log(img,QString::asprintf("stacked %s shifted by [%.1f+-%.2f,%.1f+-%.2f]",img1->getName().toUtf8().data(),-dx,sigmadx,-dy,sigmady));
-    qInfo() << "Stacked: " << img1->getName();
+    {
+      return res;
+    }
   }
   catch (std::exception& ex)
   {
@@ -362,105 +323,3 @@ OpPlugin::ResultType OpStack::stackStarMatch(const QFileInfo &file)
   return OK;
 }
 
-void OpStack::findStars(std::shared_ptr<FitsImage> image, StarList *starlist, int searchbox, int starbox)
-{
-  double sky = 0;
-  if (!subtractSky)
-  {
-    /* The sky background has not been subtracted yet.
-     * Set the mean value for the findStars function. */
-    Histogram hist;
-    hist.build(image.get());
-    AverageResult avg = hist.getAverage(0.75);
-    sky = avg.mean;
-  }
-  std::vector<Star> list;
-  for (const Star& star : starlist->getStars())
-  {
-    Star s = findStar(image,sky,star.getX(),star.getY(),searchbox,starbox);
-    list.push_back(s);
-  }
-  starlist->setStars(list);
-}
-
-Star OpStack::findStar(std::shared_ptr<FitsImage> image, double sky, int x, int y, int searchbox, int starbox)
-{
-  QRect r(x-searchbox/2,y-searchbox/2,searchbox,searchbox);
-  r = image->getOverlap(r);
-  /* find the brightest pixel in the rectangle, assuming thats the new position of the star */
-  Pixel pixel = image->getBrightestPixel(r);
-  QRect sr(pixel.x-starbox/2,pixel.y-starbox/2,starbox,starbox);
-  sr = image->getOverlap(sr);
-  int maxiter = 20;
-  double xc;
-  double yc;
-  double fwhm;
-  double xwidth;
-  double ywidth;
-  starfinder.starAxes(image,sr,sky,&xc,&yc,&fwhm,&xwidth,&ywidth,maxiter);
-  Star star(xc,yc,fwhm,xwidth,ywidth,0,0,0);
-//  qDebug() << "findStar " << image->getName() << sky << x << y << r << xc << yc << xwidth << ywidth;
-  return star;
-}
-
-/*
- * calculate the rotation angle in degrees.
- * Returns a tuple with <angle,stddev>
- */
-std::tuple<double,double> OpStack::getRotationAngle(const StarList &list1, const StarList &list2)
-{
-  double sum = 0.0;
-  double sum2 = 0.0;
-  const std::vector<Star> s1 = list1.getStars();
-  const std::vector<Star> s2 = list2.getStars();
-  int n = std::min(s1.size(),s2.size()) - 1;
-  for (int i=0;i<n;i++)
-  {
-    double a1 = atan2(s1[i+1].getY()-s1[i].getY(),s1[i+1].getX()-s1[i].getX());
-    if (a1 < 0) a1 += 2.0 * M_PI;
-    double a2 = atan2(s2[i+1].getY()-s2[i].getY(),s2[i+1].getX()-s2[i].getX());
-    if (a2 < 0) a2 += 2.0 * M_PI;
-    double a = a1 - a2;
-    sum += a;
-    sum2 += a * a;
-  }
-  double angle = sum / n * 180.0 / M_PI;
-  double stddev = 0.0;
-  if (n > 1) stddev = sqrt((n*sum2-sum*sum)/n/(n-1));
-  stddev *= 180.0 / M_PI;
-  qDebug() << QString::asprintf("StackOp: rotation angle = %f +- %f\n",angle,stddev);
-  return std::tuple(angle,stddev);
-}
-
-/*
- * Get the amount by wich list2 is shifted with respect to list1.
- */
-std::tuple<double,double,double,double> OpStack::getShift(const StarList& list1, const StarList& list2)
-{
-  const std::vector<Star> s1 = list1.getStars();
-  const std::vector<Star> s2 = list2.getStars();
-  int64_t n = std::min(s1.size(),s2.size());
-  double dx = 0;
-  double dx2 = 0;
-  double dy = 0;
-  double dy2 = 0;
-  for (int i=0;i<n;i++)
-  {
-    double d = s2[i].getX() - s1[i].getX();
-    dx += d;
-    dx2 += d * d;
-    d = s2[i].getY() - s1[i].getY();
-    dy += d;
-    dy2 += d * d;
-  }
-  double stddevDx = 0.0;
-  double stddevDy = 0.0;
-  if (n > 1)
-  {
-    stddevDx = sqrt((n*dx2-dx*dx)/n/(n-1));
-    stddevDy = sqrt((n*dy2-dy*dy)/n/(n-1));
-  }
-  dx /= n;
-  dy /= n;
-  return std::tuple(dx,stddevDx,dy,stddevDy);
-}
