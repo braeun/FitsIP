@@ -227,6 +227,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>saveButton</tabstop>
+  <tabstop>logButton</tabstop>
+  <tabstop>removeRowsButton</tabstop>
+  <tabstop>resultTable</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

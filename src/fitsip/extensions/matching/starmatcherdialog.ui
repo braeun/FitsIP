@@ -162,6 +162,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>allowRotationBox</tabstop>
+  <tabstop>searchboxSizeField</tabstop>
+  <tabstop>starboxSizeField</tabstop>
+  <tabstop>maxMovementField</tabstop>
+  <tabstop>subtractSkyBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

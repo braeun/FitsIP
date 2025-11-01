@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - often used mathematical functions                                   *
+ * FitsIP - create a test image with a Moffat distribution                      *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,44 +20,68 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "mathfunctions.h"
-#include <cmath>
+#include "moffattestimage.h"
+#include "moffattestimagedialog.h"
+#include <fitsip/core/fitsimage.h>
+#include <fitsip/core/math/mathfunctions.h>
 
-namespace math_functions
+MoffatTestImage::MoffatTestImage():
+  dlg(nullptr)
 {
-
-ValueType gaussian(ValueType x, ValueType a, ValueType c, ValueType s)
-{
-  return a * exp(-(x-c)*(x-c)/2/s/s);
 }
 
-ValueType gaussian(ValueType x, ValueType y, ValueType a, ValueType cx, ValueType sx, ValueType cy, ValueType sy)
+MoffatTestImage::~MoffatTestImage()
 {
-  return a * exp(-((x-cx)*(x-cx)/2/sx/sx+(y-cy)*(y-cy)/2/sy/sy));
 }
 
-ValueType box(ValueType x, ValueType y, ValueType ampl, ValueType centerx, ValueType width, ValueType centery, ValueType height)
+bool MoffatTestImage::requiresImage() const
 {
-  if (x < centerx - width/2 || x > centerx + width/2) return 0;
-  if (y < centery - height/2 || y > centery + height/2) return 0;
-  return ampl;
+  return false;
 }
 
-ValueType moffat(ValueType r, ValueType center, ValueType alpha, ValueType beta)
+bool MoffatTestImage::requiresFileList() const
 {
-  r -= center;
-  ValueType a2 = alpha * alpha;
-  return (beta - 1) / M_PI / a2 * pow(1+(r*r)/a2,-beta);
+  return false;
 }
 
-ValueType moffat(ValueType x, ValueType y, ValueType centerx, ValueType alphax, ValueType centery, ValueType alphay, ValueType beta)
+std::vector<std::shared_ptr<FitsObject>> MoffatTestImage::getCreatedImages() const
 {
-  x -= centerx;
-  y -= centery;
-  ValueType ax2 = alphax * alphax;
-  ValueType ay2 = alphay * alphay;
-  return (beta - 1) / M_PI / ((ax2+ay2)/2) * pow(1+(x*x/ax2+y*y/ay2),-beta);
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
-} // namespace
+
+QString MoffatTestImage::getMenuEntry() const
+{
+  return "Image/Test Images/Moffat...";
+}
+
+OpPlugin::ResultType MoffatTestImage::execute(std::shared_ptr<FitsObject> /*image*/, const OpPluginData& data)
+{
+  if (!dlg)
+  {
+    dlg = new MoffatTestImageDialog();
+  }
+  if (dlg->exec())
+  {
+    img = std::make_shared<FitsImage>("Gauss",dlg->getWidth(),dlg->getHeight());
+    double cx = dlg->getCenterX();
+    double cy = dlg->getCenterY();
+    double alphax = dlg->getAlphaX();
+    double alphay = dlg->getAlphaY();
+    double beta = dlg->getBeta();
+    PixelIterator it = img->getPixelIterator();
+    for (int y=0;y<img->getHeight();y++)
+    {
+      for (int x=0;x<img->getWidth();x++)
+      {
+        it[0] = math_functions::moffat(x,y,cx,alphax,cy,alphay,beta);
+        ++it;
+      }
+    }
+    emit logOperation("New Image","Created Moffat distribution");
+    return OK;
+  }
+  return CANCELLED;
+}
+
 

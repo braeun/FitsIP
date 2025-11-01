@@ -127,6 +127,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>starBoxSpinner</tabstop>
+  <tabstop>imageSkyButton</tabstop>
+  <tabstop>userSkyButton</tabstop>
+  <tabstop>userSkyField</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

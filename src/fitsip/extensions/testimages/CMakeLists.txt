@@ -2,10 +2,12 @@
 add_library(fitstestimages SHARED
   testplugincollection.h testplugincollection.cpp
   boxtestimage.h boxtestimage.cpp
-  gaussiantestimage.h gaussiantestimage.cpp
-  psftestimage.h psftestimage.cpp
   boxtestimagedialog.h boxtestimagedialog.cpp boxtestimagedialog.ui
+  gaussiantestimage.h gaussiantestimage.cpp
   gaussiantestimagedialog.h gaussiantestimagedialog.cpp gaussiantestimagedialog.ui
+  moffattestimage.h moffattestimage.cpp
+  moffattestimagedialog.h moffattestimagedialog.cpp moffattestimagedialog.ui
+  psftestimage.h psftestimage.cpp
   psftestimagedialog.h psftestimagedialog.cpp psftestimagedialog.ui
   plugin.json
   rulerblackonwhitetestimage.h rulerblackonwhitetestimage.cpp

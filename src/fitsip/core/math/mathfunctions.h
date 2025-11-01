@@ -62,9 +62,32 @@ namespace math_functions
    * @param width the width in x
    * @param centery the center in y
    * @param height the height in y
-   * @return the value of the gaussian
+   * @return the value
    */
   extern ValueType box(ValueType x, ValueType y, ValueType ampl, ValueType centerx, ValueType width, ValueType centery, ValueType height);
+
+  /**
+   * @brief Calculate the value of a radial (one-dimensional) Moffat distribution
+   * @param r the radius
+   * @param center the center of the distribution
+   * @param alpha alpha parameter (width)
+   * @param beta beta parameter (exponent)
+   * @return the value
+   */
+  extern ValueType moffat(ValueType r, ValueType center, ValueType alpha, ValueType beta);
+
+  /**
+   * @brief Calculate the value of a two-dimensional Moffat distribution
+   * @param x the x value
+   * @param y the y value
+   * @param centerx the center in x
+   * @param alphax alpha parameter (width) in x
+   * @param centery the center in y
+   * @param alphay alpha parameter (width) in y
+   * @param beta beta parameter (exponent)
+   * @return the value
+   */
+  extern ValueType moffat(ValueType x, ValueType y, ValueType centerx, ValueType alphax, ValueType centery, ValueType alphay, ValueType beta);
 
 }
 

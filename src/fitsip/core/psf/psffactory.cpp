@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - factory for point-spread-functions                                  *
  *                                                                              *
- * modified: 2025-02-28                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,7 @@
 #include "psffactory.h"
 #include "gaussianpsf.h"
 #include "cosinebellpsf.h"
+#include "moffatpsf.h"
 #include "imagepsf.h"
 #include "../histogram.h"
 #include "../settings.h"
@@ -42,6 +43,7 @@ void PSFFactory::rebuild()
   list.clear();
   list.push_back(std::shared_ptr<PSF>(new CosineBellPSF()));
   list.push_back(std::shared_ptr<PSF>(new GaussianPSF()));
+  list.push_back(std::shared_ptr<PSF>(new MoffatPSF()));
   QDir psfdir(Settings().getInternalPSFDirectory());
   std::cout << psfdir.absolutePath().toStdString() << std::endl;
   for (const QFileInfo& entry : psfdir.entryInfoList(QStringList("*"),QDir::NoDotAndDotDot|QDir::Files))

@@ -67,6 +67,7 @@ add_library(fitscore SHARED
   psf/cosinebellpsf.cpp
   psf/gaussianpsf.cpp
   psf/imagepsf.cpp
+  psf/moffatpsf.cpp
   psf/psf.cpp
   psf/psffactory.cpp
   psf/psfmanagerdialog.cpp psf/psfmanagerdialog.ui
@@ -153,6 +154,7 @@ target_sources(fitscore PUBLIC
   psf/cosinebellpsf.h
   psf/gaussianpsf.h
   psf/imagepsf.h
+  psf/moffatpsf.h
   psf/psf.h
   psf/psffactory.h
   psf/psfmanagerdialog.h

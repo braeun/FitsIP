@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - often used mathematical functions                                   *
+ * FitsIP - Moffat point-spread-functions                                       *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,44 +20,23 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "mathfunctions.h"
-#include <cmath>
+#ifndef MOFFATPSF_H
+#define MOFFATPSF_H
 
-namespace math_functions
+#include "psf.h"
+
+class MoffatPSF: public PSF
 {
+public:
+  MoffatPSF();
+  virtual ~MoffatPSF() override;
 
-ValueType gaussian(ValueType x, ValueType a, ValueType c, ValueType s)
-{
-  return a * exp(-(x-c)*(x-c)/2/s/s);
-}
+  virtual QString getName() const override;
 
-ValueType gaussian(ValueType x, ValueType y, ValueType a, ValueType cx, ValueType sx, ValueType cy, ValueType sy)
-{
-  return a * exp(-((x-cx)*(x-cx)/2/sx/sx+(y-cy)*(y-cy)/2/sy/sy));
-}
+  virtual ValueType value(ValueType x, ValueType y, const std::vector<ValueType>& par) const override;
 
-ValueType box(ValueType x, ValueType y, ValueType ampl, ValueType centerx, ValueType width, ValueType centery, ValueType height)
-{
-  if (x < centerx - width/2 || x > centerx + width/2) return 0;
-  if (y < centery - height/2 || y > centery + height/2) return 0;
-  return ampl;
-}
+  virtual std::vector<QString> getParameterNames() const override;
 
-ValueType moffat(ValueType r, ValueType center, ValueType alpha, ValueType beta)
-{
-  r -= center;
-  ValueType a2 = alpha * alpha;
-  return (beta - 1) / M_PI / a2 * pow(1+(r*r)/a2,-beta);
-}
+};
 
-ValueType moffat(ValueType x, ValueType y, ValueType centerx, ValueType alphax, ValueType centery, ValueType alphay, ValueType beta)
-{
-  x -= centerx;
-  y -= centery;
-  ValueType ax2 = alphax * alphax;
-  ValueType ay2 = alphay * alphay;
-  return (beta - 1) / M_PI / ((ax2+ay2)/2) * pow(1+(x*x/ax2+y*y/ay2),-beta);
-}
-
-} // namespace
-
+#endif // MOFFATPSF_H

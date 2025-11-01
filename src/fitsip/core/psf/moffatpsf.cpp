@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - often used mathematical functions                                   *
+ * FitsIP - Moffat point-spread-functions                                       *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,44 +20,30 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "mathfunctions.h"
-#include <cmath>
+#include "moffatpsf.h"
+#include "../math/mathfunctions.h"
 
-namespace math_functions
+MoffatPSF::MoffatPSF():PSF()
 {
-
-ValueType gaussian(ValueType x, ValueType a, ValueType c, ValueType s)
-{
-  return a * exp(-(x-c)*(x-c)/2/s/s);
 }
 
-ValueType gaussian(ValueType x, ValueType y, ValueType a, ValueType cx, ValueType sx, ValueType cy, ValueType sy)
+MoffatPSF::~MoffatPSF()
 {
-  return a * exp(-((x-cx)*(x-cx)/2/sx/sx+(y-cy)*(y-cy)/2/sy/sy));
 }
 
-ValueType box(ValueType x, ValueType y, ValueType ampl, ValueType centerx, ValueType width, ValueType centery, ValueType height)
+QString MoffatPSF::getName() const
 {
-  if (x < centerx - width/2 || x > centerx + width/2) return 0;
-  if (y < centery - height/2 || y > centery + height/2) return 0;
-  return ampl;
+  return "Moffat";
 }
 
-ValueType moffat(ValueType r, ValueType center, ValueType alpha, ValueType beta)
+ValueType MoffatPSF::value(ValueType x, ValueType y, const std::vector<ValueType>& par) const
 {
-  r -= center;
-  ValueType a2 = alpha * alpha;
-  return (beta - 1) / M_PI / a2 * pow(1+(r*r)/a2,-beta);
+  return math_functions::moffat(x,y,0,par[0],0,par[1],par[2]);
 }
 
-ValueType moffat(ValueType x, ValueType y, ValueType centerx, ValueType alphax, ValueType centery, ValueType alphay, ValueType beta)
+std::vector<QString> MoffatPSF::getParameterNames() const
 {
-  x -= centerx;
-  y -= centery;
-  ValueType ax2 = alphax * alphax;
-  ValueType ay2 = alphay * alphay;
-  return (beta - 1) / M_PI / ((ax2+ay2)/2) * pow(1+(x*x/ax2+y*y/ay2),-beta);
+  return std::vector<QString>{"alpha x", "alpha y", "beta"};
 }
 
-} // namespace
 

@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - often used mathematical functions                                   *
+ * FitsIP - dialog to create a test image with a Moffat distribution            *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,44 +20,39 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "mathfunctions.h"
-#include <cmath>
+#ifndef MOFFATTESTIMAGEDIALOG_H
+#define MOFFATTESTIMAGEDIALOG_H
 
-namespace math_functions
-{
+#include <QDialog>
 
-ValueType gaussian(ValueType x, ValueType a, ValueType c, ValueType s)
-{
-  return a * exp(-(x-c)*(x-c)/2/s/s);
+namespace Ui {
+class MoffatTestImageDialog;
 }
 
-ValueType gaussian(ValueType x, ValueType y, ValueType a, ValueType cx, ValueType sx, ValueType cy, ValueType sy)
+class MoffatTestImageDialog : public QDialog
 {
-  return a * exp(-((x-cx)*(x-cx)/2/sx/sx+(y-cy)*(y-cy)/2/sy/sy));
-}
+  Q_OBJECT
 
-ValueType box(ValueType x, ValueType y, ValueType ampl, ValueType centerx, ValueType width, ValueType centery, ValueType height)
-{
-  if (x < centerx - width/2 || x > centerx + width/2) return 0;
-  if (y < centery - height/2 || y > centery + height/2) return 0;
-  return ampl;
-}
+public:
+  explicit MoffatTestImageDialog(QWidget *parent = nullptr);
+  ~MoffatTestImageDialog();
 
-ValueType moffat(ValueType r, ValueType center, ValueType alpha, ValueType beta)
-{
-  r -= center;
-  ValueType a2 = alpha * alpha;
-  return (beta - 1) / M_PI / a2 * pow(1+(r*r)/a2,-beta);
-}
+  int getWidth() const;
 
-ValueType moffat(ValueType x, ValueType y, ValueType centerx, ValueType alphax, ValueType centery, ValueType alphay, ValueType beta)
-{
-  x -= centerx;
-  y -= centery;
-  ValueType ax2 = alphax * alphax;
-  ValueType ay2 = alphay * alphay;
-  return (beta - 1) / M_PI / ((ax2+ay2)/2) * pow(1+(x*x/ax2+y*y/ay2),-beta);
-}
+  int getHeight() const;
 
-} // namespace
+  double getCenterX() const;
 
+  double getCenterY() const;
+
+  double getAlphaX() const;
+
+  double getAlphaY() const;
+
+  double getBeta() const;
+
+private:
+  Ui::MoffatTestImageDialog *ui;
+};
+
+#endif // MOFFATTESTIMAGEDIALOG_H
