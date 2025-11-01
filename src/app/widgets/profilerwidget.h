@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - table model for the profiler table                                  *
+ * FitsIP - widget with the profiler table                                      *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,41 +20,35 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PROFILERTABLEMODEL_H
-#define PROFILERTABLEMODEL_H
+#ifndef PROFILERWIDGET_H
+#define PROFILERWIDGET_H
 
-#include <fitsip/core/profiling/profilerentry.h>
-#include <QAbstractTableModel>
-#include <vector>
+#include <QWidget>
 
-class ProfilerTableModel : public QAbstractTableModel
+class ProfilerTableModel;
+class QMenu;
+
+namespace Ui {
+class ProfilerWidget;
+}
+
+class ProfilerWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit ProfilerTableModel(QObject *parent = nullptr);
+  explicit ProfilerWidget(QWidget *parent = nullptr);
+  ~ProfilerWidget();
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
-  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-
-  int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-  const std::vector<ProfilerEntry>& getEntries() const;
-
-public slots:
-
-  void clear();
-
-  void addProfilerResult(QString profiler, QString image, int w, int h, int64_t t, QString notes);
+  ProfilerTableModel* getModel();
 
 private:
-  std::vector<ProfilerEntry> entries;
+  void exportData();
+  void contextMenuRequested(const QPoint &pos);
 
-  static std::vector<QString> headers;
-
+  Ui::ProfilerWidget *ui;
+  ProfilerTableModel* model;
+  QMenu* contextMenu;
 };
 
-#endif // PROFILERTABLEMODEL_H
+#endif // PROFILERWIDGET_H

@@ -1,25 +1,13 @@
-﻿add_executable(fits
-  annotationswidget.h annotationswidget.cpp
+﻿
+add_executable(fits
   appsettings.h appsettings.cpp
-  consolewidget.h consolewidget.cpp consolewidget.ui
   cursors.qrc
-  filelistwidget.h filelistwidget.cpp filelistwidget.ui
-  filesystemview.h filesystemview.cpp filesystemview.ui
-  histogramview.h histogramview.cpp histogramview.ui
   icons.qrc
-  imagewidget.h imagewidget.cpp
-  logbookwidget.h logbookwidget.cpp logbookwidget.ui
-  logbookwidget.h logwidget.cpp logwidget.ui
   main.cpp
   mainwindow.h mainwindow.cpp mainwindow.ui
   palettefactory.h palettefactory.cpp
-  pixellistwidget.h pixellistwidget.cpp pixellistwidget.ui
-  profilertablemodel.h profilertablemodel.cpp
-  profilerwidget.h profilerwidget.cpp profilerwidget.ui
-  profileview.h profileview.cpp profileview.ui
   script.h script.cpp
   scriptinterface.h scriptinterface.cpp
-  starlistwidget.h starlistwidget.cpp starlistwidget.ui
   staticplugins.cpp
   dialogs/aboutdialog.h dialogs/aboutdialog.cpp dialogs/aboutdialog.ui
   dialogs/addlogbookentrydialog.h dialogs/addlogbookentrydialog.cpp dialogs/addlogbookentrydialog.ui
@@ -31,6 +19,20 @@
   dialogs/logbookpropertiesdialog.h dialogs/logbookpropertiesdialog.cpp dialogs/logbookpropertiesdialog.ui
   dialogs/logentryeditdialog.h dialogs/logentryeditdialog.cpp dialogs/logentryeditdialog.ui
 #  dialogs/psfmanagerdialog.cpp dialogs/psfmanagerdialog.ui
+  widgets/annotationswidget.h widgets/annotationswidget.cpp
+  widgets/consolewidget.h widgets/consolewidget.cpp widgets/consolewidget.ui
+  widgets/filelistwidget.h widgets/filelistwidget.cpp widgets/filelistwidget.ui
+  widgets/filesystemview.h widgets/filesystemview.cpp widgets/filesystemview.ui
+  widgets/histogramview.h widgets/histogramview.cpp widgets/histogramview.ui
+  widgets/imagewidget.h widgets/imagewidget.cpp
+  widgets/metadatatablewidget.h widgets/metadatatablewidget.cpp widgets/metadatatablewidget.ui
+  widgets/logbookwidget.h widgets/logbookwidget.cpp widgets/logbookwidget.ui
+  widgets/logbookwidget.h widgets/logwidget.cpp widgets/logwidget.ui
+  widgets/pixellistwidget.h widgets/pixellistwidget.cpp widgets/pixellistwidget.ui
+  widgets/profilertablemodel.h widgets/profilertablemodel.cpp
+  widgets/profilerwidget.h widgets/profilerwidget.cpp widgets/profilerwidget.ui
+  widgets/profileview.h widgets/profileview.cpp widgets/profileview.ui
+  widgets/starlistwidget.h widgets/starlistwidget.cpp widgets/starlistwidget.ui
   )
 
 target_compile_definitions(fits PRIVATE ${FITS_DEF})

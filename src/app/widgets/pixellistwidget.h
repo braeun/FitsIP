@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - widget to display the profiles and associated controls              *
+ * FitsIP - widget to display the selected pixel list                           *
  *                                                                              *
- * modified: 2025-01-04                                                         *
+ * modified: 2024-12-13                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,58 +20,41 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PROFILEVIEW_H
-#define PROFILEVIEW_H
+#ifndef PIXELLISTWIDGET_H
+#define PIXELLISTWIDGET_H
 
-#include <fitsip/core/profile.h>
-#include <QMenu>
 #include <QWidget>
-#include <memory>
 
-class FitsObject;
-class ProfileChart;
+class PixelList;
+class QMenu;
 
 namespace Ui {
-class ProfileView;
+class PixelListWidget;
 }
 
-class ProfileView : public QWidget
+class PixelListWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit ProfileView(QWidget *parent = nullptr);
-  ~ProfileView();
+  explicit PixelListWidget(QWidget *parent = nullptr);
+  ~PixelListWidget();
 
-  bool getClickEndsTracking() const;
+  void setPixelList(PixelList* list);
 
-  void setClickEndsTracking(bool newClickEndsTracking);
+  void clear();
 
-  void setImage(std::shared_ptr<FitsObject> obj);
-
-public slots:
-  void updateCursor(QPoint p);
-
-  void setCursor(QPoint p);
-
-protected:
-  void changeEvent(QEvent* event);
-
-private:
-  void redraw();
-  void logYToggled(bool checked);
-  void settingsChanged();
   void save();
 
-  Ui::ProfileView *ui;
-  ProfileChart *horizontalProfileWidget;
-  ProfileChart *verticalProfileWidget;
-  std::shared_ptr<FitsObject> image;
-  QPoint cursor;
-  Profile horizontal;
-  Profile vertical;
-  bool clickEndsTracking;
-  QMenu* popupMenu;
+  void load();
+
+private:
+  void contextMenuRequested(const QPoint &pos);
+  void removeRows();
+
+  Ui::PixelListWidget *ui;
+  PixelList* pixellist;
+  QMenu* contextMenu;
 };
 
-#endif // PROFILEVIEW_H
+#endif // PIXELLISTWIDGET_H

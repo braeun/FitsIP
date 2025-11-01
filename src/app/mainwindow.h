@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-05-30                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,7 +23,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "imagewidget.h"
+#include "widgets/imagewidget.h"
 #include "script.h"
 #include "scriptinterface.h"
 #include <fitsip/core/fitsobject.h>
@@ -48,8 +48,17 @@ class OpPlugin;
 class OpPluginData;
 class EditMetadataDialog;
 class FileList;
+class FileListWidget;
+class FileSystemView;
+class HistogramView;
+class LogbookWidget;
 class LogWidget;
+class MetadataTableWidget;
 class PSFManagerDialog;
+class PixelListWidget;
+class ProfilerWidget;
+class ProfileView;
+class StarListWidget;
 class XYChartsWidget;
 
 struct PluginMenuEntry
@@ -209,6 +218,16 @@ private:
   std::unique_ptr<PixelList> defaultPixelList;
   std::unique_ptr<StarList> defaultStarList;
   ImageWidget* imageWidget;
+  FileSystemView* filesystemView;
+  FileListWidget* filelistWidget;
+  HistogramView* histogramWidget;
+  LogbookWidget* logbookWidget;
+  LogWidget* logWidget;
+  MetadataTableWidget* metaTableWidget;
+  PixelListWidget* pixellistWidget;
+  ProfilerWidget* profilerWidget;
+  ProfileView* profileWidget;
+  StarListWidget* starlistWidget;
   XYChartsWidget* chartsWidget;
   ConsoleWidget* consoleWidget;
   EditMetadataDialog* editMetadataDialog;

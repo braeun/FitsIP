@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget with the general logging console                             *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -34,6 +34,8 @@ LogWidget::LogWidget(QWidget *parent) :
   ui(new Ui::LogWidget)
 {
   ui->setupUi(this);
+  connect(ui->actionSave,&QAction::triggered,this,&LogWidget::save);
+  connect(ui->logBrowser,&QTextBrowser::customContextMenuRequested,this,&LogWidget::contextMenuRequested);
   contextMenu = new QMenu;
   contextMenu->addAction(ui->actionSave);
   contextMenu->addSeparator();
@@ -83,7 +85,7 @@ void LogWidget::dockLocationChanged(Qt::DockWidgetArea area)
 }
 
 
-void LogWidget::on_actionSave_triggered()
+void LogWidget::save()
 {
   AppSettings settings;
   QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOG,"Plain Text (*.txt);;HTML (*.html)");
@@ -105,7 +107,7 @@ void LogWidget::on_actionSave_triggered()
   }
 }
 
-void LogWidget::on_logBrowser_customContextMenuRequested(const QPoint &pos)
+void LogWidget::contextMenuRequested(const QPoint &pos)
 {
   contextMenu->popup(ui->logBrowser->mapToGlobal(pos));
 }

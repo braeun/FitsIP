@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - widget to display the selected pixel list                           *
+ * FitsIP - widget with the general logging console                             *
  *                                                                              *
- * modified: 2024-12-13                                                         *
+ * modified: 2022-11-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,46 +20,39 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef PIXELLISTWIDGET_H
-#define PIXELLISTWIDGET_H
+#ifndef LOGWIDGET_H
+#define LOGWIDGET_H
 
 #include <QWidget>
 
-class PixelList;
 class QMenu;
 
 namespace Ui {
-class PixelListWidget;
+class LogWidget;
 }
 
-class PixelListWidget : public QWidget
+class LogWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit PixelListWidget(QWidget *parent = nullptr);
-  ~PixelListWidget();
+  explicit LogWidget(QWidget *parent = nullptr);
+  ~LogWidget();
 
-  void setPixelList(PixelList* list);
+  void add(const QtMsgType type, const QMessageLogContext& context, const QString &message);
 
-  void clear();
+  void writeStdOut(const QString& s);
 
-  void save();
+  void writeStdErr(const QString& s);
 
-  void load();
-
-// signals:
-//   void findStars();
-
-private slots:
-  void on_pixellistTable_customContextMenuRequested(const QPoint &pos);
+  void dockLocationChanged(Qt::DockWidgetArea area);
 
 private:
-  void removeRows();
+  void contextMenuRequested(const QPoint &pos);
+  void save();
 
-  Ui::PixelListWidget *ui;
-  PixelList* pixellist;
+  Ui::LogWidget *ui;
   QMenu* contextMenu;
 };
 
-#endif // PIXELLISTWIDGET_H
+#endif // LOGWIDGET_H

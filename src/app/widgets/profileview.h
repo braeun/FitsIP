@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - widget with the general logging console                             *
+ * FitsIP - widget to display the profiles and associated controls              *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-01-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,43 +20,57 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef LOGWIDGET_H
-#define LOGWIDGET_H
+#ifndef PROFILEVIEW_H
+#define PROFILEVIEW_H
 
+#include <fitsip/core/profile.h>
+#include <QMenu>
 #include <QWidget>
+#include <memory>
 
-class QMenu;
+class FitsObject;
+class ProfileChart;
 
 namespace Ui {
-class LogWidget;
+class ProfileView;
 }
 
-class LogWidget : public QWidget
+class ProfileView : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit LogWidget(QWidget *parent = nullptr);
-  ~LogWidget();
+  explicit ProfileView(QWidget *parent = nullptr);
+  ~ProfileView();
 
-  void add(const QtMsgType type, const QMessageLogContext& context, const QString &message);
+  bool getClickEndsTracking() const;
 
-  void writeStdOut(const QString& s);
+  void setClickEndsTracking(bool newClickEndsTracking);
 
-  void writeStdErr(const QString& s);
+  void setImage(std::shared_ptr<FitsObject> obj);
 
-public slots:
-  void dockLocationChanged(Qt::DockWidgetArea area);
+  void updateCursor(QPoint p);
 
-private slots:
+  void setCursor(QPoint p);
 
-  void on_logBrowser_customContextMenuRequested(const QPoint &pos);
-
-  void on_actionSave_triggered();
+protected:
+  void changeEvent(QEvent* event);
 
 private:
-  Ui::LogWidget *ui;
-  QMenu* contextMenu;
+  void redraw();
+  void logYToggled(bool checked);
+  void settingsChanged();
+  void save();
+
+  Ui::ProfileView *ui;
+  ProfileChart *horizontalProfileWidget;
+  ProfileChart *verticalProfileWidget;
+  std::shared_ptr<FitsObject> image;
+  QPoint cursor;
+  Profile horizontal;
+  Profile vertical;
+  bool clickEndsTracking;
+  QMenu* popupMenu;
 };
 
-#endif // LOGWIDGET_H
+#endif // PROFILEVIEW_H

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the selected/detected star list                   *
  *                                                                              *
- * modified: 2025-08-19                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,66 +20,39 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "starlistwidget.h"
-#include "ui_starlistwidget.h"
-#include "appsettings.h"
-#include <fitsip/core/starlist.h>
-#include <fitsip/core/io/iofactory.h>
-#include <QMenu>
+#ifndef STARLISTWIDGET_H
+#define STARLISTWIDGET_H
 
-StarListWidget::StarListWidget(QWidget *parent) :
-  QWidget(parent),
-  ui(new Ui::StarListWidget)
-{
-  ui->setupUi(this);
-  contextMenu = new QMenu();
-  QAction* load = contextMenu->addAction("Load...");
-  connect(load,&QAction::triggered,this,&StarListWidget::load);
-  QAction* save = contextMenu->addAction("Save...");
-  connect(save,&QAction::triggered,this,&StarListWidget::save);
+#include <QWidget>
+
+class StarList;
+class QMenu;
+
+namespace Ui {
+class StarListWidget;
 }
 
-StarListWidget::~StarListWidget()
+class StarListWidget : public QWidget
 {
-  delete ui;
-}
+  Q_OBJECT
+public:
+  explicit StarListWidget(QWidget *parent = nullptr);
+  ~StarListWidget();
 
-void StarListWidget::setStarList(StarList* list)
-{
-  starlist = list;
-  QItemSelectionModel *m = ui->starlistTable->selectionModel();
-  ui->starlistTable->setModel(list);
-  delete m;
-}
+  void setStarList(StarList* list);
 
-void StarListWidget::clear()
-{
-  starlist->clear();
-}
+  void clear();
 
-void StarListWidget::load()
-{
-  AppSettings settings;
-  QString fn = settings.getOpenFilename(this,AppSettings::PATH_STARLIST,"File list (*.lst);;All files (*)");
-  if (!fn.isNull())
-  {
-    starlist->load(fn);
-  }
-}
+  void save();
 
-void StarListWidget::save()
-{
-  AppSettings settings;
-  QString filter;
-  QString fn = settings.getSaveFilename(this,AppSettings::PATH_STARLIST,IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter,&filter);
-  if (!fn.isNull())
-  {
-    fn = IOFactory::assertSuffix(fn,filter);
-    starlist->save(fn);
-  }
-}
+  void load();
 
-void StarListWidget::on_starlistTable_customContextMenuRequested(const QPoint &pos)
-{
-  contextMenu->popup(ui->starlistTable->mapToGlobal(pos));
-}
+private:
+  void contextMenuRequested(const QPoint &pos);
+
+  Ui::StarListWidget *ui;
+  StarList* starlist;
+  QMenu* contextMenu;
+};
+
+#endif // STARLISTWIDGET_H

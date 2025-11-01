@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - widget with the profiler table                                      *
+ * FitsIP - widget to display the selected/detected star list                   *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,62 +20,67 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#include "profilerwidget.h"
-#include "ui_profilerwidget.h"
+#include "starlistwidget.h"
+#include "ui_starlistwidget.h"
 #include "appsettings.h"
-#include "profilertablemodel.h"
-#include <QFile>
-#include <QFileDialog>
-#include <QTextStream>
+#include <fitsip/core/starlist.h>
+#include <fitsip/core/io/iofactory.h>
 #include <QMenu>
 
-ProfilerWidget::ProfilerWidget(QWidget *parent) :
+StarListWidget::StarListWidget(QWidget *parent) :
   QWidget(parent),
-  ui(new Ui::ProfilerWidget)
+  ui(new Ui::StarListWidget)
 {
   ui->setupUi(this);
-  contextMenu = new QMenu;
-  contextMenu->addAction(ui->actionExport);
-  contextMenu->addSeparator();
-  contextMenu->addAction(ui->actionClear);
-  model = new ProfilerTableModel(this);
-  connect(model,&QAbstractTableModel::layoutChanged,this,[this](){ui->profilerTableView->scrollToBottom();});
-  ui->profilerTableView->setModel(model);
-  ui->profilerTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  connect(ui->actionClear,&QAction::triggered,model,&ProfilerTableModel::clear);
+  connect(ui->starlistTable,&QTableView::customContextMenuRequested,this,&StarListWidget::contextMenuRequested);
+  contextMenu = new QMenu();
+  QAction* load = contextMenu->addAction("Load...");
+  connect(load,&QAction::triggered,this,&StarListWidget::load);
+  QAction* save = contextMenu->addAction("Save...");
+  connect(save,&QAction::triggered,this,&StarListWidget::save);
 }
 
-ProfilerWidget::~ProfilerWidget()
+StarListWidget::~StarListWidget()
 {
   delete ui;
 }
 
-ProfilerTableModel* ProfilerWidget::getModel()
+void StarListWidget::setStarList(StarList* list)
 {
-  return model;
+  starlist = list;
+  QItemSelectionModel *m = ui->starlistTable->selectionModel();
+  ui->starlistTable->setModel(list);
+  delete m;
 }
 
-void ProfilerWidget::on_actionExport_triggered()
+void StarListWidget::clear()
+{
+  starlist->clear();
+}
+
+void StarListWidget::load()
 {
   AppSettings settings;
-  QString fn = settings.getSaveFilename(this,AppSettings::PATH_LOG,"CSV  (*.csv)");
+  QString fn = settings.getOpenFilename(this,AppSettings::PATH_STARLIST,"File list (*.lst);;All files (*)");
   if (!fn.isNull())
   {
-    QFile file(fn);
-    if (file.open(QFile::WriteOnly))
-    {
-      QTextStream s(&file);
-      for (const ProfilerEntry& e : model->getEntries())
-      {
-        s << "\"" << e.profiler << "\",\"" << e.image << "\"," << e.w << "," << e.h << "," << e.t << ",\"" << e.notes << "\"\n";
-      }
-      s.flush();
-    }
-    file.close();
+    starlist->load(fn);
   }
 }
 
-void ProfilerWidget::on_profilerTableView_customContextMenuRequested(const QPoint &pos)
+void StarListWidget::save()
 {
-  contextMenu->popup(ui->profilerTableView->mapToGlobal(pos));
+  AppSettings settings;
+  QString filter;
+  QString fn = settings.getSaveFilename(this,AppSettings::PATH_STARLIST,IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter,&filter);
+  if (!fn.isNull())
+  {
+    fn = IOFactory::assertSuffix(fn,filter);
+    starlist->save(fn);
+  }
+}
+
+void StarListWidget::contextMenuRequested(const QPoint &pos)
+{
+  contextMenu->popup(ui->starlistTable->mapToGlobal(pos));
 }

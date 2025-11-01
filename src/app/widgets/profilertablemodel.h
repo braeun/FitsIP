@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - widget to display the selected/detected star list                   *
+ * FitsIP - table model for the profiler table                                  *
  *                                                                              *
- * modified: 2025-03-08                                                         *
+ * modified: 2022-11-26                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -20,39 +20,41 @@
  * FitsIP. If not, see <https://www.gnu.org/licenses/>.                         *
  ********************************************************************************/
 
-#ifndef STARLISTWIDGET_H
-#define STARLISTWIDGET_H
+#ifndef PROFILERTABLEMODEL_H
+#define PROFILERTABLEMODEL_H
 
-#include <QWidget>
+#include <fitsip/core/profiling/profilerentry.h>
+#include <QAbstractTableModel>
+#include <vector>
 
-class StarList;
-class QMenu;
-
-namespace Ui {
-class StarListWidget;
-}
-
-class StarListWidget : public QWidget
+class ProfilerTableModel : public QAbstractTableModel
 {
   Q_OBJECT
-public:
-  explicit StarListWidget(QWidget *parent = nullptr);
-  ~StarListWidget();
 
-  void setStarList(StarList* list);
+public:
+  explicit ProfilerTableModel(QObject *parent = nullptr);
+
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+  int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+
+  const std::vector<ProfilerEntry>& getEntries() const;
+
+public:
 
   void clear();
 
-  void save();
-
-  void load();
+  void addProfilerResult(QString profiler, QString image, int w, int h, int64_t t, QString notes);
 
 private:
-  void on_starlistTable_customContextMenuRequested(const QPoint &pos);
+  std::vector<ProfilerEntry> entries;
 
-  Ui::StarListWidget *ui;
-  StarList* starlist;
-  QMenu* contextMenu;
+  static std::vector<QString> headers;
+
 };
 
-#endif // STARLISTWIDGET_H
+#endif // PROFILERTABLEMODEL_H

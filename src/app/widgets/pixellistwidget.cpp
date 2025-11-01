@@ -32,6 +32,7 @@ PixelListWidget::PixelListWidget(QWidget *parent):QWidget(parent),
   pixellist(nullptr)
 {
   ui->setupUi(this);
+  connect(ui->pixellistTable,&QTableView::customContextMenuRequested,this,&PixelListWidget::contextMenuRequested);
   contextMenu = new QMenu();
   QAction* load = contextMenu->addAction("Load...");
   connect(load,&QAction::triggered,this,&PixelListWidget::load);
@@ -52,7 +53,7 @@ PixelListWidget::~PixelListWidget()
   delete ui;
 }
 
-void PixelListWidget::on_pixellistTable_customContextMenuRequested(const QPoint &pos)
+void PixelListWidget::contextMenuRequested(const QPoint &pos)
 {
   contextMenu->popup(ui->pixellistTable->mapToGlobal(pos));
 }

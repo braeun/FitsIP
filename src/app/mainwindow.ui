@@ -97,7 +97,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>727</width>
-                 <height>474</height>
+                 <height>476</height>
                 </rect>
                </property>
               </widget>
@@ -458,7 +458,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
+   <widget class="QWidget" name="openFilesDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_6">
      <property name="leftMargin">
       <number>4</number>
@@ -516,7 +516,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2">
+   <widget class="QWidget" name="fileListDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <property name="leftMargin">
       <number>4</number>
@@ -530,9 +530,6 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="FileListWidget" name="fileListWidget" native="true"/>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -543,7 +540,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3">
+   <widget class="QWidget" name="fileSystemDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_9">
      <property name="leftMargin">
       <number>4</number>
@@ -557,20 +554,17 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="FileSystemView" name="fileSystemView" native="true"/>
-     </item>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="consoleDockWidget">
+  <widget class="QDockWidget" name="logDockWidget">
    <property name="windowTitle">
     <string>Log</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_4">
+   <widget class="QWidget" name="logDockContents">
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="leftMargin">
       <number>4</number>
@@ -584,16 +578,6 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="LogWidget" name="logWidget" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -604,7 +588,7 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_5">
+   <widget class="QWidget" name="histogramDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_8">
      <property name="leftMargin">
       <number>4</number>
@@ -618,22 +602,6 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="HistogramView" name="histogramWidget" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>1</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -644,7 +612,7 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_6">
+   <widget class="QWidget" name="profilesDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <property name="leftMargin">
       <number>4</number>
@@ -658,33 +626,23 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="ProfileView" name="profileWidget" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>1</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
   </widget>
   <widget class="QDockWidget" name="metadataDockWidget">
+   <property name="minimumSize">
+    <size>
+     <width>53</width>
+     <height>36</height>
+    </size>
+   </property>
    <property name="windowTitle">
     <string>Metadata</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_7">
+   <widget class="QWidget" name="metadataDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_10">
      <property name="leftMargin">
       <number>4</number>
@@ -698,83 +656,6 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="QTableWidget" name="metadataTable">
-       <property name="editTriggers">
-        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-       </property>
-       <property name="columnCount">
-        <number>1</number>
-       </property>
-       <attribute name="horizontalHeaderVisible">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="horizontalHeaderStretchLastSection">
-        <bool>true</bool>
-       </attribute>
-       <row>
-        <property name="text">
-         <string>Object</string>
-        </property>
-       </row>
-       <row>
-        <property name="text">
-         <string>Date</string>
-        </property>
-       </row>
-       <row>
-        <property name="text">
-         <string>Observer</string>
-        </property>
-       </row>
-       <row>
-        <property name="text">
-         <string>Telescope</string>
-        </property>
-       </row>
-       <row>
-        <property name="text">
-         <string>Instrument</string>
-        </property>
-       </row>
-       <row>
-        <property name="text">
-         <string>Exp. Time</string>
-        </property>
-       </row>
-       <column/>
-       <item row="0" column="0">
-        <property name="text">
-         <string>unknown</string>
-        </property>
-       </item>
-       <item row="1" column="0">
-        <property name="text">
-         <string>unknown</string>
-        </property>
-       </item>
-       <item row="2" column="0">
-        <property name="text">
-         <string>unknown</string>
-        </property>
-       </item>
-       <item row="3" column="0">
-        <property name="text">
-         <string>unknown</string>
-        </property>
-       </item>
-       <item row="4" column="0">
-        <property name="text">
-         <string>unknown</string>
-        </property>
-       </item>
-       <item row="5" column="0">
-        <property name="text">
-         <string>unknown</string>
-        </property>
-       </item>
-      </widget>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -785,7 +666,7 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_8">
+   <widget class="QWidget" name="historyDockCOntents">
     <layout class="QVBoxLayout" name="verticalLayout_11">
      <property name="leftMargin">
       <number>4</number>
@@ -826,7 +707,7 @@
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_9">
+   <widget class="QWidget" name="logbookDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <property name="leftMargin">
       <number>4</number>
@@ -840,9 +721,6 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="LogbookWidget" name="logbookWidget" native="true"/>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -853,7 +731,7 @@
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_10">
+   <widget class="QWidget" name="profilerDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_12">
      <property name="leftMargin">
       <number>4</number>
@@ -867,9 +745,6 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="ProfilerWidget" name="profilerWidget" native="true"/>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -880,7 +755,7 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_11">
+   <widget class="QWidget" name="starlistDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_13">
      <property name="leftMargin">
       <number>4</number>
@@ -894,9 +769,6 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="StarListWidget" name="starlistWidget" native="true"/>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -907,7 +779,7 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_12">
+   <widget class="QWidget" name="pixellistDockContents">
     <layout class="QVBoxLayout" name="verticalLayout_14">
      <property name="leftMargin">
       <number>4</number>
@@ -921,9 +793,6 @@
      <property name="bottomMargin">
       <number>4</number>
      </property>
-     <item>
-      <widget class="PixelListWidget" name="pixellistWidget" native="true"/>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -1328,62 +1197,6 @@
   <zorder>starlistDockWidget</zorder>
   <zorder>pixellistDockWidget</zorder>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>HistogramView</class>
-   <extends>QWidget</extends>
-   <header>histogramview.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ProfileView</class>
-   <extends>QWidget</extends>
-   <header>profileview.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>LogWidget</class>
-   <extends>QWidget</extends>
-   <header>logwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>FileSystemView</class>
-   <extends>QWidget</extends>
-   <header>filesystemview.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>LogbookWidget</class>
-   <extends>QWidget</extends>
-   <header>logbookwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ProfilerWidget</class>
-   <extends>QWidget</extends>
-   <header>profilerwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>StarListWidget</class>
-   <extends>QWidget</extends>
-   <header>starlistwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>PixelListWidget</class>
-   <extends>QWidget</extends>
-   <header>pixellistwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>FileListWidget</class>
-   <extends>QWidget</extends>
-   <header>filelistwidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="icons.qrc"/>
  </resources>

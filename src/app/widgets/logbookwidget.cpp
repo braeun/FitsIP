@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget to display the log book                                      *
  *                                                                              *
- * modified: 2025-02-22                                                         *
+ * modified: 2025-11-012                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -50,8 +50,13 @@ LogbookWidget::LogbookWidget(QWidget *parent):QWidget(parent),
   contextMenu->addSeparator();
   contextMenu->addAction("Delete Selected Entries",this,[=](){remove();});
 
+  connect(ui->filterButton,&QToolButton::clicked,this,&LogbookWidget::doFilter);
+  connect(ui->addNoteButton,&QToolButton::clicked,this,&LogbookWidget::addNote);
+  connect(ui->addProjectButton,&QToolButton::clicked,this,&LogbookWidget::addProject);
+  connect(ui->addStepButton,&QToolButton::clicked,this,&LogbookWidget::addStep);
   connect(ui->projectBox,&QComboBox::currentTextChanged,this,&LogbookWidget::setProject);
   connect(ui->stepBox,&QComboBox::currentTextChanged,this,&LogbookWidget::setStep);
+  connect(ui->logbookTreeWidget,&QTreeWidget::customContextMenuRequested,this,&LogbookWidget::contextMenuRequested);
 }
 
 LogbookWidget::~LogbookWidget()
@@ -549,14 +554,14 @@ void LogbookWidget::editEntry()
   }
 }
 
-void LogbookWidget::on_logbookTreeWidget_customContextMenuRequested(const QPoint &pos)
+void LogbookWidget::contextMenuRequested(const QPoint &pos)
 {
   QList<QTreeWidgetItem*> items = ui->logbookTreeWidget->selectedItems();
   editEntryAction->setEnabled(items.size()==1&&items.front()->childCount()==0);
   contextMenu->popup(ui->logbookTreeWidget->mapToGlobal(pos));
 }
 
-void LogbookWidget::on_addProjectButton_clicked()
+void LogbookWidget::addProject()
 {
   QString p = QInputDialog::getText(this,QApplication::applicationDisplayName(),"New project:");
   if (!p.isEmpty())
@@ -577,7 +582,7 @@ void LogbookWidget::on_addProjectButton_clicked()
 }
 
 
-void LogbookWidget::on_addStepButton_clicked()
+void LogbookWidget::addStep()
 {
   QString p = QInputDialog::getText(this,QApplication::applicationDisplayName(),"New step:");
   if (!p.isEmpty())
@@ -600,7 +605,7 @@ void LogbookWidget::on_addStepButton_clicked()
 
 
 
-void LogbookWidget::on_filterButton_clicked()
+void LogbookWidget::doFilter()
 {
   LogbookFilter1Dialog d(logbook,this);
   if (d.exec())
@@ -609,7 +614,7 @@ void LogbookWidget::on_filterButton_clicked()
   }
 }
 
-void LogbookWidget::on_addNoteButton_clicked()
+void LogbookWidget::addNote()
 {
   AddLogbookEntryDialog d(logbook,this);
   if (d.exec())
@@ -617,3 +622,4 @@ void LogbookWidget::on_addNoteButton_clicked()
     logbook->add(d.getProject(),d.getType(),d.getImage(),d.getText());
   }
 }
+

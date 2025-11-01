@@ -21,7 +21,7 @@
  ********************************************************************************/
 
 #include "mainwindow.h"
-#include "logwidget.h"
+#include "widgets/logwidget.h"
 #include "palettefactory.h"
 #include "appsettings.h"
 #include <fitsip/core/pluginfactory.h>

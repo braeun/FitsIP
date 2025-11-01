@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-10-25                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,8 +23,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "appsettings.h"
-#include "consolewidget.h"
-#include "profilertablemodel.h"
 #ifdef USE_PYTHON
 #include <pythonscript.h>
 #endif
@@ -34,6 +32,18 @@
 #include "dialogs/editmetadatadialog.h"
 #include "dialogs/logbookexportdialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
+#include "widgets/consolewidget.h"
+#include "widgets/filelistwidget.h"
+#include "widgets/filesystemview.h"
+#include "widgets/histogramview.h"
+#include "widgets/logbookwidget.h"
+#include "widgets/logwidget.h"
+#include "widgets/metadatatablewidget.h"
+#include "widgets/pixellistwidget.h"
+#include "widgets/profilertablemodel.h"
+#include "widgets/profilerwidget.h"
+#include "widgets/profileview.h"
+#include "widgets/starlistwidget.h"
 #include <fitsip/core/externaltoolslauncher.h>
 #include <fitsip/core/filelist.h>
 #include <fitsip/core/pixellist.h>
@@ -88,31 +98,53 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   addDockWidget(Qt::BottomDockWidgetArea,consoleDockWidget);
   consoleDockWidget->setWidget(consoleWidget);
 
+  logWidget = new LogWidget();
+  ui->logDockContents->layout()->addWidget(logWidget);
+  logbookWidget = new LogbookWidget();
+  ui->logbookDockContents->layout()->addWidget(logbookWidget);
+  histogramWidget = new HistogramView();
+  ui->histogramDockContents->layout()->addWidget(histogramWidget);
+  profileWidget = new ProfileView();
+  ui->profilesDockContents->layout()->addWidget(profileWidget);
+  profilerWidget = new ProfilerWidget();
+  ui->profilerDockContents->layout()->addWidget(profilerWidget);
+  pixellistWidget = new PixelListWidget();
+  ui->pixellistDockContents->layout()->addWidget(pixellistWidget);
+  starlistWidget = new StarListWidget();
+  ui->starlistDockContents->layout()->addWidget(starlistWidget);
+  filesystemView = new FileSystemView();
+  ui->fileSystemDockContents->layout()->addWidget(filesystemView);
+  filelistWidget = new FileListWidget();
+  ui->fileListDockContents->layout()->addWidget(filelistWidget);
+  metaTableWidget = new MetadataTableWidget();
+  ui->metadataDockContents->layout()->addWidget(metaTableWidget);
+
   imageWidget = new ImageWidget();
   connect(imageWidget,&ImageWidget::setPixel,this,&MainWindow::addPixel);
   connect(imageWidget,&ImageWidget::contextMenuRequested,this,&MainWindow::showImageContextMenu);
   connect(imageWidget,&ImageWidget::cursorMoved,this,&MainWindow::updateCursor);
-  connect(imageWidget,&ImageWidget::cursorMoved,ui->profileWidget,&ProfileView::updateCursor);
-  connect(imageWidget,&ImageWidget::cursorSet,ui->profileWidget,&ProfileView::setCursor);
+  connect(imageWidget,&ImageWidget::cursorMoved,profileWidget,&ProfileView::updateCursor);
+  connect(imageWidget,&ImageWidget::cursorSet,profileWidget,&ProfileView::setCursor);
   connect(imageWidget,&ImageWidget::aoiChanged,this,&MainWindow::updateAOI);
   ui->scrollArea->setWidget(imageWidget);
   ui->scrollArea->setWidgetResizable(true);
   ui->scrollArea->setBackgroundRole(QPalette::Shadow);
-  connect(ui->histogramWidget,&HistogramView::imageScaleChanged,this,&MainWindow::onImageScaleChanged);
+  connect(histogramWidget,&HistogramView::imageScaleChanged,this,&MainWindow::onImageScaleChanged);
 
   chartsWidget = new XYChartsWidget();
   ui->chartPageLayout->addWidget(chartsWidget);
 
-  connect(ui->fileSystemView,&FileSystemView::openFile,this,[this](QString file){open(QFileInfo(file));});
-  connect(ui->fileSystemView,&FileSystemView::runFile,this,[this](QString file){run(QFileInfo(file));});
-  connect(ui->fileSystemView,&FileSystemView::openSelection,this,[this]{openSelection();});
-  connect(ui->fileSystemView,&FileSystemView::copySelectionToFilelist,this,[this]{copySelectionToList();});
-  connect(ui->fileSystemView,&FileSystemView::workingDirChanged,ui->fileListWidget,&FileListWidget::setWorkingDir);
+  connect(filesystemView,&FileSystemView::openFile,this,[this](QString file){open(QFileInfo(file));});
+  connect(filesystemView,&FileSystemView::runFile,this,[this](QString file){run(QFileInfo(file));});
+  connect(filesystemView,&FileSystemView::openSelection,this,[this]{openSelection();});
+  connect(filesystemView,&FileSystemView::copySelectionToFilelist,this,[this]{copySelectionToList();});
+  connect(filesystemView,&FileSystemView::workingDirChanged,filelistWidget,&FileListWidget::setWorkingDir);
 
-  connect(ui->fileListWidget,&FileListWidget::openSelected,this,&MainWindow::fileListOpenSelected);
+  connect(filelistWidget,&FileListWidget::openSelected,this,&MainWindow::fileListOpenSelected);
 
-  connect(ui->consoleDockWidget,&QDockWidget::dockLocationChanged,ui->logWidget,&LogWidget::dockLocationChanged);
-  connect(ui->logbookDockWidget,&QDockWidget::dockLocationChanged,ui->logbookWidget,&LogbookWidget::dockLocationChanged);
+
+  connect(ui->logDockWidget,&QDockWidget::dockLocationChanged,logWidget,&LogWidget::dockLocationChanged);
+  connect(ui->logbookDockWidget,&QDockWidget::dockLocationChanged,logbookWidget,&LogbookWidget::dockLocationChanged);
 
   connect(ui->actionFit_Window,&QAction::triggered,this,[=](){ zoom(0); });
   connect(ui->actionOriginal_Size,&QAction::triggered,this,[=](){ zoom(1); });
@@ -121,9 +153,9 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->action2_1,&QAction::triggered,this,[=](){ zoom(2); });
   connect(ui->action4_1,&QAction::triggered,this,[=](){ zoom(4); });
 
-  connect(ui->actionClear_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::clear);
-  connect(ui->actionClear_Pixel_List,&QAction::triggered,ui->pixellistWidget,&PixelListWidget::clear);
-  connect(ui->actionClear_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::clear);
+  connect(ui->actionClear_File_List,&QAction::triggered,filelistWidget,&FileListWidget::clear);
+  connect(ui->actionClear_Pixel_List,&QAction::triggered,pixellistWidget,&PixelListWidget::clear);
+  connect(ui->actionClear_Star_List,&QAction::triggered,starlistWidget,&StarListWidget::clear);
 
   connect(ui->actionShow_XY_Charts,&QAction::toggled,this,&MainWindow::toggleXYChartDisplay);
 
@@ -149,8 +181,8 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->menuWindow->addSeparator();
   ui->menuWindow->addAction(ui->logbookDockWidget->toggleViewAction());
   ui->logbookDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F10));
-  ui->menuWindow->addAction(ui->consoleDockWidget->toggleViewAction());
-  ui->consoleDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F11));
+  ui->menuWindow->addAction(ui->logDockWidget->toggleViewAction());
+  ui->logDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F11));
   ui->menuWindow->addAction(ui->profilerDockWidget->toggleViewAction());
 //  ui->profilerDockWidget->toggleViewAction()->setShortcut(QKeySequence());
   ui->menuWindow->addAction(consoleDockWidget->toggleViewAction());
@@ -176,19 +208,19 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   }
 
   if (!settings.getLogbook().isEmpty() && settings.isLogbookOpenLast()) openLogbook(settings.getLogbook());
-  ui->logbookWidget->setLogbook(&logbook);
+  logbookWidget->setLogbook(&logbook);
 
   connect(ui->actionActive,&QAction::toggled,&logbook,&Logbook::activate);
 
-  connect(ui->actionLoad_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::load);
-  connect(ui->actionAppend_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::append);
-  connect(ui->actionSave_File_List,&QAction::triggered,ui->fileListWidget,&FileListWidget::save);
-  connect(ui->actionLoad_Pixel_List,&QAction::triggered,ui->pixellistWidget,&PixelListWidget::load);
-  connect(ui->actionSave_Pixel_List,&QAction::triggered,ui->pixellistWidget,&PixelListWidget::save);
-  connect(ui->actionLoad_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::load);
-  connect(ui->actionSave_Star_List,&QAction::triggered,ui->starlistWidget,&StarListWidget::save);
+  connect(ui->actionLoad_File_List,&QAction::triggered,filelistWidget,&FileListWidget::load);
+  connect(ui->actionAppend_File_List,&QAction::triggered,filelistWidget,&FileListWidget::append);
+  connect(ui->actionSave_File_List,&QAction::triggered,filelistWidget,&FileListWidget::save);
+  connect(ui->actionLoad_Pixel_List,&QAction::triggered,pixellistWidget,&PixelListWidget::load);
+  connect(ui->actionSave_Pixel_List,&QAction::triggered,pixellistWidget,&PixelListWidget::save);
+  connect(ui->actionLoad_Star_List,&QAction::triggered,starlistWidget,&StarListWidget::load);
+  connect(ui->actionSave_Star_List,&QAction::triggered,starlistWidget,&StarListWidget::save);
 
-  connect(IOFactory::getInstance(),&IOFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
+  connect(IOFactory::getInstance(),&IOFactory::logProfilerResult,profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
 
   QActionGroup* grp = new QActionGroup(this);
   ui->actionTable->setActionGroup(grp);
@@ -196,32 +228,32 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->actionTree_By_Project->setActionGroup(grp);
   ui->actionTree_By_Project_and_Date->setActionGroup(grp);
   ui->actionTree_By_Project_and_Step->setActionGroup(grp);
-  connect(ui->actionTable,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::Table);});
-  connect(ui->actionBy_Date,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByDate);});
-  connect(ui->actionTree_By_Project,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByProject);});
-  connect(ui->actionTree_By_Project_and_Date,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByProjectByDate);});
-  connect(ui->actionTree_By_Project_and_Step,&QAction::triggered,this,[=](bool checked){if (checked) ui->logbookWidget->setDisplay(LogbookWidget::TreeByProjectByStep);});
+  connect(ui->actionTable,&QAction::triggered,this,[=](bool checked){if (checked) logbookWidget->setDisplay(LogbookWidget::Table);});
+  connect(ui->actionBy_Date,&QAction::triggered,this,[=](bool checked){if (checked) logbookWidget->setDisplay(LogbookWidget::TreeByDate);});
+  connect(ui->actionTree_By_Project,&QAction::triggered,this,[=](bool checked){if (checked) logbookWidget->setDisplay(LogbookWidget::TreeByProject);});
+  connect(ui->actionTree_By_Project_and_Date,&QAction::triggered,this,[=](bool checked){if (checked) logbookWidget->setDisplay(LogbookWidget::TreeByProjectByDate);});
+  connect(ui->actionTree_By_Project_and_Step,&QAction::triggered,this,[=](bool checked){if (checked) logbookWidget->setDisplay(LogbookWidget::TreeByProjectByStep);});
   switch (settings.getLogwidgetStyle())
   {
     case 0:
       ui->actionTable->setChecked(true);
-      ui->logbookWidget->setDisplay(LogbookWidget::Table);
+      logbookWidget->setDisplay(LogbookWidget::Table);
       break;
     case 1:
       ui->actionBy_Date->setChecked(true);
-      ui->logbookWidget->setDisplay(LogbookWidget::TreeByDate);
+      logbookWidget->setDisplay(LogbookWidget::TreeByDate);
       break;
     case 2:
       ui->actionTree_By_Project->setChecked(true);
-      ui->logbookWidget->setDisplay(LogbookWidget::TreeByProject);
+      logbookWidget->setDisplay(LogbookWidget::TreeByProject);
       break;
     case 3:
       ui->actionTree_By_Project_and_Date->setChecked(true);
-      ui->logbookWidget->setDisplay(LogbookWidget::TreeByProjectByDate);
+      logbookWidget->setDisplay(LogbookWidget::TreeByProjectByDate);
       break;
     case 4:
       ui->actionTree_By_Project_and_Step->setChecked(true);
-      ui->logbookWidget->setDisplay(LogbookWidget::TreeByProjectByStep);
+      logbookWidget->setDisplay(LogbookWidget::TreeByProjectByStep);
       break;
   }
   ui->actionShow_Selected_Pixels->setChecked(settings.isShowPixellist());
@@ -229,7 +261,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
 
   ui->actionRun_Script->setEnabled(false);
 
-  ui->fileListWidget->setWorkingDir(ui->fileSystemView->getRoot());
+  filelistWidget->setWorkingDir(filesystemView->getRoot());
 }
 
 MainWindow::~MainWindow()
@@ -244,17 +276,17 @@ void MainWindow::initialize(PluginFactory* factory)
 {
   pluginFactory = factory;
   defaultPixelList = std::make_unique<PixelList>();
-  ui->pixellistWidget->setPixelList(defaultPixelList.get());
+  pixellistWidget->setPixelList(defaultPixelList.get());
 //  connect(ui->pixellistWidget,&PixelListWidget::findStars,this,&MainWindow::getStarlistFromPixellist);
   defaultStarList = std::make_unique<StarList>();
-  ui->starlistWidget->setStarList(defaultStarList.get());
+  starlistWidget->setStarList(defaultStarList.get());
   imageCollection = std::make_unique<ImageCollection>();
   //  scriptInterface = std::make_unique<ScriptInterface>();
   selectedFileList = std::make_unique<FileList>();
-  ui->fileListWidget->setFileList(selectedFileList.get());
+  filelistWidget->setFileList(selectedFileList.get());
   ui->openFileList->setModel(imageCollection.get());
   connect(pluginFactory,&PluginFactory::logOperation,this,&MainWindow::logPluginOperation);
-  connect(pluginFactory,&PluginFactory::logProfilerResult,ui->profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
+  connect(pluginFactory,&PluginFactory::logProfilerResult,profilerWidget->getModel(),&ProfilerTableModel::addProfilerResult);
   loadPlugins();
 #ifdef USE_PYTHON
   script = std::make_unique<PythonScript>(this,pluginFactory);
@@ -269,7 +301,7 @@ void MainWindow::initialize(PluginFactory* factory)
 
 LogWidget* MainWindow::getLogWidget()
 {
-  return ui->logWidget;
+  return logWidget;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -415,7 +447,7 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   OpPluginData data;
   data.aoi = imageWidget->getAOI();
-  data.previewOptions.scale = static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale());
+  data.previewOptions.scale = static_cast<FitsImage::Scale>(histogramWidget->getImageScale());
   data.imageCollection = imageCollection.get();
   data.pixellist = (activeFile) ? activeFile->getPixelList() : defaultPixelList.get();
   data.starlist = (activeFile) ? activeFile->getStarList() : defaultStarList.get();
@@ -501,11 +533,11 @@ std::vector<QFileInfo> MainWindow::getFileList()
 {
   int src = -1;
   QStringList files;
-  if (ui->fileSystemView->isVisible())
+  if (filesystemView->isVisible())
   {
-    files = ui->fileSystemView->getSelectedFiles();
+    files = filesystemView->getSelectedFiles();
   }
-  if (ui->fileListWidget->isVisible() && selectedFileList && !selectedFileList->getFiles().empty())
+  if (filelistWidget->isVisible() && selectedFileList && !selectedFileList->getFiles().empty())
   {
     src = 0;
   }
@@ -587,8 +619,8 @@ void MainWindow::display(std::shared_ptr<FitsObject> file)
   {
     QFileInfo info(file->getFilename());
     ui->activeFileLabel->setText(info.fileName());
-    ui->pixellistWidget->setPixelList(file->getPixelList());
-    ui->starlistWidget->setStarList(file->getStarList());
+    pixellistWidget->setPixelList(file->getPixelList());
+    starlistWidget->setStarList(file->getStarList());
   }
   else
   {
@@ -603,13 +635,13 @@ void MainWindow::updateDisplay()
   SimpleProfiler profiler("UpdateDisplay");
   profiler.start();
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
-  ui->histogramWidget->setImage(activeFile);
-  ui->profileWidget->setImage(activeFile);
+  histogramWidget->setImage(activeFile);
+  profileWidget->setImage(activeFile);
   if (activeFile)
   {
-    double scaleMin = ui->histogramWidget->getScaleMin();
-    double scaleMax = ui->histogramWidget->getScaleMax();
-    FitsImage::Scale scale = static_cast<FitsImage::Scale>(ui->histogramWidget->getImageScale());
+    double scaleMin = histogramWidget->getScaleMin();
+    double scaleMax = histogramWidget->getScaleMax();
+    FitsImage::Scale scale = static_cast<FitsImage::Scale>(histogramWidget->getImageScale());
     QImage tmp = activeFile->getImage()->toQImage(scaleMin,scaleMax,scale);
     imageWidget->setImage(tmp,activeFile->getPixelList(),activeFile->getStarList());
     if (!ui->scrollArea->widgetResizable()) imageWidget->adjustSize();
@@ -638,7 +670,7 @@ void MainWindow::updateDisplay()
   profiler.stop();
   if (activeFile)
   {
-    ui->profilerWidget->getModel()->addProfilerResult(QString::fromStdString(profiler.getName()),
+    profilerWidget->getModel()->addProfilerResult(QString::fromStdString(profiler.getName()),
                                                       activeFile->getImage()->getName(),
                                                       activeFile->getImage()->getWidth(),
                                                       activeFile->getImage()->getHeight(),
@@ -649,16 +681,11 @@ void MainWindow::updateDisplay()
 
 void MainWindow::updateMetadata()
 {
+  metaTableWidget->setFile(imageCollection->getActiveFile());
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
     const ImageMetadata& metadata = activeFile->getImage()->getMetadata();
-    ui->metadataTable->item(0,0)->setText(metadata.getObject());
-    ui->metadataTable->item(1,0)->setText(metadata.getObsDateTime().toString(Qt::ISODate));
-    ui->metadataTable->item(2,0)->setText(metadata.getObserver());
-    ui->metadataTable->item(3,0)->setText(metadata.getTelescope());
-    ui->metadataTable->item(4,0)->setText(metadata.getInstrument());
-    ui->metadataTable->item(5,0)->setText(QString::number(metadata.getExposureTime()));
     int first = ui->historyTable->rowCount();
     ui->historyTable->setRowCount(metadata.getHistory().size());
     for (int i=first;i<metadata.getHistory().size();i++)
@@ -782,7 +809,7 @@ void MainWindow::openImage(const QFileInfo &fileinfo)
 
 void MainWindow::openSelection()
 {
-  for (const QString& file : ui->fileSystemView->getSelectedFiles())
+  for (const QString& file : filesystemView->getSelectedFiles())
   {
     open(QFileInfo(file));
   }
@@ -791,7 +818,7 @@ void MainWindow::openSelection()
 void MainWindow::copySelectionToList()
 {
   std::vector<QFileInfo> filelist;
-  for (const QString& file : ui->fileSystemView->getSelectedFiles())
+  for (const QString& file : filesystemView->getSelectedFiles())
   {
     if (IOFactory::getInstance()->isImage(file))
     {
@@ -818,7 +845,7 @@ void MainWindow::fileListDoubleClicked(int index)
 
 void MainWindow::fileListOpenSelected()
 {
-  std::vector<QFileInfo> list = ui->fileListWidget->getSelection();
+  std::vector<QFileInfo> list = filelistWidget->getSelection();
   for (const QFileInfo& file : list) openImage(file);
 }
 
@@ -832,7 +859,7 @@ void MainWindow::openLogbook(const QString &name)
     {
       logbook.open(s);
       ui->logbookDockWidget->setWindowTitle("Logbook - "+logbook.getTitle());
-      ui->logbookWidget->setLogbook(&logbook);
+      logbookWidget->setLogbook(&logbook);
       settings.setLogbook(name);
     }
     else
@@ -951,8 +978,8 @@ void MainWindow::setScriptOutput()
   {
     if (AppSettings().isScriptOutputToLogwidget())
     {
-      scriptOutConnection = connect(script.get(),&Script::stdoutAvailable,ui->logWidget,&LogWidget::writeStdOut);
-      scriptErrConnection = connect(script.get(),&Script::stderrAvailable,ui->logWidget,&LogWidget::writeStdErr);
+      scriptOutConnection = connect(script.get(),&Script::stdoutAvailable,logWidget,&LogWidget::writeStdOut);
+      scriptErrConnection = connect(script.get(),&Script::stderrAvailable,logWidget,&LogWidget::writeStdErr);
     }
     else
     {
@@ -964,12 +991,12 @@ void MainWindow::setScriptOutput()
 
 std::string MainWindow::getWorkingDir() const
 {
-  return ui->fileSystemView->getRoot().toStdString();
+  return filesystemView->getRoot().toStdString();
 }
 
 void MainWindow::setWorkingDir(const std::string& dir)
 {
-  ui->fileSystemView->setRoot(QString::fromStdString(dir));
+  filesystemView->setRoot(QString::fromStdString(dir));
 }
 
 std::shared_ptr<FitsObject> MainWindow::get(const std::string& filename)
@@ -977,7 +1004,7 @@ std::shared_ptr<FitsObject> MainWindow::get(const std::string& filename)
   QFileInfo fileinfo(QString::fromStdString(filename));
   if (!fileinfo.isAbsolute())
   {
-    fileinfo = QFileInfo(ui->fileSystemView->getRoot()+"/"+QString::fromStdString(filename));
+    fileinfo = QFileInfo(filesystemView->getRoot()+"/"+QString::fromStdString(filename));
   }
   return imageCollection->getFile(fileinfo.absoluteFilePath());
 }
@@ -992,7 +1019,7 @@ std::shared_ptr<FitsObject> MainWindow::load(const std::string& filename)
   QFileInfo fileinfo(QString::fromStdString(filename));
   if (!fileinfo.isAbsolute())
   {
-    fileinfo = QFileInfo(ui->fileSystemView->getRoot()+"/"+QString::fromStdString(filename));
+    fileinfo = QFileInfo(filesystemView->getRoot()+"/"+QString::fromStdString(filename));
   }
   IOHandler* handler = IOFactory::getInstance()->getHandler(fileinfo.absoluteFilePath());
   if (handler)
@@ -1022,7 +1049,7 @@ bool MainWindow::save(std::shared_ptr<FitsObject> obj, const std::string& filena
   QFileInfo fileinfo(QString::fromStdString(filename));
   if (!fileinfo.isAbsolute())
   {
-    fileinfo = QFileInfo(ui->fileSystemView->getRoot()+"/"+QString::fromStdString(filename));
+    fileinfo = QFileInfo(filesystemView->getRoot()+"/"+QString::fromStdString(filename));
   }
   try
   {
@@ -1244,8 +1271,8 @@ void MainWindow::on_actionClose_Image_triggered()
   }
   else
   {
-    ui->pixellistWidget->setPixelList(defaultPixelList.get());
-    ui->starlistWidget->setStarList(defaultStarList.get());
+    pixellistWidget->setPixelList(defaultPixelList.get());
+    starlistWidget->setStarList(defaultStarList.get());
     display(std::shared_ptr<FitsObject>());
   }
 }
@@ -1254,8 +1281,8 @@ void MainWindow::on_actionClose_All_Images_triggered()
 {
   /* first remove image from various displays! */
   display(std::shared_ptr<FitsObject>());
-  ui->pixellistWidget->setPixelList(defaultPixelList.get());
-  ui->starlistWidget->setStarList(defaultStarList.get());
+  pixellistWidget->setPixelList(defaultPixelList.get());
+  starlistWidget->setStarList(defaultStarList.get());
   imageCollection->removeAll();
 }
 
@@ -1266,8 +1293,8 @@ void MainWindow::on_actionPreferences_triggered()
   {
     dlg->commit();
     AppSettings settings;
-    ui->logbookWidget->rebuild();
-    ui->profileWidget->setClickEndsTracking(settings.isProfileStopTracking());
+    logbookWidget->rebuild();
+    profileWidget->setClickEndsTracking(settings.isProfileStopTracking());
     setScriptOutput();
     db::configure(settings);
   }
@@ -1377,7 +1404,7 @@ void MainWindow::on_actionClose_Logbook_triggered()
 {
   logbook.close();
   ui->logbookDockWidget->setWindowTitle("Logbook - not open");
-  ui->logbookWidget->rebuild();
+  logbookWidget->rebuild();
 }
 
 void MainWindow::on_actionProperties_triggered()

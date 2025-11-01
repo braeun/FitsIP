@@ -197,9 +197,9 @@ std::shared_ptr<FitsImage> FitsIO::load(CCfits::HDU* hdu, QString basename, cons
     first += w * h;
   }
 
+  ImageMetadata metadata;
   if (dynamic_cast<CCfits::ExtHDU*>(hdu))
   {
-    ImageMetadata metadata;
     hdu->readAllKeys();
     const std::map<std::string,CCfits::Keyword*>& keywords = hdu->keyWord();
     std::string v;
@@ -226,20 +226,24 @@ std::shared_ptr<FitsImage> FitsIO::load(CCfits::HDU* hdu, QString basename, cons
     }
     QString history = QString::fromStdString(hdu->history());
     metadata.setHistory(history.split("\n"));
-    img->setMetadata(metadata);
-    /* special handling for starlight xpress which stores unsigned 16bit */
-    if (metadata.getInstrument().toLower().contains("starlight xpress") && hdu->bitpix() == 16)
+  }
+  else
+  {
+    metadata = basedata;
+  }
+  img->setMetadata(metadata);
+  /* special handling for starlight xpress which stores unsigned 16bit */
+  if (metadata.getInstrument().toLower().contains("starlight xpress") && hdu->bitpix() == 16)
+  {
+    PixelIterator it = img->getPixelIterator();
+    while (true)
     {
-      PixelIterator it = img->getPixelIterator();
-      while (true)
+      for (long i=0;i<depth;i++)
       {
-        for (long i=0;i<depth;i++)
-        {
-          if (it[i] < 0) it[i] += 0x10000;
-        }
-        if (!it.hasNext()) break;
-        ++it;
+        if (it[i] < 0) it[i] += 0x10000;
       }
+      if (!it.hasNext()) break;
+      ++it;
     }
   }
   return img;

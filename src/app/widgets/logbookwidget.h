@@ -25,7 +25,6 @@
 
 #include <fitsip/core/logbook/logbookfilter.h>
 #include <QWidget>
-#include <set>
 
 class Logbook;
 class LogbookEntry;
@@ -51,22 +50,14 @@ public:
 
   void setDisplay(Display d);
 
-public slots:
   void dockLocationChanged(Qt::DockWidgetArea area);
 
-private slots:
-
-  void on_logbookTreeWidget_customContextMenuRequested(const QPoint &pos);
-
-  void on_addProjectButton_clicked();
-
-  void on_addStepButton_clicked();
-
-  void on_filterButton_clicked();
-
-  void on_addNoteButton_clicked();
-
 private:
+  void contextMenuRequested(const QPoint &pos);
+  void addProject();
+  void addStep();
+  void doFilter();
+  void addNote();
   void assignProjectStep(QTreeWidgetItem* item, const QString& project, const QString& step);
   void assignProjectStep();
   void remove(QTreeWidgetItem* item);
