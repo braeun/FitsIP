@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-11-01                                                         *
+ * modified: 2025-11-02                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -36,6 +36,7 @@
 #include "widgets/filelistwidget.h"
 #include "widgets/filesystemview.h"
 #include "widgets/histogramview.h"
+#include "widgets/historytablewidget.h"
 #include "widgets/logbookwidget.h"
 #include "widgets/logwidget.h"
 #include "widgets/metadatatablewidget.h"
@@ -118,6 +119,8 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->fileListDockContents->layout()->addWidget(filelistWidget);
   metaTableWidget = new MetadataTableWidget();
   ui->metadataDockContents->layout()->addWidget(metaTableWidget);
+  historyTableWidget = new HistoryTableWidget();
+  ui->historyDockContents->layout()->addWidget(historyTableWidget);
 
   imageWidget = new ImageWidget();
   connect(imageWidget,&ImageWidget::setPixel,this,&MainWindow::addPixel);
@@ -613,8 +616,7 @@ void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, 
 void MainWindow::display(std::shared_ptr<FitsObject> file)
 {
   imageCollection->setActiveFile(file);
-  ui->historyTable->clearContents();
-  ui->historyTable->setRowCount(0);
+  historyTableWidget->clear();
   if (file)
   {
     QFileInfo info(file->getFilename());
@@ -682,22 +684,7 @@ void MainWindow::updateDisplay()
 void MainWindow::updateMetadata()
 {
   metaTableWidget->setFile(imageCollection->getActiveFile());
-  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
-  if (activeFile)
-  {
-    const ImageMetadata& metadata = activeFile->getImage()->getMetadata();
-    int first = ui->historyTable->rowCount();
-    ui->historyTable->setRowCount(metadata.getHistory().size());
-    for (int i=first;i<metadata.getHistory().size();i++)
-    {
-      ui->historyTable->setItem(i,0,new QTableWidgetItem(metadata.getHistory()[i]));
-    }
-  }
-  else
-  {
-    ui->historyTable->clearContents();
-    ui->historyTable->setRowCount(0);
-  }
+  historyTableWidget->setFile(imageCollection->getActiveFile());
 }
 
 void MainWindow::run(const QFileInfo &fileinfo)

@@ -51,6 +51,7 @@ class FileList;
 class FileListWidget;
 class FileSystemView;
 class HistogramView;
+class HistoryTableWidget;
 class LogbookWidget;
 class LogWidget;
 class MetadataTableWidget;
@@ -221,6 +222,7 @@ private:
   FileSystemView* filesystemView;
   FileListWidget* filelistWidget;
   HistogramView* histogramWidget;
+  HistoryTableWidget* historyTableWidget;
   LogbookWidget* logbookWidget;
   LogWidget* logWidget;
   MetadataTableWidget* metaTableWidget;

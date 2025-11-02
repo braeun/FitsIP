@@ -24,6 +24,7 @@ add_executable(fits
   widgets/filelistwidget.h widgets/filelistwidget.cpp widgets/filelistwidget.ui
   widgets/filesystemview.h widgets/filesystemview.cpp widgets/filesystemview.ui
   widgets/histogramview.h widgets/histogramview.cpp widgets/histogramview.ui
+  widgets/historytablewidget.h widgets/historytablewidget.cpp
   widgets/imagewidget.h widgets/imagewidget.cpp
   widgets/metadatatablewidget.h widgets/metadatatablewidget.cpp widgets/metadatatablewidget.ui
   widgets/logbookwidget.h widgets/logbookwidget.cpp widgets/logbookwidget.ui

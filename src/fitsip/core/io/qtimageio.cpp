@@ -173,7 +173,7 @@ void QtImageIO::readExif(QString filename, ImageMetadata* data)
 {
   /* cannot handle files inside the Qt resource system */
   if (filename.startsWith(":")) return;
-  Exiv2::Image::AutoPtr image = Exiv2::ImageFactory::open(filename.toStdString());
+  auto image = Exiv2::ImageFactory::open(filename.toStdString());
   if (image.get() == nullptr) return;
   image->readMetadata();
   const Exiv2::ExifData &exifData = image->exifData();
@@ -238,9 +238,8 @@ void QtImageIO::readExif(QString filename, ImageMetadata* data)
 
 void QtImageIO::writeExif(QString filename, std::shared_ptr<FitsImage> img)
 {
-  Exiv2::Image::AutoPtr image;
   try {
-    image = Exiv2::ImageFactory::open(filename.toStdString());
+    auto image = Exiv2::ImageFactory::open(filename.toStdString());
     image->readMetadata();
     Exiv2::ExifData& exifData = image->exifData();
     Exiv2::AsciiValue sv(img->getMetadata().getObserver().toStdString());

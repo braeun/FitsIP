@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to edit image metadata                                       *
  *                                                                              *
- * modified: 2025-03-14                                                         *
+ * modified: 2025-11-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,7 @@ EditMetadataDialog::EditMetadataDialog(QWidget *parent) :
   ui(new Ui::EditMetadataDialog)
 {
   ui->setupUi(this);
+  ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 EditMetadataDialog::~EditMetadataDialog()
