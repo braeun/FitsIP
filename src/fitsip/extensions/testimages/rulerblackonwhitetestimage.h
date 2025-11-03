@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - test image with a ruloer                                            *
  *                                                                              *
- * modified: 2025-08-27                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -45,7 +45,7 @@ public:
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  std::shared_ptr<FitsImage> img;
+  std::shared_ptr<FitsObject> obj;
 };
 
 #endif // RULERBLACKONWHITETESTIMAGE_H

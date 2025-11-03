@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - FITS image format reader and writer                                 *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,6 +23,7 @@
 #include "fitsio.h"
 #include "../fitstypes.h"
 #include "../fitsimage.h"
+#include "../fitsobject.h"
 #include "../settings.h"
 #include <CCfits/FITSUtil.h>
 #include <QDate>
@@ -42,7 +43,7 @@ FitsIO::~FitsIO()
 {
 }
 
-std::vector<std::shared_ptr<FitsImage>> FitsIO::read(QString filename)
+std::vector<std::shared_ptr<FitsObject>> FitsIO::read(QString filename)
 {
   QFileInfo info(filename);
   try
@@ -71,11 +72,15 @@ std::vector<std::shared_ptr<FitsImage>> FitsIO::read(QString filename)
     QString history = QString::fromStdString(fits.pHDU().history());
     metadata.setHistory(history.split("\n"));
 
-    std::vector<std::shared_ptr<FitsImage>> list;
+    std::vector<std::shared_ptr<FitsObject>> list;
     if (fits.pHDU().axes() >= 2)
     {
       auto img = load(&fits.pHDU(),info.baseName(),metadata);
-      if (img) list.push_back(img);
+      if (img)
+      {
+        auto obj = std::make_shared<FitsObject>(img,info.absolutePath()+"/"+img->getName()+"."+info.suffix());
+        list.push_back(obj);
+      }
     }
     if (fits.pHDU().extend())
     {
@@ -85,7 +90,11 @@ std::vector<std::shared_ptr<FitsImage>> FitsIO::read(QString filename)
         fits.extension(i).readKey("XTENSION",v);
         if (v.find("IMAGE") == std::string::npos) continue;
         auto img = load(&fits.extension(i),info.baseName(),metadata);
-        if (img) list.push_back(img);
+        if (img)
+        {
+          auto obj = std::make_shared<FitsObject>(img,info.absolutePath()+"/"+img->getName()+"."+info.suffix());
+          list.push_back(obj);
+        }
       }
     }
 
@@ -111,10 +120,11 @@ std::vector<std::shared_ptr<FitsImage>> FitsIO::read(QString filename)
   }
 }
 
-bool FitsIO::write(QString filename, std::shared_ptr<FitsImage> img)
+bool FitsIO::write(QString filename, FitsObject* obj)
 {
   Settings settings;
   int format = settings.getFitsImageFormat();
+  FitsImage* img = obj->getImage().get();
   CCfits::FITS* fits = nullptr;
   try
   {

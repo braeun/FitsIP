@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - DSLR raw image format reader                                        *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,7 @@
 
 #include "rawio.h"
 #include "../fitsimage.h"
+#include "../fitsobject.h"
 #include <QFileInfo>
 
 const char* RawIO::FILENAME_FILTER = "Canon Raw Data (*.crw);;Other Raw Data (*)";
@@ -41,7 +42,7 @@ bool RawIO::handlesFile(const QString &filename)
   return err == LIBRAW_SUCCESS;
 }
 
-std::vector<std::shared_ptr<FitsImage>> RawIO::read(QString filename)
+std::vector<std::shared_ptr<FitsObject>> RawIO::read(QString filename)
 {
   QFileInfo info(filename);
   profiler.start();
@@ -99,13 +100,13 @@ std::vector<std::shared_ptr<FitsImage>> RawIO::read(QString filename)
     img->setMetadata(meta);
     profiler.stop();
     logProfiler(img,"read");
-    return {img};
+    return {std::make_shared<FitsObject>(img,filename)};
   }
   else
     throw std::runtime_error("Failed to load image");
 }
 
-bool RawIO::write(QString /*filename*/, std::shared_ptr<FitsImage> /*img*/)
+bool RawIO::write(QString /*filename*/, FitsObject* /*img*/)
 {
   throw std::runtime_error("Writing to raw format not supported.");
 }

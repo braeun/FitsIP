@@ -34,9 +34,9 @@ public:
   FitsIO();
   ~FitsIO() override;
 
-  virtual std::vector<std::shared_ptr<FitsImage>> read(QString filename) override;
+  virtual std::vector<std::shared_ptr<FitsObject>> read(QString filename) override;
 
-  virtual bool write(QString filename, std::shared_ptr<FitsImage> img) override;
+  virtual bool write(QString filename, FitsObject* obj) override;
 
   static const char* FILENAME_FILTER;
 

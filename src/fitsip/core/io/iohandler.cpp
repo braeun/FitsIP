@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for image I/O handlers                           *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,7 @@
 
 #include "iohandler.h"
 #include "../fitsimage.h"
+#include "../fitsobject.h"
 #include <QDebug>
 
 IOHandler::IOHandler(QObject* parent):QObject(parent)
@@ -30,6 +31,13 @@ IOHandler::IOHandler(QObject* parent):QObject(parent)
 
 IOHandler::~IOHandler()
 {
+}
+
+bool IOHandler::write(QString filename, FitsImage* img)
+{
+  auto copy = std::make_shared<FitsImage>(*img);
+  auto obj = std::make_shared<FitsObject>(copy,filename);
+  return write(filename,obj.get());
 }
 
 void IOHandler::logProfiler(const QString& image, const QString& msg)
@@ -48,6 +56,16 @@ void IOHandler::logProfiler(std::shared_ptr<FitsImage> image, const QString& msg
     QString name = QString::fromStdString(profiler.getName());
     emit logProfilerResult(name,image->getName(),image->getWidth(),image->getHeight(),profiler.getDuration(),msg);
 //    qInfo() << profiler.toString().c_str();
+  }
+}
+
+void IOHandler::logProfiler(FitsImage* image, const QString& msg)
+{
+  if (profiler.getDuration() > 0)
+  {
+    QString name = QString::fromStdString(profiler.getName());
+    emit logProfilerResult(name,image->getName(),image->getWidth(),image->getHeight(),profiler.getDuration(),msg);
+    //    qInfo() << profiler.toString().c_str();
   }
 }
 

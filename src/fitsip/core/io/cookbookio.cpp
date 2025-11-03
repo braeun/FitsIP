@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Cookbook CCD image reader                                           *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,7 @@
 
 #include "cookbookio.h"
 #include "../fitsimage.h"
+#include "../fitsobject.h"
 #include <QDataStream>
 #include <QFile>
 #include <QFileInfo>
@@ -39,14 +40,14 @@ CookbookIO::~CookbookIO()
 {
 }
 
-std::vector<std::shared_ptr<FitsImage>> CookbookIO::read(QString filename)
+std::vector<std::shared_ptr<FitsObject>> CookbookIO::read(QString filename)
 {
   QString suffix = QFileInfo(filename).suffix().toLower();
-  if (suffix.endsWith("a")) return {readPA(filename)};
-  return {readP1(filename)};
+  if (suffix.endsWith("a")) return {std::make_shared<FitsObject>(readPA(filename),filename)};
+  return {std::make_shared<FitsObject>(readP1(filename),filename)};
 }
 
-bool CookbookIO::write(QString /*filename*/, std::shared_ptr<FitsImage> /*img*/)
+bool CookbookIO::write(QString /*filename*/, FitsObject* /*obj*/)
 {
   throw std::runtime_error("Writing to Cookbook format not supported.");
 }

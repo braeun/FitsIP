@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for image I/O handlers                           *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -29,6 +29,7 @@
 #include <memory>
 
 class FitsImage;
+class FitsObject;
 class QWidget;
 
 class IOHandler: public QObject
@@ -38,9 +39,19 @@ public:
   IOHandler(QObject* parent=nullptr);
   virtual ~IOHandler();
 
-  virtual std::vector<std::shared_ptr<FitsImage>> read(QString filename) = 0;
+  virtual std::vector<std::shared_ptr<FitsObject>> read(QString filename) = 0;
 
-  virtual bool write(QString filename, std::shared_ptr<FitsImage> img) = 0;
+  virtual bool write(QString filename, FitsObject* obj) = 0;
+
+  /**
+   * @brief Convenience method!
+   *
+   * This method make a temporary copy of the image.
+   * @param filename
+   * @param img
+   * @return
+   */
+  virtual bool write(QString filename, FitsImage* img);
 
 signals:
   void logProfilerResult(QString profiler, QString image, int w, int h, int64_t t, QString notes);
@@ -49,6 +60,8 @@ protected:
   void logProfiler(const QString& image, const QString& msg="");
 
   void logProfiler(std::shared_ptr<FitsImage> image, const QString& msg="");
+
+  void logProfiler(FitsImage* image, const QString& msg="");
 
   SimpleProfiler profiler;
 

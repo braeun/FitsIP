@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - reader and writer for image formats handled by Qt                   *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,7 @@
 
 #include "qtimageio.h"
 #include "../fitsimage.h"
+#include "../fitsobject.h"
 #include "../histogram.h"
 #include "../settings.h"
 #include <QFileInfo>
@@ -41,7 +42,7 @@ QtImageIO::~QtImageIO()
 {
 }
 
-std::vector<std::shared_ptr<FitsImage>> QtImageIO::read(QString filename)
+std::vector<std::shared_ptr<FitsObject>> QtImageIO::read(QString filename)
 {
   profiler.start();
   QImage i(filename);
@@ -89,14 +90,15 @@ std::vector<std::shared_ptr<FitsImage>> QtImageIO::read(QString filename)
   img->setMetadata(data);
   profiler.stop();
   logProfiler(img,"read");
-  return {img};
+  return {std::make_shared<FitsObject>(img,filename)};
 }
 
-bool QtImageIO::write(QString filename, std::shared_ptr<FitsImage> img)
+bool QtImageIO::write(QString filename, FitsObject* obj)
 {
   profiler.start();
+  FitsImage* img = obj->getImage().get();
   Histogram h;
-  h.build(img.get());
+  h.build(img);
   QImage i = img->toQImage(h.getMin(),h.getMax(),FitsImage::LINEAR);
   if (!i.save(filename)) return false;
   if (Settings().isWriteMetadataFile()) writeMetadata(filename,img->getMetadata());
@@ -236,7 +238,7 @@ void QtImageIO::readExif(QString filename, ImageMetadata* data)
   image.reset();
 }
 
-void QtImageIO::writeExif(QString filename, std::shared_ptr<FitsImage> img)
+void QtImageIO::writeExif(QString filename, FitsImage* img)
 {
   try {
     auto image = Exiv2::ImageFactory::open(filename.toStdString());

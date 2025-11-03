@@ -173,7 +173,7 @@ SharpnessData MeasureSharpness::evaluate(const QFileInfo info, QRect selection) 
   if (!handler) return SharpnessData();
   try
   {
-    auto img = handler->read(info.absoluteFilePath()).front();
+    auto img = handler->read(info.absoluteFilePath()).front()->getImage();
     SharpnessData data = calculateSharpness(img,selection);
     data.info = info;
     data.filename = info.absoluteFilePath().toStdString();

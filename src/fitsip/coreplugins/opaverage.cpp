@@ -98,11 +98,11 @@ OpPlugin::ResultType OpAverage::add(const QFileInfo& file)
   {
     if (!img)
     {
-      img = std::make_shared<FitsImage>("average",*handler->read(file.absoluteFilePath()).front());
+      img = std::make_shared<FitsImage>("average",*handler->read(file.absoluteFilePath()).front()->getImage());
     }
     else
     {
-      *img += *handler->read(file.absoluteFilePath()).front();
+      *img += *handler->read(file.absoluteFilePath()).front()->getImage();
     }
     log(img,"Added image "+file.fileName());
   }

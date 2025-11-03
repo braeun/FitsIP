@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - test image with a ruler                                             *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -45,7 +45,7 @@ bool RulerWhiteOnBlackTestImage::requiresFileList() const
 
 std::vector<std::shared_ptr<FitsObject>> RulerWhiteOnBlackTestImage::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
+  return std::vector<std::shared_ptr<FitsObject>>{obj};
 }
 
 
@@ -61,8 +61,8 @@ OpPlugin::ResultType RulerWhiteOnBlackTestImage::execute(std::shared_ptr<FitsObj
   {
     try
     {
-    img = handler->read(image_file).front();
-    return OK;
+      obj = handler->read(image_file).front();
+      return OK;
     }
     catch (std::exception& ex)
     {

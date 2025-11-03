@@ -166,7 +166,7 @@ OpPlugin::ResultType OpStack::prepare(const QFileInfo& file, bool subsky)
   }
   try
   {
-    img = std::make_shared<FitsImage>("stack",*handler->read(file.absoluteFilePath()).front());
+    img = std::make_shared<FitsImage>("stack",*handler->read(file.absoluteFilePath()).front()->getImage());
     if (subtractSky)
     {
       Histogram hist;
@@ -215,7 +215,7 @@ OpPlugin::ResultType OpStack::stack(const QFileInfo &file)
   }
   try
   {
-    auto img1 = handler->read(file.absoluteFilePath()).front();
+    auto img1 = handler->read(file.absoluteFilePath()).front()->getImage();
     if (subtractSky)
     {
       Histogram hist;
@@ -245,7 +245,7 @@ OpPlugin::ResultType OpStack::stackTemplate(const QFileInfo &file)
   }
   try
   {
-    auto img1 = handler->read(file.absoluteFilePath()).front();
+    auto img1 = handler->read(file.absoluteFilePath()).front()->getImage();
     if (subtractSky)
     {
       Histogram hist;
@@ -278,7 +278,7 @@ OpPlugin::ResultType OpStack::stackStarMatch(const QFileInfo &file)
   }
   try
   {
-    auto img1 = handler->read(file.absoluteFilePath()).front();
+    auto img1 = handler->read(file.absoluteFilePath()).front()->getImage();
     if (subtractSky)
     {
       Histogram hist;

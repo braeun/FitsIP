@@ -79,7 +79,7 @@ bool PSFFactory::addPSF(const std::shared_ptr<FitsImage>& img, const QString fil
   Histogram hist;
   hist.build(tmp.get());
   *tmp /= hist.getBrightness();
-  bool ret =handler->write(file.absoluteFilePath(),tmp);
+  bool ret =handler->write(file.absoluteFilePath(),tmp.get());
   if (ret)
   {
     list.push_back(std::make_shared<ImagePSF>(file.absoluteFilePath()));

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - reader and writer for image formats handled by Qt                   *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -33,9 +33,9 @@ public:
   QtImageIO();
   ~QtImageIO() override;
 
-  virtual std::vector<std::shared_ptr<FitsImage>> read(QString filename) override;
+  virtual std::vector<std::shared_ptr<FitsObject>> read(QString filename) override;
 
-  virtual bool write(QString filename, std::shared_ptr<FitsImage> img) override;
+  virtual bool write(QString filename, FitsObject* obj) override;
 
   static const char* FILENAME_FILTER;
 
@@ -44,7 +44,7 @@ private:
   void writeMetadata(QString filename, const ImageMetadata& data);
 #ifdef HAVE_EXIV2
   void readExif(QString filename, ImageMetadata* data);
-  void writeExif(QString filename, std::shared_ptr<FitsImage> img);
+  void writeExif(QString filename, FitsImage* img);
 #endif
 };
 

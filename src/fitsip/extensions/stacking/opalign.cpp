@@ -111,7 +111,7 @@ OpPlugin::ResultType OpAlign::prepare(const QFileInfo& file, QRect aoi)
   std::shared_ptr<FitsImage> img;
   try
   {
-    img = handler->read(file.absoluteFilePath()).front();
+    img = handler->read(file.absoluteFilePath()).front()->getImage();
     save(img,outputPath,file,"aligned");
   }
   catch (std::exception& ex)
@@ -142,7 +142,7 @@ OpPlugin::ResultType OpAlign::align(const QFileInfo &file)
   }
   try
   {
-    std::shared_ptr<FitsImage> img1 = handler->read(file.absoluteFilePath()).front();
+    std::shared_ptr<FitsImage> img1 = handler->read(file.absoluteFilePath()).front()->getImage();
     matcher.computeMatch(img1);
     OpShift shift;
     shift.shift(img1,-matcher.getDx(),-matcher.getDy());

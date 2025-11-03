@@ -21,6 +21,7 @@
  ********************************************************************************/
 
 #include "imagepsf.h"
+#include "../fitsobject.h"
 #include "../io/iofactory.h"
 #include <QFileInfo>
 
@@ -51,7 +52,7 @@ void ImagePSF::init()
     IOHandler* handler = IOFactory::getInstance()->getHandler(filename);
     if (handler)
     {
-      img = handler->read(filename).front();
+      img = handler->read(filename).front()->getImage();
     }
     if (!img)
     {

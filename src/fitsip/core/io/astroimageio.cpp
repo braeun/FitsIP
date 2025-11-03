@@ -1,8 +1,8 @@
 /********************************************************************************
  *                                                                              *
- * FitsIP - astro image format reader and writer                                *
+ * FitsIP - astro image format reader                                           *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -22,6 +22,7 @@
 
 #include "astroimageio.h"
 #include "../fitsimage.h"
+#include "../fitsobject.h"
 #include <QDataStream>
 #include <QFile>
 #include <QFileInfo>
@@ -50,7 +51,7 @@ AstroImageIO::~AstroImageIO()
 {
 }
 
-std::vector<std::shared_ptr<FitsImage>> AstroImageIO::read(QString filename)
+std::vector<std::shared_ptr<FitsObject>> AstroImageIO::read(QString filename)
 {
   QFileInfo info(filename);
   profiler.start();
@@ -78,10 +79,10 @@ std::vector<std::shared_ptr<FitsImage>> AstroImageIO::read(QString filename)
   }
   profiler.stop();
   logProfiler(img,"read");
-  return {img};
+  return {std::make_shared<FitsObject>(img,filename)};
 }
 
-bool AstroImageIO::write(QString /*filename*/, std::shared_ptr<FitsImage> /*img*/)
+bool AstroImageIO::write(QString /*filename*/, FitsObject* /*img*/)
 {
   throw std::runtime_error("Writing to astro image format not supported.");
 }

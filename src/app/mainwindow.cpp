@@ -772,18 +772,17 @@ void MainWindow::openImage(const QFileInfo &fileinfo)
       {
         QMessageBox::warning(this,QApplication::applicationDisplayName(),"The file contains no images!");
       }
-      for (const std::shared_ptr<FitsImage>& image : images)
+      ui->openFileList->selectionModel()->clearSelection();
+      for (const std::shared_ptr<FitsObject>& obj : images)
       {
-        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absolutePath()+"/"+image->getName()+"."+fileinfo.suffix());
-        imageCollection->addFile(file);
-        ui->openFileList->selectionModel()->clearSelection();
-        ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
-  //      ui->scrollArea->setWidgetResizable(false);
-        display(file);
+        imageCollection->addFile(obj);
         if (AppSettings().isLogbookLogOpen())
-          logbook.add(LogbookEntry::Op,image->getName(),"Loaded from file "+fileinfo.absoluteFilePath());
+          logbook.add(LogbookEntry::Op,obj->getImage()->getName(),"Loaded from file "+fileinfo.absoluteFilePath());
       }
       QApplication::restoreOverrideCursor();
+      ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
+      //      ui->scrollArea->setWidgetResizable(false);
+      display(imageCollection->getFile(imageCollection->rowCount()-1));
     }
     catch (std::exception& ex)
     {
@@ -1019,9 +1018,7 @@ std::shared_ptr<FitsObject> MainWindow::load(const std::string& filename)
     {
       auto images = handler->read(fileinfo.absoluteFilePath());
       /* TODO: Handle multiple images loaded from a single file */
-      std::shared_ptr<FitsImage> image = images.front();
-      std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absoluteFilePath());
-      return file;
+      return images.front();
     }
     catch (std::exception& ex)
     {

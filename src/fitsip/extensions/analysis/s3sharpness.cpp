@@ -179,7 +179,7 @@ S3SharpnessData S3Sharpness::evaluate(const QFileInfo info, QRect selection)
   if (!handler) return S3SharpnessData();
   try
   {
-    auto img = handler->read(info.absoluteFilePath()).front();
+    auto img = handler->read(info.absoluteFilePath()).front()->getImage();
     if (!selection.isEmpty())
     {
       log("subimage");

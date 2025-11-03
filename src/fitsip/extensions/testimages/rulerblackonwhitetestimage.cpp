@@ -45,7 +45,7 @@ bool RulerBlackOnWhiteTestImage::requiresFileList() const
 
 std::vector<std::shared_ptr<FitsObject>> RulerBlackOnWhiteTestImage::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
+  return std::vector<std::shared_ptr<FitsObject>>{obj};
 }
 
 
@@ -61,8 +61,8 @@ OpPlugin::ResultType RulerBlackOnWhiteTestImage::execute(std::shared_ptr<FitsObj
   {
     try
     {
-    img = handler->read(image_file).front();
-    return OK;
+      obj = handler->read(image_file).front();
+      return OK;
     }
     catch (std::exception& ex)
     {

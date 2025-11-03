@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image calibration with flatfield and dark image                     *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,7 +28,6 @@
 #include <fitsip/core/fitsobject.h>
 #include <fitsip/core/fitsimage.h>
 #include <fitsip/core/io/iofactory.h>
-#include <algorithm>
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
@@ -102,7 +101,7 @@ OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, 
       if (img)
       {
         QString name = QString("%1%2%3.fts").arg(dlg->getPrefix()).arg(img->getName()).arg(dlg->getSuffix());
-        handler->write(dir.filePath(name),img);
+        handler->write(dir.filePath(name),img.get());
       }
     }
     catch (const std::exception& ex)
@@ -120,7 +119,7 @@ std::shared_ptr<FitsImage> OpCalibration::calibrate(const QFileInfo& info, std::
 {
   IOHandler* handler = IOFactory::getInstance()->getHandler(info.absoluteFilePath());
   if (!handler) return std::shared_ptr<FitsImage>();
-  auto img = handler->read(info.absoluteFilePath()).front();
+  auto img = handler->read(info.absoluteFilePath()).front()->getImage();
   if (darkframe)
   {
     *img -= *darkframe->getImage();

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Lucy Richardson deconvolution                                       *
  *                                                                              *
- * modified: 2025-06-06                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -181,11 +181,11 @@ void LucyRichardsonDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, c
     {
       QString fnc = "c_" + QString::number(niter-remain) + ".fts";
       IOHandler *io = IOFactory::getInstance()->getHandler(fnc);
-      io->write(fnc,c);
+      io->write(fnc,c.get());
       QString fns = "s_" + QString::number(niter-remain) + ".fts";
-      io->write(fns,s);
+      io->write(fns,s.get());
       QString fno = "o_" + QString::number(niter-remain) + ".fts";
-      io->write(fno,o);
+      io->write(fno,o.get());
     }
     if (prog)
     {
