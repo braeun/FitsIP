@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-11-02                                                         *
+ * modified: 2025-11-03                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -92,6 +92,11 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   openFileListMenu->addSeparator();
   openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
 
+  imageContextMenu = new QMenu;
+  imageContextMenu->addAction("Add Pixel",this,[=](){addPixel(imageContextMenuAnchor);});
+  imageContextMenu->addSeparator();
+  imageContextMenu->addAction("Annotate...",this,[=](){annotate(imageContextMenuAnchor);});
+
   QDockWidget *consoleDockWidget = new QDockWidget(tr("Script Console"), this);
   consoleDockWidget->setObjectName("console");
   consoleDockWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
@@ -123,7 +128,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->historyDockContents->layout()->addWidget(historyTableWidget);
 
   imageWidget = new ImageWidget();
-  connect(imageWidget,&ImageWidget::setPixel,this,&MainWindow::addPixel);
+  connect(imageWidget,&ImageWidget::setPixel,this,[this](QPoint p){if (selectionMode == SelectPixel) addPixel(p);});
   connect(imageWidget,&ImageWidget::contextMenuRequested,this,&MainWindow::showImageContextMenu);
   connect(imageWidget,&ImageWidget::cursorMoved,this,&MainWindow::updateCursor);
   connect(imageWidget,&ImageWidget::cursorMoved,profileWidget,&ProfileView::updateCursor);
@@ -769,7 +774,7 @@ void MainWindow::openImage(const QFileInfo &fileinfo)
       }
       for (const std::shared_ptr<FitsImage>& image : images)
       {
-        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absoluteFilePath());
+        std::shared_ptr<FitsObject> file = std::make_shared<FitsObject>(image,fileinfo.absolutePath()+"/"+image->getName()+"."+fileinfo.suffix());
         imageCollection->addFile(file);
         ui->openFileList->selectionModel()->clearSelection();
         ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
@@ -882,14 +887,11 @@ void MainWindow::zoom(int z)
 
 void MainWindow::addPixel(QPoint p)
 {
-  if (selectionMode == SelectPixel)
+  std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
+  if (activeFile)
   {
-    std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
-    if (activeFile)
-    {
-      Pixel pixel = activeFile->getImage()->getPixel(p.x(),p.y());
-      activeFile->getPixelList()->addPixel(pixel);
-    }
+    Pixel pixel = activeFile->getImage()->getPixel(p.x(),p.y());
+    activeFile->getPixelList()->addPixel(pixel);
   }
 }
 
@@ -917,6 +919,8 @@ void MainWindow::updateAOI(QRect r)
 void MainWindow::showImageContextMenu(QPoint mouse, QPoint pixel)
 {
   qInfo() << mouse << pixel;
+  imageContextMenuAnchor = pixel;
+  imageContextMenu->popup(imageWidget->mapToGlobal(mouse));
 }
 
 void MainWindow::runScriptCmd(const QString& cmd)
@@ -1468,3 +1472,7 @@ void MainWindow::on_actionPlugins_triggered()
   d->deleteLater();
 }
 
+void MainWindow::annotate(QPoint pixel)
+{
+  qInfo() << "annotate not implemented" << pixel;
+}

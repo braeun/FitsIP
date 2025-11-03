@@ -208,9 +208,12 @@ private:
   void setScriptOutput();
   void getStarlistFromPixellist();
   void toggleXYChartDisplay(bool flag);
+  void annotate(QPoint pixel);
 
   Ui::MainWindow *ui;
   QMenu* openFileListMenu;
+  QMenu* imageContextMenu;
+  QPoint imageContextMenuAnchor; /* position of the context menu in image coordinates */
   std::unique_ptr<FileList> selectedFileList;
   std::unique_ptr<ImageCollection> imageCollection;
   PluginFactory* pluginFactory;
