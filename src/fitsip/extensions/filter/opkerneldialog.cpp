@@ -78,7 +78,7 @@ void OpKernelDialog::on_kernelBox_currentTextChanged(const QString&)
     if (kernel.isEmpty()) return ;
     auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
     OpKernel op;
-    op.convolve(img,kernel);
+    op.convolve(img.get(),kernel);
     previewWidget->updatePreview(img);
   }
 }

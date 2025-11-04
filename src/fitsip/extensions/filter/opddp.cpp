@@ -65,7 +65,7 @@ void OpDDP::bindPython(void* mod) const
 OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpDDPDialog();
-  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImageShared(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();
@@ -89,12 +89,12 @@ OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, const OpP
   return CANCELLED;
 }
 
-void OpDDP::ddp(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType bkg, ValueType a, ValueType b) const
+void OpDDP::ddp(FitsImage* image, ValueType sigma, ValueType bkg, ValueType a, ValueType b) const
 {
   auto i1 = std::make_shared<FitsImage>(*image);
   *i1 -= bkg;
   OpGaussBlur blur;
-  blur.blur(i1,sigma,sigma);
+  blur.blur(i1.get(),sigma,sigma);
   *i1 += a;
   *image += b;
   *image /= *i1;

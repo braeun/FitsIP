@@ -120,7 +120,7 @@ OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsObject> image, co
   return CANCELLED;
 }
 
-void MeasureMatch::setTemplate(std::shared_ptr<FitsImage> image, QRect a)
+void MeasureMatch::setTemplate(FitsImage* image, QRect a)
 {
   aoi = a;
   if (aoi.isEmpty()) /* if no AOI specified, use the center of the image as the template */
@@ -149,7 +149,7 @@ void MeasureMatch::setTemplate(std::shared_ptr<FitsImage> image, QRect a)
   }
   else
   {
-    img = image;
+    img = std::make_shared<FitsImage>(*image);
   }
   R.clear();
   for (int i=0;i<aoi.height();i++)
@@ -178,7 +178,7 @@ void MeasureMatch::setTemplate(std::shared_ptr<FitsImage> image, QRect a)
 /*
  * Computes the match between the image I and the template image R
  */
-void MeasureMatch::computeMatch(std::shared_ptr<FitsImage> image)
+void MeasureMatch::computeMatch(FitsImage* image)
 {
   createI(image);
   int xMax = width - aoi.width();
@@ -304,7 +304,7 @@ void MeasureMatch::shiftAOI(double dx, double dy)
 
 
 
-void MeasureMatch::createI(std::shared_ptr<FitsImage> image)
+void MeasureMatch::createI(FitsImage* image)
 {
   std::shared_ptr<FitsImage> img;
   if (factor > 1)
@@ -314,7 +314,7 @@ void MeasureMatch::createI(std::shared_ptr<FitsImage> image)
   }
   else
   {
-    img = image;
+    img = std::make_shared<FitsImage>(*image);
   }
   offsetX = 0;
   offsetY = 0;

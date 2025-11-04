@@ -173,8 +173,8 @@ SharpnessData MeasureSharpness::evaluate(const QFileInfo info, QRect selection) 
   if (!handler) return SharpnessData();
   try
   {
-    auto img = handler->read(info.absoluteFilePath()).front()->getImage();
-    SharpnessData data = calculateSharpness(img,selection);
+    auto img = handler->read(info.absoluteFilePath()).front()->getImageShared();
+    SharpnessData data = calculateSharpness(img.get(),selection);
     data.info = info;
     data.filename = info.absoluteFilePath().toStdString();
     return data;
@@ -185,7 +185,7 @@ SharpnessData MeasureSharpness::evaluate(const QFileInfo info, QRect selection) 
   return SharpnessData();
 }
 
-SharpnessData MeasureSharpness::calculateSharpness(std::shared_ptr<FitsImage> img, QRect selection) const
+SharpnessData MeasureSharpness::calculateSharpness(FitsImage* img, QRect selection) const
 {
   SharpnessData data;
   auto copy = std::make_shared<FitsImage>(*img);
@@ -199,7 +199,7 @@ SharpnessData MeasureSharpness::calculateSharpness(std::shared_ptr<FitsImage> im
   /* apply laplacian */
   OpKernel op;
   const Kernel& kernel = KernelRepository::instance().getKernel(KernelRepository::LAPLACIAN);
-  op.convolve(copy,kernel);
+  op.convolve(copy.get(),kernel);
   /* ignore borders */
   QRect r(5,5,img->getWidth()-10,img->getHeight()-10);
   copy = copy->subImage(r);
@@ -236,5 +236,5 @@ void MeasureSharpness::copyToLog()
   {
     s += entry.info.fileName() + ": " + QString::number(entry.variance) + "\n";
   }
-  log(std::shared_ptr<FitsImage>(),s);
+  log(nullptr,s);
 }

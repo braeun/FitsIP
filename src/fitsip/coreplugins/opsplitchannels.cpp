@@ -93,7 +93,7 @@ OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsObject> image,
   return OK;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpSplitChannels::split(std::shared_ptr<FitsImage> image) const
+std::vector<std::shared_ptr<FitsImage>> OpSplitChannels::split(FitsImage* image) const
 {
   std::vector<std::shared_ptr<FitsImage>> list{
     std::make_shared<FitsImage>(image->getName()+"_R",image->getWidth(),image->getHeight(),1),

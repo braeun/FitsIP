@@ -114,7 +114,7 @@ OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsObject> image, const 
   return CANCELLED;
 }
 
-void OpRotate::rotate90cw(std::shared_ptr<FitsImage> image) const
+void OpRotate::rotate90cw(FitsImage* image) const
 {
   FitsImage img(image->getName(),image->getHeight(),image->getWidth(),image->getDepth());
   img.setMetadata(image->getMetadata());
@@ -133,7 +133,7 @@ void OpRotate::rotate90cw(std::shared_ptr<FitsImage> image) const
   *image = img;
 }
 
-void OpRotate::rotate90ccw(std::shared_ptr<FitsImage> image) const
+void OpRotate::rotate90ccw(FitsImage* image) const
 {
   FitsImage img(image->getName(),image->getHeight(),image->getWidth(),image->getDepth());
   img.setMetadata(image->getMetadata());
@@ -152,7 +152,7 @@ void OpRotate::rotate90ccw(std::shared_ptr<FitsImage> image) const
   *image = img;
 }
 
-void OpRotate::rotate(std::shared_ptr<FitsImage> image, ValueType angle, bool crop) const
+void OpRotate::rotate(FitsImage* image, ValueType angle, bool crop) const
 {
   if (fabs(angle) < 0.001f) return;
   int wt = image->getWidth();

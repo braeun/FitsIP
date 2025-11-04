@@ -69,7 +69,7 @@ void S3Sharpness::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("calc_sharpness",[this](std::shared_ptr<FitsObject> obj){
-    auto result = calculateSharpness(obj->getImage().get(),contrast_t1,contrast_t2);
+    auto result = calculateSharpness(obj->getImage(),contrast_t1,contrast_t2);
     if (result.images.size() < 3)
     {
       return std::make_tuple(result.s3,std::shared_ptr<FitsObject>(),std::shared_ptr<FitsObject>(),std::shared_ptr<FitsObject>());
@@ -147,7 +147,7 @@ OpPlugin::ResultType S3Sharpness::execute(const std::vector<std::shared_ptr<Fits
       QApplication::processEvents();
       if (prog->isCancelled()) break;
     }
-    auto img = obj->getImage();
+    auto img = obj->getImageShared();
     if (!data.aoi.isEmpty())
     {
       log("subimage");
@@ -179,7 +179,7 @@ S3SharpnessData S3Sharpness::evaluate(const QFileInfo info, QRect selection)
   if (!handler) return S3SharpnessData();
   try
   {
-    auto img = handler->read(info.absoluteFilePath()).front()->getImage();
+    auto img = handler->read(info.absoluteFilePath()).front()->getImageShared();
     if (!selection.isEmpty())
     {
       log("subimage");
@@ -501,5 +501,5 @@ void S3Sharpness::copyToLog()
   {
     s += entry.info.fileName() + ": " + QString::number(entry.s3) + "\n";
   }
-  log(std::shared_ptr<FitsImage>(),s);
+  log(nullptr,s);
 }

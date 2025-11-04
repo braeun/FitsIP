@@ -71,7 +71,7 @@ public:
 
 private:
   SharpnessData evaluate(const QFileInfo info, QRect selection) const;
-  SharpnessData calculateSharpness(std::shared_ptr<FitsImage> img, QRect selection=QRect()) const;
+  SharpnessData calculateSharpness(FitsImage* img, QRect selection=QRect()) const;
   void copyToLog();
 
   MeasureSharpnessResultDialog* resultDialog;

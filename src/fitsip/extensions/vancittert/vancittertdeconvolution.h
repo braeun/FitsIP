@@ -55,7 +55,7 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  void deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf, const std::vector<ValueType>& par, int niter, bool progress=false, bool storeintermediate=false, QString path="");
+  void deconvolve(FitsImage* image, const PSF* psf, const std::vector<ValueType>& par, int niter, bool progress=false, bool storeintermediate=false, QString path="");
 
 private:
   struct fftdata

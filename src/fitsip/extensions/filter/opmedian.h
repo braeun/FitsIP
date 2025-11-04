@@ -46,7 +46,7 @@ public:
   virtual void bindPython(void* m) const override;
 #endif
 
-  void filter(std::shared_ptr<FitsImage> image, ValueType threshold, int size) const;
+  void filter(FitsImage* image, ValueType threshold, int size) const;
 
 private:
   OpMedianDialog* dlg;

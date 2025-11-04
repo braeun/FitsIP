@@ -71,7 +71,12 @@ QString  FitsObject::getFilename() const
   return filename;
 }
 
-std::shared_ptr<FitsImage> FitsObject::getImage() const
+FitsImage* FitsObject::getImage() const
+{
+  return image.get();
+}
+
+std::shared_ptr<FitsImage> FitsObject::getImageShared() const
 {
   return image;
 }

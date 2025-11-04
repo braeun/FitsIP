@@ -133,7 +133,7 @@ OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, const 
   return CANCELLED;
 }
 
-std::shared_ptr<FitsImage> OpResize::resize(std::shared_ptr<FitsImage> image, double factorx, double factory, int mode) const
+std::shared_ptr<FitsImage> OpResize::resize(FitsImage* image, double factorx, double factory, int mode) const
 {
   if (mode == 0)
   {
@@ -145,23 +145,24 @@ std::shared_ptr<FitsImage> OpResize::resize(std::shared_ptr<FitsImage> image, do
   {
     return shrink(image,factorx,factory);
   }
-  else if (factorx < 1)
+  std::shared_ptr<FitsImage> img;
+  if (factorx < 1)
   {
-    image = shrink(image,factorx,1.0);
+    img = shrink(image,factorx,1.0);
     factorx = 1.0;
   }
   else if (factory < 1)
   {
-    image = shrink(image,1.0,factory);
+    img = shrink(image,1.0,factory);
     factory = 1.0;
   }
   if (mode == 1)
   {
-    return growNearestNeighbor(image,factorx,factory);
+    return growNearestNeighbor(img.get(),factorx,factory);
   }
   else //if (mode == 2)
   {
-    return growBilinear(image,factorx,factory);
+    return growBilinear(img.get(),factorx,factory);
   }
 }
 
@@ -242,7 +243,7 @@ std::shared_ptr<FitsImage> OpResize::resize(std::shared_ptr<FitsImage> image, do
 //  return img;
 //}
 
-std::shared_ptr<FitsImage> OpResize::shrink(std::shared_ptr<FitsImage> image, double factorx, double factory) const
+std::shared_ptr<FitsImage> OpResize::shrink(FitsImage* image, double factorx, double factory) const
 {
   double sx = 1 / factorx;
   double sy = 1 / factory;
@@ -308,7 +309,7 @@ std::shared_ptr<FitsImage> OpResize::shrink(std::shared_ptr<FitsImage> image, do
   return img;
 }
 
-std::shared_ptr<FitsImage> OpResize::growNearestNeighbor(std::shared_ptr<FitsImage> image, double factorx, double factory) const
+std::shared_ptr<FitsImage> OpResize::growNearestNeighbor(FitsImage* image, double factorx, double factory) const
 {
   int w = static_cast<int>(image->getWidth() * factorx);
   int h = static_cast<int>(image->getHeight() * factory);
@@ -334,7 +335,7 @@ std::shared_ptr<FitsImage> OpResize::growNearestNeighbor(std::shared_ptr<FitsIma
   return img;
 }
 
-std::shared_ptr<FitsImage> OpResize::growBilinear(std::shared_ptr<FitsImage> image, double factorx, double factory) const
+std::shared_ptr<FitsImage> OpResize::growBilinear(FitsImage* image, double factorx, double factory) const
 {
   int w = static_cast<int>(image->getWidth() * factorx);
   int h = static_cast<int>(image->getHeight() * factory);

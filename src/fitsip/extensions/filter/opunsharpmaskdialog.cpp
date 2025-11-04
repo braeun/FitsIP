@@ -86,7 +86,7 @@ void OpUnsharpMaskDialog::updatePreview()
   {
     auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
     OpUnsharpMask op;
-    op.unsharpmask(img,getSigma(),getStrength());
+    op.unsharpmask(img.get(),getSigma(),getStrength());
     previewWidget->updatePreview(img);
   }
 }

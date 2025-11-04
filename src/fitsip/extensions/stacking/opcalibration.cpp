@@ -119,17 +119,17 @@ std::shared_ptr<FitsImage> OpCalibration::calibrate(const QFileInfo& info, std::
 {
   IOHandler* handler = IOFactory::getInstance()->getHandler(info.absoluteFilePath());
   if (!handler) return std::shared_ptr<FitsImage>();
-  auto img = handler->read(info.absoluteFilePath()).front()->getImage();
+  auto img = handler->read(info.absoluteFilePath()).front()->getImageShared();
   if (darkframe)
   {
     *img -= *darkframe->getImage();
-    log(img,"Subtracted darkframe '"+darkframe->getImage()->getName()+"'");
+    log(img.get(),"Subtracted darkframe '"+darkframe->getImage()->getName()+"'");
   }
   if (flatfield)
   {
     *img /= *flatfield->getImage();
     *img *= mean;
-    log(img,"Divided flatfield '"+flatfield->getImage()->getName()+"'");
+    log(img.get(),"Divided flatfield '"+flatfield->getImage()->getName()+"'");
   }
   return img;
 }

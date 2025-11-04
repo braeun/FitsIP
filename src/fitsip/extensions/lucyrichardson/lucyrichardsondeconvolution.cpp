@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Lucy Richardson deconvolution                                       *
  *                                                                              *
- * modified: 2025-11-03                                                         *
+ * modified: 2025-11-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -105,7 +105,7 @@ OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsOb
   return CANCELLED;
 }
 
-void LucyRichardsonDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf,
+void LucyRichardsonDeconvolution::deconvolve(FitsImage* image, const PSF* psf,
                                              const std::vector<ValueType>& par, int niter,
                                              bool progress, bool storeintermediate)
 {

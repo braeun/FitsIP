@@ -46,7 +46,7 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  void unsharpmask(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType strength) const;
+  void unsharpmask(FitsImage* image, ValueType sigma, ValueType strength) const;
 
 private:
   OpUnsharpMaskDialog* dlg;

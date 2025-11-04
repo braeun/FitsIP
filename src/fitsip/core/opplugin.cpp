@@ -92,9 +92,9 @@ void OpPlugin::setError(const QString &err)
   error = err;
 }
 
-OpPlugin::ResultType OpPlugin::save(std::shared_ptr<FitsImage> image, const QString& outputpath, const QFileInfo &info, const QString& tag)
+OpPlugin::ResultType OpPlugin::save(FitsImage* image, const QString& outputpath, const QFileInfo &info, const QString& tag)
 {
-  return save(std::make_shared<FitsObject>(image),outputpath,info,tag);
+  return save(std::make_shared<FitsObject>(std::make_shared<FitsImage>(*image)),outputpath,info,tag);
 }
 
 OpPlugin::ResultType OpPlugin::save(std::shared_ptr<FitsObject> image, const QString& outputpath, const QFileInfo &info, const QString& tag)
@@ -117,7 +117,7 @@ void OpPlugin::log(const QString &msg)
   emit logOperation("",msg);
 }
 
-void OpPlugin::log(std::shared_ptr<FitsImage> image, const QString &msg)
+void OpPlugin::log(FitsImage* image, const QString &msg)
 {
   if (image)
   {
@@ -142,7 +142,7 @@ void OpPlugin::logProfiler(const QString& image, const QString& msg)
   }
 }
 
-void OpPlugin::logProfiler(std::shared_ptr<FitsImage> image, const QString& msg)
+void OpPlugin::logProfiler(FitsImage* image, const QString& msg)
 {
   if (profiler.getDuration() > 0)
   {

@@ -53,7 +53,7 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  void blur(std::shared_ptr<FitsImage> image, ValueType sigmax, ValueType sigmay, ValueType accuracy=0.1) const;
+  void blur(FitsImage* image, ValueType sigmax, ValueType sigmay, ValueType accuracy=0.1) const;
 
   /**
    * @brief Creates a 1-dimensional normalized Gaussian kernel with standard deviation sigma

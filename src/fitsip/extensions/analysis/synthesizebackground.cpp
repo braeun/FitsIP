@@ -52,7 +52,7 @@ OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> i
 {
   if (!dlg) dlg = new SynthesizeBackgroundDialog();
   Histogram hist;
-  hist.build(image->getImage().get());
+  hist.build(image->getImage());
   dlg->setSky(hist.getAverage(0.75));
   if (dlg->exec())
   {
@@ -82,14 +82,14 @@ OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> i
     }
     img = createImage(image->getImage()->getWidth(),image->getImage()->getHeight(),coeff,deg);
     profiler.stop();
-    log(img,"Synthesized Background");
-    logProfiler(img);
+    log(img.get(),"Synthesized Background");
+    logProfiler(img.get());
     return OK;
   }
   return CANCELLED;
 }
 
-std::vector<Pixel> SynthesizeBackground::getRandomPoints(std::shared_ptr<FitsImage> image, uint32_t n, double bkg)
+std::vector<Pixel> SynthesizeBackground::getRandomPoints(FitsImage* image, uint32_t n, double bkg)
 {
   std::vector<Pixel> list;
   std::uniform_int_distribution<std::mt19937::result_type> distW(0,image->getWidth()-1);
@@ -107,7 +107,7 @@ std::vector<Pixel> SynthesizeBackground::getRandomPoints(std::shared_ptr<FitsIma
   return list;
 }
 
-std::vector<Pixel> SynthesizeBackground::getGridPoints(std::shared_ptr<FitsImage> image, uint32_t n, double bkg)
+std::vector<Pixel> SynthesizeBackground::getGridPoints(FitsImage* image, uint32_t n, double bkg)
 {
   std::vector<Pixel> list;
   uint32_t nx = static_cast<uint32_t>(sqrt(n));

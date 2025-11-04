@@ -46,7 +46,7 @@ public:
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  void flip(std::shared_ptr<FitsImage> img) const;
+  void flip(FitsImage* img) const;
 };
 
 #endif // OPFLIPX_H

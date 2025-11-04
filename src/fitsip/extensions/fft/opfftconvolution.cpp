@@ -51,7 +51,7 @@ OpPlugin::ResultType OpFFTConvolution::execute(std::shared_ptr<FitsObject> image
       try
       {
         profiler.start();
-        auto img = fftconvolution(image->getImage().get(),psf,psfpar);
+        auto img = fftconvolution(image->getImage(),psf,psfpar);
         image->setImage(img);
         profiler.stop();
         QString msg = "FFT deconvolution: ";

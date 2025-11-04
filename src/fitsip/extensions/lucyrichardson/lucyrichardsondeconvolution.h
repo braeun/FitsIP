@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Lucy Richardson deconvolution                                       *
  *                                                                              *
- * modified: 2025-06-06                                                         *
+ * modified: 2025-11-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -56,7 +56,7 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  void deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf, const std::vector<ValueType>& par, int niter, bool progress=false, bool storeintermediate=false);
+  void deconvolve(FitsImage* image, const PSF* psf, const std::vector<ValueType>& par, int niter, bool progress=false, bool storeintermediate=false);
 
 private:
   struct fftdata

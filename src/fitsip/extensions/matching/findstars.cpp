@@ -310,7 +310,7 @@ void FindStars::starAxes(std::shared_ptr<FitsImage> image, const QRect &box, dou
 OpPlugin::ResultType FindStars::execute1(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   Histogram hist;
-  hist.build(image->getImage().get());
+  hist.build(image->getImage());
   AverageResult avg = hist.getAverage(0.75);
   FindStarsDialog d;
   d.setSkyMean(avg.mean);
@@ -347,7 +347,7 @@ OpPlugin::ResultType FindStars::execute1(std::shared_ptr<FitsObject> image, cons
     maxiter = d.getIterations();
 
     profiler.start();
-    auto img = image->getImage();
+    auto img = image->getImageShared();
     if (!data.aoi.isEmpty())
     {
       img = img->subImage(data.aoi);
@@ -380,7 +380,7 @@ OpPlugin::ResultType FindStars::execute1(std::shared_ptr<FitsObject> image, cons
 OpPlugin::ResultType FindStars::execute2(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   Histogram hist;
-  hist.build(image->getImage().get());
+  hist.build(image->getImage());
   AverageResult avg = hist.getAverage(0.75);
   StarDialog d;
   d.setImageSkyValue(avg.mean);
@@ -397,7 +397,7 @@ OpPlugin::ResultType FindStars::execute2(std::shared_ptr<FitsObject> image, cons
       sky = avg.mean;
     }
     profiler.start();
-    auto img = image->getImage();
+    auto img = image->getImageShared();
     image = OpToGray().toGray(image);
     std::vector<Star> stars = findStars(img,data.pixellist,sky,box);
     data.starlist->setStars(stars);

@@ -75,7 +75,7 @@ OpPlugin::ResultType OpLog::execute(std::shared_ptr<FitsObject> image, const OpP
   return OK;
 }
 
-void OpLog::calcLog(std::shared_ptr<FitsImage> img) const
+void OpLog::calcLog(FitsImage* img) const
 {
   PixelIterator p = img->getPixelIterator();
   if (img->getDepth() == 1)

@@ -48,7 +48,7 @@ public:
 
 private:
 
-  QRect findArea(std::shared_ptr<FitsImage> img, ValueType threshold, int border) const;
+  QRect findArea(FitsImage* img, ValueType threshold, int border) const;
 
   OpCropDialog* dlg;
 

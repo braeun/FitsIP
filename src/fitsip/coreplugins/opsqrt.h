@@ -46,7 +46,7 @@ public:
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  void calcSqrt(std::shared_ptr<FitsImage> img) const;
+  void calcSqrt(FitsImage* img) const;
 
 };
 

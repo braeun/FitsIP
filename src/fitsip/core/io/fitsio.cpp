@@ -124,7 +124,7 @@ bool FitsIO::write(QString filename, FitsObject* obj)
 {
   Settings settings;
   int format = settings.getFitsImageFormat();
-  FitsImage* img = obj->getImage().get();
+  FitsImage* img = obj->getImage();
   CCfits::FITS* fits = nullptr;
   try
   {

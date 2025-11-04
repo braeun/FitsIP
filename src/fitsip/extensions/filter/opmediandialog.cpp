@@ -69,7 +69,7 @@ void OpMedianDialog::textFieldChanged()
   {
     auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
     OpMedian op;
-    op.filter(img,getThreshold(),getSize());
+    op.filter(img.get(),getThreshold(),getSize());
     previewWidget->updatePreview(img);
   }
 }

@@ -85,14 +85,14 @@ OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, const 
     if (data.aoi.isNull())
       img = invfft(image->getImage());
     else
-      img = invfft(image->getImage()->subImage(data.aoi));
+      img = invfft(image->getImage()->subImage(data.aoi).get());
     profiler.stop();
   }
-  logProfiler(img);
+  logProfiler(img.get());
   return OK;
 }
 
-std::shared_ptr<FitsImage> OpInvFFT::invfft(std::shared_ptr<FitsImage> image) const
+std::shared_ptr<FitsImage> OpInvFFT::invfft(FitsImage* image) const
 {
   int preFFTWidth = (image->getWidth() - 1) * 2;
   int preFFTHeight = image->getHeight();

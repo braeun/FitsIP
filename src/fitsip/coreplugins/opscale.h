@@ -46,7 +46,7 @@ public:
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  void scaleImage(std::shared_ptr<FitsImage> img, ValueType scale, ValueType bias) const;
+  void scaleImage(FitsImage* img, ValueType scale, ValueType bias) const;
 
   TwoValueDialog dlg;
 

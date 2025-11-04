@@ -66,7 +66,7 @@ void OpKernel::bindPython(void* mod) const
 OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpKernelDialog();
-  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImageShared(),data.aoi,data.previewOptions);
   dlg->setKernelNames(KernelRepository::instance().getKernelNames());
   if (!dlg->exec()) return CANCELLED;
   Kernel kernel = KernelRepository::instance().getKernel(dlg->getKernelName());
@@ -79,7 +79,7 @@ OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsObject> image, const 
   return OK;
 }
 
-void OpKernel::convolve(std::shared_ptr<FitsImage> image, const Kernel& kernel) const
+void OpKernel::convolve(FitsImage* image, const Kernel& kernel) const
 {
   FitsImage tmp(*image);
   PixelIterator it1 = image->getPixelIterator();

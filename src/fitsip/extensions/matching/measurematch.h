@@ -53,9 +53,9 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> list, const OpPluginData& data=OpPluginData()) override;
 
-  void setTemplate(std::shared_ptr<FitsImage> image, QRect aoi=QRect());
+  void setTemplate(FitsImage* image, QRect aoi=QRect());
 
-  void computeMatch(std::shared_ptr<FitsImage> image);
+  void computeMatch(FitsImage* image);
 
   void setMatchFull(bool flag);
 
@@ -98,7 +98,7 @@ public:
   void shiftAOI(double dx, double dy);
 
 private:
-  void createI(std::shared_ptr<FitsImage> image);
+  void createI(FitsImage* image);
   double getMatchValue(int r, int s, int n);
 
   bool matchFull;

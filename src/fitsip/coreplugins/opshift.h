@@ -48,7 +48,7 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  void shift(std::shared_ptr<FitsImage> image, ValueType dx, ValueType dy) const;
+  void shift(FitsImage* image, ValueType dx, ValueType dy) const;
 
 private:
   OpShiftDialog* dlg;

@@ -114,7 +114,7 @@ OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, const Op
 }
 
 
-QRect OpCrop::findArea(std::shared_ptr<FitsImage> img, ValueType threshold, int border) const
+QRect OpCrop::findArea(FitsImage* img, ValueType threshold, int border) const
 {
   int xmin = std::numeric_limits<int>::max();
   int xmax = std::numeric_limits<int>::min();

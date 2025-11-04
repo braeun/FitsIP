@@ -79,7 +79,7 @@ void OpDDPDialog::textFieldChanged()
   {
     auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
     OpDDP op;
-    op.ddp(img,getSigma(),getBackground(),getA(),getB());
+    op.ddp(img.get(),getSigma(),getBackground(),getA(),getB());
     previewWidget->updatePreview(img);
   }
 }

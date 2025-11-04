@@ -68,7 +68,7 @@ void OpGaussBlur::bindPython(void* mod) const
 OpPlugin::ResultType OpGaussBlur::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpGaussBlurDialog();
-  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImageShared(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     ValueType sigmax = dlg->getSigma();
@@ -86,7 +86,7 @@ OpPlugin::ResultType OpGaussBlur::execute(std::shared_ptr<FitsObject> image, con
 
 
 
-void OpGaussBlur::blur(std::shared_ptr<FitsImage> image, ValueType sigmax, ValueType sigmay, ValueType accuracy) const
+void OpGaussBlur::blur(FitsImage* image, ValueType sigmax, ValueType sigmay, ValueType accuracy) const
 {
   Data data;
   if (sigmax > 2 * MIN_DOWNSCALED_SIGMA + 0.5)

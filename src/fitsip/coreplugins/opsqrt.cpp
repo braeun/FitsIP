@@ -76,7 +76,7 @@ OpPlugin::ResultType OpSqrt::execute(std::shared_ptr<FitsObject> image, const Op
   return OK;
 }
 
-void OpSqrt::calcSqrt(std::shared_ptr<FitsImage> img) const
+void OpSqrt::calcSqrt(FitsImage* img) const
 {
   PixelIterator p = img->getPixelIterator();
   if (img->getDepth() == 1)

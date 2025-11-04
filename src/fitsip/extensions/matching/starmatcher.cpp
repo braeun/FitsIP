@@ -85,7 +85,7 @@ OpPlugin::ResultType StarMatcher::execute(std::shared_ptr<FitsObject> image, con
   return CANCELLED;
 }
 
-OpPlugin::ResultType StarMatcher::prepare(std::shared_ptr<FitsImage> image, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove)
+OpPlugin::ResultType StarMatcher::prepare(FitsImage* image, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove)
 {
   this->subsky = subsky;
   if (pixellist->getPixels().empty())
@@ -121,7 +121,7 @@ OpPlugin::ResultType StarMatcher::prepare(std::shared_ptr<FitsImage> image, Pixe
   return OK;
 }
 
-OpPlugin::ResultType StarMatcher::match(std::shared_ptr<FitsImage> image)
+OpPlugin::ResultType StarMatcher::match(FitsImage* image)
 {
   angle = 0;
   angleSigma = 0;
@@ -138,7 +138,7 @@ OpPlugin::ResultType StarMatcher::match(std::shared_ptr<FitsImage> image)
     /* The sky background has not been subtracted yet.
      * Set the mean value for the findStars function. */
     Histogram hist;
-    hist.build(image.get());
+    hist.build(image);
     AverageResult avg = hist.getAverage(0.75);
     *img -= avg.mean;
   }

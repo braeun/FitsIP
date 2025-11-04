@@ -73,7 +73,7 @@ void OpGaussBlurDialog::updatePreview()
   {
     auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
     OpGaussBlur op;
-    op.blur(img,getSigma(),getSigma());
+    op.blur(img.get(),getSigma(),getSigma());
     previewWidget->updatePreview(img);
   }
 }

@@ -47,17 +47,17 @@ public:
   virtual void bindPython(void* m) const override;
 #endif
 
-  std::shared_ptr<FitsImage> resize(std::shared_ptr<FitsImage> image, double factorx, double factory, int mode) const;
+  std::shared_ptr<FitsImage> resize(FitsImage* image, double factorx, double factory, int mode) const;
 
 //  std::shared_ptr<FitsImage> grow(std::shared_ptr<FitsImage> image, int factor, bool bilinear) const;
 
 //  std::shared_ptr<FitsImage> shrink(std::shared_ptr<FitsImage> image, int factor) const;
 
-  std::shared_ptr<FitsImage> shrink(std::shared_ptr<FitsImage> image, double factorx, double factory) const;
+  std::shared_ptr<FitsImage> shrink(FitsImage* image, double factorx, double factory) const;
 
-  std::shared_ptr<FitsImage> growNearestNeighbor(std::shared_ptr<FitsImage> image, double factorx, double factory) const;
+  std::shared_ptr<FitsImage> growNearestNeighbor(FitsImage* image, double factorx, double factory) const;
 
-  std::shared_ptr<FitsImage> growBilinear(std::shared_ptr<FitsImage> image, double factorx, double factory) const;
+  std::shared_ptr<FitsImage> growBilinear(FitsImage* image, double factorx, double factory) const;
 
 private:
   void scriptResize(std::shared_ptr<FitsObject> obj, double factorx, double factory, char mode) const;

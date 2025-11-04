@@ -48,9 +48,9 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  void rotate90cw(std::shared_ptr<FitsImage> image) const;
+  void rotate90cw(FitsImage* image) const;
 
-  void rotate90ccw(std::shared_ptr<FitsImage> image) const;
+  void rotate90ccw(FitsImage* image) const;
 
   /**
    * @brief Rotate the image by an arbitrary angle
@@ -58,10 +58,9 @@ public:
    * @param angle the rotation angle in degrees
    * @param crop if true, crop the image to the original size
    */
-  void rotate(std::shared_ptr<FitsImage> image, ValueType angle, bool crop) const;
+  void rotate(FitsImage* image, ValueType angle, bool crop) const;
 
 private:
-
   OpRotateDialog* dlg;
 
 };

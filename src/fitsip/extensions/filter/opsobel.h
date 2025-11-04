@@ -48,8 +48,8 @@ public:
   virtual ResultType execute(std::shared_ptr<FitsObject> img, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  std::shared_ptr<FitsImage> applyFilter(std::shared_ptr<FitsImage> img) const;
-  ValueType* convolve(std::shared_ptr<FitsImage> img, const Kernel& kernel) const;
+  std::shared_ptr<FitsImage> applyFilter(FitsImage* img) const;
+  ValueType* convolve(FitsImage* img, const Kernel& kernel) const;
 };
 
 #endif // OPSOBEL_H

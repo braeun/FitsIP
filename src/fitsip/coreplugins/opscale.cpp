@@ -79,7 +79,7 @@ OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsObject> image, const O
   return CANCELLED;
 }
 
-void OpScale::scaleImage(std::shared_ptr<FitsImage> img, ValueType scale, ValueType bias) const
+void OpScale::scaleImage(FitsImage* img, ValueType scale, ValueType bias) const
 {
   int n = img->getWidth() * img->getHeight();
   for (int i=0;i<img->getDepth();i++)

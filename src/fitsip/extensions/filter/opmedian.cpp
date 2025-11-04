@@ -65,7 +65,7 @@ void OpMedian::bindPython(void* mod) const
 OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpMedianDialog();
-  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImageShared(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     QApplication::setOverrideCursor(Qt::BusyCursor);
@@ -82,7 +82,7 @@ OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, const 
   return CANCELLED;
 }
 
-void OpMedian::filter(std::shared_ptr<FitsImage> image, ValueType threshold, int size) const
+void OpMedian::filter(FitsImage* image, ValueType threshold, int size) const
 {
   FitsImage tmp(*image);
 //  PixelIterator it1 = img.getPixelIterator();

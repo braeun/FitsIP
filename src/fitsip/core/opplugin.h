@@ -113,7 +113,7 @@ protected:
    * @param tag optional tag, which will be appended to the basename of the file
    * @return result of the operation
    */
-  virtual ResultType save(std::shared_ptr<FitsImage> image, const QString& outputpath, const QFileInfo& info, const QString& tag="");
+  virtual ResultType save(FitsImage* image, const QString& outputpath, const QFileInfo& info, const QString& tag="");
 
   /**
    * @brief Save the image to disk
@@ -127,13 +127,13 @@ protected:
 
   void log(const QString& msg);
 
-  void log(std::shared_ptr<FitsImage> image, const QString& msg);
+  void log(FitsImage* image, const QString& msg);
 
   void log(std::shared_ptr<FitsObject> image, const QString& msg);
 
   void logProfiler(const QString& image, const QString& msg="");
 
-  void logProfiler(std::shared_ptr<FitsImage> image, const QString& msg="");
+  void logProfiler(FitsImage* image, const QString& msg="");
 
   void logProfiler(std::shared_ptr<FitsObject> image, const QString& msg="");
 

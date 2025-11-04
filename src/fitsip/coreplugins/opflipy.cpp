@@ -74,7 +74,7 @@ OpPlugin::ResultType OpFlipY::execute(std::shared_ptr<FitsObject> image, const O
   return OK;
 }
 
-void OpFlipY::flip(std::shared_ptr<FitsImage> img) const
+void OpFlipY::flip(FitsImage* img) const
 {
   for (int y=0;y<img->getHeight()/2;y++)
   {

@@ -86,7 +86,7 @@ OpPlugin::ResultType OpShift::execute(std::shared_ptr<FitsObject> image, const O
   return CANCELLED;
 }
 
-void OpShift::shift(std::shared_ptr<FitsImage> image, ValueType dx, ValueType dy) const
+void OpShift::shift(FitsImage* image, ValueType dx, ValueType dy) const
 {
   FitsImage img(*image);
   PixelIterator it2 = image->getPixelIterator();

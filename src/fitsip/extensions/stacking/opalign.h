@@ -52,7 +52,7 @@ private:
 
   OpAlignDialog* dlg;
   QString outputPath;
-  std::shared_ptr<FitsImage> img;
+//  FitsImage* img;
   MeasureMatch matcher;
   bool matchFull;
   int matchRange;

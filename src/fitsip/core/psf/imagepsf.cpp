@@ -52,7 +52,7 @@ void ImagePSF::init()
     IOHandler* handler = IOFactory::getInstance()->getHandler(filename);
     if (handler)
     {
-      img = handler->read(filename).front()->getImage();
+      img = handler->read(filename).front()->getImageShared();
     }
     if (!img)
     {

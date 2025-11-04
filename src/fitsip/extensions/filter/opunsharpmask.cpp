@@ -64,7 +64,7 @@ void OpUnsharpMask::bindPython(void* mod) const
 OpPlugin::ResultType OpUnsharpMask::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpUnsharpMaskDialog();
-  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImageShared(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();
@@ -79,11 +79,11 @@ OpPlugin::ResultType OpUnsharpMask::execute(std::shared_ptr<FitsObject> image, c
   return CANCELLED;
 }
 
-void OpUnsharpMask::unsharpmask(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType strength) const
+void OpUnsharpMask::unsharpmask(FitsImage* image, ValueType sigma, ValueType strength) const
 {
   OpGaussBlur blur;
   auto blurred = std::make_shared<FitsImage>(*image);
-  blur.blur(blurred,sigma,sigma);
+  blur.blur(blurred.get(),sigma,sigma);
   for (int d=0;d<image->getDepth();d++)
   {
     ValueType *p1 = image->getLayer(d)->getData();

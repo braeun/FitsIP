@@ -105,7 +105,7 @@ OpPlugin::ResultType VanCittertDeconvolution::execute(std::shared_ptr<FitsObject
   return CANCELLED;
 }
 
-void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const PSF* psf, const std::vector<ValueType>& par,
+void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const std::vector<ValueType>& par,
                                          int niter, bool progress, bool storeintermediate, QString path)
 {
   ProgressDialog* prog = progress && (niter > 2) ? new ProgressDialog() : nullptr;

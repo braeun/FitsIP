@@ -77,17 +77,17 @@ OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsObject> image, const OpP
   if (data.aoi.isNull())
     img = fft(image->getImage());
   else
-    img = fft(image->getImage()->subImage(data.aoi));
+    img = fft(image->getImage()->subImage(data.aoi).get());
   profiler.stop();
-  logProfiler(img);
+  logProfiler(img.get());
   return OK;
 }
 
-std::shared_ptr<FitsImage> OpFFT::fft(std::shared_ptr<FitsImage> image) const
+std::shared_ptr<FitsImage> OpFFT::fft(FitsImage* image) const
 {
   if (image->getWidth() % 2 != 0)
   {
-    image = image->paddedImage(image->getWidth()+1,image->getHeight());
+    image = image->paddedImage(image->getWidth()+1,image->getHeight()).get();
   }
   fftw_complex *s2c = new fftw_complex[image->getHeight()*(image->getWidth()/2+1)];
   double *in = new double[image->getHeight()*image->getWidth()];

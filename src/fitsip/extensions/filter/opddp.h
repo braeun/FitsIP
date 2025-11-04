@@ -26,7 +26,6 @@
 #include <fitsip/core/fitstypes.h>
 #include <fitsip/core/opplugin.h>
 #include <QObject>
-#include <vector>
 
 class OpDDPDialog;
 
@@ -67,7 +66,7 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  void ddp(std::shared_ptr<FitsImage> image, ValueType sigma, ValueType bkg, ValueType a, ValueType b) const;
+  void ddp(FitsImage* image, ValueType sigma, ValueType bkg, ValueType a, ValueType b) const;
 
 private:
   OpDDPDialog* dlg;
