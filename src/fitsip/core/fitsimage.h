@@ -217,7 +217,7 @@ public:
    * @brief Return a gray scale image of this one.
    * @return gray scale image
    */
-  std::shared_ptr<FitsImage> toGray();
+  std::shared_ptr<FitsImage> toGray() const;
 
   void scaleIntensity(ValueType min, ValueType max);
 

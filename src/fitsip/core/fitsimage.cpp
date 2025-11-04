@@ -382,7 +382,7 @@ void FitsImage::cut(ValueType lower, ValueType upper)
   }
 }
 
-std::shared_ptr<FitsImage> FitsImage::toGray()
+std::shared_ptr<FitsImage> FitsImage::toGray() const
 {
   std::shared_ptr<FitsImage>  gray = std::make_shared<FitsImage>(getName(),getWidth(),getHeight(),1);
   gray->setMetadata(getMetadata());

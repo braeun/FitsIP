@@ -39,7 +39,7 @@ public:
 
   const std::vector<std::shared_ptr<PSF>>& getList() const;
 
-  bool addPSF(const std::shared_ptr<FitsImage>& img, const QString filename);
+  bool addPSF(const FitsImage* img, const QString filename);
 
   bool deletePSF(const QString& name);
 

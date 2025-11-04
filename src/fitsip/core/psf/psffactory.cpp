@@ -70,7 +70,7 @@ const std::vector<std::shared_ptr<PSF>>& PSFFactory::getList() const
   return list;
 }
 
-bool PSFFactory::addPSF(const std::shared_ptr<FitsImage>& img, const QString filename)
+bool PSFFactory::addPSF(const FitsImage* img, const QString filename)
 {
   QFileInfo file(QDir(Settings().getInternalPSFDirectory()).absoluteFilePath(QFileInfo(filename).baseName()+".fts"));
   IOHandler* handler = IOFactory::getInstance()->getHandler(file.fileName());

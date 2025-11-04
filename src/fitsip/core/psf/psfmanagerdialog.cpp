@@ -116,7 +116,7 @@ void PSFManagerDialog::addImagePSF()
             fitsimg = fitsimg->subImage(aoi);
           }
         }
-        bool ret = PSFFactory::getInstance()->addPSF(fitsimg,name);
+        bool ret = PSFFactory::getInstance()->addPSF(fitsimg.get(),name);
         if (!ret)
         {
           QMessageBox::critical(this,"Save as PSF","Failed to save image as PSF!");

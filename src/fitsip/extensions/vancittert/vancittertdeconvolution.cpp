@@ -167,7 +167,7 @@ void VanCittertDeconvolution::deconvolve(std::shared_ptr<FitsImage> image, const
         *s *= parameter;
         break;
       case Sine:
-        applySineRelaxation(o,basestat,s);
+        applySineRelaxation(o.get(),basestat,s.get());
         break;
     }
     *o += *s;
@@ -297,7 +297,7 @@ void VanCittertDeconvolution::mul(fftw_complex *a, fftw_complex *b, int n)
   }
 }
 
-void VanCittertDeconvolution::applySineRelaxation(std::shared_ptr<FitsImage> image, const ImageStatistics& stat, std::shared_ptr<FitsImage> corr)
+void VanCittertDeconvolution::applySineRelaxation(FitsImage* image, const ImageStatistics& stat, FitsImage* corr)
 {
   ImageStatistics s = stat;
   if (!cutImage) s = ImageStatistics(*image);
