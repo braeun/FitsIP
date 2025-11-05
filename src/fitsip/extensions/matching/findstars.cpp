@@ -397,9 +397,8 @@ OpPlugin::ResultType FindStars::execute2(std::shared_ptr<FitsObject> image, cons
       sky = avg.mean;
     }
     profiler.start();
-    auto img = image->getImageShared();
-    image = OpToGray().toGray(image);
-    std::vector<Star> stars = findStars(*img,data.pixellist,sky,box);
+    auto img = image->getImage()->toGray();
+    std::vector<Star> stars = findStars(img,data.pixellist,sky,box);
     data.starlist->setStars(stars);
     profiler.stop();
     logProfiler(image->getName());

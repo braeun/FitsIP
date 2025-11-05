@@ -100,8 +100,8 @@ OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, 
       auto img = calibrate(info,darkframe,flatfield,mean);
       if (img)
       {
-        QString name = QString("%1%2%3.fts").arg(dlg->getPrefix()).arg(img->getName()).arg(dlg->getSuffix());
-        handler->write(dir.filePath(name),img.get());
+        QString name = QString("%1%2%3.fts").arg(dlg->getPrefix(),img.getName(),dlg->getSuffix());
+        handler->write(dir.filePath(name),&img);
       }
     }
     catch (const std::exception& ex)
@@ -115,21 +115,21 @@ OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, 
 
 
 
-std::shared_ptr<FitsImage> OpCalibration::calibrate(const QFileInfo& info, std::shared_ptr<FitsObject> darkframe, std::shared_ptr<FitsObject> flatfield, double mean)
+FitsImage OpCalibration::calibrate(const QFileInfo& info, std::shared_ptr<FitsObject> darkframe, std::shared_ptr<FitsObject> flatfield, double mean)
 {
   IOHandler* handler = IOFactory::getInstance()->getHandler(info.absoluteFilePath());
-  if (!handler) return std::shared_ptr<FitsImage>();
-  auto img = handler->read(info.absoluteFilePath()).front()->getImageShared();
+  if (!handler) return FitsImage();
+  FitsImage img(*handler->read(info.absoluteFilePath()).front()->getImage());
   if (darkframe)
   {
-    *img -= *darkframe->getImage();
-    log(img.get(),"Subtracted darkframe '"+darkframe->getImage()->getName()+"'");
+    img -= *darkframe->getImage();
+    log(&img,"Subtracted darkframe '"+darkframe->getImage()->getName()+"'");
   }
   if (flatfield)
   {
-    *img /= *flatfield->getImage();
-    *img *= mean;
-    log(img.get(),"Divided flatfield '"+flatfield->getImage()->getName()+"'");
+    img /= *flatfield->getImage();
+    img *= mean;
+    log(&img,"Divided flatfield '"+flatfield->getImage()->getName()+"'");
   }
   return img;
 }

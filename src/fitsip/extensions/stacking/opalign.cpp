@@ -108,11 +108,11 @@ OpPlugin::ResultType OpAlign::prepare(const QFileInfo& file, QRect aoi)
   {
     outputPath = file.absolutePath();
   }
-  std::shared_ptr<FitsImage> img;
+  FitsImage* img;
   try
   {
-    img = handler->read(file.absoluteFilePath()).front()->getImageShared();
-    save(img.get(),outputPath,file,"aligned");
+    img = handler->read(file.absoluteFilePath()).front()->getImage();
+    save(img,outputPath,file,"aligned");
   }
   catch (std::exception& ex)
   {
@@ -128,7 +128,7 @@ OpPlugin::ResultType OpAlign::prepare(const QFileInfo& file, QRect aoi)
   else
     txt += "; match range " + QString::number(matchRange);
   if (adaptAOI) txt += "; adapt AOI";
-  log(img.get(),txt);
+  log(img,txt);
   return OK;
 }
 
@@ -142,12 +142,12 @@ OpPlugin::ResultType OpAlign::align(const QFileInfo &file)
   }
   try
   {
-    std::shared_ptr<FitsImage> img1 = handler->read(file.absoluteFilePath()).front()->getImageShared();
+    FitsImage* img1 = handler->read(file.absoluteFilePath()).front()->getImage();
     matcher.computeMatch(*img1);
     OpShift shift;
-    shift.shift(img1.get(),-matcher.getDx(),-matcher.getDy());
-    save(img1.get(),outputPath,file,"aligned");
-    log(img1.get(),QString::asprintf("shifted by [%.1f,%.1f]",-matcher.getDx(),-matcher.getDy()));
+    shift.shift(img1,-matcher.getDx(),-matcher.getDy());
+    save(img1,outputPath,file,"aligned");
+    log(img1,QString::asprintf("shifted by [%.1f,%.1f]",-matcher.getDx(),-matcher.getDy()));
     if (adaptAOI) matcher.shiftAOI(matcher.getDx(),matcher.getDy());
   }
   catch (std::exception& ex)

@@ -23,8 +23,7 @@
 #ifndef SIMPLEPROFILER_H
 #define SIMPLEPROFILER_H
 
-#include <time.h>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 class SimpleProfiler
