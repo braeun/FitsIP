@@ -52,37 +52,37 @@ void ImagePSF::init()
     IOHandler* handler = IOFactory::getInstance()->getHandler(filename);
     if (handler)
     {
-      img = handler->read(filename).front()->getImageShared();
+      img = *handler->read(filename).front()->getImage();
     }
     if (!img)
     {
-      img = std::make_shared<FitsImage>(ImagePSF::getName(),50,50);
+      img = FitsImage(ImagePSF::getName(),50,50);
     }
   }
 }
 
-std::shared_ptr<FitsImage> ImagePSF::createPSF(int w, int h, const std::vector<ValueType>& par) const
+FitsImage ImagePSF::createPSF(int w, int h, const std::vector<ValueType>& par) const
 {
-  if (w < img->getWidth()) w = img->getWidth();
-  if (h < img->getHeight()) h = img->getHeight();
-  auto dst = std::make_shared<FitsImage>("",w,h,img->getDepth());
-  int iw2 = img->getWidth() / 2;
-  int iwodd = (img->getWidth() % 2);
-  int ih2 = img->getHeight() / 2;
-  int ihodd = (img->getHeight() % 2);
-  dst->blit(img.get(),iw2,ih2,iw2+iwodd,ih2+ihodd,0,0);
-  dst->blit(img.get(),0,0,iw2,ih2,dst->getWidth()-iw2,dst->getHeight()-ih2);
-  dst->blit(img.get(),0,ih2,iw2,ih2+ihodd,dst->getWidth()-iw2,0);
-  dst->blit(img.get(),iw2,0,iw2+iwodd,ih2,0,dst->getHeight()-ih2);
+  if (w < img.getWidth()) w = img.getWidth();
+  if (h < img.getHeight()) h = img.getHeight();
+  FitsImage dst("",w,h,img.getDepth());
+  int iw2 = img.getWidth() / 2;
+  int iwodd = (img.getWidth() % 2);
+  int ih2 = img.getHeight() / 2;
+  int ihodd = (img.getHeight() % 2);
+  dst.blit(img,iw2,ih2,iw2+iwodd,ih2+ihodd,0,0);
+  dst.blit(img,0,0,iw2,ih2,dst.getWidth()-iw2,dst.getHeight()-ih2);
+  dst.blit(img,0,ih2,iw2,ih2+ihodd,dst.getWidth()-iw2,0);
+  dst.blit(img,iw2,0,iw2+iwodd,ih2,0,dst.getHeight()-ih2);
   return dst;
 }
 
-std::shared_ptr<FitsImage> ImagePSF::createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const
+FitsImage ImagePSF::createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const
 {
-  if (w < img->getWidth()) w = img->getWidth();
-  if (h < img->getHeight()) h = img->getHeight();
-  auto dst = std::make_shared<FitsImage>("",w,h,img->getDepth());
-  dst->blit(img.get(),0,0,img->getWidth(),img->getHeight(),(w-img->getWidth())/2,(h-img->getHeight())/2);
+  if (w < img.getWidth()) w = img.getWidth();
+  if (h < img.getHeight()) h = img.getHeight();
+  FitsImage dst("",w,h,img.getDepth());
+  dst.blit(img,0,0,img.getWidth(),img.getHeight(),(w-img.getWidth())/2,(h-img.getHeight())/2);
   return dst;
 }
 
@@ -93,11 +93,11 @@ bool ImagePSF::isFixedSize() const
 
 int ImagePSF::getWidth() const
 {
-  return img->getWidth();
+  return img.getWidth();
 }
 
 int ImagePSF::getHeight() const
 {
-  return img->getHeight();
+  return img.getHeight();
 }
 

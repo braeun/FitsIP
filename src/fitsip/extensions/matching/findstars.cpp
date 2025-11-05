@@ -95,13 +95,13 @@ QString FindStars::getMenuEntry() const
 
 OpPlugin::ResultType FindStars::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
-  conv_img.reset();
+  conv_img = FitsImage();
   if (!data.pixellist || data.pixellist->empty())
     return execute1(image,data);
   return execute2(image,data);
 }
 
-std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
+std::vector<Star> FindStars::findStars(const FitsImage& image)
 {
   std::vector<Star> stars;
   int htiny = tinysize;
@@ -120,7 +120,7 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
   c_star = 0;
 
   /* first, create and initialize to zero the bit map */
-  bitmap = std::vector<uint8_t>(image->getWidth()*image->getHeight(),0);
+  bitmap = std::vector<uint8_t>(image.getWidth()*image.getHeight(),0);
   /* if (quickflag == false), convolve the image with a gaussian and put
      the convolved version into the 'conv_image[]' array.
      the stdev of counts in the convolved image is returned as 'conv_sig' */
@@ -148,10 +148,10 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
   }
   qDebug() << "signif" << signif;
   /* next, go through the image looking for peaks which haven't been marked yet */
-  ConstPixelIterator it = conv_img->getConstPixelIterator();
-  for (int y=0;y<conv_img->getHeight();++y)
+  ConstPixelIterator it = conv_img.getConstPixelIterator();
+  for (int y=0;y<conv_img.getHeight();++y)
   {
-    for (int x=0;x<conv_img->getWidth();++x,++it)
+    for (int x=0;x<conv_img.getWidth();++x,++it)
     {
 //      qDebug() << x << "," << y << ": " << it.getAbs();
       if (it.getAbs() < signif)
@@ -167,7 +167,7 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
       c_peak++;
 
       int tsx,tsy;
-      calc_box(x,y,conv_img->getWidth(),conv_img->getHeight(),&tsx,&tsy,wtiny,htiny);
+      calc_box(x,y,conv_img.getWidth(),conv_img.getHeight(),&tsx,&tsy,wtiny,htiny);
 
       double xc,yc,fwhm,xwidth,ywidth;
       star_axes(conv_img,tsx,tsy,wtiny,htiny,sky,&xc,&yc,&fwhm,&xwidth,&ywidth,maxiter);
@@ -191,11 +191,11 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
       /* added checks on 'irow' and 'icol' to make sure they're
          inside the image.  MWR 12/13/92 */
       int iy = (int)(yc + 0.5);
-      if (iy >= conv_img->getHeight()) iy = conv_img->getHeight() - 1;
+      if (iy >= conv_img.getHeight()) iy = conv_img.getHeight() - 1;
       int ix = (int)(xc + 0.5);
-      if (ix >= conv_img->getWidth()) ix = conv_img->getWidth() - 1;
+      if (ix >= conv_img.getWidth()) ix = conv_img.getWidth() - 1;
 
-      if (bitmap[iy*image->getWidth()+ix])
+      if (bitmap[iy*image.getWidth()+ix])
       {
         c_biton++;
         continue;
@@ -267,13 +267,13 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image)
   return stars;
 }
 
-std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image, PixelList* pixels, ValueType sky, int box)
+std::vector<Star> FindStars::findStars(const FitsImage& image, PixelList* pixels, ValueType sky, int box)
 {
   std::vector<Star> stars;
   for (const Pixel& pixel : pixels->getPixels())
   {
     QRect sr(pixel.x-box/2,pixel.y-box/2,box,box);
-    sr = image->getOverlap(sr);
+    sr = image.getOverlap(sr);
     int maxiter = 20;
     double xc;
     double yc;
@@ -282,9 +282,9 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image, PixelLi
     double ywidth;
     star_axes(image,sr.x(),sr.y(),sr.width(),sr.height(),sky,&xc,&yc,&fwhm,&xwidth,&ywidth,maxiter);
     int iy = (int)(yc + 0.5);
-    if (iy >= image->getHeight()) iy = image->getHeight() - 1;
+    if (iy >= image.getHeight()) iy = image.getHeight() - 1;
     int ix = (int)(xc + 0.5);
-    if (ix >= image->getWidth()) ix = image->getWidth() - 1;
+    if (ix >= image.getWidth()) ix = image.getWidth() - 1;
     double round = 2.0 * ((xwidth - ywidth) / (xwidth + ywidth));
     double sharp = sharpness(image,ix,iy);
     double hot_factor = hotness(image,ix,iy);
@@ -294,7 +294,7 @@ std::vector<Star> FindStars::findStars(std::shared_ptr<FitsImage> image, PixelLi
   return stars;
 }
 
-void FindStars::starAxes(std::shared_ptr<FitsImage> image, const QRect &box, double sky, double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter)
+void FindStars::starAxes(const FitsImage& image, const QRect &box, double sky, double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter)
 {
   star_axes(image,box.x(),box.y(),box.width(),box.height(),sky,xc,yc,fwhm,xwidth,ywidth,maxiter);
 }
@@ -310,7 +310,7 @@ void FindStars::starAxes(std::shared_ptr<FitsImage> image, const QRect &box, dou
 OpPlugin::ResultType FindStars::execute1(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   Histogram hist;
-  hist.build(image->getImage());
+  hist.build(*image->getImage());
   AverageResult avg = hist.getAverage(0.75);
   FindStarsDialog d;
   d.setSkyMean(avg.mean);
@@ -347,14 +347,14 @@ OpPlugin::ResultType FindStars::execute1(std::shared_ptr<FitsObject> image, cons
     maxiter = d.getIterations();
 
     profiler.start();
-    auto img = image->getImageShared();
+    FitsImage img = image->getImage()->toGray();
     if (!data.aoi.isEmpty())
     {
-      img = img->subImage(data.aoi);
+      img = img.subImage(data.aoi);
     }
     //    if (image->getDepth() > 1)
     //    {
-    image = OpToGray().toGray(image);
+    //image = OpToGray().toGray(image);
     //    }
     std::vector<Star> stars = findStars(img);
     data.starlist->setStars(stars);
@@ -380,7 +380,7 @@ OpPlugin::ResultType FindStars::execute1(std::shared_ptr<FitsObject> image, cons
 OpPlugin::ResultType FindStars::execute2(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   Histogram hist;
-  hist.build(image->getImage());
+  hist.build(*image->getImage());
   AverageResult avg = hist.getAverage(0.75);
   StarDialog d;
   d.setImageSkyValue(avg.mean);
@@ -399,7 +399,7 @@ OpPlugin::ResultType FindStars::execute2(std::shared_ptr<FitsObject> image, cons
     profiler.start();
     auto img = image->getImageShared();
     image = OpToGray().toGray(image);
-    std::vector<Star> stars = findStars(img,data.pixellist,sky,box);
+    std::vector<Star> stars = findStars(*img,data.pixellist,sky,box);
     data.starlist->setStars(stars);
     profiler.stop();
     logProfiler(image->getName());
@@ -408,16 +408,16 @@ OpPlugin::ResultType FindStars::execute2(std::shared_ptr<FitsObject> image, cons
   return CANCELLED;
 }
 
-std::shared_ptr<FitsImage> FindStars::convolve(std::shared_ptr<FitsImage> image, double fwhm)
+FitsImage FindStars::convolve(const FitsImage& image, double fwhm)
 {
   Gaussian gauss(fwhm);
-  auto conv_img = std::make_shared<FitsImage>("tmp",image->getWidth(),image->getHeight(),1);
+  FitsImage conv_img("tmp",image.getWidth(),image.getHeight(),1);
   int offset = gauss.n / 2;
   /* now, write real numbers to all of the image that we can */
-  for (int y=offset;y<image->getHeight()-offset;y++)
+  for (int y=offset;y<image.getHeight()-offset;y++)
   {
-    PixelIterator it = conv_img->getPixelIterator(offset,y);
-    for (int x=offset;x<image->getWidth()-offset;x++)
+    PixelIterator it = conv_img.getPixelIterator(offset,y);
+    for (int x=offset;x<image.getWidth()-offset;x++)
     {
       double v = do_gauss(image,x,y,gauss);
       /*
@@ -438,7 +438,7 @@ std::shared_ptr<FitsImage> FindStars::convolve(std::shared_ptr<FitsImage> image,
   return conv_img;
 }
 
-double FindStars::do_gauss(std::shared_ptr<FitsImage> image, uint32_t x, uint32_t y, const Gaussian& gauss)
+double FindStars::do_gauss(const FitsImage& image, uint32_t x, uint32_t y, const Gaussian& gauss)
 {
   uint32_t sx = x - gauss.n / 2;
   uint32_t sy = y - gauss.n / 2;
@@ -447,7 +447,7 @@ double FindStars::do_gauss(std::shared_ptr<FitsImage> image, uint32_t x, uint32_
   const double* dq = gauss.data.data();
   for (uint32_t i=0;i<gauss.n;i++)
   {
-    ConstPixelIterator it = image->getConstPixelIterator(sx,sy+i);
+    ConstPixelIterator it = image.getConstPixelIterator(sx,sy+i);
     for (uint32_t j=0;j<gauss.n;j++)
     {
       double v = it.getAbs();
@@ -483,15 +483,15 @@ double FindStars::do_gauss(std::shared_ptr<FitsImage> image, uint32_t x, uint32_
    Return a value of 1.0 if we can't calculate the standard
    deviation formally.
 */
-double FindStars::find_skysig(std::shared_ptr<FitsImage> image, double rough_sig)
+double FindStars::find_skysig(const FitsImage& image, double rough_sig)
 {
   double total = 0.0;
   int pixnum = 0;
   double sumsq = 0.0;
   double minval = -CLIPSIG * rough_sig;
   double maxval = CLIPSIG * rough_sig;
-  ConstPixelIterator it = image->getConstPixelIterator();
-  for (int i=0;i<image->getWidth()*image->getHeight();i++)
+  ConstPixelIterator it = image.getConstPixelIterator();
+  for (int i=0;i<image.getWidth()*image.getHeight();i++)
   {
     double number = it.getAbs();
     if ((number >= minval) && (number <= maxval))
@@ -512,21 +512,21 @@ double FindStars::find_skysig(std::shared_ptr<FitsImage> image, double rough_sig
   return stdev;
 }
 
-bool FindStars::is_peak(std::shared_ptr<FitsImage> image, uint32_t xc, uint32_t yc)
+bool FindStars::is_peak(const FitsImage& image, uint32_t xc, uint32_t yc)
 {
   if (xc < peakrad) return 0;
   uint32_t sx = xc - peakrad;
   if (yc < peakrad) return 0;
   uint32_t sy = yc - peakrad;
   uint32_t ex = xc + peakrad;
-  if (ex >= image->getWidth()) return 0;
+  if (ex >= image.getWidth()) return 0;
   uint32_t ey = yc + peakrad;
-  if (ey >= image->getHeight()) return 0;
+  if (ey >= image.getHeight()) return 0;
 
-  double val = image->getConstPixelIterator(xc,yc).getAbs();
+  double val = image.getConstPixelIterator(xc,yc).getAbs();
   for (uint32_t y=sy;y<ey;y++)
   {
-    ConstPixelIterator it = image->getConstPixelIterator(sx,y);
+    ConstPixelIterator it = image.getConstPixelIterator(sx,y);
     for (uint32_t x=sx;x<ex;x++)
     {
       if (val < it.getAbs())	return false;
@@ -552,7 +552,7 @@ void FindStars::calc_box(int x, int y, int w, int h, int *tsx, int *tsy, int wsi
     *tsy = y - hsize2 / 2;
 }
 
-void FindStars::star_axes(std::shared_ptr<FitsImage> image, int tsx, int tsy, int w, int h, double sky, double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter)
+void FindStars::star_axes(const FitsImage& image, int tsx, int tsy, int w, int h, double sky, double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter)
 {
 //  static int i, row, col, er, ec, bigger, fw_flag;
 //  static int16 val;
@@ -598,7 +598,7 @@ printf("into star_axes: tsx=%d tsy=%d w=%d h=%d\n", tsx, tsy, w, h);
   /* compute the centroid */
   for (int y=0;y<h;y++)
   {
-    ConstPixelIterator it = image->getConstPixelIterator(tsx,tsy+y);
+    ConstPixelIterator it = image.getConstPixelIterator(tsx,tsy+y);
     for (int x=0;x<w;x++)
     {
       double val = it.getAbs() - sky;
@@ -650,7 +650,7 @@ printf("into star_axes: tsx=%d tsy=%d w=%d h=%d\n", tsx, tsy, w, h);
   {
     x[i] = i + tsy;
     y[i] = 0;
-    ConstPixelIterator it = image->getConstPixelIterator(tsx,tsy+i);
+    ConstPixelIterator it = image.getConstPixelIterator(tsx,tsy+i);
     for (int j=0;j<w;j++)
     {
       y[i] += it.getAbs() - sky;
@@ -694,11 +694,11 @@ printf("into star_axes: tsx=%d tsy=%d w=%d h=%d\n", tsx, tsy, w, h);
   {
     x[i] = i + tsx;
     y[i] = 0;
-    ConstPixelIterator it = image->getConstPixelIterator(tsx+i,tsy);
+    ConstPixelIterator it = image.getConstPixelIterator(tsx+i,tsy);
     for (int j=0;j<h;j++)
     {
       y[i] += it.getAbs() - sky;
-      it += image->getWidth();
+      it += image.getWidth();
     }
   }
 
@@ -764,7 +764,7 @@ printf("centroid out of smallbox bounds: xc = %lf yc = %lf \n", *xc, *yc);
   for (int row=tsy;row<ey;row++)
   {
     double dyy = (row - yc_ax) * (row - yc_ax);
-    ConstPixelIterator it = image->getConstPixelIterator(tsx,row);
+    ConstPixelIterator it = image.getConstPixelIterator(tsx,row);
     for (int col=tsx;col<ex;col++)
     {
       double val = it.getAbs() - sky;
@@ -791,7 +791,7 @@ printf("centroid out of smallbox bounds: xc = %lf yc = %lf \n", *xc, *yc);
     *fwhm = 0.5 * (*xwidth + *ywidth);
 }
 
-double FindStars::do_fwhm(std::shared_ptr<FitsImage> image, int sx, int sy, int w, int h, double xc, double yc, double sky)
+double FindStars::do_fwhm(const FitsImage& image, int sx, int sy, int w, int h, double xc, double yc, double sky)
 {
 //  int i, j, cent_col, cent_row, halfmax;
 //	double frac, d1, d2, d3, d4;
@@ -805,10 +805,10 @@ double FindStars::do_fwhm(std::shared_ptr<FitsImage> image, int sx, int sy, int 
   /* check to make sure center pixel in bounds */
   if (cent_x >= sx + w) cent_x = (sx + w) - 1;
   if (cent_y >= sy + h) cent_y = (sy + h) - 1;
-  double halfmax = (image->getConstPixelIterator(cent_x,cent_y).getAbs() - sky) / 2 + sky;
+  double halfmax = (image.getConstPixelIterator(cent_x,cent_y).getAbs() - sky) / 2 + sky;
 
   int i;
-  ConstPixelIterator it = image->getConstPixelIterator(cent_x,cent_y);
+  ConstPixelIterator it = image.getConstPixelIterator(cent_x,cent_y);
   for (i=cent_x;i>sx;i--)
   {
     if (it.getAbs() < halfmax)	break;
@@ -827,7 +827,7 @@ double FindStars::do_fwhm(std::shared_ptr<FitsImage> image, int sx, int sy, int 
     double frac = get_frac(v2,v1,halfmax);
     d1 = (cent_x - (i+1)) + frac;
   }
-  it = image->getConstPixelIterator(cent_x,cent_y);
+  it = image.getConstPixelIterator(cent_x,cent_y);
   for (i=cent_x;i<(sx+w)-1;i++)
   {
     if (it.getAbs() < halfmax) break;
@@ -846,12 +846,12 @@ double FindStars::do_fwhm(std::shared_ptr<FitsImage> image, int sx, int sy, int 
     double frac = get_frac(v2,v1,halfmax);
     d2 = ((i - 1) - cent_x) + frac;
   }
-  it = image->getConstPixelIterator(cent_x,cent_y);
+  it = image.getConstPixelIterator(cent_x,cent_y);
   int j;
   for (j=cent_y;j>h;j--)
   {
     if (it.getAbs() < halfmax) break;
-    it -= image->getWidth();
+    it -= image.getWidth();
   }
   double d3;
   if (j + 1 >= sy + h)
@@ -861,16 +861,16 @@ double FindStars::do_fwhm(std::shared_ptr<FitsImage> image, int sx, int sy, int 
   else
   {
     double v1 = it.getAbs();
-    it += image->getWidth();
+    it += image.getWidth();
     double v2 = it.getAbs();
     double frac = get_frac(v2,v1,halfmax);
     d3 = (cent_y - (j+1)) + frac;
   }
-  it = image->getConstPixelIterator(cent_x,cent_y);
+  it = image.getConstPixelIterator(cent_x,cent_y);
   for (j = cent_y; j < (sy + h) - 1; j++)
   {
     if (it.getAbs() < halfmax) break;
-    it += image->getWidth();
+    it += image.getWidth();
   }
   double d4;
   if (j - 1 < sy)
@@ -880,7 +880,7 @@ double FindStars::do_fwhm(std::shared_ptr<FitsImage> image, int sx, int sy, int 
   else
   {
     double v1 = it.getAbs();
-    it -= image->getWidth();
+    it -= image.getWidth();
     double v2 = it.getAbs();
     double frac = get_frac(v2,v1,halfmax);
     d4 = ((j - 1) - cent_y) + frac;
@@ -921,20 +921,20 @@ bool FindStars::validFWHM(double fwhm)
   'xc' is the row coord of the star
   'yc' is the col coord ditto
 */
-void FindStars::markpix(std::shared_ptr<FitsImage> image, double xc, double yc, double fwhm)
+void FindStars::markpix(const FitsImage& image, double xc, double yc, double fwhm)
 {
   /* here is the new version */
   int msx = xc < peakrad ? 0 : static_cast<int>(xc-peakrad);
   int msy = yc < peakrad ? 0 : static_cast<int>(yc-peakrad);
   int mex = static_cast<int>(xc+peakrad);
-  if (mex < image->getWidth()-1)	mex = image->getWidth() - 1;
+  if (mex < image.getWidth()-1)	mex = image.getWidth() - 1;
   int mey = static_cast<int>(yc+peakrad);
-  if (mey < image->getHeight()-1)	mey = image->getHeight() - 1;
+  if (mey < image.getHeight()-1)	mey = image.getHeight() - 1;
   for (int i=msy;i<=mey;i++)
   {
     for (int j=msx;j<=mex;j++)
     {
-      bitmap[i*image->getWidth()+j] = 1;
+      bitmap[i*image.getWidth()+j] = 1;
     }
   }
 }
@@ -969,28 +969,28 @@ void FindStars::markpix(std::shared_ptr<FitsImage> image, double xc, double yc, 
  *
  * RETURNS:     the "hotness" index of the star.
  */
-double FindStars::hotness(std::shared_ptr<FitsImage> image, uint32_t x, uint32_t y)
+double FindStars::hotness(const FitsImage& image, uint32_t x, uint32_t y)
 {
   double sum = 0;
   /* subtract the contributions from the neighbors */
   if (x >= 1)
   {
-    sum -= image->getConstPixelIterator(x-1,y).getAbs() - sky;
+    sum -= image.getConstPixelIterator(x-1,y).getAbs() - sky;
   }
   if (y >= 1)
   {
-    sum -= image->getConstPixelIterator(x,y-1).getAbs() - sky;
+    sum -= image.getConstPixelIterator(x,y-1).getAbs() - sky;
   }
-  if ((x + 1) < image->getWidth())
+  if ((x + 1) < image.getWidth())
   {
-    sum -= image->getConstPixelIterator(x+1,y).getAbs() - sky;
+    sum -= image.getConstPixelIterator(x+1,y).getAbs() - sky;
   }
-  if ((y + 1) < image->getHeight())
+  if ((y + 1) < image.getHeight())
   {
-    sum -= image->getConstPixelIterator(x,y+1).getAbs() - sky;
+    sum -= image.getConstPixelIterator(x,y+1).getAbs() - sky;
   }
   /* and now the contribution from the peak pixel itself */
-  sum += image->getConstPixelIterator(x,y).getAbs() - sky;
+  sum += image.getConstPixelIterator(x,y).getAbs() - sky;
   return sum;
 }
 
@@ -1005,20 +1005,20 @@ double FindStars::hotness(std::shared_ptr<FitsImage> image, uint32_t x, uint32_t
 
 6/3/92 - edge bug fix -rrt
 *******/
-double FindStars::sharpness(std::shared_ptr<FitsImage> image, uint32_t x, uint32_t y)
+double FindStars::sharpness(const FitsImage& image, uint32_t x, uint32_t y)
 {
   double sum = 0;
   uint32_t ssx = x < peakrad ? 0 : x - peakrad;
   uint32_t ssy = y < peakrad ? 0 : y - peakrad;
   uint32_t sex = x + peakrad;
-  if (sex > image->getWidth()) sex = image->getWidth();
+  if (sex > image.getWidth()) sex = image.getWidth();
   uint32_t sey = y + peakrad;
-  if (sey > image->getHeight()) sey = image->getHeight();
+  if (sey > image.getHeight()) sey = image.getHeight();
 
   int num = 0;
   for (uint32_t i = ssy;i<sey;i++)
   {
-    ConstPixelIterator it = image->getConstPixelIterator(ssx,i);
+    ConstPixelIterator it = image.getConstPixelIterator(ssx,i);
     for (uint32_t j=ssx;j<sey;j++)
     {
       sum += it.getAbs() - sky;
@@ -1026,7 +1026,7 @@ double FindStars::sharpness(std::shared_ptr<FitsImage> image, uint32_t x, uint32
       num++;
     }
   }
-  double val = image->getConstPixelIterator(x,y).getAbs() - sky;
+  double val = image.getConstPixelIterator(x,y).getAbs() - sky;
   sum -= val;
   num--;
   if (num > 0) sum /= num;

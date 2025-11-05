@@ -143,8 +143,7 @@ bool FitsIO::write(QString filename, FitsObject* obj)
     int64_t first = 1;
     for (int i=0;i<img->getDepth();i++)
     {
-      std::shared_ptr<Layer> layer = img->getLayer(i);
-      std::valarray<ValueType> a(layer->getData(),static_cast<uint64_t>(axes[0]*axes[1]));
+      std::valarray<ValueType> a(img->getLayer(i).getData(),static_cast<uint64_t>(axes[0]*axes[1]));
       fits->pHDU().write(first,axes[0]*axes[1],a);
       first += axes[0] * axes[1];
     }
@@ -203,7 +202,7 @@ std::shared_ptr<FitsImage> FitsIO::load(CCfits::HDU* hdu, QString basename, cons
       dynamic_cast<CCfits::ExtHDU*>(hdu)->read(a,first,w*h);
     else
       return std::shared_ptr<FitsImage>();
-    img->getLayer(i)->setData(a);
+    img->getLayer(i).setData(a);
     first += w * h;
   }
 

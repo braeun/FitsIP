@@ -36,9 +36,9 @@ public:
 
   QString getFilename() const;
 
-  virtual std::shared_ptr<FitsImage> createPSF(int w, int h, const std::vector<ValueType>& par) const override;
+  virtual FitsImage createPSF(int w, int h, const std::vector<ValueType>& par) const override;
 
-  virtual std::shared_ptr<FitsImage> createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const override;
+  virtual FitsImage createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const override;
 
   virtual bool isFixedSize() const override;
 
@@ -50,7 +50,7 @@ private:
   void init();
 
   QString filename;
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
 
 };
 

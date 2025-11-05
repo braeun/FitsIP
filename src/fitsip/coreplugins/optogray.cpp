@@ -79,5 +79,5 @@ OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsObject> image, const 
 
 std::shared_ptr<FitsObject>  OpToGray::toGray(std::shared_ptr<FitsObject> image) const
 {
-  return std::make_shared<FitsObject>(image->getImage()->toGray());
+  return std::make_shared<FitsObject>(std::make_shared<FitsImage>(image->getImage()->toGray()));
 }

@@ -43,9 +43,9 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> list, const OpPluginData& data=OpPluginData()) override;
 
-  ResultType prepare(FitsImage* image, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove);
+  ResultType prepare(const FitsImage& image, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove);
 
-  ResultType match(FitsImage* image);
+  ResultType match(const FitsImage& image);
 
   double getAngle() const;
 

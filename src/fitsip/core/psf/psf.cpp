@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for point-spread-functions                       *
  *                                                                              *
- * modified: 2025-05-24                                                         *
+ * modified: 2025-11-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -21,7 +21,6 @@
  ********************************************************************************/
 
 #include "psf.h"
-#include <iostream>
 
 PSF::PSF()
 {
@@ -36,15 +35,15 @@ ValueType PSF::value(ValueType x, ValueType y, const std::vector<ValueType>& par
   return 0;
 }
 
-std::shared_ptr<FitsImage> PSF::createPSF(int w, int h, const std::vector<ValueType>& par) const
+FitsImage PSF::createPSF(int w, int h, const std::vector<ValueType>& par) const
 {
-  auto img = std::make_shared<FitsImage>(getName(),w,h);
+  FitsImage img(getName(),w,h);
   ValueType sum = 0;
-  for (int y=0;y<img->getHeight();y++)
+  for (int y=0;y<img.getHeight();y++)
   {
     ValueType yv = y < h/2 ? y : h - y;
-    PixelIterator it = img->getPixelIterator(0,y);
-    for (int x=0;x<img->getWidth();x++)
+    PixelIterator it = img.getPixelIterator(0,y);
+    for (int x=0;x<img.getWidth();x++)
     {
       ValueType xv = x < w/2 ? x : w - x;
       it[0] = value(xv,yv,par);
@@ -52,20 +51,20 @@ std::shared_ptr<FitsImage> PSF::createPSF(int w, int h, const std::vector<ValueT
       ++it;
     }
   }
-  if (sum != 0) *img /= sum;
+  if (sum != 0) img /= sum;
   return img;
 }
 
-std::shared_ptr<FitsImage> PSF::createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const
+FitsImage PSF::createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const
 {
-  auto img = std::make_shared<FitsImage>(getName(),w,h);
-  PixelIterator it = img->getPixelIterator();
-  for (int y=0;y<img->getHeight();y++)
+  FitsImage img(getName(),w,h);
+  PixelIterator it = img.getPixelIterator();
+  for (int y=0;y<img.getHeight();y++)
   {
-    ValueType yv = y - img->getHeight() / 2.0;
-    for (int x=0;x<img->getWidth();x++)
+    ValueType yv = y - img.getHeight() / 2.0;
+    for (int x=0;x<img.getWidth();x++)
     {
-      ValueType xv = x - img->getWidth() / 2.0;
+      ValueType xv = x - img.getWidth() / 2.0;
       it[0] = value(xv,yv,par);
       ++it;
     }

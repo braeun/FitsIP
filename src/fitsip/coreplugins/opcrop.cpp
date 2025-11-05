@@ -64,8 +64,8 @@ void OpCrop::bindPython(void* mod) const
       QRect r(x,y,w,h);
       if (!r.isValid()) return ERROR;
       auto img = obj->getImage()->subImage(r);
-      img->setMetadata(obj->getImage()->getMetadata());
-      obj->setImage(img);
+      img.setMetadata(obj->getImage()->getMetadata());
+      obj->setImage(std::make_shared<FitsImage>(img));
       obj->getImage()->log(QString("OpCrop: %1,%2 %3x%4").arg(x).arg(y).arg(w).arg(h));
       return OK;
     },
@@ -74,8 +74,8 @@ void OpCrop::bindPython(void* mod) const
       QRect r = findArea(obj->getImage(),threshold,border);
       if (!r.isValid()) return ERROR;
       auto img = obj->getImage()->subImage(r);
-      img->setMetadata(obj->getImage()->getMetadata());
-      obj->setImage(img);
+      img.setMetadata(obj->getImage()->getMetadata());
+      obj->setImage(std::make_shared<FitsImage>(img));
       obj->getImage()->log(QString("OpCrop: %1,%2 %3x%4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()));
       return OK;
     },
@@ -102,8 +102,8 @@ OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, const Op
     {
       profiler.start();
       auto img = image->getImage()->subImage(r);
-      img->setMetadata(image->getImage()->getMetadata());
-      image->setImage(img);
+      img.setMetadata(image->getImage()->getMetadata());
+      image->setImage(std::make_shared<FitsImage>(img));
       profiler.stop();
       log(image,QString("OpCrop: %1,%2 %3x%4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()));
       logProfiler(image);

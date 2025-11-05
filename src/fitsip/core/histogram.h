@@ -25,7 +25,6 @@
 
 #include "rgbvalue.h"
 #include <iostream>
-#include <memory>
 #include <vector>
 
 class FitsImage;
@@ -64,7 +63,7 @@ public:
    * @brief Build the histogram from the specified fits image
    * @param img the image to buld the histogram.
    */
-  void build(const FitsImage* img);
+  void build(const FitsImage& img);
 
   /* Increment bin corresponding to pixel value v */
   inline void inc(ValueType);

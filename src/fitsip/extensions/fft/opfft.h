@@ -44,7 +44,7 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  std::shared_ptr<FitsImage> fft(FitsImage* image) const;
+  std::shared_ptr<FitsImage> fft(const FitsImage& image) const;
 
 private:
   std::shared_ptr<FitsImage> img;

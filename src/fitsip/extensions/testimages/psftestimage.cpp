@@ -46,7 +46,7 @@ bool PSFTestImage::requiresFileList() const
 
 std::vector<std::shared_ptr<FitsObject>> PSFTestImage::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(std::make_shared<FitsImage>(img))};
 }
 
 
@@ -64,14 +64,14 @@ OpPlugin::ResultType PSFTestImage::execute(std::shared_ptr<FitsObject> /*image*/
   dlg->updatePSFList();
   if (dlg->exec())
   {
-    img = std::make_shared<FitsImage>(dlg->getFunction(),dlg->getWidth(),dlg->getHeight());
+    img = FitsImage(dlg->getFunction(),dlg->getWidth(),dlg->getHeight());
     ValueType a = dlg->getAmplitude();
     std::vector<ValueType> par = dlg->getParameters();
     auto psf = PSFFactory::getInstance()->getPSF(dlg->getFunction());
     if (psf)
     {
       img = psf->createPSFForDisplay(dlg->getWidth(),dlg->getHeight(),par);
-      *img *= a;
+      img *= a;
       emit logOperation("New Image","Created test image for "+dlg->getFunction());
       return OK;
     }

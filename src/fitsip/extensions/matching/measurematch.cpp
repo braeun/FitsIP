@@ -68,15 +68,15 @@ void MeasureMatch::bindPython(void* mod) const
   py::class_<MeasureMatch>(*m,"MeasureMatch","Match images to a template")
       .def(py::init<>())
       .def("set_template",[](MeasureMatch& op, std::shared_ptr<FitsObject> obj){
-          op.setTemplate(obj->getImage());
+          op.setTemplate(*obj->getImage());
         },
         "Set the template for matching",py::arg("obj"))
       .def("set_template",[](MeasureMatch& op, std::shared_ptr<FitsObject> obj, int x, int y, int w, int h){
-          op.setTemplate(obj->getImage(),QRect(x,y,w,h));
+          op.setTemplate(*obj->getImage(),QRect(x,y,w,h));
         },
         "Set the template for matching",py::arg("obj"),py::arg("x"),py::arg("y"),py::arg("w"),py::arg("h"))
       .def("match",[](MeasureMatch& op, std::shared_ptr<FitsObject> obj){
-          op.computeMatch(obj->getImage());
+          op.computeMatch(*obj->getImage());
         },
         "Compute the match of the image with the template",py::arg("obj"))
       .def("shift_aoi",[](MeasureMatch& op, int dx, int dy){op.shiftAOI(dx,dy);},
@@ -109,9 +109,9 @@ OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsObject> image, co
     subsample = dlg->getSubsample();
     factor = dlg->getScaleFactor();
     profiler.start();
-    setTemplate(image->getImage(),aoi);
+    setTemplate(*image->getImage(),aoi);
     std::shared_ptr<FitsObject> file = dlg->getImage();
-    computeMatch(file->getImage());
+    computeMatch(*file->getImage());
     profiler.stop();
     log(image,QString::asprintf("Maximum match with %s: %f at [%.1f,%.1f] shifted by [%.1f,%.1f]",file->getImage()->getName().toStdString().c_str(),max,getX(),getY(),getDx(),getDy()));
     logProfiler(image);
@@ -120,27 +120,27 @@ OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsObject> image, co
   return CANCELLED;
 }
 
-void MeasureMatch::setTemplate(FitsImage* image, QRect a)
+void MeasureMatch::setTemplate(const FitsImage& image, QRect a)
 {
   aoi = a;
   if (aoi.isEmpty()) /* if no AOI specified, use the center of the image as the template */
   {
     qWarning() << "No AOI set - using center of active image for template";
     int w = 100;
-    if (w >= image->getWidth()/2) w = image->getWidth()/2;
+    if (w >= image.getWidth()/2) w = image.getWidth()/2;
     int h = 100;
-    if (h >= image->getHeight()/2) h = image->getHeight()/2;
-    aoi = QRect((image->getWidth()-w)/2,(image->getHeight()-h)/2,w,h);
+    if (h >= image.getHeight()/2) h = image.getHeight()/2;
+    aoi = QRect((image.getWidth()-w)/2,(image.getHeight()-h)/2,w,h);
   }
   double sumR = 0;
   double sumR2 = 0;
-  QRect r(0,0,image->getWidth(),image->getHeight());
+  QRect r(0,0,image.getWidth(),image.getHeight());
   if (!r.contains(aoi))
   {
     qWarning() << "AOI not fully contained in image! Creating intersection.";
     aoi = r.intersected(aoi);
   }
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
   if (factor > 1)
   {
     OpResize op;
@@ -149,7 +149,7 @@ void MeasureMatch::setTemplate(FitsImage* image, QRect a)
   }
   else
   {
-    img = std::make_shared<FitsImage>(*image);
+    img = image;
   }
   R.clear();
   for (int i=0;i<aoi.height();i++)
@@ -161,7 +161,7 @@ void MeasureMatch::setTemplate(FitsImage* image, QRect a)
     for (int j=0;j<aoi.height();j++)
     {
       {
-        double v = img->getConstPixelIterator(i+aoi.x(),j+aoi.y()).getAbs();
+        double v = img.getConstPixelIterator(i+aoi.x(),j+aoi.y()).getAbs();
         R[j][i] = v;
         sumR += v;
         sumR2 += v * v;
@@ -178,7 +178,7 @@ void MeasureMatch::setTemplate(FitsImage* image, QRect a)
 /*
  * Computes the match between the image I and the template image R
  */
-void MeasureMatch::computeMatch(FitsImage* image)
+void MeasureMatch::computeMatch(const FitsImage& image)
 {
   createI(image);
   int xMax = width - aoi.width();
@@ -304,9 +304,9 @@ void MeasureMatch::shiftAOI(double dx, double dy)
 
 
 
-void MeasureMatch::createI(FitsImage* image)
+void MeasureMatch::createI(const FitsImage& image)
 {
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
   if (factor > 1)
   {
     OpResize op;
@@ -314,30 +314,30 @@ void MeasureMatch::createI(FitsImage* image)
   }
   else
   {
-    img = std::make_shared<FitsImage>(*image);
+    img = image;
   }
   offsetX = 0;
   offsetY = 0;
-  height = img->getHeight();
-  width = img->getWidth();
+  height = img.getHeight();
+  width = img.getWidth();
   if (!matchFull)
   {
     offsetX = std::max(aoi.x()-matchRange,0);
     offsetY = std::max(aoi.y()-matchRange,0);
-    height = std::min(aoi.height()+2*matchRange,static_cast<int>(img->getHeight())-offsetY);
-    width = std::min(aoi.width()+2*matchRange,static_cast<int>(img->getWidth())-offsetX);
+    height = std::min(aoi.height()+2*matchRange,static_cast<int>(img.getHeight())-offsetY);
+    width = std::min(aoi.width()+2*matchRange,static_cast<int>(img.getWidth())-offsetX);
   }
   I.clear();// = hmath::Matrix(height,width);
   for (int iy=0;iy<height;iy++)
   {
     if (offsetY+iy < 0) continue;
-    if (offsetY+iy >= img->getHeight()) break;
+    if (offsetY+iy >= img.getHeight()) break;
     I.push_back(std::vector<ValueType>(width,0.0));
     for (int ix=0;ix<width;ix++)
     {
       if (offsetX+ix < 0) continue;
-      if (offsetX+ix >= img->getWidth()) break;
-      I[iy][ix] = img->getConstPixelIterator(offsetX+ix,offsetY+iy).getAbs();
+      if (offsetX+ix >= img.getWidth()) break;
+      I[iy][ix] = img.getConstPixelIterator(offsetX+ix,offsetY+iy).getAbs();
     }
   }
 }

@@ -53,12 +53,12 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  std::vector<Star> findStars(std::shared_ptr<FitsImage> image);
+  std::vector<Star> findStars(const FitsImage& image);
 
-  std::vector<Star> findStars(std::shared_ptr<FitsImage> image, PixelList* pixels, ValueType sky, int box);
+  std::vector<Star> findStars(const FitsImage& image, PixelList* pixels, ValueType sky, int box);
 
   [[deprecated]]
-  void starAxes(std::shared_ptr<FitsImage> image, const QRect& box, double sky,
+  void starAxes(const FitsImage& image, const QRect& box, double sky,
                 double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter);
 
 private:
@@ -78,19 +78,19 @@ private:
 
   ResultType execute1(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData());
   ResultType execute2(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData());
-  std::shared_ptr<FitsImage> convolve(std::shared_ptr<FitsImage> image, double fwhm);
-  double do_gauss(std::shared_ptr<FitsImage> image, uint32_t x, uint32_t y, const Gaussian& gauss);
-  double find_skysig(std::shared_ptr<FitsImage> image, double rough_sig);
-  bool is_peak(std::shared_ptr<FitsImage> image, uint32_t xc, uint32_t yc);
+  FitsImage convolve(const FitsImage& image, double fwhm);
+  double do_gauss(const FitsImage& image, uint32_t x, uint32_t y, const Gaussian& gauss);
+  double find_skysig(const FitsImage& image, double rough_sig);
+  bool is_peak(const FitsImage& image, uint32_t xc, uint32_t yc);
   void calc_box(int x, int y, int w, int h, int *tsx, int *tsy, int wsize2, int hsize2);
-  void star_axes(std::shared_ptr<FitsImage> image, int tsx, int tsy, int w, int h, double sky,
+  void star_axes(const FitsImage& image, int tsx, int tsy, int w, int h, double sky,
                  double *xc, double *yc, double *fwhm, double *xwidth, double *ywidth, int maxiter);
-  double do_fwhm(std::shared_ptr<FitsImage> image, int sx, int sy, int w, int h, double xc, double yc, double sky);
+  double do_fwhm(const FitsImage& image, int sx, int sy, int w, int h, double xc, double yc, double sky);
   double get_frac(double larger, double smaller, double middle);
   bool validFWHM(double fwhm);
-  void markpix(std::shared_ptr<FitsImage> image, double xc, double yc, double fwhm);
-  double hotness(std::shared_ptr<FitsImage> image, uint32_t x, uint32_t y);
-  double sharpness(std::shared_ptr<FitsImage> image, uint32_t x, uint32_t y);
+  void markpix(const FitsImage& image, double xc, double yc, double fwhm);
+  double hotness(const FitsImage& image, uint32_t x, uint32_t y);
+  double sharpness(const FitsImage& image, uint32_t x, uint32_t y);
 
 
   std::vector<Star> stars;
@@ -124,7 +124,7 @@ private:
   int tinysize;           /* size of area on which to perform analysis (>= maxfwhm) */
   int maxiter;
   std::vector<uint8_t> bitmap;        /* bitmap to flag pixel as used */
-  std::shared_ptr<FitsImage> conv_img;
+  FitsImage conv_img;
 
 };
 

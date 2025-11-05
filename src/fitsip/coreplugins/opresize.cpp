@@ -124,7 +124,7 @@ OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, const 
       mode = "bilinear";
     }
     profiler.start();
-    image->setImage(resize(image->getImage(),factorx,factory,m));
+    image->setImage(resize(*image->getImage(),factorx,factory,m));
     profiler.stop();
     log(image,QString("Resize: factor x=%1 y=%2 %3").arg(factorx).arg(factory).arg(mode));
     logProfiler(image);
@@ -133,19 +133,19 @@ OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, const 
   return CANCELLED;
 }
 
-std::shared_ptr<FitsImage> OpResize::resize(FitsImage* image, double factorx, double factory, int mode) const
+std::shared_ptr<FitsImage> OpResize::resize(const FitsImage& image, double factorx, double factory, int mode) const
 {
   if (mode == 0)
   {
-    int w = image->getWidth() * factorx;
-    int h = image->getHeight() * factory;
-    return image->resizedImage(w,h);
+    int w = image.getWidth() * factorx;
+    int h = image.getHeight() * factory;
+    return std::make_shared<FitsImage>(image.resizedImage(w,h));
   }
   if (factorx < 1 && factory < 1)
   {
-    return shrink(image,factorx,factory);
+    return std::make_shared<FitsImage>(shrink(image,factorx,factory));
   }
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
   if (factorx < 1)
   {
     img = shrink(image,factorx,1.0);
@@ -156,13 +156,17 @@ std::shared_ptr<FitsImage> OpResize::resize(FitsImage* image, double factorx, do
     img = shrink(image,1.0,factory);
     factory = 1.0;
   }
+  else
+  {
+    img = image;
+  }
   if (mode == 1)
   {
-    return growNearestNeighbor(img.get(),factorx,factory);
+    return std::make_shared<FitsImage>(growNearestNeighbor(img,factorx,factory));
   }
   else //if (mode == 2)
   {
-    return growBilinear(img.get(),factorx,factory);
+    return std::make_shared<FitsImage>(growBilinear(img,factorx,factory));
   }
 }
 
@@ -243,25 +247,25 @@ std::shared_ptr<FitsImage> OpResize::resize(FitsImage* image, double factorx, do
 //  return img;
 //}
 
-std::shared_ptr<FitsImage> OpResize::shrink(FitsImage* image, double factorx, double factory) const
+FitsImage OpResize::shrink(const FitsImage& image, double factorx, double factory) const
 {
   double sx = 1 / factorx;
   double sy = 1 / factory;
-  int w = static_cast<int>(image->getWidth() * factorx) + 1;
-  int h = static_cast<int>(image->getHeight() * factory) + 1;
-  auto img = std::make_shared<FitsImage>(image->getName(),w,h,image->getDepth());
-  img->setMetadata(image->getMetadata());
-  for (int d=0;d<image->getDepth();d++)
+  int w = static_cast<int>(image.getWidth() * factorx) + 1;
+  int h = static_cast<int>(image.getHeight() * factory) + 1;
+  FitsImage img(image.getName(),w,h,image.getDepth());
+  img.setMetadata(image.getMetadata());
+  for (int d=0;d<image.getDepth();d++)
   {
-    ValueType* src = image->getLayer(d)->getData();
-    ValueType* dst = img->getLayer(d)->getData();
+    const ValueType* src = image.getLayer(d).getData();
+    ValueType* dst = img.getLayer(d).getData();
     double ys = sy;
-    for (int y=0;y<image->getHeight();y++)
+    for (int y=0;y<image.getHeight();y++)
     {
       double fy = (ys >= 1.0) ? 1.0 : ys;
       double xs = sx;
       int xd = 0;
-      for (int x=0;x<image->getWidth()&&xd<w;x++)
+      for (int x=0;x<image.getWidth()&&xd<w;x++)
       {
         if (xs >= 1.0)
         {
@@ -278,11 +282,11 @@ std::shared_ptr<FitsImage> OpResize::shrink(FitsImage* image, double factorx, do
       }
       if (ys < 1.0)
       {
-        dst += img->getWidth();
+        dst += img.getWidth();
         fy = 1 - ys;
         double xs = sy;
         int xd = 0;
-        for (int x=0;x<image->getWidth()&&xd<w;x++)
+        for (int x=0;x<image.getWidth()&&xd<w;x++)
         {
           if (xs >= 1.0)
           {
@@ -303,68 +307,68 @@ std::shared_ptr<FitsImage> OpResize::shrink(FitsImage* image, double factorx, do
       {
         ys -= 1.0;
       }
-      src += image->getWidth();
+      src += image.getWidth();
     }
   }
   return img;
 }
 
-std::shared_ptr<FitsImage> OpResize::growNearestNeighbor(FitsImage* image, double factorx, double factory) const
+FitsImage OpResize::growNearestNeighbor(const FitsImage& image, double factorx, double factory) const
 {
-  int w = static_cast<int>(image->getWidth() * factorx);
-  int h = static_cast<int>(image->getHeight() * factory);
-  auto img = std::make_shared<FitsImage>(image->getName(),w,h,image->getDepth());
-  img->setMetadata(image->getMetadata());
-  for (int d=0;d<image->getDepth();++d)
+  int w = static_cast<int>(image.getWidth() * factorx);
+  int h = static_cast<int>(image.getHeight() * factory);
+  FitsImage img(image.getName(),w,h,image.getDepth());
+  img.setMetadata(image.getMetadata());
+  for (int d=0;d<image.getDepth();++d)
   {
-    ValueType* dst = img->getLayer(d)->getData();
-    for (int y=0;y<img->getHeight();++y)
+    ValueType* dst = img.getLayer(d).getData();
+    for (int y=0;y<img.getHeight();++y)
     {
       int ys1 = static_cast<int>(round(y/factory));
-      if (ys1 >= image->getHeight()) ys1 = image->getHeight() - 1;
-      ValueType* src = image->getLayer(d)->getData() + ys1 * image->getWidth();
-      for (int x=0;x<img->getWidth();++x)
+      if (ys1 >= image.getHeight()) ys1 = image.getHeight() - 1;
+      const ValueType* src = image.getLayer(d).getData() + ys1 * image.getWidth();
+      for (int x=0;x<img.getWidth();++x)
       {
         int xs1 = static_cast<int>(round(x/factorx));
-        if (xs1 >= image->getWidth()) xs1 = image->getWidth() - 1;
+        if (xs1 >= image.getWidth()) xs1 = image.getWidth() - 1;
         dst[x] = src[xs1];
       }
-      dst += img->getWidth();
+      dst += img.getWidth();
     }
   }
   return img;
 }
 
-std::shared_ptr<FitsImage> OpResize::growBilinear(FitsImage* image, double factorx, double factory) const
+FitsImage OpResize::growBilinear(const FitsImage& image, double factorx, double factory) const
 {
-  int w = static_cast<int>(image->getWidth() * factorx);
-  int h = static_cast<int>(image->getHeight() * factory);
-  auto img = std::make_shared<FitsImage>(image->getName(),w,h,image->getDepth());
-  img->setMetadata(image->getMetadata());
-  for (int d=0;d<image->getDepth();++d)
+  int w = static_cast<int>(image.getWidth() * factorx);
+  int h = static_cast<int>(image.getHeight() * factory);
+  FitsImage img(image.getName(),w,h,image.getDepth());
+  img.setMetadata(image.getMetadata());
+  for (int d=0;d<image.getDepth();++d)
   {
-    ValueType* dst = img->getLayer(d)->getData();
-    for (int y=0;y<img->getHeight();++y)
+    ValueType* dst = img.getLayer(d).getData();
+    for (int y=0;y<img.getHeight();++y)
     {
       double ys = y / factory;
       int ys1 = static_cast<int>(ys);
-      ValueType* src = image->getLayer(d)->getData() + ys1 * image->getWidth();
-      if (ys1+1 >= image->getHeight())
+      const ValueType* src = image.getLayer(d).getData() + ys1 * image.getWidth();
+      if (ys1+1 >= image.getHeight())
         break;
       ys -= ys1;
-      for (int x=0;x<img->getWidth();++x)
+      for (int x=0;x<img.getWidth();++x)
       {
         double xs = x / factorx;
         int xs1 = static_cast<int>(xs);
-        if (xs1+1 >= image->getWidth())
+        if (xs1+1 >= image.getWidth())
           break;
         xs -= xs1;
         dst[x] = (1 - xs) * (1 - ys) * src[xs1]
             + xs * (1 - ys) * src[xs1+1]
-            + (1 - xs) * ys * src[image->getWidth()+xs1]
-            + xs * ys * src[image->getWidth()+xs1+1];
+            + (1 - xs) * ys * src[image.getWidth()+xs1]
+            + xs * ys * src[image.getWidth()+xs1+1];
       }
-      dst += img->getWidth();
+      dst += img.getWidth();
     }
   }
   return img;
@@ -385,7 +389,7 @@ void OpResize::scriptResize(std::shared_ptr<FitsObject> obj, double factorx, dou
     m = 2;
     md = "bilinear";
   }
-  auto img = resize(obj->getImage(),factorx,factory,m);
+  auto img = resize(*obj->getImage(),factorx,factory,m);
   obj->setImage(img);
   obj->getImage()->log(QString("Resize: factor x=%1  factor y=%2 %3").arg(factorx).arg(factory).arg(md));
 }

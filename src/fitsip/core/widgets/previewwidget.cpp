@@ -63,7 +63,7 @@ void PreviewWidget::setSourceImage(const FitsImage& image, QRect selection)
     selection = QRect(image.getWidth()/2-w/2,image.getHeight()/2-h/2,w,h);
   }
   selection = image.getOverlap(selection);
-  sourceImage = *image.subImage(selection);
+  sourceImage = image.subImage(selection);
   updatePreview(sourceImage);
 }
 
@@ -78,7 +78,7 @@ void PreviewWidget::updatePreview(const FitsImage& image)
   if (image)
   {
     Histogram h;
-    h.build(&image);
+    h.build(image);
     QImage i = image.toQImage(h.getMin(),h.getMax(),options.scale);
     ui->previewLabel->setPixmap(QPixmap::fromImage(i));
   }

@@ -86,8 +86,8 @@ void OpUnsharpMask::unsharpmask(FitsImage* image, ValueType sigma, ValueType str
   blur.blur(blurred.get(),sigma,sigma);
   for (int d=0;d<image->getDepth();d++)
   {
-    ValueType *p1 = image->getLayer(d)->getData();
-    ValueType *p2 = blurred->getLayer(d)->getData();
+    ValueType *p1 = image->getLayer(d).getData();
+    const ValueType *p2 = blurred->getLayer(d).getData();
     int n = image->getWidth() * image->getHeight();
     while (n-- > 0)
     {

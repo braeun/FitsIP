@@ -52,7 +52,7 @@ OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> i
 {
   if (!dlg) dlg = new SynthesizeBackgroundDialog();
   Histogram hist;
-  hist.build(image->getImage());
+  hist.build(*image->getImage());
   dlg->setSky(hist.getAverage(0.75));
   if (dlg->exec())
   {

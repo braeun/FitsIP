@@ -119,7 +119,7 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
   int h0 = image->getHeight() + psf->getHeight();
   ImageStatistics basestat(*image);
   auto imgpadded = image->paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
-  auto o = std::make_shared<FitsImage>(*imgpadded);
+  FitsImage o(imgpadded);
   auto h = psf->createPSF(w0,h0,par);
   fftdata data;
   data.fftsize = (w0 / 2 + 1) * h0;
@@ -127,7 +127,7 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
   data.rinout = new double[h0*w0];
   data.r2c = fftw_plan_dft_r2c_2d(h0,w0,data.rinout,data.cinout,FFTW_ESTIMATE);
   data.c2r = fftw_plan_dft_c2r_2d(h0,w0,data.cinout,data.rinout,FFTW_ESTIMATE);
-  fft(data,*h,0);
+  fft(data,h,0);
   fftw_complex* hfft = new fftw_complex[data.fftsize];
   memcpy(hfft,data.cinout,data.fftsize*sizeof(fftw_complex));
   fftw_complex* offt1 = new fftw_complex[data.fftsize];
@@ -138,27 +138,27 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
   int remain = niter;
   while (remain-- > 0)
   {
-    if (imgpadded->getDepth() == 1)
+    if (imgpadded.getDepth() == 1)
     {
-      fft(data,*o,0);
+      fft(data,o,0);
       memcpy(offt1,data.cinout,data.fftsize*sizeof(fftw_complex));
       mul(offt1,hfft,data.fftsize);
       c = invfft(data,offt1,w0,h0);
     }
-    else if (imgpadded->getDepth() == 3)
+    else if (imgpadded.getDepth() == 3)
     {
-      fft(data,*o,0);
+      fft(data,o,0);
       memcpy(offt1,data.cinout,data.fftsize*sizeof(fftw_complex));
-      fft(data,*o,1);
+      fft(data,o,1);
       memcpy(offt2,data.cinout,data.fftsize*sizeof(fftw_complex));
-      fft(data,*o,2);
+      fft(data,o,2);
       memcpy(offt3,data.cinout,data.fftsize*sizeof(fftw_complex));
       mul(offt1,hfft,data.fftsize);
       mul(offt2,hfft,data.fftsize);
       mul(offt3,hfft,data.fftsize);
       c = invfft(data,offt1,offt2,offt3,w0,h0);
     }
-    auto s = std::make_shared<FitsImage>(*imgpadded);
+    auto s = std::make_shared<FitsImage>(imgpadded);
     *s -= *c;
     stat = ImageStatistics(*s);
     switch (func)
@@ -167,13 +167,13 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
         *s *= parameter;
         break;
       case Sine:
-        applySineRelaxation(o.get(),basestat,s.get());
+        applySineRelaxation(o,basestat,s.get());
         break;
     }
-    *o += *s;
+    o += *s;
     if (cutImage)
     {
-      o->cut(basestat.getGlobalStatistics().minValue,basestat.getGlobalStatistics().maxValue);
+      o.cut(basestat.getGlobalStatistics().minValue,basestat.getGlobalStatistics().maxValue);
     }
     if (storeintermediate)
     {
@@ -183,7 +183,7 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
       QString fns = path + "/s_" + QString::number(niter-remain) + ".fts";
       io->write(fns,s.get());
       QString fno = path + "/o_" + QString::number(niter-remain) + ".fts";
-      io->write(fno,o.get());
+      io->write(fno,&o);
     }
     qInfo() << "remaining" << remain << " stddev=" << stat.getGlobalStatistics().stddev;
     if (prog)
@@ -203,8 +203,8 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
   delete [] offt3;
   delete [] hfft;
   /* crop to original size */
-  o = o->subImage(QRect(0,0,image->getWidth(),image->getHeight()));
-  *image = *o;
+  o = o.subImage(QRect(0,0,image->getWidth(),image->getHeight()));
+  *image = o;
   if (prog) prog->deleteLater();
 }
 
@@ -297,15 +297,15 @@ void VanCittertDeconvolution::mul(fftw_complex *a, fftw_complex *b, int n)
   }
 }
 
-void VanCittertDeconvolution::applySineRelaxation(FitsImage* image, const ImageStatistics& stat, FitsImage* corr)
+void VanCittertDeconvolution::applySineRelaxation(const FitsImage& image, const ImageStatistics& stat, FitsImage* corr)
 {
   ImageStatistics s = stat;
-  if (!cutImage) s = ImageStatistics(*image);
-  ConstPixelIterator p = image->getConstPixelIterator();
+  if (!cutImage) s = ImageStatistics(image);
+  ConstPixelIterator p = image.getConstPixelIterator();
   PixelIterator c = corr->getPixelIterator();
   while (p.hasNext())
   {
-    for (int i=0;i<image->getDepth();i++)
+    for (int i=0;i<image.getDepth();i++)
     {
       ValueType w;
       if (p[i] <= s.getLayerStatistics()[i].minValue)

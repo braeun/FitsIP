@@ -70,16 +70,16 @@ const std::vector<std::shared_ptr<PSF>>& PSFFactory::getList() const
   return list;
 }
 
-bool PSFFactory::addPSF(const FitsImage* img, const QString filename)
+bool PSFFactory::addPSF(const FitsImage& img, const QString filename)
 {
   QFileInfo file(QDir(Settings().getInternalPSFDirectory()).absoluteFilePath(QFileInfo(filename).baseName()+".fts"));
   IOHandler* handler = IOFactory::getInstance()->getHandler(file.fileName());
   if (!handler) return false;
-  auto tmp = img->toGray();
+  auto tmp = img.toGray();
   Histogram hist;
-  hist.build(tmp.get());
-  *tmp /= hist.getBrightness();
-  bool ret =handler->write(file.absoluteFilePath(),tmp.get());
+  hist.build(tmp);
+  tmp /= hist.getBrightness();
+  bool ret = handler->write(file.absoluteFilePath(),&tmp);
   if (ret)
   {
     list.push_back(std::make_shared<ImagePSF>(file.absoluteFilePath()));

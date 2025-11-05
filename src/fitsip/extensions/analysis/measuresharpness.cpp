@@ -188,24 +188,24 @@ SharpnessData MeasureSharpness::evaluate(const QFileInfo info, QRect selection) 
 SharpnessData MeasureSharpness::calculateSharpness(FitsImage* img, QRect selection) const
 {
   SharpnessData data;
-  auto copy = std::make_shared<FitsImage>(*img);
+  FitsImage copy(*img);
   if (selection.isValid())
   {
-    copy = copy->subImage(selection);
+    copy = copy.subImage(selection);
   }
-  ImageStatistics stat(*copy);
+  ImageStatistics stat(copy);
   data.minPixel = stat.getGlobalStatistics().minValue;
   data.maxPixel = stat.getGlobalStatistics().maxValue;
   /* apply laplacian */
   OpKernel op;
   const Kernel& kernel = KernelRepository::instance().getKernel(KernelRepository::LAPLACIAN);
-  op.convolve(copy.get(),kernel);
+  op.convolve(&copy,kernel);
   /* ignore borders */
   QRect r(5,5,img->getWidth()-10,img->getHeight()-10);
-  copy = copy->subImage(r);
+  copy = copy.subImage(r);
   /* calculate statistics */
   Average avg;
-  ConstPixelIterator p = copy->getConstPixelIterator();
+  ConstPixelIterator p = copy.getConstPixelIterator();
   while (p.hasNext())
   {
     double v = std::fabs(p.getAbs());

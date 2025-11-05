@@ -78,18 +78,18 @@ void Histogram::clear(void)
   }
 }
 
-void Histogram::build(const FitsImage* img)
+void Histogram::build(const FitsImage& img)
 {
   for (size_t i=0;i<4;i++)
   {
     data[i].assign(bin,0);
     brightness[i] = 0;
   }
-  sum = img->getWidth() * img->getHeight();
-  bool rgb = img->getDepth() == 3;
+  sum = img.getWidth() * img.getHeight();
+  bool rgb = img.getDepth() == 3;
   ValueType ma = -std::numeric_limits<ValueType>::max();
   ValueType mi = std::numeric_limits<ValueType>::max();
-  ConstPixelIterator p = img->getConstPixelIterator();
+  ConstPixelIterator p = img.getConstPixelIterator();
   while (p.hasNext())
   {
     mi = std::min(mi,p.min());
@@ -98,7 +98,7 @@ void Histogram::build(const FitsImage* img)
   }
   min = mi;
   max = ma;
-  p = img->getConstPixelIterator();
+  p = img.getConstPixelIterator();
   while (p.hasNext())
   {
     if (rgb)

@@ -67,10 +67,10 @@ OpPlugin::ResultType StarMatcher::execute(std::shared_ptr<FitsObject> image, con
   {
     profiler.start();
     std::shared_ptr<FitsObject> file = dlg->getImage();
-    auto ret = prepare(image->getImage(),data.pixellist,dlg->isSubtractSky(),dlg->getSearchBoxSize(),dlg->getStarBoxSize(),dlg->isAllowRotation(),dlg->getStarMaxMovement());
+    auto ret = prepare(*image->getImage(),data.pixellist,dlg->isSubtractSky(),dlg->getSearchBoxSize(),dlg->getStarBoxSize(),dlg->isAllowRotation(),dlg->getStarMaxMovement());
     if (ret == OK)
     {
-      ret = match(file->getImage());
+      ret = match(*file->getImage());
     }
     profiler.stop();
     if (ret == OK)
@@ -85,7 +85,7 @@ OpPlugin::ResultType StarMatcher::execute(std::shared_ptr<FitsObject> image, con
   return CANCELLED;
 }
 
-OpPlugin::ResultType StarMatcher::prepare(FitsImage* image, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove)
+OpPlugin::ResultType StarMatcher::prepare(const FitsImage& image, PixelList* pixellist, bool subsky, int searchbox, int starbox, bool rotate, double maxmove)
 {
   this->subsky = subsky;
   if (pixellist->getPixels().empty())
@@ -107,13 +107,13 @@ OpPlugin::ResultType StarMatcher::prepare(FitsImage* image, PixelList* pixellist
   this->starbox = starbox;
   this->rotate = rotate;
   this->maxmove = maxmove;
-  auto img = image->toGray();
+  auto img = image.toGray();
   if (subsky)
   {
     Histogram hist;
-    hist.build(img.get());
+    hist.build(img);
     AverageResult avg = hist.getAverage(0.75);
-    *img -= avg.mean;
+    img -= avg.mean;
   }
   std::vector<Star> stars = starfinder.findStars(img,pixellist,0,starbox);
   starlist1.setStars(stars);
@@ -121,7 +121,7 @@ OpPlugin::ResultType StarMatcher::prepare(FitsImage* image, PixelList* pixellist
   return OK;
 }
 
-OpPlugin::ResultType StarMatcher::match(FitsImage* image)
+OpPlugin::ResultType StarMatcher::match(const FitsImage& image)
 {
   angle = 0;
   angleSigma = 0;
@@ -132,7 +132,7 @@ OpPlugin::ResultType StarMatcher::match(FitsImage* image)
   /* save starlist of last image */
   StarList last;
   last.setStars(starlist2.getStars());
-  auto img = image->toGray();
+  auto img = image.toGray();
   if (!subsky)
   {
     /* The sky background has not been subtracted yet.
@@ -140,15 +140,15 @@ OpPlugin::ResultType StarMatcher::match(FitsImage* image)
     Histogram hist;
     hist.build(image);
     AverageResult avg = hist.getAverage(0.75);
-    *img -= avg.mean;
+    img -= avg.mean;
   }
   PixelList pixellist;
   for (const Star& star : starlist2.getStars())
   {
     QRect r(star.getX()-searchbox/2,star.getY()-searchbox/2,searchbox,searchbox);
-    r = image->getOverlap(r);
+    r = image.getOverlap(r);
     /* find the brightest pixel in the rectangle, assuming thats the new position of the star */
-    Pixel pixel = image->getBrightestPixel(r);
+    Pixel pixel = image.getBrightestPixel(r);
     pixellist.addPixel(pixel);
   }
   std::vector<Star> stars = starfinder.findStars(img,&pixellist,0,starbox);
@@ -161,8 +161,8 @@ OpPlugin::ResultType StarMatcher::match(FitsImage* image)
     std::tie(angle,angleSigma) = a;
     if (fabs(angle) > 0.001)
     {
-      int xc = static_cast<int>(img->getWidth()) / 2;
-      int yc = static_cast<int>(img->getHeight()) / 2;
+      int xc = static_cast<int>(img.getWidth()) / 2;
+      int yc = static_cast<int>(img.getHeight()) / 2;
       tmp.rotate(xc,yc,angle);
     }
   }
@@ -170,7 +170,7 @@ OpPlugin::ResultType StarMatcher::match(FitsImage* image)
   std::tie(dx,sigmadx,dy,sigmady) = getShift(last,starlist2);
   if (fabs(dx) > maxmove || fabs(dy) > maxmove)
   {
-    qWarning() << img->getName() << " shift " << dx << dy << "exceeds max move value" << maxmove;
+    qWarning() << img.getName() << " shift " << dx << dy << "exceeds max move value" << maxmove;
     return ERROR;
   }
   /* using the new rotated starlist, get shift to first image for stacking */

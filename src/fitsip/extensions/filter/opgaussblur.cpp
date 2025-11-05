@@ -137,8 +137,8 @@ void OpGaussBlur::blur(FitsImage* image, ValueType sigmax, ValueType sigmay, Val
   }
   for (int d=0;d<image->getDepth();d++)
   {
-    blurX(image->getLayer(d)->getData(),image->getWidth(),image->getHeight(),data);
-    blurY(image->getLayer(d)->getData(),image->getWidth(),image->getHeight(),data);
+    blurX(image->getLayer(d).getData(),image->getWidth(),image->getHeight(),data);
+    blurY(image->getLayer(d).getData(),image->getWidth(),image->getHeight(),data);
   }
 }
 

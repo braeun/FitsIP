@@ -170,7 +170,7 @@ OpPlugin::ResultType OpStack::prepare(const QFileInfo& file, bool subsky)
     if (subtractSky)
     {
       Histogram hist;
-      hist.build(img.get());
+      hist.build(*img);
       AverageResult avg = hist.getAverage(0.75);
       *img -= avg.mean;
     }
@@ -190,7 +190,7 @@ OpPlugin::ResultType OpStack::prepareTemplate(const QFileInfo &file, bool subsky
   {
     matcher.setMatchFull(full);
     matcher.setMatchRange(range);
-    matcher.setTemplate(img.get(),aoi);
+    matcher.setTemplate(*img,aoi);
   }
   return res;
 }
@@ -200,7 +200,7 @@ OpPlugin::ResultType OpStack::prepareStarMatch(const QFileInfo &file, PixelList*
   OpPlugin::ResultType res = prepare(file,subsky);
   if (res == OK)
   {
-    res = starmatcher.prepare(img.get(),pixellist,false,searchbox,starbox,rotate,maxmove);
+    res = starmatcher.prepare(*img,pixellist,false,searchbox,starbox,rotate,maxmove);
   }
   return res;
 }
@@ -219,7 +219,7 @@ OpPlugin::ResultType OpStack::stack(const QFileInfo &file)
     if (subtractSky)
     {
       Histogram hist;
-      hist.build(img1.get());
+      hist.build(*img1);
       AverageResult avg = hist.getAverage(0.75);
       *img1 -= avg.mean;
     }
@@ -249,11 +249,11 @@ OpPlugin::ResultType OpStack::stackTemplate(const QFileInfo &file)
     if (subtractSky)
     {
       Histogram hist;
-      hist.build(img1.get());
+      hist.build(*img1);
       AverageResult avg = hist.getAverage(0.75);
       *img1 -= avg.mean;
     }
-    matcher.computeMatch(img1.get());
+    matcher.computeMatch(*img1);
     OpShift shift;
     shift.shift(img1.get(),-matcher.getDx(),-matcher.getDy());
     *img += *img1;
@@ -282,11 +282,11 @@ OpPlugin::ResultType OpStack::stackStarMatch(const QFileInfo &file)
     if (subtractSky)
     {
       Histogram hist;
-      hist.build(img1.get());
+      hist.build(*img1);
       AverageResult avg = hist.getAverage(0.75);
       *img1 -= avg.mean;
     }
-    ResultType res = starmatcher.match(img1.get());
+    ResultType res = starmatcher.match(*img1);
     if (res == OK)
     {
       if (rotate)

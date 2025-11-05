@@ -84,7 +84,7 @@ void OpScale::scaleImage(FitsImage* img, ValueType scale, ValueType bias) const
   int n = img->getWidth() * img->getHeight();
   for (int i=0;i<img->getDepth();i++)
   {
-    ValueType* p = img->getLayer(i)->getData();
+    ValueType* p = img->getLayer(i).getData();
     for (int j=0;j<n;j++)
     {
       *p = *p * scale + bias;

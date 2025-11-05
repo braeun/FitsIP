@@ -121,7 +121,7 @@ OpPlugin::ResultType OpAlign::prepare(const QFileInfo& file, QRect aoi)
   }
   matcher.setMatchFull(matchFull);
   matcher.setMatchRange(matchRange);
-  matcher.setTemplate(img.get(),aoi);
+  matcher.setTemplate(*img,aoi);
   QString txt = QString::asprintf("base for alignment using AOI [%d,%d+%dx%d]",aoi.x(),aoi.y(),aoi.width(),aoi.height());
   if (matchFull)
     txt += "; match full";
@@ -143,7 +143,7 @@ OpPlugin::ResultType OpAlign::align(const QFileInfo &file)
   try
   {
     std::shared_ptr<FitsImage> img1 = handler->read(file.absoluteFilePath()).front()->getImageShared();
-    matcher.computeMatch(img1.get());
+    matcher.computeMatch(*img1);
     OpShift shift;
     shift.shift(img1.get(),-matcher.getDx(),-matcher.getDy());
     save(img1.get(),outputPath,file,"aligned");

@@ -49,11 +49,11 @@ public:
 
 private:
   S3SharpnessData evaluate(const QFileInfo info, QRect selection);
-  S3SharpnessData calculateSharpness(FitsImage* img, double t1, double t2) const;
-  std::pair<Layer*,std::vector<XYData>> calculateSpectralSharpness(Layer* layer, double t1, double t2) const;
+  S3SharpnessData calculateSharpness(const FitsImage& img, double t1, double t2) const;
+  std::pair<Layer*,std::vector<XYData>> calculateSpectralSharpness(const Layer& layer, double t1, double t2) const;
   std::pair<LinearRegression,XYData> getSlope(fftw_complex* c, int m) const;
-  Layer* calculateSpatialSharpness(Layer* layer) const;
-  std::unique_ptr<Layer> calculateContrast(Layer* layer, int m, double t1, double t2) const;
+  Layer* calculateSpatialSharpness(const Layer& layer) const;
+  std::unique_ptr<Layer> calculateContrast(const Layer& layer, int m, double t1, double t2) const;
   void copyToLog();
 
   std::vector<std::shared_ptr<FitsObject>> images;

@@ -98,7 +98,7 @@ bool QtImageIO::write(QString filename, FitsObject* obj)
   profiler.start();
   FitsImage* img = obj->getImage();
   Histogram h;
-  h.build(img);
+  h.build(*img);
   QImage i = img->toQImage(h.getMin(),h.getMax(),FitsImage::LINEAR);
   if (!i.save(filename)) return false;
   if (Settings().isWriteMetadataFile()) writeMetadata(filename,img->getMetadata());

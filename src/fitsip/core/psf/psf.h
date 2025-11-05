@@ -55,7 +55,7 @@ public:
    * @param par parameters for the psf
    * @return the image
    */
-  virtual std::shared_ptr<FitsImage> createPSF(int w, int h, const std::vector<ValueType>& par) const;
+  virtual FitsImage createPSF(int w, int h, const std::vector<ValueType>& par) const;
 
   /**
    * @brief Create a fits image with the point-spread-function suitable for display.
@@ -66,7 +66,7 @@ public:
    * @param par parameters for the psf
    * @return the image
    */
-  virtual std::shared_ptr<FitsImage> createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const;
+  virtual FitsImage createPSFForDisplay(int w, int h, const std::vector<ValueType>& par) const;
 
   /**
    * @brief Return a vector with all parameter names.

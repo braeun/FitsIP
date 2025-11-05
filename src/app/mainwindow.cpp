@@ -1444,7 +1444,7 @@ void MainWindow::on_actionSave_As_PSF_triggered()
   {
     SimpleProfiler profiler("SavePSF");
     profiler.start();
-    bool ret = PSFFactory::getInstance()->addPSF(activeFile->getImage(),name);
+    bool ret = PSFFactory::getInstance()->addPSF(*activeFile->getImage(),name);
     profiler.stop();
     if (!ret)
     {

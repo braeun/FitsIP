@@ -184,8 +184,8 @@ void OpRotate::rotate(FitsImage* image, ValueType angle, bool crop) const
   }
   int wnew = static_cast<int>(xmax - xmin) + 1;
   int hnew = static_cast<int>(ymax - ymin) + 1;
-  auto img = std::make_shared<FitsImage>(image->getName(),wnew,hnew,image->getDepth());
-  img->setMetadata(image->getMetadata());
+  FitsImage img(image->getName(),wnew,hnew,image->getDepth());
+  img.setMetadata(image->getMetadata());
   ConstPixelIterator it = image->getConstPixelIterator();
   for (int32_t y=0;y<static_cast<int32_t>(image->getHeight());y++)
   {
@@ -195,17 +195,17 @@ void OpRotate::rotate(FitsImage* image, ValueType angle, bool crop) const
       ValueType yr = (x - xc) * sa + (y - yc) * ca - ymin;
       int xi = static_cast<int>(xr);
       int yi = static_cast<int>(yr);
-      if (xr >= 0 && xi < img->getWidth() && yr >= 0 && yi < img->getHeight())
+      if (xr >= 0 && xi < img.getWidth() && yr >= 0 && yi < img.getHeight())
       {
         ValueType fx = xr - xi;
         ValueType fy = yr - yi;
         for (int d=0;d<image->getDepth();d++)
         {
           ValueType v = it[d];
-          img->getPixelIterator(xi,yi)[d] += v * (1 - fx) * (1 - fy);
-          img->getPixelIterator(xi,yi+1)[d] += v * (1 - fx) * fy;
-          img->getPixelIterator(xi+1,yi)[d] += v * fx * (1 - fy);
-          img->getPixelIterator(xi+1,yi+1)[d] += v * fx * fy;
+          img.getPixelIterator(xi,yi)[d] += v * (1 - fx) * (1 - fy);
+          img.getPixelIterator(xi,yi+1)[d] += v * (1 - fx) * fy;
+          img.getPixelIterator(xi+1,yi)[d] += v * fx * (1 - fy);
+          img.getPixelIterator(xi+1,yi+1)[d] += v * fx * fy;
         }
       }
       ++it;
@@ -215,7 +215,7 @@ void OpRotate::rotate(FitsImage* image, ValueType angle, bool crop) const
   {
     int x = (wnew - wt) / 2;
     int y = (hnew - ht) / 2;
-    img = img->subImage(QRect(x,y,wt,ht));
+    img = img.subImage(QRect(x,y,wt,ht));
   }
-  *image = *img;
+  *image = img;
 }

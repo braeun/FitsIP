@@ -69,7 +69,7 @@ void S3Sharpness::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("calc_sharpness",[this](std::shared_ptr<FitsObject> obj){
-    auto result = calculateSharpness(obj->getImage(),contrast_t1,contrast_t2);
+    auto result = calculateSharpness(*obj->getImage(),contrast_t1,contrast_t2);
     if (result.images.size() < 3)
     {
       return std::make_tuple(result.s3,std::shared_ptr<FitsObject>(),std::shared_ptr<FitsObject>(),std::shared_ptr<FitsObject>());
@@ -147,13 +147,13 @@ OpPlugin::ResultType S3Sharpness::execute(const std::vector<std::shared_ptr<Fits
       QApplication::processEvents();
       if (prog->isCancelled()) break;
     }
-    auto img = obj->getImageShared();
+    FitsImage img(*obj->getImage());
     if (!data.aoi.isEmpty())
     {
       log("subimage");
-      img = img->subImage(data.aoi);
+      img = img.subImage(data.aoi);
     }
-    auto result = calculateSharpness(img.get(),contrast_t1,contrast_t2);
+    auto result = calculateSharpness(img,contrast_t1,contrast_t2);
     result.info = info;
     result.filename = info.absoluteFilePath().toStdString();
     images.insert(images.begin(),result.images.begin(),result.images.end());
@@ -179,13 +179,13 @@ S3SharpnessData S3Sharpness::evaluate(const QFileInfo info, QRect selection)
   if (!handler) return S3SharpnessData();
   try
   {
-    auto img = handler->read(info.absoluteFilePath()).front()->getImageShared();
+    FitsImage img(*handler->read(info.absoluteFilePath()).front()->getImage());
     if (!selection.isEmpty())
     {
       log("subimage");
-      img = img->subImage(selection);
+      img = img.subImage(selection);
     }
-    auto result = calculateSharpness(img.get(),contrast_t1,contrast_t2);
+    auto result = calculateSharpness(img,contrast_t1,contrast_t2);
     result.info = info;
     result.filename = info.absoluteFilePath().toStdString();
 //    log(QString::asprintf("sharpness: %g",result.s3));
@@ -197,31 +197,31 @@ S3SharpnessData S3Sharpness::evaluate(const QFileInfo info, QRect selection)
   return S3SharpnessData();
 }
 
-S3SharpnessData S3Sharpness::calculateSharpness(FitsImage* img, double t1, double t2) const
+S3SharpnessData S3Sharpness::calculateSharpness(const FitsImage& img, double t1, double t2) const
 {
   S3SharpnessData sd;
-  auto grayimg = img->toGray();
-  grayimg->scaleIntensity(0,255);
-  auto grayobj = std::make_shared<FitsObject>(grayimg);
+  auto grayimg = img.toGray();
+  grayimg.scaleIntensity(0,255);
+  auto grayobj = std::make_shared<FitsObject>(std::make_shared<FitsImage>(grayimg));
 //  images.push_back(grayobj);
-  auto spectral = calculateSpectralSharpness(img->getLayer(0).get(),t1,t2);
+  auto spectral = calculateSpectralSharpness(img.getLayer(0),t1,t2);
   {
     std::vector<Layer*> layers{spectral.first};
-    auto specimg = std::make_shared<FitsImage>(img->getName()+"_spectral",layers);
+    auto specimg = std::make_shared<FitsImage>(img.getName()+"_spectral",layers);
     auto specobj = std::make_shared<FitsObject>(specimg);
     specobj->addXYData(spectral.second);
     sd.images.push_back(specobj);
   }
-  auto spatial = calculateSpatialSharpness(img->getLayer(0).get());
+  auto spatial = calculateSpatialSharpness(img.getLayer(0));
   {
     std::vector<Layer*> layers{spatial};
-    auto spatimg = std::make_shared<FitsImage>(img->getName()+"_spatial",layers);
+    auto spatimg = std::make_shared<FitsImage>(img.getName()+"_spatial",layers);
     auto spatobj = std::make_shared<FitsObject>(spatimg);
     sd.images.push_back(spatobj);
   }
   auto s3 = new Layer(*spectral.first);
   ValueType* ptr = s3->getData();
-  ValueType* ptr2 = spatial->getData();
+  const ValueType* ptr2 = spatial->getData();
   for (size_t i=0;i<s3->size();++i)
   {
     *ptr = pow(*ptr,alpha) * pow(*ptr2,1-alpha);
@@ -230,7 +230,7 @@ S3SharpnessData S3Sharpness::calculateSharpness(FitsImage* img, double t1, doubl
   }
   {
     std::vector<Layer*> layers{s3};
-    auto s3img = std::make_shared<FitsImage>(img->getName()+"_sharpness",layers);
+    auto s3img = std::make_shared<FitsImage>(img.getName()+"_sharpness",layers);
     auto s3obj = std::make_shared<FitsObject>(s3img);
     sd.images.push_back(s3obj);
   }
@@ -250,11 +250,11 @@ S3SharpnessData S3Sharpness::calculateSharpness(FitsImage* img, double t1, doubl
   return sd;
 }
 
-std::pair<Layer*,std::vector<XYData>>  S3Sharpness::calculateSpectralSharpness(Layer* layer, double t1, double t2) const
+std::pair<Layer*,std::vector<XYData>>  S3Sharpness::calculateSpectralSharpness(const Layer& layer, double t1, double t2) const
 {
   int m = spectralBlocksize;
   int o = spectralOverlap;
-  auto sl = new Layer(layer->getWidth(),layer->getHeight());
+  auto sl = new Layer(layer.getWidth(),layer.getHeight());
   std::vector<XYData> data;
   fftw_complex *s2c = new fftw_complex[m*(m/2+1)];
   double *in = new double[m*m];
@@ -262,10 +262,10 @@ std::pair<Layer*,std::vector<XYData>>  S3Sharpness::calculateSpectralSharpness(L
   int y = 0;
   auto cl = calculateContrast(layer,m,t1,t2);
   HanningWindow w(m);
-  while (y+m <= layer->getHeight())
+  while (y+m <= layer.getHeight())
   {
     int x = 0;
-    while (x+m <= layer->getWidth())
+    while (x+m <= layer.getWidth())
     {
       ValueType contrast = 0;
       for (int j=0;j<m;++j)
@@ -283,7 +283,7 @@ std::pair<Layer*,std::vector<XYData>>  S3Sharpness::calculateSpectralSharpness(L
         double* dptr = in;
         for (int j=0;j<m;++j)
         {
-          ValueType* ptr = layer->getData() + (y + j) * layer->getWidth() + x;
+          const ValueType* ptr = layer.getData() + (y + j) * layer.getWidth() + x;
           for (int i=0;i<m;++i)
           {
             double v = *ptr++ * w[j] * w[i];
@@ -395,21 +395,21 @@ std::pair<LinearRegression,XYData> S3Sharpness::getSlope(fftw_complex* c, int m)
   return std::make_pair(r,data);
 }
 
-Layer* S3Sharpness::calculateSpatialSharpness(Layer* layer) const
+Layer* S3Sharpness::calculateSpatialSharpness(const Layer& layer) const
 {
   int m = spatialBlocksize;
-  auto sl = new Layer(layer->getWidth(),layer->getHeight());
+  auto sl = new Layer(layer.getWidth(),layer.getHeight());
   int y = 0;
-  while (y+m <= layer->getHeight())
+  while (y+m <= layer.getHeight())
   {
     int x = 0;
-    while (x+m < layer->getWidth())
+    while (x+m < layer.getWidth())
     {
       ValueType tv_max = 0;
       for (int j=0;j<m-1;++j)
       {
-        ValueType* ptr1 = layer->getData() + (y + j) * layer->getWidth() + x;
-        ValueType* ptr2 = layer->getData() + (y + j + 1) * layer->getWidth() + x;
+        const ValueType* ptr1 = layer.getData() + (y + j) * layer.getWidth() + x;
+        const ValueType* ptr2 = layer.getData() + (y + j + 1) * layer.getWidth() + x;
         for (int i=0;i<m-1;++i)
         {
           ValueType d = (abs(ptr1[0]-ptr2[0])
@@ -439,9 +439,9 @@ Layer* S3Sharpness::calculateSpatialSharpness(Layer* layer) const
   return sl;
 }
 
-std::unique_ptr<Layer> S3Sharpness::calculateContrast(Layer* layer, int m, double t1, double t2) const
+std::unique_ptr<Layer> S3Sharpness::calculateContrast(const Layer& layer, int m, double t1, double t2) const
 {
-  auto cl = std::make_unique<Layer>(*layer);
+  auto cl = std::make_unique<Layer>(layer);
   /* calculate  luminosity */
   ValueType* ptr = cl->getData();
   for (size_t i=0;i<cl->size();++i)

@@ -97,27 +97,27 @@ std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(FitsImage* img, cons
   data.rinout = new double[h0*w0];
   data.r2c = fftw_plan_dft_r2c_2d(h0,w0,data.rinout,data.cinout,FFTW_ESTIMATE);
   data.c2r = fftw_plan_dft_c2r_2d(h0,w0,data.cinout,data.rinout,FFTW_ESTIMATE);
-  fft(data,*h,0);
+  fft(data,h,0);
   fftw_complex* hfft = new fftw_complex[data.fftsize];
   memcpy(hfft,data.cinout,data.fftsize*sizeof(fftw_complex));
   auto imgpadded = img->paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
   std::shared_ptr<FitsImage> fftimage;
-  if (imgpadded->getDepth() == 1)
+  if (imgpadded.getDepth() == 1)
   {
-    fft(data,*imgpadded,0);
+    fft(data,imgpadded,0);
     mul(data.cinout,hfft,data.fftsize);
     fftimage = invfft(data,data.cinout,w0,h0);
   }
-  else if (imgpadded->getDepth() == 3)
+  else if (imgpadded.getDepth() == 3)
   {
     fftw_complex* offt1 = new fftw_complex[data.fftsize];
     fftw_complex* offt2 = new fftw_complex[data.fftsize];
     fftw_complex* offt3 = new fftw_complex[data.fftsize];
-    fft(data,*imgpadded,0);
+    fft(data,imgpadded,0);
     memcpy(offt1,data.cinout,data.fftsize*sizeof(fftw_complex));
-    fft(data,*imgpadded,1);
+    fft(data,imgpadded,1);
     memcpy(offt2,data.cinout,data.fftsize*sizeof(fftw_complex));
-    fft(data,*imgpadded,2);
+    fft(data,imgpadded,2);
     memcpy(offt3,data.cinout,data.fftsize*sizeof(fftw_complex));
     mul(offt1,hfft,data.fftsize);
     mul(offt2,hfft,data.fftsize);
@@ -133,7 +133,7 @@ std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(FitsImage* img, cons
   delete [] data.cinout;
   delete [] hfft;
   /* crop to original size */
-  fftimage = fftimage->subImage(QRect(0,0,img->getWidth(),img->getHeight()));
+  fftimage = std::make_shared<FitsImage>(fftimage->subImage(QRect(0,0,img->getWidth(),img->getHeight())));
   return fftimage;
 }
 

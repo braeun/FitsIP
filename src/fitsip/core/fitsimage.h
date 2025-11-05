@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-08-17                                                         *
+ * modified: 2025-11-05                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,7 +28,6 @@
 #include "pixel.h"
 #include "pixeliterator.h"
 #include <QImage>
-#include <memory>
 #include <vector>
 #include <valarray>
 
@@ -55,7 +54,7 @@ public:
 
   const ValueType* getData() const;
 
-  void blit(Layer* layer, int x, int y, int w, int h, int xd, int yd);
+  void blit(const Layer& layer, int x, int y, int w, int h, int xd, int yd);
 
   inline const ValueType& operator()(int x, int y) const { return data[y*width+x];}
 
@@ -130,9 +129,9 @@ public:
 
   ConstPixelIterator getConstPixelIterator(int x, int y) const;
 
-  std::shared_ptr<Layer> getLayer(int index);
+  Layer& getLayer(int index);
 
-  std::shared_ptr<Layer> getLayer(int index) const;
+  const Layer& getLayer(int index) const;
 
   /**
    * @brief Convert the image to a QImage suitable for display.
@@ -175,7 +174,7 @@ public:
    * @param r the rectangle for the sub image
    * @return the new sub image
    */
-  std::shared_ptr<FitsImage> subImage(const QRect& r) const;
+  FitsImage subImage(const QRect& r) const;
 
   /**
    * @brief Return this image resized to the new width and height.
@@ -188,7 +187,7 @@ public:
    * @param h the new height
    * @return the resized image
    */
-  std::shared_ptr<FitsImage> resizedImage(int w, int h) const;
+  FitsImage resizedImage(int w, int h) const;
 
   /**
    * @brief Return this image padded to the new width and height.
@@ -202,9 +201,9 @@ public:
    * @param h the new height
    * @return the padded image
    */
-  std::shared_ptr<FitsImage> paddedImage(int w, int h) const;
+  FitsImage paddedImage(int w, int h) const;
 
-  void blit(FitsImage* src, int x, int y, int w, int h, int xd, int yd);
+  void blit(const FitsImage& src, int x, int y, int w, int h, int xd, int yd);
 
   /**
    * @brief Limit the intensity to the given range.
@@ -217,7 +216,7 @@ public:
    * @brief Return a gray scale image of this one.
    * @return gray scale image
    */
-  std::shared_ptr<FitsImage> toGray() const;
+  FitsImage toGray() const;
 
   void scaleIntensity(ValueType min, ValueType max);
 
@@ -253,7 +252,7 @@ private:
   int width;
   int height;
   int depth;
-  std::vector<std::shared_ptr<Layer>> layers;
+  std::vector<Layer> layers;
   ImageMetadata metadata;
 };
 
@@ -272,12 +271,12 @@ inline int FitsImage::getDepth() const
   return depth;
 }
 
-inline std::shared_ptr<Layer> FitsImage::getLayer(int index)
+inline Layer& FitsImage::getLayer(int index)
 {
   return layers[index];
 }
 
-inline std::shared_ptr<Layer> FitsImage::getLayer(int index) const
+inline const Layer& FitsImage::getLayer(int index) const
 {
   return layers[index];
 }

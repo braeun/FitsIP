@@ -64,7 +64,7 @@ void OpInvFFT::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("invfft",[this](std::shared_ptr<FitsObject> obj){
-    auto img = invfft(obj->getImage());
+    auto img = invfft(*obj->getImage());
     return std::make_shared<FitsObject>(img);
   },
   "Calculate inverse FFT of the image",py::arg("obj"));
@@ -82,26 +82,28 @@ OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, const 
   else
   {
     profiler.start();
+    FitsImage tmp;
     if (data.aoi.isNull())
-      img = invfft(image->getImage());
+      tmp = *image->getImage();
     else
-      img = invfft(image->getImage()->subImage(data.aoi).get());
+      tmp = image->getImage()->subImage(data.aoi);
+    img = invfft(tmp);
     profiler.stop();
   }
   logProfiler(img.get());
   return OK;
 }
 
-std::shared_ptr<FitsImage> OpInvFFT::invfft(FitsImage* image) const
+std::shared_ptr<FitsImage> OpInvFFT::invfft(const FitsImage& image) const
 {
-  int preFFTWidth = (image->getWidth() - 1) * 2;
-  int preFFTHeight = image->getHeight();
-  fftw_complex* in = new fftw_complex[image->getHeight()*image->getWidth()];
+  int preFFTWidth = (image.getWidth() - 1) * 2;
+  int preFFTHeight = image.getHeight();
+  fftw_complex* in = new fftw_complex[image.getHeight()*image.getWidth()];
   double *out = new double[preFFTHeight*preFFTWidth];
   fftw_plan f = fftw_plan_dft_c2r_2d(preFFTHeight,preFFTWidth,in,out,FFTW_ESTIMATE);
-  ConstPixelIterator it = image->getConstPixelIterator();
+  ConstPixelIterator it = image.getConstPixelIterator();
   fftw_complex* cptr = in;
-  for (int i=0;i<image->getHeight()*image->getWidth();i++)
+  for (int i=0;i<image.getHeight()*image.getWidth();i++)
   {
     (*cptr)[0] = it[0];
     (*cptr)[1] = it[1];
@@ -109,7 +111,7 @@ std::shared_ptr<FitsImage> OpInvFFT::invfft(FitsImage* image) const
     ++cptr;
   }
   fftw_execute(f);
-  auto fftimg = std::make_shared<FitsImage>(image->getName()+"_INVFFT",preFFTWidth,preFFTHeight,1);
+  auto fftimg = std::make_shared<FitsImage>(image.getName()+"_INVFFT",preFFTWidth,preFFTHeight,1);
   PixelIterator it2 = fftimg->getPixelIterator();
   double* ptr = out;
   for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)

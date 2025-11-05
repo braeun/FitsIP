@@ -86,12 +86,12 @@ void PSFManagerDialog::preview()
   auto psfpar = psfWidget->getParameters();
   if (psf)
   {
-    std::shared_ptr<FitsImage> img;
+    FitsImage img;
     if (ui->fftInputBox->isChecked())
       img = psf->createPSF(w,h,psfpar);
     else
       img = psf->createPSFForDisplay(w,h,psfpar);
-    previewWidget->setSourceImage(*img);
+    previewWidget->setSourceImage(img);
   }
 }
 
@@ -107,16 +107,16 @@ void PSFManagerDialog::addImagePSF()
       QString name = QInputDialog::getText(this,"Save as PSF","Name:");
       if (!name.isEmpty())
       {
-        auto fitsimg = img->getImageShared();
+        FitsImage fitsimg = *img->getImage();
         QRect aoi = img->getAOI();
         if (aoi.isValid())
         {
           if (QMessageBox::question(this,"Save as PSF","Crop to defined AOI?") == QMessageBox::Yes)
           {
-            fitsimg = fitsimg->subImage(aoi);
+            fitsimg = fitsimg.subImage(aoi);
           }
         }
-        bool ret = PSFFactory::getInstance()->addPSF(fitsimg.get(),name);
+        bool ret = PSFFactory::getInstance()->addPSF(fitsimg,name);
         if (!ret)
         {
           QMessageBox::critical(this,"Save as PSF","Failed to save image as PSF!");

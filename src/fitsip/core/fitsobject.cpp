@@ -100,14 +100,14 @@ const Histogram& FitsObject::getHistogram(bool update)
 {
   if (histogram.isEmpty() || update)
   {
-    histogram.build(image.get());
+    histogram.build(*image);
   }
   return histogram;
 }
 
 void FitsObject::updateHistogram()
 {
-  histogram.build(image.get());
+  histogram.build(*image);
 }
 
 void FitsObject::setXProfile(const Profile& p)
