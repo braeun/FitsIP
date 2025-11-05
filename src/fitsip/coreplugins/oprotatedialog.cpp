@@ -23,8 +23,7 @@
 #include "oprotatedialog.h"
 #include "ui_oprotatedialog.h"
 
-OpRotateDialog::OpRotateDialog(QWidget *parent) :
-  QDialog(parent),
+OpRotateDialog::OpRotateDialog(QWidget *parent):QDialog(parent),
   ui(new Ui::OpRotateDialog)
 {
   ui->setupUi(this);

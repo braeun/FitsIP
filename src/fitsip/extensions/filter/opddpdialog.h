@@ -41,7 +41,7 @@ public:
   explicit OpDDPDialog(QWidget *parent = nullptr);
   ~OpDDPDialog();
 
-  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
+  void setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt);
 
   double getBackground() const;
 

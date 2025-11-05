@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - unsharp masking dialog                                              *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-11-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -41,24 +41,23 @@ public:
   explicit OpUnsharpMaskDialog(QWidget *parent = nullptr);
   ~OpUnsharpMaskDialog();
 
-  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
+  void setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt);
 
   double getSigma() const;
 
   double getStrength() const;
 
-private slots:
-  void on_sigmaSlider_valueChanged(int value);
-
-  void on_strengthSlider_valueChanged(int value);
-
 private:
+  void sigmaSliderChanged(int value);
+  void strengthSliderChanged(int value);
   void textFieldChanged();
   void updatePreview();
 
   Ui::OpUnsharpMaskDialog *ui;
   PreviewWidget *previewWidget;
   bool updating;
+
+  static double sliderScale;
 };
 
 #endif // OPUNSHARPMASKDIALOG_H

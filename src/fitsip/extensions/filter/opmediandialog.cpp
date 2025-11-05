@@ -45,7 +45,7 @@ OpMedianDialog::~OpMedianDialog()
   delete ui;
 }
 
-void OpMedianDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+void OpMedianDialog::setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt)
 {
   previewWidget->setOptions(opt);
   previewWidget->setSourceImage(img,selection);
@@ -67,9 +67,9 @@ void OpMedianDialog::textFieldChanged()
 {
   if (previewWidget->getSourceImage())
   {
-    auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
+    FitsImage img(previewWidget->getSourceImage());
     OpMedian op;
-    op.filter(img.get(),getThreshold(),getSize());
+    op.filter(&img,getThreshold(),getSize());
     previewWidget->updatePreview(img);
   }
 }

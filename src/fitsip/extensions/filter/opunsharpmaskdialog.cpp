@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - unsharp masking dialog                                              *
  *                                                                              *
- * modified: 2025-02-09                                                         *
+ * modified: 2025-11-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,6 +28,8 @@
 #include <fitsip/core/settings.h>
 #include <fitsip/core/widgets/previewwidget.h>
 
+double OpUnsharpMaskDialog::sliderScale = 25;
+
 OpUnsharpMaskDialog::OpUnsharpMaskDialog(QWidget *parent):QDialog(parent),
   ui(new Ui::OpUnsharpMaskDialog),
   updating(false)
@@ -42,6 +44,13 @@ OpUnsharpMaskDialog::OpUnsharpMaskDialog(QWidget *parent):QDialog(parent),
   previewWidget->setSizePolicy(sizePolicy);
   ui->verticalLayout_2->addWidget(previewWidget);
 
+  int32_t v = static_cast<int32_t>(ui->sigmaField->text().toDouble()*sliderScale);
+  ui->sigmaSlider->setValue(v);
+  v = static_cast<int32_t>(ui->strengthField->text().toDouble()*sliderScale);
+  ui->strengthSlider->setValue(v);
+
+  connect(ui->sigmaSlider,&QSlider::valueChanged,this,&OpUnsharpMaskDialog::sigmaSliderChanged);
+  connect(ui->strengthSlider,&QSlider::valueChanged,this,&OpUnsharpMaskDialog::strengthSliderChanged);
   connect(ui->sigmaField,&QLineEdit::editingFinished,this,&OpUnsharpMaskDialog::textFieldChanged);
   connect(ui->strengthField,&QLineEdit::editingFinished,this,&OpUnsharpMaskDialog::textFieldChanged);
 }
@@ -51,7 +60,7 @@ OpUnsharpMaskDialog::~OpUnsharpMaskDialog()
   delete ui;
 }
 
-void OpUnsharpMaskDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+void OpUnsharpMaskDialog::setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt)
 {
   previewWidget->setOptions(opt);
   previewWidget->setSourceImage(img,selection);
@@ -72,9 +81,9 @@ double OpUnsharpMaskDialog::getStrength() const
 void OpUnsharpMaskDialog::textFieldChanged()
 {
   updating = true;
-  int32_t v = static_cast<int32_t>(ui->sigmaField->text().toDouble()*10);
+  int32_t v = static_cast<int32_t>(ui->sigmaField->text().toDouble()*sliderScale);
   ui->sigmaSlider->setValue(v);
-  v = static_cast<int32_t>(ui->strengthField->text().toDouble()*10);
+  v = static_cast<int32_t>(ui->strengthField->text().toDouble()*sliderScale);
   ui->strengthSlider->setValue(v);
   updatePreview();
   updating = false;
@@ -84,28 +93,28 @@ void OpUnsharpMaskDialog::updatePreview()
 {
   if (previewWidget->getSourceImage())
   {
-    auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
+    FitsImage img(previewWidget->getSourceImage());
     OpUnsharpMask op;
-    op.unsharpmask(img.get(),getSigma(),getStrength());
+    op.unsharpmask(&img,getSigma(),getStrength());
     previewWidget->updatePreview(img);
   }
 }
 
 
-void OpUnsharpMaskDialog::on_sigmaSlider_valueChanged(int value)
+void OpUnsharpMaskDialog::sigmaSliderChanged(int value)
 {
   if (!updating)
   {
-    ui->sigmaField->setText(QString::number(value/10.0));
+    ui->sigmaField->setText(QString::number(value/sliderScale));
     updatePreview();
   }
 }
 
-void OpUnsharpMaskDialog::on_strengthSlider_valueChanged(int value)
+void OpUnsharpMaskDialog::strengthSliderChanged(int value)
 {
   if (!updating)
   {
-    ui->strengthField->setText(QString::number(value/10.0));
+    ui->strengthField->setText(QString::number(value/sliderScale));
     updatePreview();
   }
 }

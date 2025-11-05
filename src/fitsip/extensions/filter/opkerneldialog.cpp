@@ -57,7 +57,7 @@ void OpKernelDialog::setKernelNames(const std::vector<QString> &list)
   }
 }
 
-void OpKernelDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+void OpKernelDialog::setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt)
 {
   previewWidget->setOptions(opt);
   previewWidget->setSourceImage(img,selection);
@@ -76,9 +76,9 @@ void OpKernelDialog::on_kernelBox_currentTextChanged(const QString&)
   {
     Kernel kernel = KernelRepository::instance().getKernel(getKernelName());
     if (kernel.isEmpty()) return ;
-    auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
+    FitsImage img(previewWidget->getSourceImage());
     OpKernel op;
-    op.convolve(img.get(),kernel);
+    op.convolve(&img,kernel);
     previewWidget->updatePreview(img);
   }
 }

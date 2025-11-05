@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - intensity histogram                                                 *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-11-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -64,7 +64,7 @@ public:
    * @brief Build the histogram from the specified fits image
    * @param img the image to buld the histogram.
    */
-  void build(FitsImage* img);
+  void build(const FitsImage* img);
 
   /* Increment bin corresponding to pixel value v */
   inline void inc(ValueType);

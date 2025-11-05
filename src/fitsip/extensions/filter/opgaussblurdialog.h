@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - gaussian blur dialog                                                *
  *                                                                              *
- * modified: 2024-12-16                                                         *
+ * modified: 2025-11-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -43,20 +43,20 @@ public:
   explicit OpGaussBlurDialog(QWidget *parent = nullptr);
   ~OpGaussBlurDialog();
 
-  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
+  void setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt);
 
   double getSigma() const;
 
-private slots:
-  void on_sigmaSlider_valueChanged(int value);
-
 private:
+  void sigmaSliderChanged(int value);
   void textFieldChanged();
   void updatePreview();
 
   Ui::OpGaussBlurDialog *ui;
   PreviewWidget *previewWidget;
   bool updating;
+
+  static double sliderScale;
 };
 
 #endif // OPGAUSSBLURDIALOG_H

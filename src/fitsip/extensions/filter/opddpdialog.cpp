@@ -46,7 +46,7 @@ OpDDPDialog::~OpDDPDialog()
   delete ui;
 }
 
-void OpDDPDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+void OpDDPDialog::setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt)
 {
   previewWidget->setOptions(opt);
   previewWidget->setSourceImage(img,selection);
@@ -77,9 +77,9 @@ void OpDDPDialog::textFieldChanged()
 {
   if (previewWidget->getSourceImage())
   {
-    auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
+    FitsImage img(previewWidget->getSourceImage());
     OpDDP op;
-    op.ddp(img.get(),getSigma(),getBackground(),getA(),getB());
+    op.ddp(&img,getSigma(),getBackground(),getA(),getB());
     previewWidget->updatePreview(img);
   }
 }

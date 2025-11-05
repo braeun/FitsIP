@@ -223,6 +223,8 @@ public:
 
   Pixel getBrightestPixel(const QRect& r) const;
 
+  operator bool() const { return !isNull(); }
+
   FitsImage& operator+=(const FitsImage& img);
 
   FitsImage& operator+=(ValueType v);

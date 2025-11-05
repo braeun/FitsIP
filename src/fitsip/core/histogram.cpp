@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - intensity histogram                                                 *
  *                                                                              *
- * modified: 2025-01-10                                                         *
+ * modified: 2025-11-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -78,7 +78,7 @@ void Histogram::clear(void)
   }
 }
 
-void Histogram::build(FitsImage* img)
+void Histogram::build(const FitsImage* img)
 {
   for (size_t i=0;i<4;i++)
   {

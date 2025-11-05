@@ -41,7 +41,7 @@ public:
   explicit OpMedianDialog(QWidget *parent = nullptr);
   ~OpMedianDialog();
 
-  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
+  void setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt);
 
   int getSize() const;
 

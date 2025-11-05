@@ -65,7 +65,7 @@ void OpDDP::bindPython(void* mod) const
 OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpDDPDialog();
-  dlg->setSourceImage(image->getImageShared(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(*image->getImage(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();

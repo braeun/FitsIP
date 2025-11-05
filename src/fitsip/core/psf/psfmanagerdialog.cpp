@@ -91,7 +91,7 @@ void PSFManagerDialog::preview()
       img = psf->createPSF(w,h,psfpar);
     else
       img = psf->createPSFForDisplay(w,h,psfpar);
-    previewWidget->setSourceImage(img);
+    previewWidget->setSourceImage(*img);
   }
 }
 

@@ -41,19 +41,21 @@ public:
   explicit PreviewWidget(QWidget *parent = nullptr);
   ~PreviewWidget();
 
+  void clear();
+
   void setOptions(const PreviewOptions& opt);
 
-  void setSourceImage(std::shared_ptr<FitsImage> image);
+  void setSourceImage(const FitsImage& image);
 
-  void setSourceImage(std::shared_ptr<FitsImage> image, QRect selection);
+  void setSourceImage(const FitsImage& image, QRect selection);
 
-  std::shared_ptr<FitsImage> getSourceImage() const;
+  const FitsImage& getSourceImage() const;
 
-  void updatePreview(std::shared_ptr<FitsImage> image);
+  void updatePreview(const FitsImage& image);
 
 private:
   Ui::PreviewWidget *ui;
-  std::shared_ptr<FitsImage> sourceImage;
+  FitsImage sourceImage;
   PreviewOptions options;
 };
 

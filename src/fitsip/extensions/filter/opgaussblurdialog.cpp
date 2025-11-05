@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - gaussian blur dialog                                                *
  *                                                                              *
- * modified: 2025-02-09                                                         *
+ * modified: 2025-11-04                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,6 +28,7 @@
 #include <fitsip/core/settings.h>
 #include <fitsip/core/widgets/previewwidget.h>
 
+double OpGaussBlurDialog::sliderScale = 10.0;
 
 OpGaussBlurDialog::OpGaussBlurDialog(QWidget *parent):QDialog(parent),
   ui(new Ui::OpGaussBlurDialog),
@@ -37,6 +38,7 @@ OpGaussBlurDialog::OpGaussBlurDialog(QWidget *parent):QDialog(parent),
   previewWidget = new PreviewWidget(ui->groupBox_2);
   previewWidget->setObjectName(QString::fromUtf8("previewWidget"));
   ui->verticalLayout_2->addWidget(previewWidget);
+  connect(ui->sigmaSlider,&QSlider::valueChanged,this,&OpGaussBlurDialog::sigmaSliderChanged);
   connect(ui->sigmaField,&QLineEdit::editingFinished,this,&OpGaussBlurDialog::textFieldChanged);
 }
 
@@ -45,7 +47,7 @@ OpGaussBlurDialog::~OpGaussBlurDialog()
   delete ui;
 }
 
-void OpGaussBlurDialog::setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt)
+void OpGaussBlurDialog::setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt)
 {
   previewWidget->setOptions(opt);
   previewWidget->setSourceImage(img,selection);
@@ -71,15 +73,15 @@ void OpGaussBlurDialog::updatePreview()
 {
   if (previewWidget->getSourceImage())
   {
-    auto img = std::make_shared<FitsImage>(*previewWidget->getSourceImage());
+    FitsImage img(previewWidget->getSourceImage());
     OpGaussBlur op;
-    op.blur(img.get(),getSigma(),getSigma());
+    op.blur(&img,getSigma(),getSigma());
     previewWidget->updatePreview(img);
   }
 }
 
 
-void OpGaussBlurDialog::on_sigmaSlider_valueChanged(int value)
+void OpGaussBlurDialog::sigmaSliderChanged(int value)
 {
   if (!updating)
   {

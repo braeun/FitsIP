@@ -40,7 +40,7 @@ public:
   explicit OpKernelDialog(QWidget *parent = nullptr);
   ~OpKernelDialog();
 
-  void setSourceImage(std::shared_ptr<FitsImage> img, QRect selection, const PreviewOptions& opt);
+  void setSourceImage(const FitsImage& img, QRect selection, const PreviewOptions& opt);
 
   void setKernelNames(const std::vector<QString>& list);
 

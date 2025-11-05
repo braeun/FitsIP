@@ -37,44 +37,49 @@ PreviewWidget::~PreviewWidget()
   delete ui;
 }
 
+void PreviewWidget::clear()
+{
+  ui->previewLabel->setPixmap(QPixmap());
+}
+
 void PreviewWidget::setOptions(const PreviewOptions& opt)
 {
   options = opt;
 }
 
-void PreviewWidget::setSourceImage(std::shared_ptr<FitsImage> image)
+void PreviewWidget::setSourceImage(const FitsImage& image)
 {
-  sourceImage = std::make_shared<FitsImage>(*image.get());
-  updatePreview(sourceImage);
+  sourceImage = image;
+  updatePreview(image);
 }
 
-void PreviewWidget::setSourceImage(std::shared_ptr<FitsImage> image, QRect selection)
+void PreviewWidget::setSourceImage(const FitsImage& image, QRect selection)
 {
   if (selection.isEmpty())
   {
     Settings s;
     int w = s.getPreviewWidth();
     int h = s.getPreviewHeight();
-    selection = QRect(image->getWidth()/2-w/2,image->getHeight()/2-h/2,w,h);
+    selection = QRect(image.getWidth()/2-w/2,image.getHeight()/2-h/2,w,h);
   }
-  selection = image->getOverlap(selection);
-  sourceImage = image->subImage(selection);
+  selection = image.getOverlap(selection);
+  sourceImage = *image.subImage(selection);
   updatePreview(sourceImage);
 }
 
-std::shared_ptr<FitsImage> PreviewWidget::getSourceImage() const
+const FitsImage& PreviewWidget::getSourceImage() const
 {
   return sourceImage;
 }
 
-void PreviewWidget::updatePreview(std::shared_ptr<FitsImage> image)
+void PreviewWidget::updatePreview(const FitsImage& image)
 {
   ui->previewLabel->setPixmap(QPixmap());
   if (image)
   {
     Histogram h;
-    h.build(image.get());
-    QImage i = image->toQImage(h.getMin(),h.getMax(),options.scale);
+    h.build(&image);
+    QImage i = image.toQImage(h.getMin(),h.getMax(),options.scale);
     ui->previewLabel->setPixmap(QPixmap::fromImage(i));
   }
 }
