@@ -28,7 +28,7 @@
 
 int FitsObject::idCounter = 0;
 
-FitsObject::FitsObject(std::shared_ptr<FitsImage> img, const QString&  fn):
+FitsObject::FitsObject(const FitsImage& img, const QString&  fn):
   id(idCounter++),
   filename(fn),
   image(img)
@@ -40,7 +40,7 @@ FitsObject::FitsObject(std::shared_ptr<FitsImage> img, const QString&  fn):
 //  histogram.build(image.get());
 }
 
-FitsObject::FitsObject(std::shared_ptr<FitsImage> img, const std::string&  fn):
+FitsObject::FitsObject(const FitsImage& img, const std::string&  fn):
  id(idCounter++),
  filename(QString::fromStdString(fn)),
  image(img)
@@ -63,7 +63,7 @@ int32_t FitsObject::getId() const
 
 QString FitsObject::getName() const
 {
-  return image->getName();
+  return image.getName();
 }
 
 QString  FitsObject::getFilename() const
@@ -73,20 +73,15 @@ QString  FitsObject::getFilename() const
 
 const FitsImage& FitsObject::getImage() const
 {
-  return *image;
+  return image;
 }
 
 FitsImage& FitsObject::getImage()
 {
-  return *image;
-}
-
-std::shared_ptr<FitsImage> FitsObject::getImageShared() const
-{
   return image;
 }
 
-void FitsObject::setImage(const std::shared_ptr<FitsImage>& img)
+void FitsObject::setImage(const FitsImage& img)
 {
   image = img;
 }
@@ -105,14 +100,14 @@ const Histogram& FitsObject::getHistogram(bool update)
 {
   if (histogram.isEmpty() || update)
   {
-    histogram.build(*image);
+    histogram.build(image);
   }
   return histogram;
 }
 
 void FitsObject::updateHistogram()
 {
-  histogram.build(*image);
+  histogram.build(image);
 }
 
 void FitsObject::setXProfile(const Profile& p)
@@ -208,7 +203,7 @@ void FitsObject::pushUndo()
 
 void FitsObject::popUndo()
 {
-  std::shared_ptr<FitsImage> img = undostack.pop();
+  FitsImage img = undostack.pop();
   if (img)
   {
     image = img;
@@ -223,8 +218,7 @@ bool FitsObject::isUndoAvailable() const
 
 std::shared_ptr<FitsObject> FitsObject::copy(const std::string& filename) const
 {
-  auto img = std::make_shared<FitsImage>(*image.get());
-  auto obj = std::make_shared<FitsObject>(img,filename);
+  auto obj = std::make_shared<FitsObject>(image,filename);
   obj->histogram = histogram;
   obj->xprofile = xprofile;
   obj->yprofile = yprofile;

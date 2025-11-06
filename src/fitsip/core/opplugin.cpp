@@ -94,7 +94,7 @@ void OpPlugin::setError(const QString &err)
 
 OpPlugin::ResultType OpPlugin::save(const FitsImage& image, const QString& outputpath, const QFileInfo &info, const QString& tag)
 {
-  return save(std::make_shared<FitsObject>(std::make_shared<FitsImage>(image)),outputpath,info,tag);
+  return save(std::make_shared<FitsObject>(image),outputpath,info,tag);
 }
 
 OpPlugin::ResultType OpPlugin::save(std::shared_ptr<FitsObject> image, const QString& outputpath, const QFileInfo &info, const QString& tag)

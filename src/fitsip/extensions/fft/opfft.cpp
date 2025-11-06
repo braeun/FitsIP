@@ -90,11 +90,11 @@ OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsObject> image, const OpP
   }
   img = fft(tmp);
   profiler.stop();
-  logProfiler(*img);
+  logProfiler(img);
   return OK;
 }
 
-std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage& image) const
+FitsImage OpFFT::fft(const FitsImage& image) const
 {
   fftw_complex *s2c = new fftw_complex[image.getHeight()*(image.getWidth()/2+1)];
   double *in = new double[image.getHeight()*image.getWidth()];
@@ -164,10 +164,10 @@ std::shared_ptr<FitsImage> OpFFT::fft(const FitsImage& image) const
   delete [] tmp;
   delete [] tmp1;
 #else
-  auto fftimg = std::make_shared<FitsImage>(image.getName()+"_FFT",image.getWidth()/2+1,image.getHeight(),2);
-  PixelIterator it2 = fftimg->getPixelIterator();
+  FitsImage fftimg(image.getName()+"_FFT",image.getWidth()/2+1,image.getHeight(),2);
+  PixelIterator it2 = fftimg.getPixelIterator();
   fftw_complex* cptr = s2c;
-  for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+  for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
   {
     it2[0] = (*cptr)[0];
     it2[1] = (*cptr)[1];

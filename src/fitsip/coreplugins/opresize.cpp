@@ -133,17 +133,17 @@ OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, const 
   return CANCELLED;
 }
 
-std::shared_ptr<FitsImage> OpResize::resize(const FitsImage& image, double factorx, double factory, int mode) const
+FitsImage OpResize::resize(const FitsImage& image, double factorx, double factory, int mode) const
 {
   if (mode == 0)
   {
     int w = image.getWidth() * factorx;
     int h = image.getHeight() * factory;
-    return std::make_shared<FitsImage>(image.resizedImage(w,h));
+    return image.resizedImage(w,h);
   }
   if (factorx < 1 && factory < 1)
   {
-    return std::make_shared<FitsImage>(shrink(image,factorx,factory));
+    return shrink(image,factorx,factory);
   }
   FitsImage img;
   if (factorx < 1)
@@ -162,11 +162,11 @@ std::shared_ptr<FitsImage> OpResize::resize(const FitsImage& image, double facto
   }
   if (mode == 1)
   {
-    return std::make_shared<FitsImage>(growNearestNeighbor(img,factorx,factory));
+    return growNearestNeighbor(img,factorx,factory);
   }
   else //if (mode == 2)
   {
-    return std::make_shared<FitsImage>(growBilinear(img,factorx,factory));
+    return growBilinear(img,factorx,factory);
   }
 }
 

@@ -67,39 +67,39 @@ std::vector<std::shared_ptr<FitsObject>> RawIO::read(QString filename)
     if (image->type != LIBRAW_IMAGE_BITMAP) throw std::runtime_error("Failed to load image");
     if (image->colors != 3 && image->colors != 1) throw std::runtime_error("Only monochrome and 3-color images supported");
 //    if (image->bits != 8) throw std::runtime_error("Only 8 bpp images supported");
-    auto img = std::make_shared<FitsImage>(info.baseName(),image->width,image->height,image->colors);
-    PixelIterator it = img->getPixelIterator();
+    FitsImage img(info.baseName(),image->width,image->height,image->colors);
+    PixelIterator it = img.getPixelIterator();
     if (image->colors == 1)
     {
       if (image->bits == 8)
       {
-        copyGray<uint8_t>(img.get(),image);
+        copyGray<uint8_t>(&img,image);
       }
       else
       {
-        copyGray<uint16_t>(img.get(),image);
+        copyGray<uint16_t>(&img,image);
       }
     }
     else
     {
       if (image->bits == 8)
       {
-        copyColor<uint8_t>(img.get(),image);
+        copyColor<uint8_t>(&img,image);
       }
       else
       {
-        copyColor<uint16_t>(img.get(),image);
+        copyColor<uint16_t>(&img,image);
       }
     }
     LibRaw::dcraw_clear_mem(image);
-    ImageMetadata meta = img->getMetadata();
+    ImageMetadata meta = img.getMetadata();
     meta.setExposureTime(ip.imgdata.other.shutter);
     meta.setObserver(ip.imgdata.other.artist);
     meta.setInstrument(ip.imgdata.idata.model);
     meta.setObsDateTime(QDateTime::fromTime_t(ip.imgdata.other.timestamp));
-    img->setMetadata(meta);
+    img.setMetadata(meta);
     profiler.stop();
-    logProfiler(*img,"read");
+    logProfiler(img,"read");
     return {std::make_shared<FitsObject>(img,filename)};
   }
   else

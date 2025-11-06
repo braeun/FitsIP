@@ -44,10 +44,10 @@ public:
   virtual void bindPython(void* m) const override;
 #endif
 
-  std::vector<std::shared_ptr<FitsImage>> split(const FitsImage& image) const;
+  std::vector<FitsImage> split(const FitsImage& image) const;
 
 private:
-  std::vector<std::shared_ptr<FitsImage>> images;
+  std::vector<FitsImage> images;
 };
 
 #endif // OPSPLITCHANNELS_H

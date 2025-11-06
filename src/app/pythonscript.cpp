@@ -176,7 +176,7 @@ void PythonScript::bindLists(py::module_& m, ScriptInterface* intf)
 void PythonScript::bindFitsObject(py::module_& m)
 {
   py::class_<FitsObject, std::shared_ptr<FitsObject>>(m,"FitsObject","Fits Object")
-      .def(py::init<std::shared_ptr<FitsImage>, const std::string&>())
+      .def(py::init<const FitsImage&, const std::string&>())
       .def_property_readonly("id",&FitsObject::getId)
       .def_property_readonly("name",[](const FitsObject& obj){return obj.getName().toStdString();})
       .def_property_readonly("filename",[](const FitsObject& obj){return obj.getFilename().toStdString();})

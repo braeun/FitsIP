@@ -45,7 +45,7 @@ public:
 
 private:
   ResultType add(const QFileInfo& file);
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
 
 };
 

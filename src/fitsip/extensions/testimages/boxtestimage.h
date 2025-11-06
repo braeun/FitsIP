@@ -47,7 +47,7 @@ public:
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
   BoxTestImageDialog* dlg;
 };
 

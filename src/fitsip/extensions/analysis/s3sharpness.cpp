@@ -202,12 +202,12 @@ S3SharpnessData S3Sharpness::calculateSharpness(const FitsImage& img, double t1,
   S3SharpnessData sd;
   auto grayimg = img.toGray();
   grayimg.scaleIntensity(0,255);
-  auto grayobj = std::make_shared<FitsObject>(std::make_shared<FitsImage>(grayimg));
+  auto grayobj = std::make_shared<FitsObject>(grayimg);
 //  images.push_back(grayobj);
   auto spectral = calculateSpectralSharpness(img.getLayer(0),t1,t2);
   {
     std::vector<Layer*> layers{spectral.first};
-    auto specimg = std::make_shared<FitsImage>(img.getName()+"_spectral",layers);
+    FitsImage specimg(img.getName()+"_spectral",layers);
     auto specobj = std::make_shared<FitsObject>(specimg);
     specobj->addXYData(spectral.second);
     sd.images.push_back(specobj);
@@ -215,7 +215,7 @@ S3SharpnessData S3Sharpness::calculateSharpness(const FitsImage& img, double t1,
   auto spatial = calculateSpatialSharpness(img.getLayer(0));
   {
     std::vector<Layer*> layers{spatial};
-    auto spatimg = std::make_shared<FitsImage>(img.getName()+"_spatial",layers);
+    FitsImage spatimg(img.getName()+"_spatial",layers);
     auto spatobj = std::make_shared<FitsObject>(spatimg);
     sd.images.push_back(spatobj);
   }
@@ -230,7 +230,7 @@ S3SharpnessData S3Sharpness::calculateSharpness(const FitsImage& img, double t1,
   }
   {
     std::vector<Layer*> layers{s3};
-    auto s3img = std::make_shared<FitsImage>(img.getName()+"_sharpness",layers);
+    FitsImage s3img(img.getName()+"_sharpness",layers);
     auto s3obj = std::make_shared<FitsObject>(s3img);
     sd.images.push_back(s3obj);
   }

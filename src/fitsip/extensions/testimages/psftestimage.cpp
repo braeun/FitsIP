@@ -46,7 +46,7 @@ bool PSFTestImage::requiresFileList() const
 
 std::vector<std::shared_ptr<FitsObject>> PSFTestImage::getCreatedImages() const
 {
-  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(std::make_shared<FitsImage>(img))};
+  return std::vector<std::shared_ptr<FitsObject>>{std::make_shared<FitsObject>(img)};
 }
 
 

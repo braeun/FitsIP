@@ -41,8 +41,8 @@
 class FitsObject
 {
 public:
-  FitsObject(std::shared_ptr<FitsImage> img, const QString& filename="");
-  FitsObject(std::shared_ptr<FitsImage> img, const std::string& filename);
+  FitsObject(const FitsImage& img, const QString& filename="");
+  FitsObject(const FitsImage& img, const std::string& filename);
   FitsObject(const FitsObject& obj) = delete;
   ~FitsObject();
 
@@ -58,10 +58,7 @@ public:
 
   FitsImage& getImage();
 
-  [[deprecated]]
-  std::shared_ptr<FitsImage> getImageShared() const;
-
-  void setImage(const std::shared_ptr<FitsImage>& img);
+  void setImage(const FitsImage& img);
 
   QRect getAOI() const;
 
@@ -129,7 +126,7 @@ public:
 private:
   const int id;
   QString  filename;
-  std::shared_ptr<FitsImage> image;
+  FitsImage image;
   QRect aoi;
   Histogram histogram;
   Profile xprofile;

@@ -103,16 +103,16 @@ OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsObject> /*im
   return OK;
 }
 
-std::shared_ptr<FitsImage> OpCombineChannels::combine(std::shared_ptr<FitsObject> rimg, std::shared_ptr<FitsObject> gimg, std::shared_ptr<FitsObject> bimg) const
+FitsImage OpCombineChannels::combine(std::shared_ptr<FitsObject> rimg, std::shared_ptr<FitsObject> gimg, std::shared_ptr<FitsObject> bimg) const
 {
   auto r = rimg->getImage();
   auto g = gimg->getImage();
   auto b = bimg->getImage();
   if (r.isCompatible(g) && r.isCompatible(b))
   {
-    auto img = std::make_shared<FitsImage>(r.getName()+"_RGB",r.getWidth(),r.getHeight(),3);
-    img->setMetadata(r.getMetadata());
-    PixelIterator dest = img->getPixelIterator();
+    FitsImage img(r.getName()+"_RGB",r.getWidth(),r.getHeight(),3);
+    img.setMetadata(r.getMetadata());
+    PixelIterator dest = img.getPixelIterator();
     ConstPixelIterator ri = r.getConstPixelIterator();
     ConstPixelIterator gi = g.getConstPixelIterator();
     ConstPixelIterator bi = b.getConstPixelIterator();
@@ -128,7 +128,7 @@ std::shared_ptr<FitsImage> OpCombineChannels::combine(std::shared_ptr<FitsObject
     }
     return img;
   }
-  return std::shared_ptr<FitsImage>();
+  return FitsImage();
 }
 
 

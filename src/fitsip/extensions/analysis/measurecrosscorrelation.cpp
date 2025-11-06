@@ -134,8 +134,8 @@ std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<F
   fftw_execute(b);
   double *sin = new double[img1.getHeight()*img1.getWidth()];
   sort(in,sin,img1.getWidth(),img1.getHeight());
-  auto ccimg = std::make_shared<FitsImage>(img2.getName()+"_cc",img1.getWidth(),img1.getHeight());
-  PixelIterator it2 = ccimg->getPixelIterator();
+  FitsImage ccimg(img2.getName()+"_cc",img1.getWidth(),img1.getHeight());
+  PixelIterator it2 = ccimg.getPixelIterator();
   double *rptr = sin;
   for (int i=0;i<img1.getHeight()*img1.getWidth();i++)
   {

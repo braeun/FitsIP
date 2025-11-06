@@ -76,7 +76,7 @@ OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, const 
   if (image->getImage().getDepth() != 2)
   {
     setError("Input is not a complex image");
-    img = std::shared_ptr<FitsImage>();
+    img = FitsImage();
     return ERROR;
   }
   else
@@ -90,11 +90,11 @@ OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, const 
     img = invfft(tmp);
     profiler.stop();
   }
-  logProfiler(*img);
+  logProfiler(img);
   return OK;
 }
 
-std::shared_ptr<FitsImage> OpInvFFT::invfft(const FitsImage& image) const
+FitsImage OpInvFFT::invfft(const FitsImage& image) const
 {
   int preFFTWidth = (image.getWidth() - 1) * 2;
   int preFFTHeight = image.getHeight();
@@ -111,10 +111,10 @@ std::shared_ptr<FitsImage> OpInvFFT::invfft(const FitsImage& image) const
     ++cptr;
   }
   fftw_execute(f);
-  auto fftimg = std::make_shared<FitsImage>(image.getName()+"_INVFFT",preFFTWidth,preFFTHeight,1);
-  PixelIterator it2 = fftimg->getPixelIterator();
+  FitsImage fftimg(image.getName()+"_INVFFT",preFFTWidth,preFFTHeight,1);
+  PixelIterator it2 = fftimg.getPixelIterator();
   double* ptr = out;
-  for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+  for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
   {
     it2[0] = *ptr;
     ++ptr;
@@ -123,6 +123,6 @@ std::shared_ptr<FitsImage> OpInvFFT::invfft(const FitsImage& image) const
   fftw_destroy_plan(f);
   delete [] out;
   delete [] in;
-  *fftimg /= fftimg->getHeight() * fftimg->getWidth();
+  fftimg /= fftimg.getHeight() * fftimg.getWidth();
   return fftimg;
 }

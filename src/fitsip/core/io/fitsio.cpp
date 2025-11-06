@@ -78,7 +78,7 @@ std::vector<std::shared_ptr<FitsObject>> FitsIO::read(QString filename)
       auto img = load(&fits.pHDU(),info.baseName(),metadata);
       if (img)
       {
-        auto obj = std::make_shared<FitsObject>(img,info.absolutePath()+"/"+img->getName()+"."+info.suffix());
+        auto obj = std::make_shared<FitsObject>(img,info.absolutePath()+"/"+img.getName()+"."+info.suffix());
         list.push_back(obj);
       }
     }
@@ -92,7 +92,7 @@ std::vector<std::shared_ptr<FitsObject>> FitsIO::read(QString filename)
         auto img = load(&fits.extension(i),info.baseName(),metadata);
         if (img)
         {
-          auto obj = std::make_shared<FitsObject>(img,info.absolutePath()+"/"+img->getName()+"."+info.suffix());
+          auto obj = std::make_shared<FitsObject>(img,info.absolutePath()+"/"+img.getName()+"."+info.suffix());
           list.push_back(obj);
         }
       }
@@ -179,7 +179,7 @@ bool FitsIO::write(QString filename, FitsObject* obj)
   return true;
 }
 
-std::shared_ptr<FitsImage> FitsIO::load(CCfits::HDU* hdu, QString basename, const ImageMetadata& basedata)
+FitsImage FitsIO::load(CCfits::HDU* hdu, QString basename, const ImageMetadata& basedata)
 {
   if (hdu->axes() < 2) return {};
   QString name = basename;
@@ -191,7 +191,7 @@ std::shared_ptr<FitsImage> FitsIO::load(CCfits::HDU* hdu, QString basename, cons
   long h = hdu->axis(1);
   long depth = 1;
   if (hdu->axes() > 2) depth = hdu->axis(2);
-  auto img = std::make_shared<FitsImage>(name,static_cast<int>(w),static_cast<int>(h),static_cast<int>(depth));
+  FitsImage img(name,static_cast<int>(w),static_cast<int>(h),static_cast<int>(depth));
   int64_t first = 1;
   std::valarray<ValueType> a;
   for (long i=0;i<depth;i++)
@@ -201,8 +201,8 @@ std::shared_ptr<FitsImage> FitsIO::load(CCfits::HDU* hdu, QString basename, cons
     else if (dynamic_cast<CCfits::ExtHDU*>(hdu))
       dynamic_cast<CCfits::ExtHDU*>(hdu)->read(a,first,w*h);
     else
-      return std::shared_ptr<FitsImage>();
-    img->getLayer(i).setData(a);
+      return FitsImage();
+    img.getLayer(i).setData(a);
     first += w * h;
   }
 
@@ -240,11 +240,11 @@ std::shared_ptr<FitsImage> FitsIO::load(CCfits::HDU* hdu, QString basename, cons
   {
     metadata = basedata;
   }
-  img->setMetadata(metadata);
+  img.setMetadata(metadata);
   /* special handling for starlight xpress which stores unsigned 16bit */
   if (metadata.getInstrument().toLower().contains("starlight xpress") && hdu->bitpix() == 16)
   {
-    PixelIterator it = img->getPixelIterator();
+    PixelIterator it = img.getPixelIterator();
     while (true)
     {
       for (long i=0;i<depth;i++)

@@ -41,7 +41,7 @@ public:
   static const char* FILENAME_FILTER;
 
 private:
-  std::shared_ptr<FitsImage> load(CCfits::HDU* hdu, QString basename, const ImageMetadata& basedata);
+  FitsImage load(CCfits::HDU* hdu, QString basename, const ImageMetadata& basedata);
 
 };
 

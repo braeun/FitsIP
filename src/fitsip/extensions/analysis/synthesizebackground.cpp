@@ -82,8 +82,8 @@ OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> i
     }
     img = createImage(image->getImage().getWidth(),image->getImage().getHeight(),coeff,deg);
     profiler.stop();
-    log(img.get(),"Synthesized Background");
-    logProfiler(*img);
+    log(&img,"Synthesized Background");
+    logProfiler(img);
     return OK;
   }
   return CANCELLED;
@@ -251,13 +251,13 @@ std::vector<double> SynthesizeBackground::getCoefficients(const std::vector<Pixe
   return xg;
 }
 
-std::shared_ptr<FitsImage> SynthesizeBackground::createImage(u_int32_t w, uint32_t h, std::vector<std::vector<double>> coeff, uint32_t deg)
+FitsImage SynthesizeBackground::createImage(u_int32_t w, uint32_t h, std::vector<std::vector<double>> coeff, uint32_t deg)
 {
-  std::shared_ptr<FitsImage> img = std::make_shared<FitsImage>("Background",w,h,coeff.size());
-  PixelIterator it = img->getPixelIterator();
-  for (int y=0;y<img->getHeight();y++)
+  FitsImage img("Background",w,h,coeff.size());
+  PixelIterator it = img.getPixelIterator();
+  for (int y=0;y<img.getHeight();y++)
   {
-    for (int x=0;x<img->getWidth();x++)
+    for (int x=0;x<img.getWidth();x++)
     {
       for (size_t l=0;l<coeff.size();l++)
       {

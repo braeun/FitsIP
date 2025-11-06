@@ -38,8 +38,8 @@ public:
   static const char* FILENAME_FILTER;
 
 private:
-  std::shared_ptr<FitsImage> readPA(QString filename);
-  std::shared_ptr<FitsImage> readP1(QString filename);
+  FitsImage readPA(QString filename);
+  FitsImage readP1(QString filename);
 
 };
 

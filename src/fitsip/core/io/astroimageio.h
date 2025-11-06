@@ -41,8 +41,8 @@ public:
   static const char* FILENAME_FILTER;
 
 private:
-  std::shared_ptr<FitsImage> read_0x0100(QFile* file, const QFileInfo& info);
-  std::shared_ptr<FitsImage> read_0x0200(QFile* file, const QFileInfo& info);
+  FitsImage read_0x0100(QFile* file, const QFileInfo& info);
+  FitsImage read_0x0200(QFile* file, const QFileInfo& info);
 
 };
 

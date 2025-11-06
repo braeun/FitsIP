@@ -61,7 +61,7 @@ private:
   ResultType stackStarMatch(const QFileInfo& file);
 
   OpStackDialog* dlg;
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
   bool subtractSky;
   MeasureMatch matcher;
   StarMatcher starmatcher;

@@ -85,7 +85,7 @@ OpPlugin::ResultType OpFFTConvolution::execute(std::shared_ptr<FitsObject> image
   return CANCELLED;
 }
 
-std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(const FitsImage& img, const PSF* psf, const std::vector<ValueType>& par) const
+FitsImage OpFFTConvolution::fftconvolution(const FitsImage& img, const PSF* psf, const std::vector<ValueType>& par) const
 {
   fftdata data;
   int w0 = img.getWidth() + psf->getWidth();
@@ -101,7 +101,7 @@ std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(const FitsImage& img
   fftw_complex* hfft = new fftw_complex[data.fftsize];
   memcpy(hfft,data.cinout,data.fftsize*sizeof(fftw_complex));
   auto imgpadded = img.paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
-  std::shared_ptr<FitsImage> fftimage;
+  FitsImage fftimage;
   if (imgpadded.getDepth() == 1)
   {
     fft(data,imgpadded,0);
@@ -133,7 +133,7 @@ std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(const FitsImage& img
   delete [] data.cinout;
   delete [] hfft;
   /* crop to original size */
-  fftimage = std::make_shared<FitsImage>(fftimage->subImage(QRect(0,0,img.getWidth(),img.getHeight())));
+  fftimage = fftimage.subImage(QRect(0,0,img.getWidth(),img.getHeight()));
   return fftimage;
 }
 
@@ -149,32 +149,32 @@ void OpFFTConvolution::fft(const fftdata& data, const FitsImage &image, int chan
   fftw_execute(data.r2c);
 }
 
-std::shared_ptr<FitsImage> OpFFTConvolution::invfft(const fftdata& data, fftw_complex* c, int w, int h) const
+FitsImage OpFFTConvolution::invfft(const fftdata& data, fftw_complex* c, int w, int h) const
 {
   memmove(data.cinout,c,data.fftsize*sizeof(fftw_complex));
   fftw_execute(data.c2r);
-  auto fftimg = std::make_shared<FitsImage>("tmp",w,h,1);
-  PixelIterator it2 = fftimg->getPixelIterator();
+  FitsImage fftimg("tmp",w,h,1);
+  PixelIterator it2 = fftimg.getPixelIterator();
   double* ptr = data.rinout;
-  for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+  for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
   {
     it2[0] = *ptr;
     ++ptr;
     ++it2;
   }
-  *fftimg /= fftimg->getHeight() * fftimg->getWidth();
+  fftimg /= fftimg.getHeight() * fftimg.getWidth();
   return fftimg;
 }
 
-std::shared_ptr<FitsImage> OpFFTConvolution::invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h) const
+FitsImage OpFFTConvolution::invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h) const
 {
-  auto fftimg = std::make_shared<FitsImage>("tmp",w,h,3);
+  FitsImage fftimg("tmp",w,h,3);
   {
     memmove(data.cinout,c1,data.fftsize*sizeof(fftw_complex));
     fftw_execute(data.c2r);
-    PixelIterator it2 = fftimg->getPixelIterator();
+    PixelIterator it2 = fftimg.getPixelIterator();
     double* ptr = data.rinout;
-    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
     {
       it2[0] = *ptr;
       ++ptr;
@@ -184,9 +184,9 @@ std::shared_ptr<FitsImage> OpFFTConvolution::invfft(const fftdata& data, fftw_co
   {
     memmove(data.cinout,c2,data.fftsize*sizeof(fftw_complex));
     fftw_execute(data.c2r);
-    PixelIterator it2 = fftimg->getPixelIterator();
+    PixelIterator it2 = fftimg.getPixelIterator();
     double* ptr = data.rinout;
-    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
     {
       it2[1] = *ptr;
       ++ptr;
@@ -196,16 +196,16 @@ std::shared_ptr<FitsImage> OpFFTConvolution::invfft(const fftdata& data, fftw_co
   {
     memmove(data.cinout,c3,data.fftsize*sizeof(fftw_complex));
     fftw_execute(data.c2r);
-    PixelIterator it2 = fftimg->getPixelIterator();
+    PixelIterator it2 = fftimg.getPixelIterator();
     double* ptr = data.rinout;
-    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
     {
       it2[2] = *ptr;
       ++ptr;
       ++it2;
     }
   }
-  *fftimg /= fftimg->getHeight() * fftimg->getWidth();
+  fftimg /= fftimg.getHeight() * fftimg.getWidth();
   return fftimg;
 }
 

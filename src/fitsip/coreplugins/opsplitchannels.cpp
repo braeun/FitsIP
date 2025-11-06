@@ -93,20 +93,20 @@ OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsObject> image,
   return OK;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpSplitChannels::split(const FitsImage& image) const
+std::vector<FitsImage> OpSplitChannels::split(const FitsImage& image) const
 {
-  std::vector<std::shared_ptr<FitsImage>> list{
-    std::make_shared<FitsImage>(image.getName()+"_R",image.getWidth(),image.getHeight(),1),
-    std::make_shared<FitsImage>(image.getName()+"_G",image.getWidth(),image.getHeight(),1),
-    std::make_shared<FitsImage>(image.getName()+"_B",image.getWidth(),image.getHeight(),1)
+  std::vector<FitsImage> list{
+    FitsImage(image.getName()+"_R",image.getWidth(),image.getHeight(),1),
+    FitsImage(image.getName()+"_G",image.getWidth(),image.getHeight(),1),
+    FitsImage(image.getName()+"_B",image.getWidth(),image.getHeight(),1)
   };
-  list[0]->setMetadata(image.getMetadata());
-  list[1]->setMetadata(image.getMetadata());
-  list[2]->setMetadata(image.getMetadata());
+  list[0].setMetadata(image.getMetadata());
+  list[1].setMetadata(image.getMetadata());
+  list[2].setMetadata(image.getMetadata());
   ConstPixelIterator src = image.getConstPixelIterator();
-  PixelIterator r = list[0]->getPixelIterator();
-  PixelIterator g = list[1]->getPixelIterator();
-  PixelIterator b = list[2]->getPixelIterator();
+  PixelIterator r = list[0].getPixelIterator();
+  PixelIterator g = list[1].getPixelIterator();
+  PixelIterator b = list[2].getPixelIterator();
   while (src.hasNext())
   {
     r[0] = src[0];

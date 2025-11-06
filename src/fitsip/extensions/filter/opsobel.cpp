@@ -71,15 +71,15 @@ OpPlugin::ResultType OpSobel::execute(std::shared_ptr<FitsObject> image, const O
 }
 
 
-std::shared_ptr<FitsImage> OpSobel::applyFilter(const FitsImage&  img) const
+FitsImage OpSobel::applyFilter(const FitsImage&  img) const
 {
   const Kernel& kx = KernelRepository::instance().getKernel(KernelRepository::SOBEL_X);
   ValueType* gx = convolve(img,kx);
   const Kernel& ky = KernelRepository::instance().getKernel(KernelRepository::SOBEL_Y);
   ValueType* gy = convolve(img,ky);
-  auto img1 = std::make_shared<FitsImage>(img.getName(),img.getWidth(),img.getHeight(),1);
-  img1->setMetadata(img.getMetadata());
-  PixelIterator it = img1->getPixelIterator();
+  FitsImage img1(img.getName(),img.getWidth(),img.getHeight(),1);
+  img1.setMetadata(img.getMetadata());
+  PixelIterator it = img1.getPixelIterator();
   ValueType* ptrgx = gx;
   ValueType* ptrgy = gy;
   uint32_t n = img.getWidth() * img.getHeight();

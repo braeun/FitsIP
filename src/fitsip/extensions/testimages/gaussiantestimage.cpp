@@ -63,16 +63,16 @@ OpPlugin::ResultType GaussianTestImage::execute(std::shared_ptr<FitsObject> /*im
   }
   if (dlg->exec())
   {
-    img = std::make_shared<FitsImage>("Gauss",dlg->getWidth(),dlg->getHeight());
+    img = FitsImage("Gauss",dlg->getWidth(),dlg->getHeight());
     double a = dlg->getAmplitude();
     double cx = dlg->getCenterX();
     double sx = dlg->getSigmaX();
     double cy = dlg->getCenterY();
     double sy = dlg->getSigmaY();
-    PixelIterator it = img->getPixelIterator();
-    for (int y=0;y<img->getHeight();y++)
+    PixelIterator it = img.getPixelIterator();
+    for (int y=0;y<img.getHeight();y++)
     {
-      for (int x=0;x<img->getWidth();x++)
+      for (int x=0;x<img.getWidth();x++)
       {
         it[0] = math_functions::gaussian(x,y,a,cx,sx,cy,sy);
         ++it;

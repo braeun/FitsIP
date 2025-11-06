@@ -63,16 +63,16 @@ OpPlugin::ResultType MoffatTestImage::execute(std::shared_ptr<FitsObject> /*imag
   }
   if (dlg->exec())
   {
-    img = std::make_shared<FitsImage>("Gauss",dlg->getWidth(),dlg->getHeight());
+    img = FitsImage("Gauss",dlg->getWidth(),dlg->getHeight());
     double cx = dlg->getCenterX();
     double cy = dlg->getCenterY();
     double alphax = dlg->getAlphaX();
     double alphay = dlg->getAlphaY();
     double beta = dlg->getBeta();
-    PixelIterator it = img->getPixelIterator();
-    for (int y=0;y<img->getHeight();y++)
+    PixelIterator it = img.getPixelIterator();
+    for (int y=0;y<img.getHeight();y++)
     {
-      for (int x=0;x<img->getWidth();x++)
+      for (int x=0;x<img.getWidth();x++)
       {
         it[0] = math_functions::moffat(x,y,cx,alphax,cy,alphay,beta);
         ++it;

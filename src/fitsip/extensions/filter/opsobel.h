@@ -48,7 +48,7 @@ public:
   virtual ResultType execute(std::shared_ptr<FitsObject> img, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  std::shared_ptr<FitsImage> applyFilter(const FitsImage& img) const;
+  FitsImage applyFilter(const FitsImage& img) const;
   ValueType* convolve(const FitsImage& img, const Kernel& kernel) const;
 };
 

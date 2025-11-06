@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - stack for undo operations                                           *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-11-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,7 +26,6 @@
 #include "fitsimage.h"
 #include <QObject>
 #include <deque>
-#include <memory>
 
 class UndoStack: public QObject
 {
@@ -40,16 +39,16 @@ public:
 
   bool isUndoAvailable() const;
 
-  void push(std::shared_ptr<FitsImage> img);
+  void push(const FitsImage& img);
 
-  std::shared_ptr<FitsImage> pop();
+  FitsImage pop();
 
 signals:
   void undoAvailable(bool flag);
 
 private:
   size_t maxdepth;
-  std::deque<std::shared_ptr<FitsImage>> stack;
+  std::deque<FitsImage> stack;
 };
 
 #endif // UNDOSTACK_H

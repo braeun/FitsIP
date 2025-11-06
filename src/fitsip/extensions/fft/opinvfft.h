@@ -44,10 +44,10 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  std::shared_ptr<FitsImage> invfft(const FitsImage& image) const;
+  FitsImage invfft(const FitsImage& image) const;
 
 private:
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
 
 };
 

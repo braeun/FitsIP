@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - astro image format reader                                           *
  *                                                                              *
- * modified: 2025-11-03                                                         *
+ * modified: 2025-11-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -64,7 +64,7 @@ std::vector<std::shared_ptr<FitsObject>> AstroImageIO::read(QString filename)
   }
   a = f.read(sizeof(uint32_t));
   uint32_t version = *(reinterpret_cast<uint32_t*>(a.data()));
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
   switch (version)
   {
     case 0x0100:
@@ -78,7 +78,7 @@ std::vector<std::shared_ptr<FitsObject>> AstroImageIO::read(QString filename)
       break;
   }
   profiler.stop();
-  logProfiler(*img,"read");
+  logProfiler(img,"read");
   return {std::make_shared<FitsObject>(img,filename)};
 }
 
@@ -89,7 +89,7 @@ bool AstroImageIO::write(QString /*filename*/, FitsObject* /*img*/)
 
 
 
-std::shared_ptr<FitsImage> AstroImageIO::read_0x0100(QFile *f, const QFileInfo& info)
+FitsImage AstroImageIO::read_0x0100(QFile *f, const QFileInfo& info)
 {
   ImageMetadata metadata;
   /* image data */
@@ -129,18 +129,18 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0100(QFile *f, const QFileInfo& 
   uint32_t size = *(reinterpret_cast<uint32_t*>(a.data()));
   QByteArray d = f->read(size);
   if (compressed) d = qUncompress(d);
-  auto img = std::make_shared<FitsImage>(info.baseName(),w,h,1);
-  PixelIterator it = img->getPixelIterator();
+  auto img = FitsImage(info.baseName(),w,h,1);
+  PixelIterator it = img.getPixelIterator();
   for (uint8_t v : std::as_const(d))
   {
     it[0] = v;
     ++it;
   }
-  img->setMetadata(metadata);
+  img.setMetadata(metadata);
   return img;
 }
 
-std::shared_ptr<FitsImage> AstroImageIO::read_0x0200(QFile *f, const QFileInfo& info)
+FitsImage AstroImageIO::read_0x0200(QFile *f, const QFileInfo& info)
 {
   ImageMetadata metadata;
   /* image data */
@@ -180,11 +180,11 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0200(QFile *f, const QFileInfo& 
   uint32_t size = *(reinterpret_cast<uint32_t*>(a.data()));
   QByteArray d = f->read(size);
   if (compressed) d = qUncompress(d);
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
   if (bytesPerPixel == 1)
   {
-    img = std::make_shared<FitsImage>(info.baseName(),w,h,1);
-    PixelIterator it = img->getPixelIterator();
+    img = FitsImage(info.baseName(),w,h,1);
+    PixelIterator it = img.getPixelIterator();
     for (uint8_t v : std::as_const(d))
     {
       it[0] = v;
@@ -193,9 +193,9 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0200(QFile *f, const QFileInfo& 
   }
   else if (bytesPerPixel == 2)
   {
-    img = std::make_shared<FitsImage>(info.baseName(),w,h,1);
+    img = FitsImage(info.baseName(),w,h,1);
     uint16_t* v = reinterpret_cast<uint16_t*>(d.data());
-    PixelIterator it = img->getPixelIterator();
+    PixelIterator it = img.getPixelIterator();
     for (uint32_t i=0;i<w*h;i++)
     {
       it[0] = *v;
@@ -205,9 +205,9 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0200(QFile *f, const QFileInfo& 
   }
   else
   {
-    img = std::make_shared<FitsImage>(info.baseName(),w,h,3);
+    img = FitsImage(info.baseName(),w,h,3);
     uint32_t* v = reinterpret_cast<uint32_t*>(d.data());
-    PixelIterator it = img->getPixelIterator();
+    PixelIterator it = img.getPixelIterator();
     for (uint32_t i=0;i<w*h;i++)
     {
       it[0] = (*v >> 16) & 0xFF;
@@ -217,6 +217,6 @@ std::shared_ptr<FitsImage> AstroImageIO::read_0x0200(QFile *f, const QFileInfo& 
       ++it;
     }
   }
-  img->setMetadata(metadata);
+  img.setMetadata(metadata);
   return img;
 }

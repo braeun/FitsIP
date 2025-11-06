@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - stack for undo operations                                           *
  *                                                                              *
- * modified: 2022-11-26                                                         *
+ * modified: 2025-11-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -42,16 +42,16 @@ bool UndoStack::isUndoAvailable() const
   return !stack.empty();
 }
 
-void UndoStack::push(std::shared_ptr<FitsImage> img)
+void UndoStack::push(const FitsImage& img)
 {
   if (stack.size() == maxdepth) stack.pop_front();
-  stack.push_back(std::make_shared<FitsImage>(*img));
+  stack.push_back(img);
 }
 
-std::shared_ptr<FitsImage> UndoStack::pop()
+FitsImage UndoStack::pop()
 {
-  if (stack.empty()) return std::shared_ptr<FitsImage>();
-  std::shared_ptr<FitsImage> p = stack.back();
+  if (stack.empty()) return FitsImage();
+  FitsImage p = stack.back();
   stack.pop_back();
   return p;
 }

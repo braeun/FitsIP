@@ -47,7 +47,7 @@ public:
   virtual void bindPython(void* m) const override;
 #endif
 
-  std::shared_ptr<FitsImage> resize(const FitsImage& image, double factorx, double factory, int mode) const;
+  FitsImage resize(const FitsImage& image, double factorx, double factory, int mode) const;
 
 //  std::shared_ptr<FitsImage> grow(std::shared_ptr<FitsImage> image, int factor, bool bilinear) const;
 

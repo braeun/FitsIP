@@ -77,10 +77,10 @@ OpPlugin::ResultType OpAverage::execute(const std::vector<QFileInfo>& list, cons
     }
   }
   if (n == 0) return ERROR;
-  *img /= n;
+  img /= n;
   profiler.stop();
-  log(img.get(),QString("Divided image by %1").arg(n));
-  logProfiler(*img);
+  log(&img,QString("Divided image by %1").arg(n));
+  logProfiler(img);
   if (prog) prog->deleteLater();
   QApplication::restoreOverrideCursor();
   return OK;
@@ -98,13 +98,13 @@ OpPlugin::ResultType OpAverage::add(const QFileInfo& file)
   {
     if (!img)
     {
-      img = std::make_shared<FitsImage>("average",handler->read(file.absoluteFilePath()).front()->getImage());
+      img = FitsImage("average",handler->read(file.absoluteFilePath()).front()->getImage());
     }
     else
     {
-      *img += handler->read(file.absoluteFilePath()).front()->getImage();
+      img += handler->read(file.absoluteFilePath()).front()->getImage();
     }
-    log(img.get(),"Added image "+file.fileName());
+    log(&img,"Added image "+file.fileName());
   }
   catch (std::exception& ex)
   {

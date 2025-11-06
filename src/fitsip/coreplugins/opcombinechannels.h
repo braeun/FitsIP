@@ -49,10 +49,10 @@ public:
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
 private:
-  std::shared_ptr<FitsImage> combine(std::shared_ptr<FitsObject> rimg, std::shared_ptr<FitsObject> gimg, std::shared_ptr<FitsObject> bimg) const;
+  FitsImage combine(std::shared_ptr<FitsObject> rimg, std::shared_ptr<FitsObject> gimg, std::shared_ptr<FitsObject> bimg) const;
 
   OpCombineChannelsDialog* dlg;
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
 
 };
 

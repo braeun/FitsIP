@@ -35,8 +35,7 @@ IOHandler::~IOHandler()
 
 bool IOHandler::write(QString filename, FitsImage* img)
 {
-  auto copy = std::make_shared<FitsImage>(*img);
-  auto obj = std::make_shared<FitsObject>(copy,filename);
+  auto obj = std::make_shared<FitsObject>(*img,filename);
   return write(filename,obj.get());
 }
 

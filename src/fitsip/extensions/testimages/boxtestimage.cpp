@@ -63,16 +63,16 @@ OpPlugin::ResultType BoxTestImage::execute(std::shared_ptr<FitsObject> /*image*/
   }
   if (dlg->exec())
   {
-    img = std::make_shared<FitsImage>("Box",dlg->getWidth(),dlg->getHeight());
+    img = FitsImage("Box",dlg->getWidth(),dlg->getHeight());
     double a = dlg->getAmplitude();
     int cx = dlg->getCenterX();
     int sx = dlg->getBoxWidth();
     int cy = dlg->getCenterY();
     int sy = dlg->getBoxHeight();
-    PixelIterator it = img->getPixelIterator();
-    for (int y=0;y<img->getHeight();y++)
+    PixelIterator it = img.getPixelIterator();
+    for (int y=0;y<img.getHeight();y++)
     {
-      for (int x=0;x<img->getWidth();x++)
+      for (int x=0;x<img.getWidth();x++)
       {
         it[0] = math_functions::box(x,y,a,cx,sx,cy,sy);
         ++it;

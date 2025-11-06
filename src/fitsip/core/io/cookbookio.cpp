@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - Cookbook CCD image reader                                           *
  *                                                                              *
- * modified: 2025-11-03                                                         *
+ * modified: 2025-11-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -53,12 +53,12 @@ bool CookbookIO::write(QString /*filename*/, FitsObject* /*obj*/)
 }
 
 
-std::shared_ptr<FitsImage> CookbookIO::readPA(QString filename)
+FitsImage CookbookIO::readPA(QString filename)
 {
   QFileInfo info(filename);
   profiler.start();
-  auto img = std::make_shared<FitsImage>(info.baseName(),252,242,1);
-  PixelIterator it = img->getPixelIterator();
+  FitsImage img(info.baseName(),252,242,1);
+  PixelIterator it = img.getPixelIterator();
   {
     QFile f(filename);
     if (!f.open(QFile::ReadOnly)) throw std::runtime_error("CookbookIO: Failed to open file");
@@ -102,16 +102,16 @@ std::shared_ptr<FitsImage> CookbookIO::readPA(QString filename)
     f.close();
   }
   profiler.stop();
-  logProfiler(*img,"read");
+  logProfiler(img,"read");
   return img;
 }
 
-std::shared_ptr<FitsImage> CookbookIO::readP1(QString filename)
+FitsImage CookbookIO::readP1(QString filename)
 {
   QFileInfo info(filename);
   profiler.start();
-  auto img = std::make_shared<FitsImage>(info.baseName(),378,242,1);
-  PixelIterator it = img->getPixelIterator();
+  FitsImage img(info.baseName(),378,242,1);
+  PixelIterator it = img.getPixelIterator();
   {
     QFile f(filename);
     if (!f.open(QFile::ReadOnly)) throw std::runtime_error("CookbookIO: Failed to open file");
@@ -166,7 +166,7 @@ std::shared_ptr<FitsImage> CookbookIO::readP1(QString filename)
     f.close();
   }
   profiler.stop();
-  logProfiler(*img,"read");
+  logProfiler(img,"read");
   return img;
 }
 

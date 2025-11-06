@@ -48,11 +48,11 @@ std::vector<std::shared_ptr<FitsObject>> QtImageIO::read(QString filename)
   QImage i(filename);
   if (i.isNull()) throw std::runtime_error("Failed to load image: "+filename.toStdString());
   QFileInfo info(filename);
-  std::shared_ptr<FitsImage> img;
+  FitsImage img;
   if (i.depth() == 8)
   {
-    img = std::make_shared<FitsImage>(info.baseName(),i.width(),i.height(),1);
-    PixelIterator pixel = img->getPixelIterator();
+    img = FitsImage(info.baseName(),i.width(),i.height(),1);
+    PixelIterator pixel = img.getPixelIterator();
     for (int y=0;y<i.height();y++)
     {
       const uchar* ptr = i.scanLine(y);
@@ -66,8 +66,8 @@ std::vector<std::shared_ptr<FitsObject>> QtImageIO::read(QString filename)
   }
   else
   {
-    img = std::make_shared<FitsImage>(info.baseName(),i.width(),i.height(),3);
-    PixelIterator pixel = img->getPixelIterator();
+    img = FitsImage(info.baseName(),i.width(),i.height(),3);
+    PixelIterator pixel = img.getPixelIterator();
     for (int y=0;y<i.height();y++)
     {
       const QRgb* rgb = reinterpret_cast<QRgb*>(i.scanLine(y));
@@ -82,14 +82,14 @@ std::vector<std::shared_ptr<FitsObject>> QtImageIO::read(QString filename)
       }
     }
   }
-  ImageMetadata data = img->getMetadata();
+  ImageMetadata data = img.getMetadata();
   readMetadata(filename,&data);
 #ifdef HAVE_EXIV2
   readExif(filename,&data);
 #endif
-  img->setMetadata(data);
+  img.setMetadata(data);
   profiler.stop();
-  logProfiler(*img,"read");
+  logProfiler(img,"read");
   return {std::make_shared<FitsObject>(img,filename)};
 }
 
