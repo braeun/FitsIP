@@ -54,7 +54,7 @@ void OpToGray::bindPython(void* mod) const
     {
       return ERROR;
     }
-    obj->setImage(toGray(obj)->getImageShared());
+    obj->getImage() = toGray(obj)->getImage();
     obj->getImage().log("Converted to gray image");
     return OK;
   },
@@ -70,7 +70,7 @@ OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsObject> image, const 
     return ERROR;
   }
   profiler.start();
-  image->setImage(toGray(image)->getImageShared());
+  image->getImage() = toGray(image)->getImage();
   profiler.stop();
   log(image,"Converted to gray image");
   logProfiler(image);

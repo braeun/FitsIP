@@ -58,6 +58,7 @@ public:
 
   FitsImage& getImage();
 
+  [[deprecated]]
   std::shared_ptr<FitsImage> getImageShared() const;
 
   void setImage(const std::shared_ptr<FitsImage>& img);

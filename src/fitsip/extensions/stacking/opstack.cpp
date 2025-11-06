@@ -215,17 +215,17 @@ OpPlugin::ResultType OpStack::stack(const QFileInfo &file)
   }
   try
   {
-    auto img1 = handler->read(file.absoluteFilePath()).front()->getImageShared();
+    auto img1 = handler->read(file.absoluteFilePath()).front()->getImage();
     if (subtractSky)
     {
       Histogram hist;
-      hist.build(*img1);
+      hist.build(img1);
       AverageResult avg = hist.getAverage(0.75);
-      *img1 -= avg.mean;
+      img1 -= avg.mean;
     }
-    *img += *img1;
-    log(img.get(),"stacked  "+img1->getName());
-    qInfo() << "Stacked: " << img1->getName();
+    *img += img1;
+    log(img.get(),"stacked  "+img1.getName());
+    qInfo() << "Stacked: " << img1.getName();
   }
   catch (std::exception& ex)
   {
@@ -245,20 +245,20 @@ OpPlugin::ResultType OpStack::stackTemplate(const QFileInfo &file)
   }
   try
   {
-    auto img1 = handler->read(file.absoluteFilePath()).front()->getImageShared();
+    auto img1 = handler->read(file.absoluteFilePath()).front()->getImage();
     if (subtractSky)
     {
       Histogram hist;
-      hist.build(*img1);
+      hist.build(img1);
       AverageResult avg = hist.getAverage(0.75);
-      *img1 -= avg.mean;
+      img1 -= avg.mean;
     }
-    matcher.computeMatch(*img1);
+    matcher.computeMatch(img1);
     OpShift shift;
-    shift.shift(img1.get(),-matcher.getDx(),-matcher.getDy());
-    *img += *img1;
-    log(img.get(),QString::asprintf("stacked %s shifted by [%.1f,%.1f]",img1->getName().toUtf8().data(),-matcher.getDx(),-matcher.getDy()));
-    qInfo() << "Stacked: " << img1->getName();
+    shift.shift(&img1,-matcher.getDx(),-matcher.getDy());
+    *img += img1;
+    log(img.get(),QString::asprintf("stacked %s shifted by [%.1f,%.1f]",img1.getName().toUtf8().data(),-matcher.getDx(),-matcher.getDy()));
+    qInfo() << "Stacked: " << img1.getName();
   }
   catch (std::exception& ex)
   {
@@ -278,15 +278,15 @@ OpPlugin::ResultType OpStack::stackStarMatch(const QFileInfo &file)
   }
   try
   {
-    auto img1 = handler->read(file.absoluteFilePath()).front()->getImageShared();
+    auto img1 = handler->read(file.absoluteFilePath()).front()->getImage();
     if (subtractSky)
     {
       Histogram hist;
-      hist.build(*img1);
+      hist.build(img1);
       AverageResult avg = hist.getAverage(0.75);
-      *img1 -= avg.mean;
+      img1 -= avg.mean;
     }
-    ResultType res = starmatcher.match(*img1);
+    ResultType res = starmatcher.match(img1);
     if (res == OK)
     {
       if (rotate)
@@ -295,20 +295,20 @@ OpPlugin::ResultType OpStack::stackStarMatch(const QFileInfo &file)
         if (fabs(angle) > 0.001 && fabs(angle) < starmatcher.getAngleSigma()/2)
         {
           OpRotate rot;
-          rot.rotate(img1.get(),angle,true);
+          rot.rotate(&img1,angle,true);
         }
       }
       OpShift shift;
-      shift.shift(img1.get(),-starmatcher.getDx(),-starmatcher.getDy());
-      *img += *img1;
+      shift.shift(&img1,-starmatcher.getDx(),-starmatcher.getDy());
+      *img += img1;
       if (rotate)
-        log(img.get(),QString::asprintf("stacked %s rotated by %.3f°+-%.3f° shifted by [%.1f+-%.2f,%.1f+-%.2f]",img1->getName().toUtf8().data(),
+        log(img.get(),QString::asprintf("stacked %s rotated by %.3f°+-%.3f° shifted by [%.1f+-%.2f,%.1f+-%.2f]",img1.getName().toUtf8().data(),
                                    starmatcher.getAngle(),starmatcher.getAngleSigma(),
                                    -starmatcher.getDx(),starmatcher.getSigmadx(),-starmatcher.getDy(),starmatcher.getSigmady()));
       else
-        log(img.get(),QString::asprintf("stacked %s shifted by [%.1f+-%.2f,%.1f+-%.2f]",img1->getName().toUtf8().data(),
+        log(img.get(),QString::asprintf("stacked %s shifted by [%.1f+-%.2f,%.1f+-%.2f]",img1.getName().toUtf8().data(),
                                    -starmatcher.getDx(),starmatcher.getSigmadx(),-starmatcher.getDy(),starmatcher.getSigmady()));
-      qInfo() << "Stacked: " << img1->getName();
+      qInfo() << "Stacked: " << img1.getName();
     }
     else
     {

@@ -99,7 +99,7 @@ std::vector<std::shared_ptr<FitsObject>> RawIO::read(QString filename)
     meta.setObsDateTime(QDateTime::fromTime_t(ip.imgdata.other.timestamp));
     img->setMetadata(meta);
     profiler.stop();
-    logProfiler(img,"read");
+    logProfiler(*img,"read");
     return {std::make_shared<FitsObject>(img,filename)};
   }
   else
