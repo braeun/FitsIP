@@ -47,8 +47,8 @@ QString MeasureStatistics::getMenuEntry() const
 
 OpPlugin::ResultType MeasureStatistics::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
-  stat = ImageStatistics(*image->getImage(),data.aoi);
-  logOperation(image->getImage()->getName(),"Image Statistics:\n"+toString());
+  stat = ImageStatistics(image->getImage(),data.aoi);
+  emit logOperation(image->getImage().getName(),"Image Statistics:\n"+toString());
   TextInfoDialog d;
   d.setTitle("Image Statistics");
   d.setText(toString());

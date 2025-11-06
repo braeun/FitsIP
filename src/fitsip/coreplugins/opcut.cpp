@@ -61,8 +61,8 @@ void OpCut::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("cut",[](std::shared_ptr<FitsObject> obj, ValueType lo, ValueType hi){
-    obj->getImage()->cut(lo,hi);
-    obj->getImage()->log(QString("cut values ouside range: lower=%1 upper=%2").arg(lo).arg(hi));
+    obj->getImage().cut(lo,hi);
+    obj->getImage().log(QString("cut values ouside range: lower=%1 upper=%2").arg(lo).arg(hi));
     return OK;
   },
   "Cut values outside a given range",py::arg("obj"),py::arg("lo"),py::arg("hi"));
@@ -76,7 +76,7 @@ OpPlugin::ResultType OpCut::execute(std::shared_ptr<FitsObject> image, const OpP
     ValueType lower = dlg.getValue1().toDouble();
     ValueType upper = dlg.getValue2().toDouble();
     profiler.start();
-    image->getImage()->cut(lower,upper);
+    image->getImage().cut(lower,upper);
     profiler.stop();
     log(image,QString("cut values ouside range: lower=%1 upper=%2").arg(lower).arg(upper));
     logProfiler(image);

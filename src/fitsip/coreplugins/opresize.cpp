@@ -106,7 +106,7 @@ OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, const 
   {
     dlg = new OpResizeDialog();
   }
-  dlg->setCurrentSize(image->getImage()->getWidth(),image->getImage()->getHeight());
+  dlg->setCurrentSize(image->getImage().getWidth(),image->getImage().getHeight());
   if (dlg->exec())
   {
     double factorx = dlg->getFactorX();
@@ -124,7 +124,7 @@ OpPlugin::ResultType OpResize::execute(std::shared_ptr<FitsObject> image, const 
       mode = "bilinear";
     }
     profiler.start();
-    image->setImage(resize(*image->getImage(),factorx,factory,m));
+    image->setImage(resize(image->getImage(),factorx,factory,m));
     profiler.stop();
     log(image,QString("Resize: factor x=%1 y=%2 %3").arg(factorx).arg(factory).arg(mode));
     logProfiler(image);
@@ -389,8 +389,8 @@ void OpResize::scriptResize(std::shared_ptr<FitsObject> obj, double factorx, dou
     m = 2;
     md = "bilinear";
   }
-  auto img = resize(*obj->getImage(),factorx,factory,m);
+  auto img = resize(obj->getImage(),factorx,factory,m);
   obj->setImage(img);
-  obj->getImage()->log(QString("Resize: factor x=%1  factor y=%2 %3").arg(factorx).arg(factory).arg(md));
+  obj->getImage().log(QString("Resize: factor x=%1  factor y=%2 %3").arg(factorx).arg(factory).arg(md));
 }
 

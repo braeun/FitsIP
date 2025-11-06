@@ -61,8 +61,8 @@ void OpDiv::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("div",[](std::shared_ptr<FitsObject> obj1, std::shared_ptr<FitsObject> obj2){
-    *(obj1->getImage()) /= *(obj2->getImage());
-    obj1->getImage()->log("Divided by image "+obj2->getImage()->getName());
+    obj1->getImage() /= obj2->getImage();
+    obj1->getImage().log("Divided by image "+obj2->getImage().getName());
     return OK;
   },
   "Divide the first image by the second one",py::arg("obj1"),py::arg("obj2"));
@@ -84,9 +84,9 @@ OpPlugin::ResultType OpDiv::execute(std::shared_ptr<FitsObject> image, const OpP
     profiler.start();
     try
     {
-      *image->getImage() /= *file->getImage();
+      image->getImage() /= file->getImage();
       profiler.stop();
-      log(image,"Divided by image "+file->getImage()->getName());
+      log(image,"Divided by image "+file->getImage().getName());
       logProfiler(image);
     }
     catch (const std::exception& ex)

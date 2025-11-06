@@ -60,8 +60,8 @@ public:
 
 private:
 
-  std::vector<Pixel> getRandomPoints(FitsImage* image, uint32_t n, double bkg);
-  std::vector<Pixel> getGridPoints(FitsImage* image, uint32_t n, double bkg);
+  std::vector<Pixel> getRandomPoints(const FitsImage& image, uint32_t n, double bkg);
+  std::vector<Pixel> getGridPoints(const FitsImage& image, uint32_t n, double bkg);
   std::vector<double> getCoefficients(const std::vector<Pixel>& pixels, uint32_t deg, uint32_t layer);
   std::shared_ptr<FitsImage> createImage(u_int32_t w, uint32_t h, std::vector<std::vector<double>> coeff, uint32_t deg);
 

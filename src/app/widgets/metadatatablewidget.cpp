@@ -17,7 +17,7 @@ void MetadataTableWidget::setFile(std::shared_ptr<FitsObject> file)
 {
   if (file)
   {
-    const ImageMetadata& metadata = file->getImage()->getMetadata();
+    const ImageMetadata& metadata = file->getImage().getMetadata();
     ui->tableWidget->setItem(0,0,new QTableWidgetItem(metadata.getObject()));
     ui->tableWidget->setItem(1,0,new QTableWidgetItem(metadata.getObsDateTime().toString(Qt::ISODate)));
     ui->tableWidget->setItem(2,0,new QTableWidgetItem(metadata.getObserver()));

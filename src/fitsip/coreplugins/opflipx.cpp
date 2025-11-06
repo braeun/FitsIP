@@ -56,8 +56,8 @@ void OpFlipX::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("flipx",[this](std::shared_ptr<FitsObject> obj){
-    flip(obj->getImage());
-    obj->getImage()->log("flipped in X");
+    flip(&obj->getImage());
+    obj->getImage().log("flipped in X");
     return OK;
   },
   "Flip in x",py::arg("obj"));
@@ -67,7 +67,7 @@ void OpFlipX::bindPython(void* mod) const
 OpPlugin::ResultType OpFlipX::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   profiler.start();
-  flip(image->getImage());
+  flip(&image->getImage());
   profiler.stop();
   log(image,"flipped in X");
   logProfiler(image);

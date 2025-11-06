@@ -185,10 +185,10 @@ SharpnessData MeasureSharpness::evaluate(const QFileInfo info, QRect selection) 
   return SharpnessData();
 }
 
-SharpnessData MeasureSharpness::calculateSharpness(FitsImage* img, QRect selection) const
+SharpnessData MeasureSharpness::calculateSharpness(const FitsImage& img, QRect selection) const
 {
   SharpnessData data;
-  FitsImage copy(*img);
+  FitsImage copy(img);
   if (selection.isValid())
   {
     copy = copy.subImage(selection);
@@ -201,7 +201,7 @@ SharpnessData MeasureSharpness::calculateSharpness(FitsImage* img, QRect selecti
   const Kernel& kernel = KernelRepository::instance().getKernel(KernelRepository::LAPLACIAN);
   op.convolve(&copy,kernel);
   /* ignore borders */
-  QRect r(5,5,img->getWidth()-10,img->getHeight()-10);
+  QRect r(5,5,img.getWidth()-10,img.getHeight()-10);
   copy = copy.subImage(r);
   /* calculate statistics */
   Average avg;

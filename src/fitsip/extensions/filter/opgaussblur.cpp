@@ -57,8 +57,8 @@ void OpGaussBlur::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("gauss_blur",[this](std::shared_ptr<FitsObject> obj, ValueType sigmax, ValueType sigmay, ValueType accuracy){
-    blur(obj->getImage(),sigmax,sigmay,accuracy);
-    obj->getImage()->log(QString::asprintf("Gaussian blur: sigmax=%f  sigmay=%f  accuracy=%f",sigmax,sigmay,accuracy));
+    blur(&obj->getImage(),sigmax,sigmay,accuracy);
+    obj->getImage().log(QString::asprintf("Gaussian blur: sigmax=%f  sigmay=%f  accuracy=%f",sigmax,sigmay,accuracy));
     return OK;
   },
   "Blur an image by a gaussian",py::arg("obj"),py::arg("sigmax"),py::arg("sigmay"),py::arg("accuracy"));
@@ -68,14 +68,14 @@ void OpGaussBlur::bindPython(void* mod) const
 OpPlugin::ResultType OpGaussBlur::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpGaussBlurDialog();
-  dlg->setSourceImage(*image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     ValueType sigmax = dlg->getSigma();
     ValueType sigmay = dlg->getSigma();
     ValueType accuracy = 0.1;
     profiler.start();
-    blur(image->getImage(),sigmax,sigmay,accuracy);
+    blur(&image->getImage(),sigmax,sigmay,accuracy);
     profiler.stop();
     log(image,QString::asprintf("Gaussian blur: sigmax=%f  sigmay=%f  accuracy=%f",sigmax,sigmay,accuracy));
     logProfiler(image);

@@ -46,7 +46,7 @@ public:
 
   virtual ResultType execute(std::shared_ptr<FitsObject> image, const OpPluginData& data=OpPluginData()) override;
 
-  std::shared_ptr<FitsImage> fftconvolution(FitsImage* img, const PSF* psf, const std::vector<ValueType>& par) const;
+  std::shared_ptr<FitsImage> fftconvolution(const FitsImage& img, const PSF* psf, const std::vector<ValueType>& par) const;
 
 private:
   struct fftdata

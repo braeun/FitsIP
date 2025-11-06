@@ -145,8 +145,8 @@ void ProfileView::redraw()
     {
       int r = ui->rangeSpinBox->value() / 2;
       int left = std::max(cursor.x()-r,0);
-      int right = std::min(cursor.x()+r,(int)image->getImage()->getWidth());
-      ConstPixelIterator it = image->getImage()->getConstPixelIterator(0,cursor.y());
+      int right = std::min(cursor.x()+r,(int)image->getImage().getWidth());
+      ConstPixelIterator it = image->getImage().getConstPixelIterator(0,cursor.y());
       it += left;
       for (int x=left;x<right;x++)
       {
@@ -154,28 +154,28 @@ void ProfileView::redraw()
         ++it;
       }
       int top = std::max(cursor.y()-r,0);
-      int bottom = std::min(cursor.y()+r,(int)image->getImage()->getHeight());
-      it = image->getImage()->getConstPixelIterator(cursor.x(),0);
-      it += top * image->getImage()->getWidth();
+      int bottom = std::min(cursor.y()+r,(int)image->getImage().getHeight());
+      it = image->getImage().getConstPixelIterator(cursor.x(),0);
+      it += top * image->getImage().getWidth();
       for (int y=top;y<bottom;y++)
       {
         vertical.push_back(QPointF(y,it.getAbs()));
-        it += image->getImage()->getWidth();
+        it += image->getImage().getWidth();
       }
     }
     else
     {
-      ConstPixelIterator it = image->getImage()->getConstPixelIterator(0,cursor.y());
-      for (int x=0;x<image->getImage()->getWidth();x++)
+      ConstPixelIterator it = image->getImage().getConstPixelIterator(0,cursor.y());
+      for (int x=0;x<image->getImage().getWidth();x++)
       {
         horizontal.push_back(QPointF(x,it.getAbs()));
         ++it;
       }
-      it = image->getImage()->getConstPixelIterator(cursor.x(),0);
-      for (int y=0;y<image->getImage()->getHeight();y++)
+      it = image->getImage().getConstPixelIterator(cursor.x(),0);
+      for (int y=0;y<image->getImage().getHeight();y++)
       {
         vertical.push_back(QPointF(y,it.getAbs()));
-        it += image->getImage()->getWidth();
+        it += image->getImage().getWidth();
       }
     }
     image->setXProfile(horizontal);

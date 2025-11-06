@@ -48,7 +48,7 @@ public:
 
 private:
 
-  QRect findArea(FitsImage* img, ValueType threshold, int border) const;
+  QRect findArea(const FitsImage& img, ValueType threshold, int border) const;
 
   OpCropDialog* dlg;
 

@@ -53,8 +53,8 @@ void OpUnsharpMask::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("unsharp_mask",[this](std::shared_ptr<FitsObject> obj, ValueType sigma, ValueType strength){
-    unsharpmask(obj->getImage(),sigma,strength);
-    obj->getImage()->log(QString::asprintf("Unsharp mask: sigma=%f  strength=%f",sigma,strength));
+    unsharpmask(&obj->getImage(),sigma,strength);
+    obj->getImage().log(QString::asprintf("Unsharp mask: sigma=%f  strength=%f",sigma,strength));
     return OK;
   },
   "Apply unsharp mask",py::arg("obj"),py::arg("sigma"),py::arg("strength"));
@@ -64,13 +64,13 @@ void OpUnsharpMask::bindPython(void* mod) const
 OpPlugin::ResultType OpUnsharpMask::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpUnsharpMaskDialog();
-  dlg->setSourceImage(*image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();
     ValueType strength = dlg->getStrength();
     profiler.start();
-    unsharpmask(image->getImage(),sigma,strength);
+    unsharpmask(&image->getImage(),sigma,strength);
     profiler.stop();
     log(image,QString::asprintf("Unsharp mask: sigma=%f  strength=%f",sigma,strength));
     logProfiler(image);

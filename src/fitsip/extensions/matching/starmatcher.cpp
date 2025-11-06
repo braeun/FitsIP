@@ -67,16 +67,16 @@ OpPlugin::ResultType StarMatcher::execute(std::shared_ptr<FitsObject> image, con
   {
     profiler.start();
     std::shared_ptr<FitsObject> file = dlg->getImage();
-    auto ret = prepare(*image->getImage(),data.pixellist,dlg->isSubtractSky(),dlg->getSearchBoxSize(),dlg->getStarBoxSize(),dlg->isAllowRotation(),dlg->getStarMaxMovement());
+    auto ret = prepare(image->getImage(),data.pixellist,dlg->isSubtractSky(),dlg->getSearchBoxSize(),dlg->getStarBoxSize(),dlg->isAllowRotation(),dlg->getStarMaxMovement());
     if (ret == OK)
     {
-      ret = match(*file->getImage());
+      ret = match(file->getImage());
     }
     profiler.stop();
     if (ret == OK)
     {
       log(image,QString::asprintf("Match with %s: shifted by [%.1f+-%.1f , %.1f+-%.1f], rotation=%.1f+-%.1f°",
-                                   file->getImage()->getName().toStdString().c_str(),getDx(),getSigmadx(),getDy(),getSigmady(),
+                                   file->getImage().getName().toStdString().c_str(),getDx(),getSigmadx(),getDy(),getSigmady(),
                                   getAngle()*180/M_PI,getAngleSigma()*180/M_PI));
     }
     logProfiler(image);

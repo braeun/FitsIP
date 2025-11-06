@@ -59,12 +59,12 @@ void IOHandler::logProfiler(std::shared_ptr<FitsImage> image, const QString& msg
   }
 }
 
-void IOHandler::logProfiler(FitsImage* image, const QString& msg)
+void IOHandler::logProfiler(const FitsImage& image, const QString& msg)
 {
   if (profiler.getDuration() > 0)
   {
     QString name = QString::fromStdString(profiler.getName());
-    emit logProfilerResult(name,image->getName(),image->getWidth(),image->getHeight(),profiler.getDuration(),msg);
+    emit logProfilerResult(name,image.getName(),image.getWidth(),image.getHeight(),profiler.getDuration(),msg);
     //    qInfo() << profiler.toString().c_str();
   }
 }

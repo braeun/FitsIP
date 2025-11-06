@@ -62,7 +62,7 @@ void OpSplitChannels::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("split",[this](std::shared_ptr<FitsObject> obj){
-    if (obj->getImage()->getDepth() != 3)
+    if (obj->getImage().getDepth() != 3)
     {
       return std::vector<std::shared_ptr<FitsObject>>();
     }
@@ -81,7 +81,7 @@ void OpSplitChannels::bindPython(void* mod) const
 
 OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
-  if (image->getImage()->getDepth() != 3)
+  if (image->getImage().getDepth() != 3)
   {
     setError("Not a color image");
     return ERROR;
@@ -93,17 +93,17 @@ OpPlugin::ResultType OpSplitChannels::execute(std::shared_ptr<FitsObject> image,
   return OK;
 }
 
-std::vector<std::shared_ptr<FitsImage>> OpSplitChannels::split(FitsImage* image) const
+std::vector<std::shared_ptr<FitsImage>> OpSplitChannels::split(const FitsImage& image) const
 {
   std::vector<std::shared_ptr<FitsImage>> list{
-    std::make_shared<FitsImage>(image->getName()+"_R",image->getWidth(),image->getHeight(),1),
-    std::make_shared<FitsImage>(image->getName()+"_G",image->getWidth(),image->getHeight(),1),
-    std::make_shared<FitsImage>(image->getName()+"_B",image->getWidth(),image->getHeight(),1)
+    std::make_shared<FitsImage>(image.getName()+"_R",image.getWidth(),image.getHeight(),1),
+    std::make_shared<FitsImage>(image.getName()+"_G",image.getWidth(),image.getHeight(),1),
+    std::make_shared<FitsImage>(image.getName()+"_B",image.getWidth(),image.getHeight(),1)
   };
-  list[0]->setMetadata(image->getMetadata());
-  list[1]->setMetadata(image->getMetadata());
-  list[2]->setMetadata(image->getMetadata());
-  ConstPixelIterator src = image->getConstPixelIterator();
+  list[0]->setMetadata(image.getMetadata());
+  list[1]->setMetadata(image.getMetadata());
+  list[2]->setMetadata(image.getMetadata());
+  ConstPixelIterator src = image.getConstPixelIterator();
   PixelIterator r = list[0]->getPixelIterator();
   PixelIterator g = list[1]->getPixelIterator();
   PixelIterator b = list[2]->getPixelIterator();

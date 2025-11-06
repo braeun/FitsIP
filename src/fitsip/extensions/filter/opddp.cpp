@@ -54,8 +54,8 @@ void OpDDP::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("ddp",[this](std::shared_ptr<FitsObject> obj, ValueType sigma, ValueType bkg, ValueType a, ValueType b){
-    ddp(obj->getImage(),sigma,bkg,a,b);
-    obj->getImage()->log(QString::asprintf("DDP: sigma=%f  bkg=%f  a=%f  b=%f",sigma,bkg,a,b));
+    ddp(&obj->getImage(),sigma,bkg,a,b);
+    obj->getImage().log(QString::asprintf("DDP: sigma=%f  bkg=%f  a=%f  b=%f",sigma,bkg,a,b));
     return OK;
   },
   "DDP processing",py::arg("obj"),py::arg("sigma"),py::arg("bkg"),py::arg("a"),py::arg("b"));
@@ -65,7 +65,7 @@ void OpDDP::bindPython(void* mod) const
 OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpDDPDialog();
-  dlg->setSourceImage(*image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     ValueType sigma = dlg->getSigma();
@@ -73,7 +73,7 @@ OpPlugin::ResultType OpDDP::execute(std::shared_ptr<FitsObject> image, const OpP
     ValueType a = dlg->getA();
     ValueType b = dlg->getB();
     profiler.start();
-    ddp(image->getImage(),sigma,bkg,a,b);
+    ddp(&image->getImage(),sigma,bkg,a,b);
 //    auto i1 = std::make_shared<FitsImage>(*image);
 //    *i1 -= bkg;
 //    OpGaussBlur blur;

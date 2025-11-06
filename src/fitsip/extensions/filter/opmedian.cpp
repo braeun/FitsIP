@@ -54,8 +54,8 @@ void OpMedian::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("median_filter",[this](std::shared_ptr<FitsObject> obj, int size, ValueType threshold){
-    filter(obj->getImage(),threshold,size);
-    obj->getImage()->log(QString::asprintf("Median filter: size=%d threshold=%f",size,threshold));
+    filter(&obj->getImage(),threshold,size);
+    obj->getImage().log(QString::asprintf("Median filter: size=%d threshold=%f",size,threshold));
     return OK;
   },
   "Apply median filter",py::arg("obj"),py::arg("size"),py::arg("threshold"));
@@ -65,14 +65,14 @@ void OpMedian::bindPython(void* mod) const
 OpPlugin::ResultType OpMedian::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpMedianDialog();
-  dlg->setSourceImage(*image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
   if (dlg->exec())
   {
     QApplication::setOverrideCursor(Qt::BusyCursor);
     ValueType threshold = dlg->getThreshold();
     int size = dlg->getSize();
     profiler.start();
-    filter(image->getImage(),threshold,size);
+    filter(&image->getImage(),threshold,size);
     profiler.stop();
     log(image,QString::asprintf("Median filter: size=%d threshold=%f",size,threshold));
     logProfiler(image);

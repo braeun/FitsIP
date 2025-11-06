@@ -55,8 +55,8 @@ void OpKernel::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("convolve",[this](std::shared_ptr<FitsObject> obj, const Kernel& kernel){
-    convolve(obj->getImage(),kernel);
-    obj->getImage()->log("Convolution with kernel "+kernel.getName());
+    convolve(&obj->getImage(),kernel);
+    obj->getImage().log("Convolution with kernel "+kernel.getName());
     return OK;
   },
   "Convolution with kernel",py::arg("obj"),py::arg("kernel"));
@@ -66,13 +66,13 @@ void OpKernel::bindPython(void* mod) const
 OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
   if (!dlg) dlg = new OpKernelDialog();
-  dlg->setSourceImage(*image->getImage(),data.aoi,data.previewOptions);
+  dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
   dlg->setKernelNames(KernelRepository::instance().getKernelNames());
   if (!dlg->exec()) return CANCELLED;
   Kernel kernel = KernelRepository::instance().getKernel(dlg->getKernelName());
   if (kernel.isEmpty()) return ERROR;
   profiler.start();
-  convolve(image->getImage(),kernel);
+  convolve(&image->getImage(),kernel);
   profiler.stop();
   log(image,"Convolution with kernel "+kernel.getName());
   logProfiler(image);

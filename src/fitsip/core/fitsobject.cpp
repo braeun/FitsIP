@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - fits object containing the image and other data                     *
  *                                                                              *
- * modified: 2025-08-16                                                         *
+ * modified: 2025-11-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -71,9 +71,14 @@ QString  FitsObject::getFilename() const
   return filename;
 }
 
-FitsImage* FitsObject::getImage() const
+const FitsImage& FitsObject::getImage() const
 {
-  return image.get();
+  return *image;
+}
+
+FitsImage& FitsObject::getImage()
+{
+  return *image;
 }
 
 std::shared_ptr<FitsImage> FitsObject::getImageShared() const

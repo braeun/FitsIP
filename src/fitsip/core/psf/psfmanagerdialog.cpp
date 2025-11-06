@@ -107,7 +107,7 @@ void PSFManagerDialog::addImagePSF()
       QString name = QInputDialog::getText(this,"Save as PSF","Name:");
       if (!name.isEmpty())
       {
-        FitsImage fitsimg = *img->getImage();
+        FitsImage fitsimg = img->getImage();
         QRect aoi = img->getAOI();
         if (aoi.isValid())
         {

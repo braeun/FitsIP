@@ -68,15 +68,15 @@ void MeasureMatch::bindPython(void* mod) const
   py::class_<MeasureMatch>(*m,"MeasureMatch","Match images to a template")
       .def(py::init<>())
       .def("set_template",[](MeasureMatch& op, std::shared_ptr<FitsObject> obj){
-          op.setTemplate(*obj->getImage());
+          op.setTemplate(obj->getImage());
         },
         "Set the template for matching",py::arg("obj"))
       .def("set_template",[](MeasureMatch& op, std::shared_ptr<FitsObject> obj, int x, int y, int w, int h){
-          op.setTemplate(*obj->getImage(),QRect(x,y,w,h));
+          op.setTemplate(obj->getImage(),QRect(x,y,w,h));
         },
         "Set the template for matching",py::arg("obj"),py::arg("x"),py::arg("y"),py::arg("w"),py::arg("h"))
       .def("match",[](MeasureMatch& op, std::shared_ptr<FitsObject> obj){
-          op.computeMatch(*obj->getImage());
+          op.computeMatch(obj->getImage());
         },
         "Compute the match of the image with the template",py::arg("obj"))
       .def("shift_aoi",[](MeasureMatch& op, int dx, int dy){op.shiftAOI(dx,dy);},
@@ -109,11 +109,11 @@ OpPlugin::ResultType MeasureMatch::execute(std::shared_ptr<FitsObject> image, co
     subsample = dlg->getSubsample();
     factor = dlg->getScaleFactor();
     profiler.start();
-    setTemplate(*image->getImage(),aoi);
+    setTemplate(image->getImage(),aoi);
     std::shared_ptr<FitsObject> file = dlg->getImage();
-    computeMatch(*file->getImage());
+    computeMatch(file->getImage());
     profiler.stop();
-    log(image,QString::asprintf("Maximum match with %s: %f at [%.1f,%.1f] shifted by [%.1f,%.1f]",file->getImage()->getName().toStdString().c_str(),max,getX(),getY(),getDx(),getDy()));
+    log(image,QString::asprintf("Maximum match with %s: %f at [%.1f,%.1f] shifted by [%.1f,%.1f]",file->getImage().getName().toStdString().c_str(),max,getX(),getY(),getDx(),getDy()));
     logProfiler(image);
     return OK;
   }

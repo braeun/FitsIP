@@ -27,7 +27,7 @@ void HistoryTableWidget::setFile(std::shared_ptr<FitsObject> file)
 {
   if (file)
   {
-    const ImageMetadata& metadata = file->getImage()->getMetadata();
+    const ImageMetadata& metadata = file->getImage().getMetadata();
     int first = tableWidget->rowCount();
     tableWidget->setRowCount(metadata.getHistory().size());
     for (int i=first;i<metadata.getHistory().size();i++)

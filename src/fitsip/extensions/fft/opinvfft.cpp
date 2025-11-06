@@ -64,7 +64,7 @@ void OpInvFFT::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("invfft",[this](std::shared_ptr<FitsObject> obj){
-    auto img = invfft(*obj->getImage());
+    auto img = invfft(obj->getImage());
     return std::make_shared<FitsObject>(img);
   },
   "Calculate inverse FFT of the image",py::arg("obj"));
@@ -73,7 +73,7 @@ void OpInvFFT::bindPython(void* mod) const
 
 OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
-  if (image->getImage()->getDepth() != 2)
+  if (image->getImage().getDepth() != 2)
   {
     setError("Input is not a complex image");
     img = std::shared_ptr<FitsImage>();
@@ -84,13 +84,13 @@ OpPlugin::ResultType OpInvFFT::execute(std::shared_ptr<FitsObject> image, const 
     profiler.start();
     FitsImage tmp;
     if (data.aoi.isNull())
-      tmp = *image->getImage();
+      tmp = image->getImage();
     else
-      tmp = image->getImage()->subImage(data.aoi);
+      tmp = image->getImage().subImage(data.aoi);
     img = invfft(tmp);
     profiler.stop();
   }
-  logProfiler(img.get());
+  logProfiler(*img);
   return OK;
 }
 

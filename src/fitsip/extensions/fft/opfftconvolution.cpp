@@ -85,12 +85,12 @@ OpPlugin::ResultType OpFFTConvolution::execute(std::shared_ptr<FitsObject> image
   return CANCELLED;
 }
 
-std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(FitsImage* img, const PSF* psf, const std::vector<ValueType>& par) const
+std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(const FitsImage& img, const PSF* psf, const std::vector<ValueType>& par) const
 {
   fftdata data;
-  int w0 = img->getWidth() + psf->getWidth();
+  int w0 = img.getWidth() + psf->getWidth();
   w0 += w0 % 2;
-  int h0 = img->getHeight() + psf->getHeight();
+  int h0 = img.getHeight() + psf->getHeight();
   data.fftsize = w0 * (h0 / 2 + 1);
   auto h = psf->createPSF(w0,h0,par);
   data.cinout = new fftw_complex[data.fftsize];
@@ -100,7 +100,7 @@ std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(FitsImage* img, cons
   fft(data,h,0);
   fftw_complex* hfft = new fftw_complex[data.fftsize];
   memcpy(hfft,data.cinout,data.fftsize*sizeof(fftw_complex));
-  auto imgpadded = img->paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
+  auto imgpadded = img.paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
   std::shared_ptr<FitsImage> fftimage;
   if (imgpadded.getDepth() == 1)
   {
@@ -133,7 +133,7 @@ std::shared_ptr<FitsImage> OpFFTConvolution::fftconvolution(FitsImage* img, cons
   delete [] data.cinout;
   delete [] hfft;
   /* crop to original size */
-  fftimage = std::make_shared<FitsImage>(fftimage->subImage(QRect(0,0,img->getWidth(),img->getHeight())));
+  fftimage = std::make_shared<FitsImage>(fftimage->subImage(QRect(0,0,img.getWidth(),img.getHeight())));
   return fftimage;
 }
 

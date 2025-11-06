@@ -64,7 +64,7 @@ void OpFFT::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("fft",[this](std::shared_ptr<FitsObject> obj){
-    FitsImage tmp(*obj->getImage());
+    FitsImage tmp(obj->getImage());
     if (tmp.getWidth() % 2 != 0)
     {
       tmp = tmp.paddedImage(tmp.getWidth()+1,tmp.getHeight());
@@ -81,16 +81,16 @@ OpPlugin::ResultType OpFFT::execute(std::shared_ptr<FitsObject> image, const OpP
   profiler.start();
   FitsImage tmp;
   if (data.aoi.isNull())
-    tmp = *image->getImage();
+    tmp = image->getImage();
   else
-    tmp = image->getImage()->subImage(data.aoi);
+    tmp = image->getImage().subImage(data.aoi);
   if (tmp.getWidth() % 2 != 0)
   {
     tmp = tmp.paddedImage(tmp.getWidth()+1,tmp.getHeight());
   }
   img = fft(tmp);
   profiler.stop();
-  logProfiler(img.get());
+  logProfiler(*img);
   return OK;
 }
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - reader and writer for image formats handled by Qt                   *
  *                                                                              *
- * modified: 2025-11-03                                                         *
+ * modified: 2025-11-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -89,19 +89,19 @@ std::vector<std::shared_ptr<FitsObject>> QtImageIO::read(QString filename)
 #endif
   img->setMetadata(data);
   profiler.stop();
-  logProfiler(img,"read");
+  logProfiler(*img,"read");
   return {std::make_shared<FitsObject>(img,filename)};
 }
 
 bool QtImageIO::write(QString filename, FitsObject* obj)
 {
   profiler.start();
-  FitsImage* img = obj->getImage();
+  const FitsImage& img = obj->getImage();
   Histogram h;
-  h.build(*img);
-  QImage i = img->toQImage(h.getMin(),h.getMax(),FitsImage::LINEAR);
+  h.build(img);
+  QImage i = img.toQImage(h.getMin(),h.getMax(),FitsImage::LINEAR);
   if (!i.save(filename)) return false;
-  if (Settings().isWriteMetadataFile()) writeMetadata(filename,img->getMetadata());
+  if (Settings().isWriteMetadataFile()) writeMetadata(filename,img.getMetadata());
 #ifdef HAVE_EXIV2
   writeExif(filename,img);
 #endif
@@ -238,17 +238,17 @@ void QtImageIO::readExif(QString filename, ImageMetadata* data)
   image.reset();
 }
 
-void QtImageIO::writeExif(QString filename, FitsImage* img)
+void QtImageIO::writeExif(QString filename, const FitsImage& img)
 {
   try {
     auto image = Exiv2::ImageFactory::open(filename.toStdString());
     image->readMetadata();
     Exiv2::ExifData& exifData = image->exifData();
-    Exiv2::AsciiValue sv(img->getMetadata().getObserver().toStdString());
+    Exiv2::AsciiValue sv(img.getMetadata().getObserver().toStdString());
     exifData.add(Exiv2::ExifKey("Exif.Photo.CameraOwnerName"),&sv);
-    sv = Exiv2::AsciiValue(img->getMetadata().getInstrument().toStdString());
+    sv = Exiv2::AsciiValue(img.getMetadata().getInstrument().toStdString());
     exifData.add(Exiv2::ExifKey("Exif.Image.Model"),&sv);
-    Exiv2::FloatValue fv(static_cast<float>(img->getMetadata().getExposureTime()));
+    Exiv2::FloatValue fv(static_cast<float>(img.getMetadata().getExposureTime()));
     exifData.add(Exiv2::ExifKey("Exif.Photo.ExposureTime"),&fv);
   //  image->setExifData(exifData);
     image->writeMetadata();

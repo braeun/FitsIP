@@ -124,30 +124,30 @@ bool FitsIO::write(QString filename, FitsObject* obj)
 {
   Settings settings;
   int format = settings.getFitsImageFormat();
-  FitsImage* img = obj->getImage();
+  const FitsImage& img = obj->getImage();
   CCfits::FITS* fits = nullptr;
   try
   {
     profiler.start();
-    int64_t axes[]{img->getWidth(),img->getHeight(),img->getDepth()};
+    int64_t axes[]{img.getWidth(),img.getHeight(),img.getDepth()};
     switch (format)
     {
       case 0:
       default:
-        fits = new CCfits::FITS("!"+filename.toStdString(),DOUBLE_IMG,img->getDepth()==1?2:3,axes);
+        fits = new CCfits::FITS("!"+filename.toStdString(),DOUBLE_IMG,img.getDepth()==1?2:3,axes);
         break;
       case 1:
-        fits = new CCfits::FITS("!"+filename.toStdString(),FLOAT_IMG,img->getDepth()==1?2:3,axes);
+        fits = new CCfits::FITS("!"+filename.toStdString(),FLOAT_IMG,img.getDepth()==1?2:3,axes);
         break;
     }
     int64_t first = 1;
-    for (int i=0;i<img->getDepth();i++)
+    for (int i=0;i<img.getDepth();i++)
     {
-      std::valarray<ValueType> a(img->getLayer(i).getData(),static_cast<uint64_t>(axes[0]*axes[1]));
+      std::valarray<ValueType> a(img.getLayer(i).getData(),static_cast<uint64_t>(axes[0]*axes[1]));
       fits->pHDU().write(first,axes[0]*axes[1],a);
       first += axes[0] * axes[1];
     }
-    const ImageMetadata& metadata = img->getMetadata();
+    const ImageMetadata& metadata = img.getMetadata();
     for (const auto& entry : metadata.getEntries())
     {
       fits->pHDU().addKey(entry.first.toStdString(),entry.second.value.toStdString(),entry.second.comment.toStdString());

@@ -139,11 +139,11 @@ QVariant ImageCollection::data(const QModelIndex &index, int role) const
     auto file = files[index.row()];
     if (file->getFilename().isEmpty())
     {
-      if (file->getImage()->getName().isEmpty())
+      if (file->getImage().getName().isEmpty())
       {
         return QVariant(QString("image %1").arg(files[index.row()]->getId()));
       }
-      return file->getImage()->getName();
+      return file->getImage().getName();
     }
     else
     {
@@ -156,11 +156,11 @@ QVariant ImageCollection::data(const QModelIndex &index, int role) const
     auto file = files[index.row()];
     if (file->getFilename().isEmpty())
     {
-      if (file->getImage()->getName().isEmpty())
+      if (file->getImage().getName().isEmpty())
       {
         return QVariant(QString("image %1").arg(files[index.row()]->getId()));
       }
-      return file->getImage()->getName();
+      return file->getImage().getName();
     }
     else
     {

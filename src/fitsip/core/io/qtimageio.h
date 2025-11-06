@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - reader and writer for image formats handled by Qt                   *
  *                                                                              *
- * modified: 2025-11-03                                                         *
+ * modified: 2025-11-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -44,7 +44,7 @@ private:
   void writeMetadata(QString filename, const ImageMetadata& data);
 #ifdef HAVE_EXIV2
   void readExif(QString filename, ImageMetadata* data);
-  void writeExif(QString filename, FitsImage* img);
+  void writeExif(QString filename, const FitsImage& img);
 #endif
 };
 

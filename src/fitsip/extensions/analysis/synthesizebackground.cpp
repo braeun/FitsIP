@@ -52,7 +52,7 @@ OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> i
 {
   if (!dlg) dlg = new SynthesizeBackgroundDialog();
   Histogram hist;
-  hist.build(*image->getImage());
+  hist.build(image->getImage());
   dlg->setSky(hist.getAverage(0.75));
   if (dlg->exec())
   {
@@ -76,53 +76,53 @@ OpPlugin::ResultType SynthesizeBackground::execute(std::shared_ptr<FitsObject> i
     }
     uint32_t deg = dlg->getPolynomDegree();
     std::vector<std::vector<double>> coeff;
-    for (int l=0;l<image->getImage()->getDepth();l++)
+    for (int l=0;l<image->getImage().getDepth();l++)
     {
       coeff.push_back(getCoefficients(list,deg,l));
     }
-    img = createImage(image->getImage()->getWidth(),image->getImage()->getHeight(),coeff,deg);
+    img = createImage(image->getImage().getWidth(),image->getImage().getHeight(),coeff,deg);
     profiler.stop();
     log(img.get(),"Synthesized Background");
-    logProfiler(img.get());
+    logProfiler(*img);
     return OK;
   }
   return CANCELLED;
 }
 
-std::vector<Pixel> SynthesizeBackground::getRandomPoints(FitsImage* image, uint32_t n, double bkg)
+std::vector<Pixel> SynthesizeBackground::getRandomPoints(const FitsImage& image, uint32_t n, double bkg)
 {
   std::vector<Pixel> list;
-  std::uniform_int_distribution<std::mt19937::result_type> distW(0,image->getWidth()-1);
-  std::uniform_int_distribution<std::mt19937::result_type> distH(0,image->getHeight()-1);
+  std::uniform_int_distribution<std::mt19937::result_type> distW(0,image.getWidth()-1);
+  std::uniform_int_distribution<std::mt19937::result_type> distH(0,image.getHeight()-1);
   while (--n > 0)
   {
     uint32_t x = distW(rng);
     uint32_t y = distH(rng);
-    ConstPixelIterator it = image->getConstPixelIterator(x,y);
+    ConstPixelIterator it = image.getConstPixelIterator(x,y);
     if (it.getRGB().gray() <= bkg)
     {
-      list.push_back(image->getPixel(it));
+      list.push_back(image.getPixel(it));
     }
   }
   return list;
 }
 
-std::vector<Pixel> SynthesizeBackground::getGridPoints(FitsImage* image, uint32_t n, double bkg)
+std::vector<Pixel> SynthesizeBackground::getGridPoints(const FitsImage& image, uint32_t n, double bkg)
 {
   std::vector<Pixel> list;
   uint32_t nx = static_cast<uint32_t>(sqrt(n));
   uint32_t ny = n / nx;
-  uint32_t dy = image->getHeight() / ny;
-  uint32_t dx = image->getWidth() / nx;
+  uint32_t dy = image.getHeight() / ny;
+  uint32_t dx = image.getWidth() / nx;
   uint32_t yi = dy / 2;
   for (uint32_t j=0;j<ny;j++)
   {
-    ConstPixelIterator it = image->getConstPixelIterator(dx/2,yi);
+    ConstPixelIterator it = image.getConstPixelIterator(dx/2,yi);
     for (uint32_t i=0;i<nx;i++)
     {
       if (it.getRGB().gray() <= bkg)
       {
-        list.push_back(image->getPixel(it));
+        list.push_back(image.getPixel(it));
       }
       it += dx;
     }

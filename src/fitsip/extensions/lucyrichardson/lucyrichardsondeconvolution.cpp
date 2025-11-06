@@ -71,7 +71,7 @@ OpPlugin::ResultType LucyRichardsonDeconvolution::execute(std::shared_ptr<FitsOb
       parameter = dlg->getParameter();
       auto psfpar = dlg->getParameters();
       profiler.start();
-      deconvolve(image->getImage(),psf,psfpar,dlg->getIterationCount(),true,dlg->isStoreIntermediate());
+      deconvolve(&image->getImage(),psf,psfpar,dlg->getIterationCount(),true,dlg->isStoreIntermediate());
       profiler.stop();
       QString msg = "Lucy Richardson deconvolution: ";
       msg += psf->getName() + " par=";

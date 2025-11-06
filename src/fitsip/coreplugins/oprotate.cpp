@@ -61,20 +61,20 @@ void OpRotate::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("rotate90cw",[this](std::shared_ptr<FitsObject> obj){
-    rotate90cw(obj->getImage());
-    obj->getImage()->log("OpRotate: 90deg cw");
+    rotate90cw(&obj->getImage());
+    obj->getImage().log("OpRotate: 90deg cw");
     return OK;
   },
   "Rotate image 90° clock wise",py::arg("obj"));
   m->def("rotate90ccw",[this](std::shared_ptr<FitsObject> obj){
-    rotate90ccw(obj->getImage());
-    obj->getImage()->log("OpRotate: 90deg ccw");
+    rotate90ccw(&obj->getImage());
+    obj->getImage().log("OpRotate: 90deg ccw");
     return OK;
   },
   "Rotate image 90° counter clock wise",py::arg("obj"));
   m->def("rotate",[this](std::shared_ptr<FitsObject> obj, double angle, bool crop){
-    rotate(obj->getImage(),angle,crop);
-    obj->getImage()->log(QString("OpRotate: %1deg").arg(static_cast<ValueType>(dlg->getAngle())));
+    rotate(&obj->getImage(),angle,crop);
+    obj->getImage().log(QString("OpRotate: %1deg").arg(static_cast<ValueType>(dlg->getAngle())));
     return OK;
   },
   "Rotate image",py::arg("obj"),py::arg("angle"),py::arg("crop"));
@@ -92,19 +92,19 @@ OpPlugin::ResultType OpRotate::execute(std::shared_ptr<FitsObject> image, const 
     profiler.start();
     if (dlg->isRotate90CW())
     {
-      rotate90cw(image->getImage());
+      rotate90cw(&image->getImage());
       profiler.stop();
       log(image,"OpRotate: 90deg cw");
     }
     else if (dlg->isRotate90CCW())
     {
-      rotate90ccw(image->getImage());
+      rotate90ccw(&image->getImage());
       profiler.stop();
       log(image,"OpRotate: 90deg ccw");
     }
     else
     {
-      rotate(image->getImage(),dlg->getAngle(),false);
+      rotate(&image->getImage(),dlg->getAngle(),false);
       profiler.stop();
       log(image,QString("OpRotate: %1deg").arg(static_cast<ValueType>(dlg->getAngle())));
     }

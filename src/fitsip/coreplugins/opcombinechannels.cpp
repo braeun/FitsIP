@@ -75,7 +75,7 @@ OpPlugin::ResultType OpCombineChannels::execute(std::shared_ptr<FitsObject> /*im
   ImageCollection collection;
   for (const auto& img : data.imageCollection->getFiles())
   {
-    if (img->getImage()->getDepth() == 1)
+    if (img->getImage().getDepth() == 1)
     {
       collection.addFile(img);
     }
@@ -108,14 +108,14 @@ std::shared_ptr<FitsImage> OpCombineChannels::combine(std::shared_ptr<FitsObject
   auto r = rimg->getImage();
   auto g = gimg->getImage();
   auto b = bimg->getImage();
-  if (r->isCompatible(*g) && r->isCompatible(*b))
+  if (r.isCompatible(g) && r.isCompatible(b))
   {
-    auto img = std::make_shared<FitsImage>(r->getName()+"_RGB",r->getWidth(),r->getHeight(),3);
-    img->setMetadata(r->getMetadata());
+    auto img = std::make_shared<FitsImage>(r.getName()+"_RGB",r.getWidth(),r.getHeight(),3);
+    img->setMetadata(r.getMetadata());
     PixelIterator dest = img->getPixelIterator();
-    ConstPixelIterator ri = r->getConstPixelIterator();
-    ConstPixelIterator gi = g->getConstPixelIterator();
-    ConstPixelIterator bi = b->getConstPixelIterator();
+    ConstPixelIterator ri = r.getConstPixelIterator();
+    ConstPixelIterator gi = g.getConstPixelIterator();
+    ConstPixelIterator bi = b.getConstPixelIterator();
     while (ri.hasNext())
     {
       dest[0] = ri[0];

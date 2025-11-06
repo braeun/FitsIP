@@ -180,17 +180,17 @@ void PythonScript::bindFitsObject(py::module_& m)
       .def_property_readonly("id",&FitsObject::getId)
       .def_property_readonly("name",[](const FitsObject& obj){return obj.getName().toStdString();})
       .def_property_readonly("filename",[](const FitsObject& obj){return obj.getFilename().toStdString();})
-      .def_property_readonly("width",[](const FitsObject& obj){ return obj.getImage()->getWidth(); },
+      .def_property_readonly("width",[](const FitsObject& obj){ return obj.getImage().getWidth(); },
           "width of image")
-      .def_property_readonly("height",[](const FitsObject& obj){ return obj.getImage()->getHeight(); },
+      .def_property_readonly("height",[](const FitsObject& obj){ return obj.getImage().getHeight(); },
           "height of image")
-      .def_property_readonly("depth",[](const FitsObject& obj){ return obj.getImage()->getDepth(); },
+      .def_property_readonly("depth",[](const FitsObject& obj){ return obj.getImage().getDepth(); },
           "depth of image")
       .def("push_undo",&FitsObject::pushUndo)
       .def("pop_undo",&FitsObject::popUndo)
       .def("can_undo",&FitsObject::isUndoAvailable)
       .def("log",[](const std::shared_ptr<FitsObject>& obj, const std::string& msg){
-            obj->getImage()->log(QString::fromStdString(msg));
+            obj->getImage().log(QString::fromStdString(msg));
           },
           "Add a message to the history",py::arg("msg"))
       ;
@@ -257,10 +257,10 @@ void PythonScript::bindStatistics(py::module_& m)
         return new ImageStatistics(img,QRect(x,y,w,h));
       }))
       .def(py::init([](const FitsObject& img){
-        return new ImageStatistics(*img.getImage());
+        return new ImageStatistics(img.getImage());
       }))
       .def(py::init([](const FitsObject& img, int x, int y, int w, int h){
-        return new ImageStatistics(*img.getImage(),QRect(x,y,w,h));
+        return new ImageStatistics(img.getImage(),QRect(x,y,w,h));
       }))
       .def_property_readonly("summary",&ImageStatistics::getGlobalStatistics)
       .def_property_readonly("layers",&ImageStatistics::getLayerStatistics)

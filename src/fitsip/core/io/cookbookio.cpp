@@ -102,7 +102,7 @@ std::shared_ptr<FitsImage> CookbookIO::readPA(QString filename)
     f.close();
   }
   profiler.stop();
-  logProfiler(img,"read");
+  logProfiler(*img,"read");
   return img;
 }
 
@@ -166,7 +166,7 @@ std::shared_ptr<FitsImage> CookbookIO::readP1(QString filename)
     f.close();
   }
   profiler.stop();
-  logProfiler(img,"read");
+  logProfiler(*img,"read");
   return img;
 }
 

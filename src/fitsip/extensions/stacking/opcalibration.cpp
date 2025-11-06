@@ -79,10 +79,10 @@ OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, 
   double mean = 1.0;
   if (flatfield)
   {
-    double w = flatfield->getImage()->getWidth() / 5;
-    double h = flatfield->getImage()->getHeight() / 5;
-    QRect r((flatfield->getImage()->getWidth()-w)/2,(flatfield->getImage()->getHeight()-h)/2,w,h);
-    ImageStatistics stat(*flatfield->getImage(),r);
+    double w = flatfield->getImage().getWidth() / 5;
+    double h = flatfield->getImage().getHeight() / 5;
+    QRect r((flatfield->getImage().getWidth()-w)/2,(flatfield->getImage().getHeight()-h)/2,w,h);
+    ImageStatistics stat(flatfield->getImage(),r);
     mean = stat.getGlobalStatistics().meanValue;
   }
   int32_t n = 0;
@@ -119,17 +119,17 @@ FitsImage OpCalibration::calibrate(const QFileInfo& info, std::shared_ptr<FitsOb
 {
   IOHandler* handler = IOFactory::getInstance()->getHandler(info.absoluteFilePath());
   if (!handler) return FitsImage();
-  FitsImage img(*handler->read(info.absoluteFilePath()).front()->getImage());
+  FitsImage img(handler->read(info.absoluteFilePath()).front()->getImage());
   if (darkframe)
   {
-    img -= *darkframe->getImage();
-    log(&img,"Subtracted darkframe '"+darkframe->getImage()->getName()+"'");
+    img -= darkframe->getImage();
+    log(&img,"Subtracted darkframe '"+darkframe->getImage().getName()+"'");
   }
   if (flatfield)
   {
-    img /= *flatfield->getImage();
+    img /= flatfield->getImage();
     img *= mean;
-    log(&img,"Divided flatfield '"+flatfield->getImage()->getName()+"'");
+    log(&img,"Divided flatfield '"+flatfield->getImage().getName()+"'");
   }
   return img;
 }

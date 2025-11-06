@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - virtual base class for image I/O handlers                           *
  *                                                                              *
- * modified: 2025-11-03                                                         *
+ * modified: 2025-11-06                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -59,9 +59,10 @@ signals:
 protected:
   void logProfiler(const QString& image, const QString& msg="");
 
+  [[deprecated]]
   void logProfiler(std::shared_ptr<FitsImage> image, const QString& msg="");
 
-  void logProfiler(FitsImage* image, const QString& msg="");
+  void logProfiler(const FitsImage& image, const QString& msg="");
 
   SimpleProfiler profiler;
 

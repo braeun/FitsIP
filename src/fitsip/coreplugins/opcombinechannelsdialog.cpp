@@ -42,9 +42,9 @@ void OpCombineChannelsDialog::setCollection(const ImageCollection& collection)
   ui->blueChannelBox->clear();
   for (const auto& img : collection.getFiles())
   {
-    ui->redChannelBox->addItem(img->getImage()->getName(),img->getId());
-    ui->greenChannelBox->addItem(img->getImage()->getName(),img->getId());
-    ui->blueChannelBox->addItem(img->getImage()->getName(),img->getId());
+    ui->redChannelBox->addItem(img->getImage().getName(),img->getId());
+    ui->greenChannelBox->addItem(img->getImage().getName(),img->getId());
+    ui->blueChannelBox->addItem(img->getImage().getName(),img->getId());
   }
 }
 

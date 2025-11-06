@@ -55,8 +55,8 @@ void OpScale::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("scale",[this](std::shared_ptr<FitsObject> obj, ValueType scale, ValueType bias){
-    scaleImage(obj->getImage(),scale,bias);
-    obj->getImage()->log(QString("scaled image: scale=%1 bias=%2").arg(scale).arg(bias));
+    scaleImage(&obj->getImage(),scale,bias);
+    obj->getImage().log(QString("scaled image: scale=%1 bias=%2").arg(scale).arg(bias));
     return OK;
   },
   "Scale an image",py::arg("obj"),py::arg("scale"),py::arg("bias"));
@@ -70,7 +70,7 @@ OpPlugin::ResultType OpScale::execute(std::shared_ptr<FitsObject> image, const O
     ValueType bias = dlg.getValue1().toDouble();
     ValueType scale = dlg.getValue2().toDouble();
     profiler.start();
-    scaleImage(image->getImage(),scale,bias);
+    scaleImage(&image->getImage(),scale,bias);
     profiler.stop();
     log(image,QString("scaled image: scale=%1 bias=%2").arg(scale).arg(bias));
     logProfiler(image);

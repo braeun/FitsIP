@@ -78,7 +78,7 @@ std::vector<std::shared_ptr<FitsObject>> AstroImageIO::read(QString filename)
       break;
   }
   profiler.stop();
-  logProfiler(img,"read");
+  logProfiler(*img,"read");
   return {std::make_shared<FitsObject>(img,filename)};
 }
 

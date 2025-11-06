@@ -147,7 +147,7 @@ OpPlugin::ResultType OpStack::execute(const std::vector<QFileInfo>& list, const 
       }
     }
     profiler.stop();
-    if (img) logProfiler(img.get(),msg);
+    if (img) logProfiler(*img,msg);
     if (prog) prog->deleteLater();
     QApplication::restoreOverrideCursor();
     return OK;
@@ -166,7 +166,7 @@ OpPlugin::ResultType OpStack::prepare(const QFileInfo& file, bool subsky)
   }
   try
   {
-    img = std::make_shared<FitsImage>("stack",*handler->read(file.absoluteFilePath()).front()->getImage());
+    img = std::make_shared<FitsImage>("stack",handler->read(file.absoluteFilePath()).front()->getImage());
     if (subtractSky)
     {
       Histogram hist;

@@ -649,12 +649,12 @@ void MainWindow::updateDisplay()
     double scaleMin = histogramWidget->getScaleMin();
     double scaleMax = histogramWidget->getScaleMax();
     FitsImage::Scale scale = static_cast<FitsImage::Scale>(histogramWidget->getImageScale());
-    QImage tmp = activeFile->getImage()->toQImage(scaleMin,scaleMax,scale);
+    QImage tmp = activeFile->getImage().toQImage(scaleMin,scaleMax,scale);
     imageWidget->setImage(tmp,activeFile->getPixelList(),activeFile->getStarList());
     if (!ui->scrollArea->widgetResizable()) imageWidget->adjustSize();
     imageWidget->setAOI(activeFile->getAOI());
-    QString txt = QString::asprintf("%4d,%4d",activeFile->getImage()->getWidth(),activeFile->getImage()->getHeight());
-    switch (activeFile->getImage()->getDepth())
+    QString txt = QString::asprintf("%4d,%4d",activeFile->getImage().getWidth(),activeFile->getImage().getHeight());
+    switch (activeFile->getImage().getDepth())
     {
       case 1:
         txt += " GRAY";
@@ -678,9 +678,9 @@ void MainWindow::updateDisplay()
   if (activeFile)
   {
     profilerWidget->getModel()->addProfilerResult(QString::fromStdString(profiler.getName()),
-                                                      activeFile->getImage()->getName(),
-                                                      activeFile->getImage()->getWidth(),
-                                                      activeFile->getImage()->getHeight(),
+                                                      activeFile->getImage().getName(),
+                                                      activeFile->getImage().getWidth(),
+                                                      activeFile->getImage().getHeight(),
                                                       profiler.getDuration(),
                                                       "");
   }
@@ -777,7 +777,7 @@ void MainWindow::openImage(const QFileInfo &fileinfo)
       {
         imageCollection->addFile(obj);
         if (AppSettings().isLogbookLogOpen())
-          logbook.add(LogbookEntry::Op,obj->getImage()->getName(),"Loaded from file "+fileinfo.absoluteFilePath());
+          logbook.add(LogbookEntry::Op,obj->getImage().getName(),"Loaded from file "+fileinfo.absoluteFilePath());
       }
       QApplication::restoreOverrideCursor();
       ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
@@ -889,7 +889,7 @@ void MainWindow::addPixel(QPoint p)
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
-    Pixel pixel = activeFile->getImage()->getPixel(p.x(),p.y());
+    Pixel pixel = activeFile->getImage().getPixel(p.x(),p.y());
     activeFile->getPixelList()->addPixel(pixel);
   }
 }
@@ -900,7 +900,7 @@ void MainWindow::updateCursor(QPoint p)
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
-    txt += " : " + QString::number(activeFile->getImage()->getConstPixelIterator(p.x(),p.y()).getRGB().gray());
+    txt += " : " + QString::number(activeFile->getImage().getConstPixelIterator(p.x(),p.y()).getRGB().gray());
   }
   ui->cursorLabel->setText(txt);
 }
@@ -1042,7 +1042,7 @@ bool MainWindow::save(std::shared_ptr<FitsObject> obj, const std::string& filena
   try
   {
     obj->save(fileinfo.absoluteFilePath());
-    //    logbook.add(LogbookEntry::Op,activeFile->getImage()->getName(),"Saved to file "+fn);
+    //    logbook.add(LogbookEntry::Op,activeFile->getImage().getName(),"Saved to file "+fn);
   }
   catch (std::exception& ex)
   {
@@ -1101,7 +1101,7 @@ void MainWindow::onImageScaleChanged(double min, double max, int scale)
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
-    QImage tmp = activeFile->getImage()->toQImage(min,max,static_cast<FitsImage::Scale>(scale));
+    QImage tmp = activeFile->getImage().toQImage(min,max,static_cast<FitsImage::Scale>(scale));
     imageWidget->setImage(tmp,activeFile->getPixelList(),activeFile->getStarList());
   }
 }
@@ -1147,7 +1147,7 @@ void MainWindow::on_actionSave_triggered()
     try
     {
       activeFile->save(fn);
-      logbook.add(LogbookEntry::Op,activeFile->getImage()->getName(),"Saved to file "+fn);
+      logbook.add(LogbookEntry::Op,activeFile->getImage().getName(),"Saved to file "+fn);
     }
     catch (std::exception& ex)
     {
@@ -1170,7 +1170,7 @@ void MainWindow::on_actionSave_As_triggered()
     {
       fn = IOFactory::assertSuffix(fn,filter);
       activeFile->save(fn);
-      logbook.add(LogbookEntry::Op,activeFile->getImage()->getName(),"Saved to file "+fn);
+      logbook.add(LogbookEntry::Op,activeFile->getImage().getName(),"Saved to file "+fn);
     }
     catch (std::exception& ex)
     {
@@ -1205,7 +1205,7 @@ void MainWindow::on_actionUndo_triggered()
   if (activeFile)
   {
     activeFile->popUndo();
-    logbook.add(LogbookEntry::Op,activeFile->getImage()->getName(),"Undo last operation");
+    logbook.add(LogbookEntry::Op,activeFile->getImage().getName(),"Undo last operation");
     updateDisplay();
     ui->actionUndo->setEnabled(activeFile->isUndoAvailable());
   }
@@ -1217,12 +1217,12 @@ void MainWindow::on_actionMetadata_triggered()
   if (activeFile)
   {
     if (!editMetadataDialog) editMetadataDialog = new EditMetadataDialog(this);
-    ImageMetadata data = activeFile->getImage()->getMetadata();
+    ImageMetadata data = activeFile->getImage().getMetadata();
     editMetadataDialog->displayMetadata(data);
     if (editMetadataDialog->exec())
     {
       editMetadataDialog->commit(data);
-      activeFile->getImage()->setMetadata(data);
+      activeFile->getImage().setMetadata(data);
       updateMetadata();
     }
   }
@@ -1444,7 +1444,7 @@ void MainWindow::on_actionSave_As_PSF_triggered()
   {
     SimpleProfiler profiler("SavePSF");
     profiler.start();
-    bool ret = PSFFactory::getInstance()->addPSF(*activeFile->getImage(),name);
+    bool ret = PSFFactory::getInstance()->addPSF(activeFile->getImage(),name);
     profiler.stop();
     if (!ret)
     {

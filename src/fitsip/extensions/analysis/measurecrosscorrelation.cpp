@@ -59,7 +59,7 @@ void MeasureCrossCorrelation::bindPython(void* mod) const
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("crosscorrelation",[this](std::shared_ptr<FitsObject> obj1, std::shared_ptr<FitsObject> obj2){
     return correlate(obj1,obj2);
-    obj1->getImage()->log("Cross correlation between: "+obj1->getImage()->getName()+" and "+obj2->getImage()->getName());
+    obj1->getImage().log("Cross correlation between: "+obj1->getImage().getName()+" and "+obj2->getImage().getName());
   },
   "Cross correlation between to images",py::arg("obj1"),py::arg("obj2"));
 }
@@ -79,7 +79,7 @@ OpPlugin::ResultType MeasureCrossCorrelation::execute(std::shared_ptr<FitsObject
     profiler.start();
     img = correlate(image,file,data.aoi);
     profiler.stop();
-    log(img,"Cross correlation between: "+image->getImage()->getName()+" and "+file->getImage()->getName());
+    log(img,"Cross correlation between: "+image->getImage().getName()+" and "+file->getImage().getName());
     logProfiler(img);
     return OK;
   }
@@ -90,12 +90,12 @@ std::shared_ptr<FitsObject> MeasureCrossCorrelation::correlate(std::shared_ptr<F
 {
   auto i1 = image1->getImage();
   auto i2 = image2->getImage();
-  QRect r1 = QRect(0,0,i1->getWidth(),i1->getHeight());
-  QRect r2 = QRect(0,0,i2->getWidth(),i2->getHeight());
+  QRect r1 = QRect(0,0,i1.getWidth(),i1.getHeight());
+  QRect r2 = QRect(0,0,i2.getWidth(),i2.getHeight());
   r1 = r1.intersected(r2);
   if (!selection.isNull()) r1 = r1.intersected(selection);
-  auto img1 = i1->subImage(r1);
-  auto img2 = i2->subImage(r1);
+  auto img1 = i1.subImage(r1);
+  auto img2 = i2.subImage(r1);
   fftw_complex *s2c = new fftw_complex[img1.getHeight()*(img1.getWidth()/2+1)];
   double *in = new double[img1.getHeight()*img1.getWidth()];
   fftw_plan f = fftw_plan_dft_r2c_2d(img1.getHeight(),img1.getWidth(),in,s2c,FFTW_ESTIMATE);

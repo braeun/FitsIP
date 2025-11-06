@@ -50,12 +50,12 @@ void OpToGray::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("to_gray",[this](std::shared_ptr<FitsObject> obj){
-    if (obj->getImage()->getDepth() != 3)
+    if (obj->getImage().getDepth() != 3)
     {
       return ERROR;
     }
     obj->setImage(toGray(obj)->getImageShared());
-    obj->getImage()->log("Converted to gray image");
+    obj->getImage().log("Converted to gray image");
     return OK;
   },
   "Convert image to gray",py::arg("obj"));
@@ -64,7 +64,7 @@ void OpToGray::bindPython(void* mod) const
 
 OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsObject> image, const OpPluginData& data)
 {
-  if (image->getImage()->getDepth() != 3)
+  if (image->getImage().getDepth() != 3)
   {
     setError("Not a color image");
     return ERROR;
@@ -79,5 +79,5 @@ OpPlugin::ResultType OpToGray::execute(std::shared_ptr<FitsObject> image, const 
 
 std::shared_ptr<FitsObject>  OpToGray::toGray(std::shared_ptr<FitsObject> image) const
 {
-  return std::make_shared<FitsObject>(std::make_shared<FitsImage>(image->getImage()->toGray()));
+  return std::make_shared<FitsObject>(std::make_shared<FitsImage>(image->getImage().toGray()));
 }
