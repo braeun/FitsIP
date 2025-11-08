@@ -82,7 +82,7 @@ std::vector<std::shared_ptr<FitsObject>> AstroImageIO::read(QString filename)
   return {std::make_shared<FitsObject>(img,filename)};
 }
 
-bool AstroImageIO::write(QString /*filename*/, FitsObject* /*img*/)
+bool AstroImageIO::write(QString /*filename*/, const FitsObject& /*img*/)
 {
   throw std::runtime_error("Writing to astro image format not supported.");
 }

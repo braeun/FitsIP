@@ -119,8 +119,8 @@ void LucyRichardsonDeconvolution::deconvolve(FitsImage* image, const PSF* psf,
   int w0 = image->getWidth() + psf->getWidth();
   w0 += w0 % 2;
   int h0 = image->getHeight() + psf->getHeight();
-  auto imgpadded = image->paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
-  auto o = imgpadded;
+  FitsImage imgpadded = image->paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
+  FitsImage o = imgpadded;
   auto h = psf->createPSF(w0,h0,par);
   fftdata data;
   data.fftsize = (w0 / 2 + 1) * h0;
@@ -134,7 +134,7 @@ void LucyRichardsonDeconvolution::deconvolve(FitsImage* image, const PSF* psf,
   fftw_complex* offt1 = new fftw_complex[data.fftsize];
   fftw_complex* offt2 = new fftw_complex[data.fftsize];
   fftw_complex* offt3 = new fftw_complex[data.fftsize];
-  std::shared_ptr<FitsImage> c;
+  FitsImage c;
   int remain = niter;
   while (remain-- > 0)
   {
@@ -159,20 +159,20 @@ void LucyRichardsonDeconvolution::deconvolve(FitsImage* image, const PSF* psf,
       mul(offt3,hfft,data.fftsize);
       c = invfft(data,offt1,offt2,offt3,w0,h0);
     }
-    auto s = std::make_shared<FitsImage>(imgpadded);
-    *s /= *c;
-    *s -= 1;
+    FitsImage s = imgpadded;
+    s /= c;
+    s -= 1;
     switch (func)
     {
       case Constant:
-        *s *= parameter;
+        s *= parameter;
         break;
       case Sine:
-        applySineRelaxation(o,basestat,s);
+        applySineRelaxation(o,basestat,&s);
         break;
     }
-    *s += 1;
-    o *= *s;
+    s += 1;
+    o *= s;
     if (cutImage)
     {
       o.cut(basestat.getGlobalStatistics().minValue,basestat.getGlobalStatistics().maxValue);
@@ -181,11 +181,11 @@ void LucyRichardsonDeconvolution::deconvolve(FitsImage* image, const PSF* psf,
     {
       QString fnc = "c_" + QString::number(niter-remain) + ".fts";
       IOHandler *io = IOFactory::getInstance()->getHandler(fnc);
-      io->write(fnc,c.get());
+      io->write(fnc,c);
       QString fns = "s_" + QString::number(niter-remain) + ".fts";
-      io->write(fns,s.get());
+      io->write(fns,s);
       QString fno = "o_" + QString::number(niter-remain) + ".fts";
-      io->write(fno,&o);
+      io->write(fno,o);
     }
     if (prog)
     {
@@ -223,32 +223,32 @@ void LucyRichardsonDeconvolution::fft(const fftdata& data, const FitsImage &imag
   fftw_execute(data.r2c);
 }
 
-std::shared_ptr<FitsImage> LucyRichardsonDeconvolution::invfft(const fftdata& data, fftw_complex* c, int w, int h)
+FitsImage LucyRichardsonDeconvolution::invfft(const fftdata& data, fftw_complex* c, int w, int h)
 {
   memmove(data.cinout,c,data.fftsize*sizeof(fftw_complex));
   fftw_execute(data.c2r);
-  auto fftimg = std::make_shared<FitsImage>("tmp",w,h,1);
-  PixelIterator it2 = fftimg->getPixelIterator();
+  FitsImage fftimg("tmp",w,h,1);
+  PixelIterator it2 = fftimg.getPixelIterator();
   double* ptr = data.rinout;
-  for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+  for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
   {
     it2[0] = *ptr;
     ++ptr;
     ++it2;
   }
-  *fftimg /= fftimg->getHeight() * fftimg->getWidth();
+  fftimg /= fftimg.getHeight() * fftimg.getWidth();
   return fftimg;
 }
 
-std::shared_ptr<FitsImage> LucyRichardsonDeconvolution::invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h)
+FitsImage LucyRichardsonDeconvolution::invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h)
 {
-  auto fftimg = std::make_shared<FitsImage>("tmp",w,h,3);
+  FitsImage fftimg("tmp",w,h,3);
   {
     memmove(data.cinout,c1,data.fftsize*sizeof(fftw_complex));
     fftw_execute(data.c2r);
-    PixelIterator it2 = fftimg->getPixelIterator();
+    PixelIterator it2 = fftimg.getPixelIterator();
     double* ptr = data.rinout;
-    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
     {
       it2[0] = *ptr;
       ++ptr;
@@ -258,9 +258,9 @@ std::shared_ptr<FitsImage> LucyRichardsonDeconvolution::invfft(const fftdata& da
   {
     memmove(data.cinout,c2,data.fftsize*sizeof(fftw_complex));
     fftw_execute(data.c2r);
-    PixelIterator it2 = fftimg->getPixelIterator();
+    PixelIterator it2 = fftimg.getPixelIterator();
     double* ptr = data.rinout;
-    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
     {
       it2[1] = *ptr;
       ++ptr;
@@ -270,16 +270,16 @@ std::shared_ptr<FitsImage> LucyRichardsonDeconvolution::invfft(const fftdata& da
   {
     memmove(data.cinout,c3,data.fftsize*sizeof(fftw_complex));
     fftw_execute(data.c2r);
-    PixelIterator it2 = fftimg->getPixelIterator();
+    PixelIterator it2 = fftimg.getPixelIterator();
     double* ptr = data.rinout;
-    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
     {
       it2[2] = *ptr;
       ++ptr;
       ++it2;
     }
   }
-  *fftimg /= fftimg->getHeight() * fftimg->getWidth();
+  fftimg /= fftimg.getHeight() * fftimg.getWidth();
   return fftimg;
 }
 
@@ -297,7 +297,7 @@ void LucyRichardsonDeconvolution::mul(fftw_complex *a, fftw_complex *b, int n)
   }
 }
 
-void LucyRichardsonDeconvolution::applySineRelaxation(const FitsImage& image, const ImageStatistics& stat, std::shared_ptr<FitsImage> corr)
+void LucyRichardsonDeconvolution::applySineRelaxation(const FitsImage& image, const ImageStatistics& stat, FitsImage* corr)
 {
   ImageStatistics s = stat;
   if (!cutImage) s = ImageStatistics(image);

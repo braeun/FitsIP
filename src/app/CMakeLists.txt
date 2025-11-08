@@ -10,7 +10,9 @@ add_executable(fits
   scriptinterface.h scriptinterface.cpp
   staticplugins.cpp
   dialogs/aboutdialog.h dialogs/aboutdialog.cpp dialogs/aboutdialog.ui
+  dialogs/addcameradialog.h dialogs/addcameradialog.cpp dialogs/addcameradialog.ui
   dialogs/addlogbookentrydialog.h dialogs/addlogbookentrydialog.cpp dialogs/addlogbookentrydialog.ui
+  dialogs/cameradatabasedialog.h dialogs/cameradatabasedialog.cpp dialogs/cameradatabasedialog.ui
   dialogs/configurationdialog.h dialogs/configurationdialog.cpp dialogs/configurationdialog.ui
   dialogs/editmetadatadialog.h dialogs/editmetadatadialog.cpp dialogs/editmetadatadialog.ui
   dialogs/logbookexportdialog.h dialogs/logbookexportdialog.h dialogs/logbookexportdialog.cpp dialogs/logbookexportdialog.ui
@@ -18,6 +20,7 @@ add_executable(fits
   dialogs/logbookfilter1dialog.h dialogs/logbookfilter1dialog.cpp dialogs/logbookfilter1dialog.ui
   dialogs/logbookpropertiesdialog.h dialogs/logbookpropertiesdialog.cpp dialogs/logbookpropertiesdialog.ui
   dialogs/logentryeditdialog.h dialogs/logentryeditdialog.cpp dialogs/logentryeditdialog.ui
+  dialogs/sysinfodialog.h dialogs/sysinfodialog.cpp dialogs/sysinfodialog.ui
 #  dialogs/psfmanagerdialog.cpp dialogs/psfmanagerdialog.ui
   widgets/annotationswidget.h widgets/annotationswidget.cpp
   widgets/consolewidget.h widgets/consolewidget.cpp widgets/consolewidget.ui

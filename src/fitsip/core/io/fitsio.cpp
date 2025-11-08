@@ -120,11 +120,11 @@ std::vector<std::shared_ptr<FitsObject>> FitsIO::read(QString filename)
   }
 }
 
-bool FitsIO::write(QString filename, FitsObject* obj)
+bool FitsIO::write(QString filename, const FitsObject& obj)
 {
   Settings settings;
   int format = settings.getFitsImageFormat();
-  const FitsImage& img = obj->getImage();
+  const FitsImage& img = obj.getImage();
   CCfits::FITS* fits = nullptr;
   try
   {

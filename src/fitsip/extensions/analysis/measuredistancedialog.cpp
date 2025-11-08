@@ -23,6 +23,7 @@
 #include "measuredistancedialog.h"
 #include "ui_measuredistancedialog.h"
 #include <fitsip/core/pixellist.h>
+#include <fitsip/core/db/database.h>
 #include <QPushButton>
 #include <QShowEvent>
 #include <cmath>
@@ -33,7 +34,6 @@ MeasureDistanceDialog::MeasureDistanceDialog(QWidget *parent) :
 {
   ui->setupUi(this);
   connect(ui->calculateButton,&QPushButton::clicked,this,&MeasureDistanceDialog::calculate);
-  connect(ui->saveCameraButton,&QPushButton::clicked,this,&MeasureDistanceDialog::save);
   connect(ui->cameraBox,&QComboBox::currentTextChanged,this,&MeasureDistanceDialog::cameraSelected);
 }
 
@@ -60,11 +60,11 @@ void MeasureDistanceDialog::showEvent(QShowEvent *event)
 {
   if (!event->spontaneous())
   {
-    cameras = db::getCameras();
+    cameras = Database::get()->getCameraList();
     ui->cameraBox->clear();
     for (const auto& camera : cameras)
     {
-      ui->cameraBox->addItem(camera.name);
+      ui->cameraBox->addItem(camera);
     }
   }
 }
@@ -72,15 +72,9 @@ void MeasureDistanceDialog::showEvent(QShowEvent *event)
 
 void MeasureDistanceDialog::cameraSelected(const QString& name)
 {
-  for (const auto& camera : cameras)
-  {
-    if (camera.name == name)
-    {
-      ui->widthField->setText(QString::number(camera.pixelwidth));
-      ui->heightField->setText(QString::number(camera.pixelheight));
-      break;
-    }
-  }
+  Camera camera = Database::get()->getCamera(name);
+  ui->widthField->setText(QString::number(camera.getPixelwidth()));
+  ui->heightField->setText(QString::number(camera.getPixelheight()));
 }
 
 
@@ -125,19 +119,3 @@ void MeasureDistanceDialog::calculate()
   }
 }
 
-void MeasureDistanceDialog::save()
-{
-  db::Camera c;
-  c.name = ui->cameraBox->currentText();
-  c.pixelwidth = ui->widthField->text().toDouble();
-  c.pixelheight = ui->heightField->text().toDouble();
-  for (const auto& camera : cameras)
-  {
-    if (camera.name == c.name)
-    {
-      db::updateCamera(c);
-      return;
-    }
-  }
-  db::addCamera(c);
-}

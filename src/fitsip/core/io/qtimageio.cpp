@@ -93,10 +93,10 @@ std::vector<std::shared_ptr<FitsObject>> QtImageIO::read(QString filename)
   return {std::make_shared<FitsObject>(img,filename)};
 }
 
-bool QtImageIO::write(QString filename, FitsObject* obj)
+bool QtImageIO::write(QString filename, const FitsObject& obj)
 {
   profiler.start();
-  const FitsImage& img = obj->getImage();
+  const FitsImage& img = obj.getImage();
   Histogram h;
   h.build(img);
   QImage i = img.toQImage(h.getMin(),h.getMax(),FitsImage::LINEAR);

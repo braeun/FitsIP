@@ -24,10 +24,10 @@
 #include "ui_configurationdialog.h"
 #include "../appsettings.h"
 #include "../palettefactory.h"
+#include <fitsip/core/db/database.h>
 #include <QFileDialog>
 #include <QStyleFactory>
 #include <QSettings>
-#include <QSqlDatabase>
 
 const char* bindir = "/usr/bin";
 
@@ -36,7 +36,7 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
   ui(new Ui::ConfigurationDialog)
 {
   ui->setupUi(this);
-  ui->dbDriverBox->addItems(QSqlDatabase::drivers());
+  ui->dbDriverBox->addItems(Database::getDrivers());
   ui->styleBox->insertItems(0,QStyleFactory::keys());
   for (const QString& key : PaletteFactory::getPaletteNames())
   {
@@ -122,7 +122,7 @@ void ConfigurationDialog::updateFields(const AppSettings &settings)
   ui->scriptEditorField->setText(settings.getTool(Settings::ScriptEditor));
   ui->officeTextEditorField->setText(settings.getTool(Settings::OfficeEditor));
   ui->textEditorField->setText(settings.getTool(Settings::TextEditor));
-  if (QSqlDatabase::isDriverAvailable(settings.getDatabaseDriver()))
+  if (Database::getDrivers().contains(settings.getDatabaseDriver()))
   {
     ui->dbDriverBox->setCurrentText(settings.getDatabaseDriver());
   }

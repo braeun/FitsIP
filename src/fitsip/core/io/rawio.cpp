@@ -106,7 +106,7 @@ std::vector<std::shared_ptr<FitsObject>> RawIO::read(QString filename)
     throw std::runtime_error("Failed to load image");
 }
 
-bool RawIO::write(QString /*filename*/, FitsObject* /*img*/)
+bool RawIO::write(QString /*filename*/, const FitsObject& /*img*/)
 {
   throw std::runtime_error("Writing to raw format not supported.");
 }

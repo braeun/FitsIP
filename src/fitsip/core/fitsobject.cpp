@@ -178,7 +178,7 @@ bool FitsObject::save(const QString& fn)
   }
   try
   {
-    handler->write(fn,this);
+    handler->write(fn,*this);
     this->filename = fn;
   }
   catch (std::exception& ex)

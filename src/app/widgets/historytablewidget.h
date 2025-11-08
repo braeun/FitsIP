@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <memory>
 
+class ImageMetadata;
 class QTableWidget;
 class QVBoxLayout;
 
@@ -16,7 +17,9 @@ public:
 
   void clear();
 
-  void setFile(std::shared_ptr<FitsObject> file);
+  void setData(const ImageMetadata& data);
+
+//  void setFile(std::shared_ptr<FitsObject> file);
 
 private:
   QVBoxLayout *verticalLayout;

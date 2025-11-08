@@ -161,7 +161,13 @@ void ImageWidget::mousePressEvent(QMouseEvent *event)
     {
       dragStart = event->pos();
       dragStop = event->pos();
-      aoi = QRect();
+      clearAOI();
+      if (!image.isNull())
+      {
+        double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
+        QPoint p = (event->pos() - imageRect.topLeft()) * scale / zoomFactor;
+        emit cursorSet(p);
+      }
     }
   }
 }
@@ -176,13 +182,6 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent *event)
       dragStop = QPoint();
     }
     repaint();
-    if (!image.isNull() && imageRect.contains(event->pos()))
-    {
-      double scale = static_cast<double>(image.width()) / static_cast<double>(imageRect.width());
-      QPoint p = (event->pos() - imageRect.topLeft()) * scale;
-      emit cursorSet(p);
-      if (dragStart == dragStop) emit setPixel(p/zoomFactor);
-    }
   }
 }
 

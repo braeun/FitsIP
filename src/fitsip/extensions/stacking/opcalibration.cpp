@@ -101,7 +101,7 @@ OpPlugin::ResultType OpCalibration::execute(const std::vector<QFileInfo>& list, 
       if (img)
       {
         QString name = QString("%1%2%3.fts").arg(dlg->getPrefix(),img.getName(),dlg->getSuffix());
-        handler->write(dir.filePath(name),&img);
+        handler->write(dir.filePath(name),img);
       }
     }
     catch (const std::exception& ex)

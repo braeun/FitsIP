@@ -29,6 +29,10 @@ add_library(fitscore SHARED
   starlist.cpp
   undostack.cpp
   xydata.cpp
+  db/camera.cpp
+  db/cameratablemodel.cpp
+  db/database.cpp
+  db/sqldatabase.cpp
   dialogs/imageselectdialog.cpp dialogs/imageselectdialog.ui
   dialogs/pluginfilelistreturndialog.cpp dialogs/pluginfilelistreturndialog.ui
   dialogs/plugininfodialog.cpp dialogs/plugininfodialog.ui
@@ -38,7 +42,6 @@ add_library(fitscore SHARED
   dialogs/twovaluedialog.cpp dialogs/twovaluedialog.ui
   io/astroimageio.cpp
   io/cookbookio.cpp
-  io/db.cpp
   io/fitsio.cpp
   io/iofactory.cpp
   io/iohandler.cpp
@@ -115,7 +118,10 @@ target_sources(fitscore PUBLIC
   star.h
   starlist.h
   undostack.h
-  xydata.h
+  db/camera.h
+  db/cameratablemodel.h
+  db/database.h
+  db/sqldatabase.h
   dialogs/imageselectdialog.h
   dialogs/pluginfilelistreturndialog.h
   dialogs/plugininfodialog.h
@@ -125,7 +131,6 @@ target_sources(fitscore PUBLIC
   dialogs/twovaluedialog.h
   io/astroimageio.h
   io/cookbookio.h
-  io/db.h
   io/fitsio.h
   io/iofactory.h
   io/iohandler.h
@@ -224,6 +229,13 @@ if (USE_PYTHON)
 endif()
 
 if (nlohmann_json_FOUND)
+  target_sources(fitscore PUBLIC
+    db/jsondatabase.cpp
+  )
+  target_sources(fitscore PUBLIC
+    FILE_SET HEADERS TYPE HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../.." "${CMAKE_CURRENT_BINARY_DIR}/../.." FILES
+    db/jsondatabase.h
+  )
   target_link_libraries(fitscore
     PUBLIC nlohmann_json::nlohmann_json
     )

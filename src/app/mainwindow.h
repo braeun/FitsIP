@@ -60,6 +60,7 @@ class PixelListWidget;
 class ProfilerWidget;
 class ProfileView;
 class StarListWidget;
+class SysInfoDialog;
 class XYChartsWidget;
 
 struct PluginMenuEntry
@@ -109,6 +110,8 @@ private slots:
   void zoom(int z);
 
   void addPixel(QPoint p);
+
+  void setCursor(QPoint p);
 
   void updateCursor(QPoint p);
 
@@ -209,6 +212,7 @@ private:
   void getStarlistFromPixellist();
   void toggleXYChartDisplay(bool flag);
   void annotate(QPoint pixel);
+  void showSysInfo();
 
   Ui::MainWindow *ui;
   QMenu* openFileListMenu;
@@ -239,6 +243,7 @@ private:
   Logbook logbook;
   SelectionMode selectionMode;
   PSFManagerDialog* psfManager;
+  SysInfoDialog* sysinfoDialog;
   std::unique_ptr<Script> script;
   QMetaObject::Connection scriptOutConnection;
   QMetaObject::Connection scriptErrConnection;

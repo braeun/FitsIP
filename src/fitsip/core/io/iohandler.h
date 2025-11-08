@@ -41,7 +41,7 @@ public:
 
   virtual std::vector<std::shared_ptr<FitsObject>> read(QString filename) = 0;
 
-  virtual bool write(QString filename, FitsObject* obj) = 0;
+  virtual bool write(QString filename, const FitsObject& obj) = 0;
 
   /**
    * @brief Convenience method!
@@ -51,16 +51,13 @@ public:
    * @param img
    * @return
    */
-  virtual bool write(QString filename, FitsImage* img);
+  virtual bool write(QString filename, const FitsImage& img);
 
 signals:
   void logProfilerResult(QString profiler, QString image, int w, int h, int64_t t, QString notes);
 
 protected:
   void logProfiler(const QString& image, const QString& msg="");
-
-  [[deprecated]]
-  void logProfiler(std::shared_ptr<FitsImage> image, const QString& msg="");
 
   void logProfiler(const FitsImage& image, const QString& msg="");
 

@@ -10,6 +10,8 @@ namespace Ui {
 class MetadataTableWidget;
 }
 
+class ImageMetadata;
+
 class MetadataTableWidget : public QWidget
 {
   Q_OBJECT
@@ -18,7 +20,11 @@ public:
   explicit MetadataTableWidget(QWidget *parent = nullptr);
   ~MetadataTableWidget();
 
-  void setFile(std::shared_ptr<FitsObject> file);
+  void clear();
+
+  void setData(const ImageMetadata& data);
+
+//  void setFile(std::shared_ptr<FitsObject> file);
 
 private:
   Ui::MetadataTableWidget *ui;

@@ -35,7 +35,7 @@ public:
 
   virtual std::vector<std::shared_ptr<FitsObject>> read(QString filename) override;
 
-  virtual bool write(QString filename, FitsObject* obj) override;
+  virtual bool write(QString filename, const FitsObject& obj) override;
 
   static const char* FILENAME_FILTER;
 

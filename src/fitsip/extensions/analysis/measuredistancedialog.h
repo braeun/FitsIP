@@ -25,7 +25,6 @@
 
 #include <QDialog>
 #include <fitsip/core/pixel.h>
-#include <fitsip/core/io/db.h>
 
 class PixelList;
 
@@ -49,14 +48,13 @@ protected:
 private:
   void cameraSelected(const QString& name);
   void calculate();
-  void save();
 
   Ui::MeasureDistanceDialog *ui;
   double p1x;
   double p1y;
   double p2x;
   double p2y;
-  std::vector<db::Camera> cameras;
+  std::vector<QString> cameras;
 };
 
 #endif // MEASUREDISTANCEDIALOG_H

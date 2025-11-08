@@ -70,11 +70,11 @@ private:
 
 //  std::shared_ptr<FitsImage> createPSF(uint32_t w, uint32_t h, const PSF* psf, const std::vector<ValueType>& par) const;
   void fft(const fftdata& data, const FitsImage &image, int channel);
-  std::shared_ptr<FitsImage> invfft(const fftdata& data, fftw_complex* c, int w, int h);
-  std::shared_ptr<FitsImage> invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h);
+  FitsImage invfft(const fftdata& data, fftw_complex* c, int w, int h);
+  FitsImage invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h);
   /* calculate a*b overwriting a */
   void mul(fftw_complex* a, fftw_complex* b, int n);
-  void applySineRelaxation(const FitsImage& image, const ImageStatistics& stat, std::shared_ptr<FitsImage> corr);
+  void applySineRelaxation(const FitsImage& image, const ImageStatistics& stat, FitsImage* corr);
 
   bool cutImage;
   RelaxationFunction func;

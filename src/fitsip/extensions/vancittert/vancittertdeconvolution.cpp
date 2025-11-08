@@ -118,7 +118,7 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
   w0 += w0 % 2;
   int h0 = image->getHeight() + psf->getHeight();
   ImageStatistics basestat(*image);
-  auto imgpadded = image->paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
+  FitsImage imgpadded = image->paddedImage(w0,h0); //std::make_shared<FitsImage>(*image);
   FitsImage o(imgpadded);
   auto h = psf->createPSF(w0,h0,par);
   fftdata data;
@@ -134,7 +134,7 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
   fftw_complex* offt2 = new fftw_complex[data.fftsize];
   fftw_complex* offt3 = new fftw_complex[data.fftsize];
   ImageStatistics stat;
-  std::shared_ptr<FitsImage> c;
+  FitsImage c;
   int remain = niter;
   while (remain-- > 0)
   {
@@ -158,19 +158,19 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
       mul(offt3,hfft,data.fftsize);
       c = invfft(data,offt1,offt2,offt3,w0,h0);
     }
-    auto s = std::make_shared<FitsImage>(imgpadded);
-    *s -= *c;
-    stat = ImageStatistics(*s);
+    FitsImage s = imgpadded;
+    s -= c;
+    stat = ImageStatistics(s);
     switch (func)
     {
       case Constant:
-        *s *= parameter;
+        s *= parameter;
         break;
       case Sine:
-        applySineRelaxation(o,basestat,s.get());
+        applySineRelaxation(o,basestat,&s);
         break;
     }
-    o += *s;
+    o += s;
     if (cutImage)
     {
       o.cut(basestat.getGlobalStatistics().minValue,basestat.getGlobalStatistics().maxValue);
@@ -179,11 +179,11 @@ void VanCittertDeconvolution::deconvolve(FitsImage* image, const PSF* psf, const
     {
       QString fnc = path + "/c_" + QString::number(niter-remain) + ".fts";
       IOHandler *io = IOFactory::getInstance()->getHandler(fnc);
-      io->write(fnc,c.get());
+      io->write(fnc,c);
       QString fns = path + "/s_" + QString::number(niter-remain) + ".fts";
-      io->write(fns,s.get());
+      io->write(fns,s);
       QString fno = path + "/o_" + QString::number(niter-remain) + ".fts";
-      io->write(fno,&o);
+      io->write(fno,o);
     }
     qInfo() << "remaining" << remain << " stddev=" << stat.getGlobalStatistics().stddev;
     if (prog)
@@ -223,32 +223,32 @@ void VanCittertDeconvolution::fft(const fftdata& data, const FitsImage &image, i
   fftw_execute(data.r2c);
 }
 
-std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(const fftdata& data, fftw_complex* c, int w, int h)
+FitsImage VanCittertDeconvolution::invfft(const fftdata& data, fftw_complex* c, int w, int h)
 {
   memmove(data.cinout,c,data.fftsize*sizeof(fftw_complex));
   fftw_execute(data.c2r);
-  auto fftimg = std::make_shared<FitsImage>("tmp",w,h,1);
-  PixelIterator it2 = fftimg->getPixelIterator();
+  FitsImage fftimg("tmp",w,h,1);
+  PixelIterator it2 = fftimg.getPixelIterator();
   double* ptr = data.rinout;
-  for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+  for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
   {
     it2[0] = *ptr;
     ++ptr;
     ++it2;
   }
-  *fftimg /= fftimg->getHeight() * fftimg->getWidth();
+  fftimg /= fftimg.getHeight() * fftimg.getWidth();
   return fftimg;
 }
 
-std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h)
+FitsImage VanCittertDeconvolution::invfft(const fftdata& data, fftw_complex* c1, fftw_complex* c2, fftw_complex* c3, int w, int h)
 {
-  auto fftimg = std::make_shared<FitsImage>("tmp",w,h,3);
+  FitsImage fftimg("tmp",w,h,3);
   {
     memmove(data.cinout,c1,data.fftsize*sizeof(fftw_complex));
     fftw_execute(data.c2r);
-    PixelIterator it2 = fftimg->getPixelIterator();
+    PixelIterator it2 = fftimg.getPixelIterator();
     double* ptr = data.rinout;
-    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
     {
       it2[0] = *ptr;
       ++ptr;
@@ -258,9 +258,9 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(const fftdata& data, 
   {
     memmove(data.cinout,c2,data.fftsize*sizeof(fftw_complex));
     fftw_execute(data.c2r);
-    PixelIterator it2 = fftimg->getPixelIterator();
+    PixelIterator it2 = fftimg.getPixelIterator();
     double* ptr = data.rinout;
-    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
     {
       it2[1] = *ptr;
       ++ptr;
@@ -270,16 +270,16 @@ std::shared_ptr<FitsImage> VanCittertDeconvolution::invfft(const fftdata& data, 
   {
     memmove(data.cinout,c3,data.fftsize*sizeof(fftw_complex));
     fftw_execute(data.c2r);
-    PixelIterator it2 = fftimg->getPixelIterator();
+    PixelIterator it2 = fftimg.getPixelIterator();
     double* ptr = data.rinout;
-    for (int i=0;i<fftimg->getHeight()*fftimg->getWidth();i++)
+    for (int i=0;i<fftimg.getHeight()*fftimg.getWidth();i++)
     {
       it2[2] = *ptr;
       ++ptr;
       ++it2;
     }
   }
-  *fftimg /= fftimg->getHeight() * fftimg->getWidth();
+  fftimg /= fftimg.getHeight() * fftimg.getWidth();
   return fftimg;
 }
 

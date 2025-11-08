@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1150</width>
-    <height>630</height>
+    <width>1139</width>
+    <height>632</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -96,8 +96,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>825</width>
-                 <height>476</height>
+                 <width>807</width>
+                 <height>478</height>
                 </rect>
                </property>
               </widget>
@@ -135,7 +135,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>250</width>
+               <width>210</width>
                <height>0</height>
               </size>
              </property>
@@ -228,7 +228,7 @@
            <item row="0" column="6">
             <widget class="QLabel" name="activeFileLabel">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -238,6 +238,9 @@
              </property>
              <property name="text">
               <string>---</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -271,7 +274,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1150</width>
+     <width>1139</width>
      <height>23</height>
     </rect>
    </property>
@@ -354,6 +357,8 @@
     </property>
     <addaction name="actionPlugins"/>
     <addaction name="separator"/>
+    <addaction name="actionSystem_Information"/>
+    <addaction name="separator"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
@@ -413,7 +418,14 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <widget class="QMenu" name="menuInstruments">
+     <property name="title">
+      <string>Instruments</string>
+     </property>
+     <addaction name="actionCameras"/>
+    </widget>
     <addaction name="actionPSF_Manager"/>
+    <addaction name="menuInstruments"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -632,8 +644,8 @@
   <widget class="QDockWidget" name="metadataDockWidget">
    <property name="minimumSize">
     <size>
-     <width>53</width>
-     <height>36</height>
+     <width>60</width>
+     <height>37</height>
     </size>
    </property>
    <property name="windowTitle">
@@ -1171,6 +1183,16 @@
    </property>
    <property name="text">
     <string>Show XY Charts</string>
+   </property>
+  </action>
+  <action name="actionCameras">
+   <property name="text">
+    <string>Cameras...</string>
+   </property>
+  </action>
+  <action name="actionSystem_Information">
+   <property name="text">
+    <string>System Information...</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

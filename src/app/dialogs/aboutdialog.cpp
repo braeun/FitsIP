@@ -31,17 +31,17 @@ AboutDialog::AboutDialog(QWidget *parent) :
   ui->setupUi(this);
   ui->versionLabel->setText("Version "+QApplication::applicationVersion());
   ui->releaseLabel->setText(QString("Release ")+__DATE__);
-  QString options = "Build Options:\n";
-#ifdef USE_FLOAT
-  options += "  Value Type      = float\n";
-#else
-  options += "  ValueType = double\n";
-#endif
-#ifdef USE_16BITRAW
-  options += "  Raw Image Input = 16 bits\n";
-#else
-#endif
-  ui->buildOptionLabel->setText(options);
+//   QString options = "Build Options:\n";
+// #ifdef USE_FLOAT
+//   options += "  Value Type      = float\n";
+// #else
+//   options += "  ValueType = double\n";
+// #endif
+// #ifdef USE_16BITRAW
+//   options += "  Raw Image Input = 16 bits\n";
+// #else
+// #endif
+//   ui->buildOptionLabel->setText(options);
 }
 
 AboutDialog::~AboutDialog()

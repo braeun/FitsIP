@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-11-03                                                         *
+ * modified: 2025-11-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,10 +28,12 @@
 #endif
 #include "script.h"
 #include "dialogs/aboutdialog.h"
+#include "dialogs/cameradatabasedialog.h"
 #include "dialogs/configurationdialog.h"
 #include "dialogs/editmetadatadialog.h"
 #include "dialogs/logbookexportdialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
+#include "dialogs/sysinfodialog.h"
 #include "widgets/consolewidget.h"
 #include "widgets/filelistwidget.h"
 #include "widgets/filesystemview.h"
@@ -51,7 +53,6 @@
 #include <fitsip/core/dialogs/pluginfilelistreturndialog.h>
 #include <fitsip/core/dialogs/plugininfodialog.h>
 #include <fitsip/core/dialogs/twovaluedialog.h>
-#include <fitsip/core/io/db.h>
 #include <fitsip/core/io/iofactory.h>
 #include <fitsip/core/logbook/logbookutils.h>
 #include <fitsip/core/opplugin.h>
@@ -81,11 +82,12 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui(new Ui::MainWindow),
   editMetadataDialog(nullptr),
   selectionMode(None),
-  psfManager(nullptr)
+  psfManager(nullptr),
+  sysinfoDialog(nullptr)
 {
   ui->setupUi(this);
   AppSettings settings;
-  db::configure(settings);
+//  db::configure(settings);
 
   openFileListMenu = new QMenu;
   openFileListMenu->addAction("Copy",this,[=](){copyImage();});
@@ -128,7 +130,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   ui->historyDockContents->layout()->addWidget(historyTableWidget);
 
   imageWidget = new ImageWidget();
-  connect(imageWidget,&ImageWidget::setPixel,this,[this](QPoint p){if (selectionMode == SelectPixel) addPixel(p);});
+  connect(imageWidget,&ImageWidget::cursorSet,this,&MainWindow::setCursor);
   connect(imageWidget,&ImageWidget::contextMenuRequested,this,&MainWindow::showImageContextMenu);
   connect(imageWidget,&ImageWidget::cursorMoved,this,&MainWindow::updateCursor);
   connect(imageWidget,&ImageWidget::cursorMoved,profileWidget,&ProfileView::updateCursor);
@@ -166,6 +168,10 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->actionClear_Star_List,&QAction::triggered,starlistWidget,&StarListWidget::clear);
 
   connect(ui->actionShow_XY_Charts,&QAction::toggled,this,&MainWindow::toggleXYChartDisplay);
+
+  connect(ui->actionCameras,&QAction::triggered,this,[](){CameraDatabaseDialog::showDialog();});
+
+  connect(ui->actionSystem_Information,&QAction::triggered,this,&MainWindow::showSysInfo);
 
   ui->menuWindow->addAction(ui->fileSystemDockWidget->toggleViewAction());
   ui->fileSystemDockWidget->toggleViewAction()->setShortcut(QKeySequence(Qt::Key_F1));
@@ -621,7 +627,6 @@ void MainWindow::executeOpPlugin(OpPlugin *op, std::shared_ptr<FitsObject> img, 
 void MainWindow::display(std::shared_ptr<FitsObject> file)
 {
   imageCollection->setActiveFile(file);
-  historyTableWidget->clear();
   if (file)
   {
     QFileInfo info(file->getFilename());
@@ -688,8 +693,13 @@ void MainWindow::updateDisplay()
 
 void MainWindow::updateMetadata()
 {
-  metaTableWidget->setFile(imageCollection->getActiveFile());
-  historyTableWidget->setFile(imageCollection->getActiveFile());
+  metaTableWidget->clear();
+  historyTableWidget->clear();
+  if (imageCollection->getActiveFile())
+  {
+    metaTableWidget->setData(imageCollection->getActiveFile()->getImage().getMetadata());
+    historyTableWidget->setData(imageCollection->getActiveFile()->getImage().getMetadata());
+  }
 }
 
 void MainWindow::run(const QFileInfo &fileinfo)
@@ -894,6 +904,12 @@ void MainWindow::addPixel(QPoint p)
   }
 }
 
+void MainWindow::setCursor(QPoint p)
+{
+  if (selectionMode == SelectPixel) addPixel(p);
+//  ui->aoiLabel->setText("---");
+}
+
 void MainWindow::updateCursor(QPoint p)
 {
   QString txt = QString::asprintf("%4d,%4d",p.x(),p.y());
@@ -907,7 +923,14 @@ void MainWindow::updateCursor(QPoint p)
 
 void MainWindow::updateAOI(QRect r)
 {
-  ui->aoiLabel->setText(QString("%1,%2 %3x%4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()));
+  if (r.isNull())
+  {
+    ui->aoiLabel->setText("---");
+  }
+  else
+  {
+    ui->aoiLabel->setText(QString("%1,%2 %3x%4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()));
+  }
   std::shared_ptr<FitsObject> activeFile = imageCollection->getActiveFile();
   if (activeFile)
   {
@@ -1284,7 +1307,7 @@ void MainWindow::on_actionPreferences_triggered()
     logbookWidget->rebuild();
     profileWidget->setClickEndsTracking(settings.isProfileStopTracking());
     setScriptOutput();
-    db::configure(settings);
+//    db::configure(settings);
   }
   delete dlg;
 }
@@ -1472,4 +1495,13 @@ void MainWindow::on_actionPlugins_triggered()
 void MainWindow::annotate(QPoint pixel)
 {
   qInfo() << "annotate not implemented" << pixel;
+}
+
+void MainWindow::showSysInfo()
+{
+  if (!sysinfoDialog)
+  {
+    sysinfoDialog = new SysInfoDialog(this);
+  }
+  sysinfoDialog->show();
 }

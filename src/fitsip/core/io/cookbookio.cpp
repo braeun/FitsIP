@@ -47,7 +47,7 @@ std::vector<std::shared_ptr<FitsObject>> CookbookIO::read(QString filename)
   return {std::make_shared<FitsObject>(readP1(filename),filename)};
 }
 
-bool CookbookIO::write(QString /*filename*/, FitsObject* /*obj*/)
+bool CookbookIO::write(QString /*filename*/, const FitsObject& /*obj*/)
 {
   throw std::runtime_error("Writing to Cookbook format not supported.");
 }

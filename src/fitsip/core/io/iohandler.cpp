@@ -33,10 +33,10 @@ IOHandler::~IOHandler()
 {
 }
 
-bool IOHandler::write(QString filename, FitsImage* img)
+bool IOHandler::write(QString filename, const FitsImage& img)
 {
-  auto obj = std::make_shared<FitsObject>(*img,filename);
-  return write(filename,obj.get());
+  FitsObject obj(img,filename);
+  return write(filename,obj);
 }
 
 void IOHandler::logProfiler(const QString& image, const QString& msg)
@@ -45,16 +45,6 @@ void IOHandler::logProfiler(const QString& image, const QString& msg)
   {
     QString name = QString::fromStdString(profiler.getName());
     emit logProfilerResult(name,image,0,0,profiler.getDuration(),msg);
-  }
-}
-
-void IOHandler::logProfiler(std::shared_ptr<FitsImage> image, const QString& msg)
-{
-  if (profiler.getDuration() > 0)
-  {
-    QString name = QString::fromStdString(profiler.getName());
-    emit logProfilerResult(name,image->getName(),image->getWidth(),image->getHeight(),profiler.getDuration(),msg);
-//    qInfo() << profiler.toString().c_str();
   }
 }
 
