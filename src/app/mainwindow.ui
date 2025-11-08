@@ -423,6 +423,7 @@
       <string>Instruments</string>
      </property>
      <addaction name="actionCameras"/>
+     <addaction name="actionTelescopes"/>
     </widget>
     <addaction name="actionPSF_Manager"/>
     <addaction name="menuInstruments"/>
@@ -1193,6 +1194,11 @@
   <action name="actionSystem_Information">
    <property name="text">
     <string>System Information...</string>
+   </property>
+  </action>
+  <action name="actionTelescopes">
+   <property name="text">
+    <string>Telescopes...</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

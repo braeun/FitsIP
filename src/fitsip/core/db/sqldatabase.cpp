@@ -165,6 +165,129 @@ bool SQLDatabase::updateCamera(const Camera& c)
   return true;
 }
 
+std::vector<QString> SQLDatabase::getTelescopeList()
+{
+  std::vector<QString> list;
+  QSqlDatabase db = QSqlDatabase::database(connectionName);
+  if (!(db.isValid() && db.isOpen()))
+  {
+    qWarning() << "Database not configured";
+    return list;
+  }
+  QSqlQuery q("select name from telescopes order by name",db);
+  if (q.exec())
+  {
+    while (q.next())
+    {
+      list.push_back(q.value(0).toString());
+    }
+  }
+  return list;
+}
+
+std::vector<Telescope> SQLDatabase::getTelescopes()
+{
+  std::vector<Telescope> list;
+  QSqlDatabase db = QSqlDatabase::database(connectionName);
+  if (!(db.isValid() && db.isOpen()))
+  {
+    qWarning() << "Database not configured";
+    return list;
+  }
+  QSqlQuery q("select name,f,d from telescopes order by name",db);
+  if (q.exec())
+  {
+    while (q.next())
+    {
+      Telescope c(q.value(0).toString(),q.value(1).toDouble(),q.value(2).toDouble());
+      list.push_back(c);
+    }
+  }
+  return list;
+}
+
+Telescope SQLDatabase::getTelescope(QString name)
+{
+  QSqlDatabase db = QSqlDatabase::database(connectionName);
+  if (!(db.isValid() && db.isOpen()))
+  {
+    qWarning() << "Database not configured";
+    return Telescope();
+  }
+  QSqlQuery q("select f,d from telescopes where name=?",db);
+  q.bindValue(0,name);
+  if (q.exec())
+  {
+    if (q.next())
+    {
+      double f = q.value(0).toDouble();
+      double d = q.value(1).toDouble();
+      return Telescope(name,f,d);
+    }
+  }
+  return Telescope();
+}
+
+bool SQLDatabase::removeTelescope(QString name)
+{
+  QSqlDatabase db = QSqlDatabase::database(connectionName);
+  if (!(db.isValid() && db.isOpen()))
+  {
+    qWarning() << "Database not configured";
+    return false;
+  }
+  QSqlQuery q("delete from telescopes where name=?",db);
+  q.bindValue(0,name);
+  if (!q.exec())
+  {
+    qWarning() << q.lastError();
+    return false;
+  }
+  return true;
+}
+
+bool SQLDatabase::addTelescope(const Telescope& t)
+{
+  QSqlDatabase db = QSqlDatabase::database(connectionName);
+  if (!(db.isValid() && db.isOpen()))
+  {
+    qWarning() << "Database not configured";
+    return false;
+  }
+  QSqlQuery q("insert into telescopes (name,f,d) values (?,?,?)",db);
+  q.bindValue(0,t.getName());
+  q.bindValue(1,t.getF());
+  q.bindValue(2,t.getD());
+  if (!q.exec())
+  {
+    qWarning() << q.lastError();
+    return false;
+  }
+  qInfo() << "Added telescope: " << t.getName();
+  return true;
+}
+
+bool SQLDatabase::updateTelescope(const Telescope& c)
+{
+  QSqlDatabase db = QSqlDatabase::database(connectionName);
+  if (!(db.isValid() && db.isOpen()))
+  {
+    qWarning() << "Database not configured";
+    return false;
+  }
+  QSqlQuery q("update telescopes set f=?,d=? where name=?",db);
+  q.bindValue(0,c.getF());
+  q.bindValue(1,c.getD());
+  q.bindValue(2,c.getName());
+  if (!q.exec())
+  {
+    qWarning() << q.lastError();
+    return false;
+  }
+  qInfo() << "Updated telescope: " << c.getName();
+  return true;
+}
+
 
 
 QStringList SQLDatabase::getDrivers()
@@ -191,6 +314,16 @@ void SQLDatabase::assertTables()
                 + "name varchar(128) not null,"
                 + "pixelwidth real,"
                 + "pixelheight real"
+                + ")";
+    if (!q.exec(s)) qWarning() << q.lastError().text();
+  }
+  if (!db.tables().contains("telescopes"))
+  {
+    QSqlQuery q(db);
+    QString s = QString("create table telescopes (")
+                + "name varchar(128) not null,"
+                + "f real,"
+                + "d real"
                 + ")";
     if (!q.exec(s)) qWarning() << q.lastError().text();
   }

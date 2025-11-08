@@ -33,6 +33,8 @@ add_library(fitscore SHARED
   db/cameratablemodel.cpp
   db/database.cpp
   db/sqldatabase.cpp
+  db/telescope.cpp
+  db/telescopetablemodel.cpp
   dialogs/imageselectdialog.cpp dialogs/imageselectdialog.ui
   dialogs/pluginfilelistreturndialog.cpp dialogs/pluginfilelistreturndialog.ui
   dialogs/plugininfodialog.cpp dialogs/plugininfodialog.ui
@@ -122,6 +124,8 @@ target_sources(fitscore PUBLIC
   db/cameratablemodel.h
   db/database.h
   db/sqldatabase.h
+  db/telescope.h
+  db/telescopetablemodel.h
   dialogs/imageselectdialog.h
   dialogs/pluginfilelistreturndialog.h
   dialogs/plugininfodialog.h
@@ -206,16 +210,6 @@ target_compile_definitions(fitscore
 
 target_compile_options(fitscore PRIVATE -fPIC)
 
-target_link_libraries(fitscore
-  PUBLIC PkgConfig::CCfits
-  PUBLIC PkgConfig::cfitsio
-  PUBLIC PkgConfig::QWT
-  PUBLIC Qt5::Xml
-  PUBLIC Qt5::Sql
-  PUBLIC Qt5::Widgets
-  PUBLIC Qt5::Core
-  )
-
 if (USE_PYTHON)
 #   # required by pybind11
 #   # maybe just set the class with __attribute__ ((visibility("hidden")))
@@ -229,7 +223,7 @@ if (USE_PYTHON)
 endif()
 
 if (nlohmann_json_FOUND)
-  target_sources(fitscore PUBLIC
+  target_sources(fitscore PRIVATE
     db/jsondatabase.cpp
   )
   target_sources(fitscore PUBLIC
@@ -240,6 +234,16 @@ if (nlohmann_json_FOUND)
     PUBLIC nlohmann_json::nlohmann_json
     )
 endif()
+
+target_link_libraries(fitscore
+  PUBLIC PkgConfig::CCfits
+  PUBLIC PkgConfig::cfitsio
+  PUBLIC PkgConfig::QWT
+  PUBLIC Qt5::Xml
+  PUBLIC Qt5::Sql
+  PUBLIC Qt5::Widgets
+  PUBLIC Qt5::Core
+  )
 
 set_target_properties(fitscore
     PROPERTIES

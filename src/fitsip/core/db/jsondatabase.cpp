@@ -90,6 +90,72 @@ bool JsonDatabase::updateCamera(const Camera& c)
   return save();
 }
 
+std::vector<QString> JsonDatabase::getTelescopeList()
+{
+  std::vector<QString> list;
+  for (const auto& t : telescopes)
+  {
+    list.push_back(t.getName());
+  }
+  return list;
+}
+
+std::vector<Telescope> JsonDatabase::getTelescopes()
+{
+  return telescopes;
+}
+
+Telescope JsonDatabase::getTelescope(QString name)
+{
+  for (const auto& t : telescopes)
+  {
+    if (t.getName() == name) return t;
+  }
+  return Telescope();
+}
+
+bool JsonDatabase::removeTelescope(QString name)
+{
+  for (auto it = telescopes.begin(); it != telescopes.end();)
+  {
+    if (it->getName() == name)
+    {
+      telescopes.erase(it);
+      break;
+    }
+  }
+  return save();
+}
+
+bool JsonDatabase::addTelescope(const Telescope& telescope)
+{
+  Telescope t = getTelescope(telescope.getName());
+  if (t)
+  {
+    qWarning() << "Camera with name" << telescope.getName() << "already exists";
+    return false;
+  }
+  telescopes.push_back(telescope);
+  std::sort(telescopes.begin(),telescopes.end(),[](const Telescope& c1, const Telescope& c2){return c1.getName()<c2.getName();});
+  qInfo() << "Added camera: " << telescope.getName();
+  return save();
+}
+
+bool JsonDatabase::updateTelescope(const Telescope& telescope)
+{
+  for (auto& t : telescopes)
+  {
+    if (telescope.getName() == t.getName())
+    {
+      t.setF(telescope.getF());
+      t.setD(telescope.getD());
+      qInfo() << "Updated camera: " << telescope.getName();
+      break;
+    }
+  }
+  return save();
+}
+
 
 QStringList JsonDatabase::getDrivers()
 {

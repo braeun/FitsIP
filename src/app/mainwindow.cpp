@@ -34,6 +34,7 @@
 #include "dialogs/logbookexportdialog.h"
 #include "dialogs/logbookpropertiesdialog.h"
 #include "dialogs/sysinfodialog.h"
+#include "dialogs/telescopedatabasedialog.h"
 #include "widgets/consolewidget.h"
 #include "widgets/filelistwidget.h"
 #include "widgets/filesystemview.h"
@@ -170,6 +171,7 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   connect(ui->actionShow_XY_Charts,&QAction::toggled,this,&MainWindow::toggleXYChartDisplay);
 
   connect(ui->actionCameras,&QAction::triggered,this,[](){CameraDatabaseDialog::showDialog();});
+  connect(ui->actionTelescopes,&QAction::triggered,this,[](){TelescopeDatabaseDialog::showDialog();});
 
   connect(ui->actionSystem_Information,&QAction::triggered,this,&MainWindow::showSysInfo);
 
@@ -289,11 +291,9 @@ MainWindow::~MainWindow()
 void MainWindow::initialize(PluginFactory* factory)
 {
   pluginFactory = factory;
-  defaultPixelList = std::make_unique<PixelList>();
-  pixellistWidget->setPixelList(defaultPixelList.get());
+  pixellistWidget->setPixelList(&defaultPixelList);
+  starlistWidget->setStarList(&defaultStarList);
 //  connect(ui->pixellistWidget,&PixelListWidget::findStars,this,&MainWindow::getStarlistFromPixellist);
-  defaultStarList = std::make_unique<StarList>();
-  starlistWidget->setStarList(defaultStarList.get());
   imageCollection = std::make_unique<ImageCollection>();
   //  scriptInterface = std::make_unique<ScriptInterface>();
   selectedFileList = std::make_unique<FileList>();
@@ -463,8 +463,8 @@ void MainWindow::executeOpPlugin(OpPlugin *op)
   data.aoi = imageWidget->getAOI();
   data.previewOptions.scale = static_cast<FitsImage::Scale>(histogramWidget->getImageScale());
   data.imageCollection = imageCollection.get();
-  data.pixellist = (activeFile) ? activeFile->getPixelList() : defaultPixelList.get();
-  data.starlist = (activeFile) ? activeFile->getStarList() : defaultStarList.get();
+  data.pixellist = (activeFile) ? activeFile->getPixelList() : &defaultPixelList;
+  data.starlist = (activeFile) ? activeFile->getStarList() : &defaultStarList;
   if (op->requiresFileList())
   {
     std::vector<std::shared_ptr<FitsObject>> imglist;
@@ -791,8 +791,9 @@ void MainWindow::openImage(const QFileInfo &fileinfo)
       }
       QApplication::restoreOverrideCursor();
       ui->openFileList->selectionModel()->setCurrentIndex(imageCollection->index(imageCollection->rowCount()-1,0),QItemSelectionModel::SelectCurrent);
+      imageCollection->setActiveFile(imageCollection->rowCount()-1);
       //      ui->scrollArea->setWidgetResizable(false);
-      display(imageCollection->getFile(imageCollection->rowCount()-1));
+      display(imageCollection->getActiveFile());
     }
     catch (std::exception& ex)
     {
@@ -1282,8 +1283,8 @@ void MainWindow::on_actionClose_Image_triggered()
   }
   else
   {
-    pixellistWidget->setPixelList(defaultPixelList.get());
-    starlistWidget->setStarList(defaultStarList.get());
+    pixellistWidget->setPixelList(&defaultPixelList);
+    starlistWidget->setStarList(&defaultStarList);
     display(std::shared_ptr<FitsObject>());
   }
 }
@@ -1292,8 +1293,8 @@ void MainWindow::on_actionClose_All_Images_triggered()
 {
   /* first remove image from various displays! */
   display(std::shared_ptr<FitsObject>());
-  pixellistWidget->setPixelList(defaultPixelList.get());
-  starlistWidget->setStarList(defaultStarList.get());
+  pixellistWidget->setPixelList(&defaultPixelList);
+  starlistWidget->setStarList(&defaultStarList);
   imageCollection->removeAll();
 }
 

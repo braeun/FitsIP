@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include "camera.h"
+#include "telescope.h"
 #include <memory>
 #include <map>
 #include <vector>
@@ -22,6 +23,18 @@ public:
   virtual bool addCamera(const Camera& c) = 0;
 
   virtual bool updateCamera(const Camera& c) = 0;
+
+  virtual std::vector<QString> getTelescopeList() = 0;
+
+  virtual  std::vector<Telescope> getTelescopes() = 0;
+
+  virtual Telescope getTelescope(QString name) = 0;
+
+  virtual bool removeTelescope(QString name) = 0;
+
+  virtual bool addTelescope(const Telescope& c) = 0;
+
+  virtual bool updateTelescope(const Telescope& c) = 0;
 
   static Database* get(QString name="");
 

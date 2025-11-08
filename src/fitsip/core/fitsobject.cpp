@@ -33,9 +33,9 @@ FitsObject::FitsObject(const FitsImage& img, const QString&  fn):
   filename(fn),
   image(img)
 {
-  pixelList = std::make_unique<PixelList>();
-  starList = std::make_unique<StarList>();
-  annotations = std::make_unique<Annotations>();
+  // pixelList = std::make_unique<PixelList>();
+  // starList = std::make_unique<StarList>();
+  // annotations = std::make_unique<Annotations>();
 //  QFileInfo info(filename);
 //  histogram.build(image.get());
 }
@@ -45,8 +45,8 @@ FitsObject::FitsObject(const FitsImage& img, const std::string&  fn):
  filename(QString::fromStdString(fn)),
  image(img)
 {
-  pixelList = std::make_unique<PixelList>();
-  starList = std::make_unique<StarList>();
+  // pixelList = std::make_unique<PixelList>();
+  // starList = std::make_unique<StarList>();
 //  QFileInfo info(filename);
 //  histogram.build(image.get());
 }
@@ -130,19 +130,34 @@ const Profile& FitsObject::getYProfile() const
   return yprofile;
 }
 
-PixelList* FitsObject::getPixelList() const
+PixelList* FitsObject::getPixelList()
 {
-  return pixelList.get();
+  return &pixelList;
 }
 
-StarList* FitsObject::getStarList() const
+const PixelList* FitsObject::getPixelList() const
 {
-  return starList.get();
+  return &pixelList;
 }
 
-Annotations* FitsObject::getAnnotations() const
+StarList* FitsObject::getStarList()
 {
-  return annotations.get();
+  return &starList;
+}
+
+const StarList* FitsObject::getStarList() const
+{
+  return &starList;
+}
+
+Annotations* FitsObject::getAnnotations()
+{
+  return &annotations;
+}
+
+const Annotations* FitsObject::getAnnotations() const
+{
+  return &annotations;
 }
 
 void FitsObject::addXYData(const XYData& data)

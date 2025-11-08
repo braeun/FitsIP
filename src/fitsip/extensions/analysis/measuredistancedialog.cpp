@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - measure the distance dialog                                         *
  *                                                                              *
- * modified: 2025-03-13                                                         *
+ * modified: 2025-11-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -35,6 +35,7 @@ MeasureDistanceDialog::MeasureDistanceDialog(QWidget *parent) :
   ui->setupUi(this);
   connect(ui->calculateButton,&QPushButton::clicked,this,&MeasureDistanceDialog::calculate);
   connect(ui->cameraBox,&QComboBox::currentTextChanged,this,&MeasureDistanceDialog::cameraSelected);
+  connect(ui->telescopeBox,&QComboBox::currentTextChanged,this,&MeasureDistanceDialog::telescopeSelected);
 }
 
 MeasureDistanceDialog::~MeasureDistanceDialog()
@@ -60,11 +61,17 @@ void MeasureDistanceDialog::showEvent(QShowEvent *event)
 {
   if (!event->spontaneous())
   {
-    cameras = Database::get()->getCameraList();
+    auto cameras = Database::get()->getCameraList();
     ui->cameraBox->clear();
     for (const auto& camera : cameras)
     {
       ui->cameraBox->addItem(camera);
+    }
+    auto telescopes = Database::get()->getTelescopeList();
+    ui->telescopeBox->clear();
+    for (const auto& telescope : telescopes)
+    {
+      ui->telescopeBox->addItem(telescope);
     }
   }
 }
@@ -75,6 +82,12 @@ void MeasureDistanceDialog::cameraSelected(const QString& name)
   Camera camera = Database::get()->getCamera(name);
   ui->widthField->setText(QString::number(camera.getPixelwidth()));
   ui->heightField->setText(QString::number(camera.getPixelheight()));
+}
+
+void MeasureDistanceDialog::telescopeSelected(const QString& name)
+{
+  Telescope telescope = Database::get()->getTelescope(name);
+  ui->focalLengthField->setText(QString::number(telescope.getF()));
 }
 
 

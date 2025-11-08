@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - measure the distance dialog                                         *
  *                                                                              *
- * modified: 2025-03-13                                                         *
+ * modified: 2025-11-08                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -47,6 +47,7 @@ protected:
 
 private:
   void cameraSelected(const QString& name);
+  void telescopeSelected(const QString& name);
   void calculate();
 
   Ui::MeasureDistanceDialog *ui;
@@ -54,7 +55,7 @@ private:
   double p1y;
   double p2x;
   double p2y;
-  std::vector<QString> cameras;
+//  std::vector<QString> cameras;
 };
 
 #endif // MEASUREDISTANCEDIALOG_H

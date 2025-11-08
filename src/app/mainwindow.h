@@ -223,8 +223,8 @@ private:
   PluginFactory* pluginFactory;
   std::vector<PluginMenuEntry> pluginMenus;
   std::map<QString,QToolBar*> pluginToolbars;
-  std::unique_ptr<PixelList> defaultPixelList;
-  std::unique_ptr<StarList> defaultStarList;
+  PixelList defaultPixelList;
+  StarList defaultStarList;
   ImageWidget* imageWidget;
   FileSystemView* filesystemView;
   FileListWidget* filelistWidget;

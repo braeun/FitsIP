@@ -76,11 +76,17 @@ public:
 
   const Profile& getYProfile() const;
 
-  PixelList* getPixelList() const;
+  PixelList* getPixelList();
 
-  StarList* getStarList() const;
+  const PixelList* getPixelList() const;
 
-  Annotations* getAnnotations() const;
+  StarList* getStarList();
+
+  const StarList* getStarList() const;
+
+  Annotations* getAnnotations();
+
+  const Annotations* getAnnotations() const;
 
   void addXYData(const XYData& data);
 
@@ -131,9 +137,9 @@ private:
   Histogram histogram;
   Profile xprofile;
   Profile yprofile;
-  std::unique_ptr<PixelList> pixelList;
-  std::unique_ptr<StarList> starList;
-  std::unique_ptr<Annotations> annotations;
+  PixelList pixelList;
+  StarList starList;
+  Annotations annotations;
   std::vector<XYData> xydata;
   UndoStack undostack;
 
