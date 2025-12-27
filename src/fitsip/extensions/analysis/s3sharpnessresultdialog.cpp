@@ -33,6 +33,8 @@ void S3SharpnessResultDialog::setResult(const std::vector<S3SharpnessData> &list
   {
     ui->resultTable->setItem(row,0,new QTableWidgetItem(entry.info.fileName()));
     ui->resultTable->setItem(row,1,new QTableWidgetItem(QString::number(entry.s3)));
+    ui->resultTable->setItem(row,2,new QTableWidgetItem(QString::number(entry.s3min)));
+    ui->resultTable->setItem(row,3,new QTableWidgetItem(QString::number(entry.s3max)));
     row++;
     normvaravg.add(entry.s3);
   }
@@ -90,7 +92,7 @@ void S3SharpnessResultDialog::save()
       {
         for (const S3SharpnessData& entry : entries)
         {
-          s << entry.info.absoluteFilePath() << "," << entry.s3 << Qt::endl;
+          s << entry.info.absoluteFilePath() << "," << entry.s3 << "," << entry.s3min << "," << entry.s3max << Qt::endl;
         }
       }
       s.flush();

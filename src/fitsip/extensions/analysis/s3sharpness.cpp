@@ -28,6 +28,7 @@ S3Sharpness::S3Sharpness():
   spectralBlocksize(32),
   spectralOverlap(24),
   spatialBlocksize(8),
+  contrastBlockSize(8),
   sigmoid_t1(-3),
   sigmoid_t2(2),
   contrast_t1(5),
@@ -72,11 +73,11 @@ void S3Sharpness::bindPython(void* mod) const
     auto result = calculateSharpness(obj->getImage(),contrast_t1,contrast_t2);
     if (result.images.size() < 3)
     {
-      return std::make_tuple(result.s3,std::shared_ptr<FitsObject>(),std::shared_ptr<FitsObject>(),std::shared_ptr<FitsObject>());
+      return std::make_tuple(result.s3,result.s3min,result.s3max,std::shared_ptr<FitsObject>(),std::shared_ptr<FitsObject>(),std::shared_ptr<FitsObject>());
     }
     else
     {
-      return std::make_tuple(result.s3,result.images[0],result.images[1],result.images[2]);
+      return std::make_tuple(result.s3,result.s3min,result.s3max,result.images[0],result.images[1],result.images[2]);
     }
   },
   "Calculate sharpness",py::arg("obj"));
@@ -108,6 +109,9 @@ OpPlugin::ResultType S3Sharpness::execute(const std::vector<QFileInfo>& list, co
     auto result = evaluate(info,data.aoi);
     if (result.info.exists())
     {
+//      log(QString::asprintf("sharpness: %g",result.s3));
+      /* only keep intermediate images of the last file */
+      images.clear();
       images.insert(images.begin(),result.images.begin(),result.images.end());
       result.images.clear(); /* discard intermediate images */
       results.push_back(result);
@@ -156,6 +160,8 @@ OpPlugin::ResultType S3Sharpness::execute(const std::vector<std::shared_ptr<Fits
     auto result = calculateSharpness(img,contrast_t1,contrast_t2);
     result.info = info;
     result.filename = info.absoluteFilePath().toStdString();
+    /* only keep intermediate images of the last file */
+    images.clear();
     images.insert(images.begin(),result.images.begin(),result.images.end());
     result.images.clear(); /* discard intermediate images */
 //    log(QString::asprintf("sharpness: %g",result.s3));
@@ -193,6 +199,7 @@ S3SharpnessData S3Sharpness::evaluate(const QFileInfo info, QRect selection)
   }
   catch (std::exception& ex)
   {
+    log(ex.what());
   }
   return S3SharpnessData();
 }
@@ -243,10 +250,19 @@ S3SharpnessData S3Sharpness::calculateSharpness(const FitsImage& img, double t1,
     s3int += s[i];
   }
   s3int /= s.size()/100;
+  ValueType s3min = std::numeric_limits<ValueType>::max();
+  ValueType s3max = std::numeric_limits<ValueType>::lowest();
+  for (size_t i=0;i<s.size();++i)
+  {
+    s3min = std::min(s3min,s[i]);
+    s3max = std::max(s3max,s[i]);
+  }
   delete spectral.first;
   delete spatial;
   delete s3;
   sd.s3 = s3int;
+  sd.s3min = s3min;
+  sd.s3max = s3max;
   return sd;
 }
 
@@ -260,7 +276,7 @@ std::pair<Layer*,std::vector<XYData>>  S3Sharpness::calculateSpectralSharpness(c
   double *in = new double[m*m];
   fftw_plan f = fftw_plan_dft_r2c_2d(m,m,in,s2c,FFTW_ESTIMATE);
   int y = 0;
-  auto cl = calculateContrast(layer,m,t1,t2);
+  auto cl = calculateContrast(layer,contrastBlockSize,t1,t2);
   HanningWindow w(m);
   while (y+m <= layer.getHeight())
   {
@@ -457,7 +473,7 @@ std::unique_ptr<Layer> S3Sharpness::calculateContrast(const Layer& layer, int m,
       double sx = 0;
       double sx2 = 0;
       double lmin = std::numeric_limits<double>::max();
-      double lmax = std::numeric_limits<double>::min();
+      double lmax = std::numeric_limits<double>::lowest();
       for (int j=0;j<m;++j)
       {
         ValueType* ptr = cl->getData() + (y + j) * cl->getWidth() + x;
@@ -480,10 +496,10 @@ std::unique_ptr<Layer> S3Sharpness::calculateContrast(const Layer& layer, int m,
       }
       if (contrast > t1) contrast = t1;
       contrast /= t1;
-      for (int j=0;j<m;++j)
+      for (int j=0;j<d;++j)
       {
         ValueType* ptr = cl->getData() + (y + j) * cl->getWidth() + x;
-        for (int i=0;i<m;++i)
+        for (int i=0;i<d;++i)
         {
           *ptr = contrast;
           ++ptr;

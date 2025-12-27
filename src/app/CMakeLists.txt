@@ -10,6 +10,7 @@ add_executable(fits
   scriptinterface.h scriptinterface.cpp
   staticplugins.cpp
   dialogs/aboutdialog.h dialogs/aboutdialog.cpp dialogs/aboutdialog.ui
+  dialogs/addannotationdialog.h dialogs/addannotationdialog.cpp dialogs/addannotationdialog.ui
   dialogs/addcameradialog.h dialogs/addcameradialog.cpp dialogs/addcameradialog.ui
   dialogs/addlogbookentrydialog.h dialogs/addlogbookentrydialog.cpp dialogs/addlogbookentrydialog.ui
   dialogs/addtelescopedialog.h dialogs/addtelescopedialog.cpp dialogs/addtelescopedialog.ui

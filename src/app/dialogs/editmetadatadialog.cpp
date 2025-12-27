@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to edit image metadata                                       *
  *                                                                              *
- * modified: 2025-11-01                                                         *
+ * modified: 2025-11-09                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,13 +23,19 @@
 #include "editmetadatadialog.h"
 #include "ui_editmetadatadialog.h"
 #include <fitsip/core/imagemetadata.h>
+#include <fitsip/core/db/database.h>
 
-EditMetadataDialog::EditMetadataDialog(QWidget *parent) :
-  QDialog(parent),
+EditMetadataDialog::EditMetadataDialog(QWidget *parent):QDialog(parent),
   ui(new Ui::EditMetadataDialog)
 {
   ui->setupUi(this);
   ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  Database* db = Database::get();
+  if (db)
+  {
+    ui->telescopeBox->addItems(db->getTelescopeList());
+    ui->instrumentBox->addItems(db->getCameraList());
+  }
 }
 
 EditMetadataDialog::~EditMetadataDialog()
@@ -41,8 +47,8 @@ void EditMetadataDialog::displayMetadata(const ImageMetadata &data)
 {
   ui->objectField->setText(data.getObject());
   ui->observerField->setText(data.getObserver());
-  ui->telescopeField->setText(data.getTelescope());
-  ui->instrumentField->setText(data.getInstrument());
+  ui->telescopeBox->setCurrentText(data.getTelescope());
+  ui->instrumentBox->setCurrentText(data.getInstrument());
   ui->exposureField->setText(QString::number(data.getExposureTime()));
   ui->dateField->setDateTime(data.getObsDateTime());
   ui->tableWidget->clearContents();
@@ -63,8 +69,8 @@ void EditMetadataDialog::commit(ImageMetadata &data)
   {
     data.setObject(ui->objectField->text());
     data.setObserver(ui->observerField->text());
-    data.setTelescope(ui->telescopeField->text());
-    data.setInstrument(ui->instrumentField->text());
+    data.setTelescope(ui->telescopeBox->currentText());
+    data.setInstrument(ui->instrumentBox->currentText());
     data.setExposureTime(ui->exposureField->text().toDouble());
     data.setObsDateTime(ui->dateField->dateTime());
   }

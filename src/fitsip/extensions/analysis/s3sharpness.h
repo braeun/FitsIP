@@ -15,6 +15,8 @@ struct S3SharpnessData
   QFileInfo info;
   std::string filename;
   double s3 = 0;
+  double s3min = 0;
+  double s3max = 0;
   std::vector<std::shared_ptr<FitsObject>> images;
 };
 
@@ -62,6 +64,7 @@ private:
   int spectralBlocksize;
   int spectralOverlap;
   int spatialBlocksize;
+  int contrastBlockSize;
   double sigmoid_t1;
   double sigmoid_t2;
   double contrast_t1;

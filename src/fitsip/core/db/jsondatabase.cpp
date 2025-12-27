@@ -24,9 +24,9 @@ JsonDatabase::JsonDatabase(QString name, QString driver, QString host, QString u
   load();
 }
 
-std::vector<QString> JsonDatabase::getCameraList()
+QStringList JsonDatabase::getCameraList()
 {
-  std::vector<QString> list;
+  QStringList list;
   for (const auto& c : cameras)
   {
     list.push_back(c.getName());
@@ -90,9 +90,9 @@ bool JsonDatabase::updateCamera(const Camera& c)
   return save();
 }
 
-std::vector<QString> JsonDatabase::getTelescopeList()
+QStringList JsonDatabase::getTelescopeList()
 {
-  std::vector<QString> list;
+  QStringList list;
   for (const auto& t : telescopes)
   {
     list.push_back(t.getName());

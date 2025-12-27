@@ -41,9 +41,9 @@ SQLDatabase::SQLDatabase(QString name, QString driver, QString host, QString use
   assertTables();
 }
 
-std::vector<QString> SQLDatabase::getCameraList()
+QStringList SQLDatabase::getCameraList()
 {
-  std::vector<QString> list;
+  QStringList list;
   QSqlDatabase db = QSqlDatabase::database(connectionName);
   if (!(db.isValid() && db.isOpen()))
   {
@@ -165,9 +165,9 @@ bool SQLDatabase::updateCamera(const Camera& c)
   return true;
 }
 
-std::vector<QString> SQLDatabase::getTelescopeList()
+QStringList SQLDatabase::getTelescopeList()
 {
-  std::vector<QString> list;
+  QStringList list;
   QSqlDatabase db = QSqlDatabase::database(connectionName);
   if (!(db.isValid() && db.isOpen()))
   {

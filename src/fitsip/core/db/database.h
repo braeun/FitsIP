@@ -3,6 +3,7 @@
 
 #include "camera.h"
 #include "telescope.h"
+#include <QStringList>
 #include <memory>
 #include <map>
 #include <vector>
@@ -12,7 +13,7 @@ class Database
 public:
   Database();
 
-  virtual std::vector<QString> getCameraList() = 0;
+  virtual QStringList getCameraList() = 0;
 
   virtual  std::vector<Camera> getCameras() = 0;
 
@@ -24,7 +25,7 @@ public:
 
   virtual bool updateCamera(const Camera& c) = 0;
 
-  virtual std::vector<QString> getTelescopeList() = 0;
+  virtual QStringList getTelescopeList() = 0;
 
   virtual  std::vector<Telescope> getTelescopes() = 0;
 

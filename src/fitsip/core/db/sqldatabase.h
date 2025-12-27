@@ -9,7 +9,7 @@ class SQLDatabase: public Database
 public:
   SQLDatabase(QString name, QString driver, QString host, QString user, QString pwd);
 
-  virtual std::vector<QString> getCameraList() override;
+  virtual QStringList getCameraList() override;
 
   virtual  std::vector<Camera> getCameras() override;
 
@@ -21,7 +21,7 @@ public:
 
   virtual bool updateCamera(const Camera& c) override;
 
-  virtual std::vector<QString> getTelescopeList() override;
+  virtual QStringList getTelescopeList() override;
 
   virtual  std::vector<Telescope> getTelescopes() override;
 
