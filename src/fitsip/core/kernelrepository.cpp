@@ -22,6 +22,7 @@
 
 #include "kernelrepository.h"
 #include <algorithm>
+#include <cmath>
 
 static const Kernel EMPTY;
 
@@ -43,6 +44,7 @@ const char* KernelRepository::CRISPEN2 = "Crispen 2 (3x3)";
 const char* KernelRepository::SOBEL_X = "Sobel X (3x3)";
 const char* KernelRepository::SOBEL_Y = "Sobel Y (3x3)";
 const char* KernelRepository::LAPLACIAN = "Laplacian";
+const char* KernelRepository::LAPLACIAN2 = "Laplacian2";
 
 KernelRepository::KernelRepository()
 {
@@ -67,9 +69,10 @@ KernelRepository::KernelRepository()
   kernels.insert(std::make_pair(SOBEL_Y,Kernel(SOBEL_Y,"Generic",3,3,{{-1,-2,-1},{0,0,0},{1,2,1}})));
 
   kernels.insert(std::make_pair(LAPLACIAN,Kernel(LAPLACIAN,"Generic",3,3,{{0,-1,0},{-1,4,-1},{0,-1,0}})));
+  kernels.insert(std::make_pair(LAPLACIAN2,Kernel(LAPLACIAN2,"Generic",3,3,{{-1,-1,-1},{-1,8,-1},{-1,-1,-1}})));
 }
 
-std::vector<QString> KernelRepository::getKernelNames() const
+std::vector<QString> KernelRepository::getPredefinedKernelNames() const
 {
   std::vector<QString> list;
   for (const auto& entry : kernels) list.push_back(entry.first);
@@ -77,10 +80,54 @@ std::vector<QString> KernelRepository::getKernelNames() const
   return list;
 }
 
-const Kernel& KernelRepository::getKernel(const QString &name)
+const Kernel& KernelRepository::getKernel(const QString &name) const
 {
   if (kernels.find(name) == kernels.end()) return EMPTY;
   return kernels.at(name);
+}
+
+Kernel KernelRepository::createGaussianKernel(double sigma, double accuracy) const
+{
+  if (sigma <= 0) throw std::invalid_argument("sigma must be > 0");
+  if (accuracy <= 0) throw std::invalid_argument("accuracy must be > 0");
+  int size = 2 * static_cast<int>(ceil(sigma * sqrt(-2 * ::log(accuracy)))) + 1;
+  int center = size / 2;
+  double s2 = 2 * sigma * sigma;
+  double norm = 1.0 / (M_PI * s2);
+  std::vector<std::vector<ValueType>> data;
+  for (int j=0;j<size;++j)
+  {
+    double j2 = (j - center) * (j - center);
+    for (int i=0;i<size;++i)
+    {
+      double i2 = (i - center) * (i - center);
+      data[j][i] = norm * ::exp((i2+j2)/s2);
+    }
+  }
+  return Kernel(QString::asprintf("Gaussian %.2f sigma",sigma),"gaussian",size,size,data);
+}
+
+Kernel KernelRepository::createLoGKernel(double sigma, double accuracy) const
+{
+  if (sigma <= 0) throw std::invalid_argument("sigma must be > 0");
+  if (accuracy <= 0) throw std::invalid_argument("accuracy must be > 0");
+  int size = 2 * static_cast<int>(ceil(sigma * sqrt(-2 * ::log(accuracy)))) + 1;
+  /* empirically increase size for the laplacian */
+  size += 2;
+  int center = size / 2;
+  double s2 = 2 * sigma * sigma;
+  double norm = -1.0 / (M_PI * sigma * sigma * sigma * sigma);
+  std::vector<std::vector<ValueType>> data;
+  for (int j=0;j<size;++j)
+  {
+    double j2 = (j - center) * (j - center);
+    for (int i=0;i<size;++i)
+    {
+      double i2 = (i - center) * (i - center);
+      data[j][i] = norm * (1 - (i2+j2)/s2) * ::exp((i2+j2)/s2);
+    }
+  }
+  return Kernel(QString::asprintf("Gaussian %.2f sigma",sigma),"gaussian",size,size,data);
 }
 
 KernelRepository& KernelRepository::instance()

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - python scripting                                                    *
  *                                                                              *
- * modified: 2025-05-30                                                         *
+ * modified: 2025-12-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -30,8 +30,6 @@
 #include <fitsip/core/opplugin.h>
 #include <fitsip/core/pluginfactory.h>
 #include <fitsip/core/scriptutilities.h>
-#include <iostream>
-#include <functional>
 #include <QApplication>
 #include <QFileInfo>
 #include <pybind11/stl.h>
@@ -235,7 +233,9 @@ void PythonScript::bindKernel(py::module_& m)
       .def_readonly_static("SOBEL_Y",&KernelRepository::SOBEL_Y)
       .def_readonly_static("LAPLACIAN",&KernelRepository::LAPLACIAN)
       .def_static("get_kernel",[](const std::string& name){return KernelRepository::instance().getKernel(QString::fromStdString(name));})
-      .def_static("get_names",[](){return ScriptUtilities::convertStringList(KernelRepository::instance().getKernelNames());})
+      .def_static("get_names",[](){return ScriptUtilities::convertStringList(KernelRepository::instance().getPredefinedKernelNames());})
+      .def_static("create_gaussian",[](double sigma){return KernelRepository::instance().createGaussianKernel(sigma);})
+      .def_static("create_log",[](double sigma){return KernelRepository::instance().createLoGKernel(sigma);})
       ;
 }
 

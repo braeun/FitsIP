@@ -36,6 +36,7 @@ private:
 
   Ui::S3SharpnessResultDialog *ui;
   std::vector<S3SharpnessData> entries;
+  QString lastFilter;
 };
 
 #endif // S3SHARPNESSRESULTDIALOG_H

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - measure the sharpness of images - result dialog                     *
  *                                                                              *
- * modified: 2025-02-10                                                         *
+ * modified: 2025-12-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -50,14 +50,12 @@ signals:
   void writeToLogbook();
   void fileListChanged();
 
-private slots:
-  void on_removeRowsButton_clicked();
-
-  void on_saveButton_clicked();
-
-  void on_logButton_clicked();
-
 private:
+  void removeRows();
+  void save();
+  void writeToLog();
+  void discardPercent();
+
   Ui::MeasureSharpnessResultDialog *ui;
   std::vector<SharpnessData> entries;
 };

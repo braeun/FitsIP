@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - average of a list of values                                         *
  *                                                                              *
- * modified: 2025-02-15                                                         *
+ * modified: 2025-12-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -31,7 +31,7 @@ public:
   Average();
   Average(const std::vector<double>& list);
 
-  inline void add(double d);
+  inline void add(double v);
 
   int getN() const;
 
@@ -39,19 +39,25 @@ public:
 
   double getVariance() const;
 
+  inline Average& operator+=(double v);
+
 private:
   int n;
   double sum;
   double sum2;
 };
 
-void Average::add(double d)
+void Average::add(double v)
 {
   ++n;
-  sum += d;
-  sum2 += d * d;
+  sum += v;
+  sum2 += v * v;
 }
 
-
+Average& Average::operator+=(double v)
+{
+  add(v);
+  return *this;
+}
 
 #endif // AVERAGE_H

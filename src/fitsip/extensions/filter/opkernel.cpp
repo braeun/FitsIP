@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - kernel filter                                                       *
  *                                                                              *
- * modified: 2025-03-18                                                         *
+ * modified: 2025-12-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -24,7 +24,6 @@
 #include "opkerneldialog.h"
 #include <fitsip/core/fitsimage.h>
 #include <fitsip/core/kernelrepository.h>
-#include <iostream>
 
 #ifdef USE_PYTHON
 #undef SLOT
@@ -67,7 +66,7 @@ OpPlugin::ResultType OpKernel::execute(std::shared_ptr<FitsObject> image, const 
 {
   if (!dlg) dlg = new OpKernelDialog();
   dlg->setSourceImage(image->getImage(),data.aoi,data.previewOptions);
-  dlg->setKernelNames(KernelRepository::instance().getKernelNames());
+  dlg->setKernelNames(KernelRepository::instance().getPredefinedKernelNames());
   if (!dlg->exec()) return CANCELLED;
   Kernel kernel = KernelRepository::instance().getKernel(dlg->getKernelName());
   if (kernel.isEmpty()) return ERROR;

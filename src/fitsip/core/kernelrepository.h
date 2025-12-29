@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - kernel repository for filters                                       *
  *                                                                              *
- * modified: 2022-11-21                                                         *
+ * modified: 2025-12-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -32,9 +32,25 @@ class KernelRepository
 public:
   KernelRepository();
 
-  std::vector<QString> getKernelNames() const;
+  std::vector<QString> getPredefinedKernelNames() const;
 
-  const Kernel& getKernel(const QString& name);
+  const Kernel& getKernel(const QString& name) const;
+
+  /**
+   * @brief Create a Gaussian kernel with a given sigma and accuracy.
+   * @param sigma the sigma in pixels
+   * @param accuracy the accuracy in percent of the peak value
+   * @return the kernel
+   */
+  Kernel createGaussianKernel(double sigma, double accuracy=0.01) const;
+
+  /**
+   * @brief Create a Laplacian of Gaussian kernel with a given sigma and accuracy.
+   * @param sigma the sigma of the Gaussian in pixels
+   * @param accuracy the accuracy in percent of the peak value of the Gaussian function
+   * @return the kernel
+   */
+  Kernel createLoGKernel(double sigma, double accuracy=0.01) const;
 
   static KernelRepository& instance();
 
@@ -54,6 +70,7 @@ public:
   static const char* SOBEL_X;
   static const char* SOBEL_Y;
   static const char* LAPLACIAN;
+  static const char* LAPLACIAN2;
 
 private:
   std::map<QString,Kernel> kernels;

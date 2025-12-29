@@ -26,7 +26,6 @@
 #include "fitstypes.h"
 #include <QRect>
 #include <vector>
-#include <memory>
 
 class FitsImage;
 

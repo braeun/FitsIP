@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - measure the sharpness of images                                     *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-12-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -116,10 +116,14 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<QFileInfo>& lis
       normvaravg.add(entry.normalizedVariance);
     }
   }
-  if (prog) prog->deleteLater();
+  if (prog)
+  {
+    prog->hide();
+    prog->deleteLater();
+  }
   if (results.empty()) return CANCELLED;
   log(QString::asprintf("Average sharpness: %g +- %g",normvaravg.getMean(),sqrt(normvaravg.getVariance())));
-  std::sort(results.begin(),results.end(),[](const SharpnessData& e1, const SharpnessData& e2){return e1.normalizedVariance>e2.normalizedVariance;});
+  std::sort(results.begin(),results.end(),[](const SharpnessData& e1, const SharpnessData& e2){return e1.variance>e2.variance;});
   resultDialog->setResult(results);
   resultDialog->exec();
   filelist = resultDialog->getFileList();
@@ -157,7 +161,7 @@ OpPlugin::ResultType MeasureSharpness::execute(const std::vector<std::shared_ptr
   if (prog) prog->deleteLater();
   if (results.empty()) return CANCELLED;
   log(QString::asprintf("Average sharpness: %g +- %g",normvaravg.getMean(),sqrt(normvaravg.getVariance())));
-  std::sort(results.begin(),results.end(),[](const SharpnessData& e1, const SharpnessData& e2){return e1.normalizedVariance>e2.normalizedVariance;});
+  std::sort(results.begin(),results.end(),[](const SharpnessData& e1, const SharpnessData& e2){return e1.variance>e2.variance;});
   QApplication::processEvents();
   resultDialog->setResult(results);
   resultDialog->exec();
@@ -216,14 +220,15 @@ SharpnessData MeasureSharpness::calculateSharpness(const FitsImage& img, QRect s
   }
   data.mean = avg.getMean();
   data.variance = avg.getVariance();
-  double delta = data.maxPixel - data.minPixel;
+  // TODO: is this really the case or relevant???
   /*
    * The absolute value of the variance also depends on the image
    * brightness. The same image with half the brightness has only
    * a quarter of the variance. Thus we normalize with the square
-   * of the maximum brightness difference to account for different
+   * of the mean image brightness to account for different
    * brightness.
    */
+  double delta = stat.getGlobalStatistics().meanValue;
   if (delta >= 0) data.normalizedVariance = data.variance / (delta * delta);
   return data;
 }

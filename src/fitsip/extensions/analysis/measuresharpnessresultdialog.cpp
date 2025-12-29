@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - measure the sharpness of images - result dialog                     *
  *                                                                              *
- * modified: 2025-02-12                                                         *
+ * modified: 2025-12-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -33,6 +33,10 @@ MeasureSharpnessResultDialog::MeasureSharpnessResultDialog(QWidget *parent):QDia
 {
   ui->setupUi(this);
   ui->resultTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
+  connect(ui->removeRowsButton,&QPushButton::clicked,this,&MeasureSharpnessResultDialog::removeRows);
+  connect(ui->saveButton,&QPushButton::clicked,this,&MeasureSharpnessResultDialog::save);
+  connect(ui->logButton,&QPushButton::clicked,this,&MeasureSharpnessResultDialog::writeToLog);
+  connect(ui->discardButton,&QPushButton::clicked,this,&MeasureSharpnessResultDialog::discardPercent);
 }
 
 MeasureSharpnessResultDialog::~MeasureSharpnessResultDialog()
@@ -78,7 +82,7 @@ std::vector<QFileInfo> MeasureSharpnessResultDialog::getFileList() const
 
 
 
-void MeasureSharpnessResultDialog::on_removeRowsButton_clicked()
+void MeasureSharpnessResultDialog::removeRows()
 {
   std::vector<SharpnessData> list;
   for (int32_t row=0;row<ui->resultTable->rowCount();row++)
@@ -92,7 +96,7 @@ void MeasureSharpnessResultDialog::on_removeRowsButton_clicked()
   emit fileListChanged();
 }
 
-void MeasureSharpnessResultDialog::on_saveButton_clicked()
+void MeasureSharpnessResultDialog::save()
 {
   QString filter;
   QString fn = Settings().getSaveFilename(this,Settings::PATH_IMAGE,IOFactory::filelist_filter+QString(";;")+IOFactory::csv_filter+QString(";;")+IOFactory::all_files_filter,&filter);
@@ -123,8 +127,21 @@ void MeasureSharpnessResultDialog::on_saveButton_clicked()
   }
 }
 
-void MeasureSharpnessResultDialog::on_logButton_clicked()
+void MeasureSharpnessResultDialog::writeToLog()
 {
   emit writeToLogbook();
 }
 
+
+void MeasureSharpnessResultDialog::discardPercent()
+{
+  int p = ui->discardBox->value();
+  if (p > 0)
+  {
+    int n = entries.size() * p / 100;
+    std::vector<SharpnessData> list;
+    list.insert(list.begin(),entries.begin(),entries.begin()+(entries.size()-n));
+    setResult(list);
+    emit fileListChanged();
+  }
+}

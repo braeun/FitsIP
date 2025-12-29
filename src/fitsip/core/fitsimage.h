@@ -203,6 +203,14 @@ public:
    */
   FitsImage paddedImage(int w, int h) const;
 
+  /**
+   * @brief Return a downsampled image
+   * @param factor the downsampling factor
+   * @param avg if true, average over the pixels
+   * @return
+   */
+  FitsImage downsampledImage(int factor, bool avg=true);
+
   void blit(const FitsImage& src, int x, int y, int w, int h, int xd, int yd);
 
   /**

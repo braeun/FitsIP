@@ -358,6 +358,50 @@ FitsImage FitsImage::paddedImage(int w, int h) const
   return img;
 }
 
+FitsImage FitsImage::downsampledImage(int factor, bool avg)
+{
+  if (factor <= 1) return *this;
+  int w = width / factor;
+  int h = height / factor;
+  FitsImage img(name,w,h,getDepth());
+  for (int d=0;d<getDepth();d++)
+  {
+    ValueType* dst = img.getLayer(d).getData();
+    const ValueType* src = getLayer(d).getData();
+    for (int j=0;j<h;++j)
+    {
+      for (int i=0;i<w;++i)
+      {
+        int j0 = j * factor;
+        int i0 = i * factor;
+        if (avg)
+        {
+          ValueType v = 0;
+          for (int l=0;l<factor;++l)
+          {
+            for (int k=0;k<factor;++k)
+            {
+              v += src[(j0+l)*width+i0+k];
+            }
+          }
+          *dst = v / (factor * factor);
+        }
+        else
+        {
+          *dst = src[j0*width+i0];
+        }
+      }
+    }
+    for (int i=0;i<height;++i)
+    {
+      memcpy(dst,src,width*sizeof(ValueType));
+      dst += w;
+      src += width;
+    }
+  }
+  return img;
+}
+
 void FitsImage::blit(const FitsImage& src, int x, int y, int w, int h, int xd, int yd)
 {
   for (int d=0;d<getDepth();++d)

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-03-13                                                         *
+ * modified: 2025-12-27                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -71,7 +71,7 @@ QString Settings::getOpenFilename(QWidget* parent, const QString &setting, const
   if (!fn.isNull())
   {
     QFileInfo info(fn);
-    settings.setValue(setting,info.filePath());
+    settings.setValue(setting,info.absolutePath());
   }
   return fn;
 }
@@ -83,7 +83,7 @@ QString Settings::getSaveFilename(QWidget* parent, const QString &setting, const
   if (!fn.isNull())
   {
     QFileInfo info(fn);
-    settings.setValue(setting,info.filePath());
+    settings.setValue(setting,info.absolutePath());
   }
   return fn;
 }
