@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-08-19                                                         *
+ * modified: 2025-12-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -50,6 +50,15 @@ public:
   QString getSaveFilename(QWidget* parent, const QString& setting, const QString& filter=QString(), QString* selectedFilter=nullptr);
 
   QString getExistingDirectory(QWidget* parent, const QString& setting);
+
+  /**
+   * @brief Define whether the root path should always be used as the initial
+   *        path in Open/Save-Dialogs.
+   * @param flag true if the root path is to be used
+   */
+  void setAlwaysUseRootPath(bool flag);
+
+  bool isAlwaysUseRootPath() const;
 
   /**
    * @brief Set the default width for previews in plugins.
@@ -141,16 +150,21 @@ public:
 
 
   static const char* PATH_IMAGE;    //!< key for fits image path
-
   static const char* PATH_EXPORT;   //!< key for export image path
-
   static const char* PATH_LOGBOOK;  //!< key for logbook path
-
   static const char* PATH_SCRIPT;    //!< key for script path
+  static const char* PATH_LOG;
+  static const char* PATH_ROOT;
+  static const char* PATH_PLUGIN;
+  static const char* PATH_FILELIST;
+  static const char* PATH_PIXELLIST;
+  static const char* PATH_STARLIST;
+  static const char* PATH_PROFILE;
+  static const char* PATH_LAST;
 
 protected:
   QSettings settings;
-
+  bool alwaysUseRoot;
 };
 
 #endif // SETTINGS_H

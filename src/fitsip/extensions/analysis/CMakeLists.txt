@@ -29,8 +29,8 @@ target_compile_options(fitsanalysis PRIVATE -fPIC)
 
 target_link_libraries(fitsanalysis
   PUBLIC fitsip::core
-  PUBLIC Qt5::Widgets
-  PUBLIC Qt5::Core
+  PUBLIC Qt::Widgets
+  PUBLIC Qt::Core
   )
 
 if (FFTW_FOUND)

@@ -1,6 +1,6 @@
 # Fits - vanCittert deconvolution plugin
 #
-# modified: 2025-05-28
+# modified: 2026-07-23
 
 
 add_library(fitsvancittert SHARED
@@ -22,8 +22,8 @@ target_compile_options(fitsvancittert PRIVATE -fPIC)
 
 target_link_libraries(fitsvancittert
   PUBLIC fitsip::core
-  PUBLIC Qt5::Widgets
-  PUBLIC Qt5::Core
+  PUBLIC Qt::Widgets
+  PUBLIC Qt::Core
   PUBLIC PkgConfig::FFTW
   )
 

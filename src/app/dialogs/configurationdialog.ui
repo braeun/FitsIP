@@ -296,6 +296,22 @@
            </widget>
           </item>
           <item>
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="title">
+             <string>File Dialogs</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_8">
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="initialRootBox">
+               <property name="text">
+                <string>always use image root initial path</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_2">
             <property name="orientation">
              <enum>Qt::Vertical</enum>

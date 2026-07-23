@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - image object                                                        *
  *                                                                              *
- * modified: 2025-10-24                                                         *
+ * modified: 2025-12-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -311,6 +311,7 @@ FitsImage FitsImage::subImage(const QRect &r) const
       src += getWidth();
     }
   }
+  img.setMetadata(metadata);
   return img;
 }
 
@@ -336,6 +337,7 @@ FitsImage FitsImage::resizedImage(int w, int h) const
       src += width;
     }
   }
+  img.setMetadata(metadata);
   return img;
 }
 
@@ -355,6 +357,7 @@ FitsImage FitsImage::paddedImage(int w, int h) const
       src += width;
     }
   }
+  img.setMetadata(metadata);
   return img;
 }
 
@@ -399,6 +402,7 @@ FitsImage FitsImage::downsampledImage(int factor, bool avg)
       src += width;
     }
   }
+  img.setMetadata(metadata);
   return img;
 }
 

@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - metadata for the image                                              *
  *                                                                              *
- * modified: 2025-03-14                                                         *
+ * modified: 2026-07-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -21,6 +21,7 @@
  ********************************************************************************/
 
 #include "imagemetadata.h"
+#include <QTimeZone>
 
 static const char* keyObject = "OBJECT";
 static const char* keyInstrument = "INSTRUME";
@@ -148,7 +149,7 @@ QDateTime ImageMetadata::getObsDateTime() const
   {
     QDate d = QDate::fromString(date,Qt::ISODate);
     QTime t = QTime::fromString(time,Qt::ISODate);
-    return QDateTime(d,t,Qt::UTC);
+    return QDateTime(d,t,QTimeZone(Qt::UTC));
   }
   return QDateTime();
 }

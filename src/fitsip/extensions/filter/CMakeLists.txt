@@ -31,8 +31,8 @@ target_compile_options(fitsfilter PRIVATE -fPIC)
 target_link_libraries(fitsfilter
   PUBLIC fitsip::coreplugins
   PUBLIC fitsip::core
-  PUBLIC Qt5::Widgets
-  PUBLIC Qt5::Core
+  PUBLIC Qt::Widgets
+  PUBLIC Qt::Core
   )
 
 if (USE_PYTHON)

@@ -40,9 +40,9 @@ public:
 
   void updatePSFList();
 
-  QString getFunction() const;
+  QString getFunction();
 
-  std::vector<ValueType> getParameters() const;
+  std::vector<ValueType> getParameters();
 
 signals:
   void functionSelected(QString name);
@@ -51,6 +51,8 @@ private:
   void selectionChanged(const QString &text);
 
   Ui::PSFWidget *ui;
+  QString lastFunction;
+  std::vector<ValueType> lastParameters;
 };
 
 #endif // PSFWIDGET_H

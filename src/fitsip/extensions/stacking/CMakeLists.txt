@@ -24,8 +24,8 @@ target_link_libraries(fitsstacking
 #  PUBLIC fitsip::matching
 #  PUBLIC fitsip::coreplugins
   PUBLIC fitsip::core
-  PUBLIC Qt5::Widgets
-  PUBLIC Qt5::Core
+  PUBLIC Qt::Widgets
+  PUBLIC Qt::Core
   )
 
 if (USE_PYTHON)

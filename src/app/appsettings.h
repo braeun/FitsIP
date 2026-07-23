@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2025-05-28                                                         *
+ * modified: 2025-12-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -96,14 +96,6 @@ public:
 
   static const char* MAINWINDOW_STATE;
   static const char* MAINWINDOW_GEOMETRY;
-  static const char* PATH_LOG;
-  static const char* PATH_ROOT;
-  static const char* PATH_PLUGIN;
-  static const char* PATH_FILELIST;
-  static const char* PATH_PIXELLIST;
-  static const char* PATH_STARLIST;
-  static const char* PATH_PROFILE;
-  static const char* PATH_LAST;
 
 };
 

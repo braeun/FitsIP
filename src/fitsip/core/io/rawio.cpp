@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - DSLR raw image format reader                                        *
  *                                                                              *
- * modified: 2025-11-03                                                         *
+ * modified: 2026-07-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -96,7 +96,7 @@ std::vector<std::shared_ptr<FitsObject>> RawIO::read(QString filename)
     meta.setExposureTime(ip.imgdata.other.shutter);
     meta.setObserver(ip.imgdata.other.artist);
     meta.setInstrument(ip.imgdata.idata.model);
-    meta.setObsDateTime(QDateTime::fromTime_t(ip.imgdata.other.timestamp));
+    meta.setObsDateTime(QDateTime::fromSecsSinceEpoch(ip.imgdata.other.timestamp));
     img.setMetadata(meta);
     profiler.stop();
     logProfiler(img,"read");

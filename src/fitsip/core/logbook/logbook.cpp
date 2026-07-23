@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - log book for logging image processing steps                         *
  *                                                                              *
- * modified: 2025-06-08                                                         *
+ * modified: 2025-12-31                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,10 +28,8 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
-#ifdef HAVE_INJA
-#include <inja/inja.hpp>
-#include <nlohmann/json.hpp>
-#endif
+#include "../io/inja.hpp"
+#include "../io/json.hpp"
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -240,7 +238,6 @@ bool Logbook::exportToFile(const QString &file)
   return exportPlainText(file);
 }
 
-#ifdef HAVE_INJA
 bool Logbook::exportToFile(const QString& file, QString templ)
 {
   if (!store) return false;
@@ -289,7 +286,6 @@ nlohmann::json Logbook::toJson() const
   }
   return json;
 }
-#endif
 
 std::vector<QString> Logbook::getTemplates()
 {

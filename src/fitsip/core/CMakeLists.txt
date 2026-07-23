@@ -32,6 +32,7 @@ add_library(fitscore SHARED
   db/camera.cpp
   db/cameratablemodel.cpp
   db/database.cpp
+  db/jsondatabase.cpp
   db/sqldatabase.cpp
   db/telescope.cpp
   db/telescopetablemodel.cpp
@@ -123,6 +124,7 @@ target_sources(fitscore PUBLIC
   db/camera.h
   db/cameratablemodel.h
   db/database.h
+  db/jsondatabase.h
   db/sqldatabase.h
   db/telescope.h
   db/telescopetablemodel.h
@@ -222,27 +224,14 @@ if (USE_PYTHON)
   # )
 endif()
 
-if (nlohmann_json_FOUND)
-  target_sources(fitscore PRIVATE
-    db/jsondatabase.cpp
-  )
-  target_sources(fitscore PUBLIC
-    FILE_SET HEADERS TYPE HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../.." "${CMAKE_CURRENT_BINARY_DIR}/../.." FILES
-    db/jsondatabase.h
-  )
-  target_link_libraries(fitscore
-    PUBLIC nlohmann_json::nlohmann_json
-    )
-endif()
-
 target_link_libraries(fitscore
   PUBLIC PkgConfig::CCfits
   PUBLIC PkgConfig::cfitsio
   PUBLIC PkgConfig::QWT
-  PUBLIC Qt5::Xml
-  PUBLIC Qt5::Sql
-  PUBLIC Qt5::Widgets
-  PUBLIC Qt5::Core
+  PUBLIC Qt::Xml
+  PUBLIC Qt::Sql
+  PUBLIC Qt::Widgets
+  PUBLIC Qt::Core
   )
 
 set_target_properties(fitscore

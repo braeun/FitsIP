@@ -47,15 +47,15 @@ include(CMakePackageConfigHelpers)
 set(ENV{PKG_CONFIG_PATH} "${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig")
 find_package(PkgConfig REQUIRED)
 
-# check for Qt5
-find_package(Qt5 COMPONENTS Widgets Xml Sql REQUIRED)
+# check for Qt6
+find_package(Qt6 COMPONENTS Widgets Xml Sql REQUIRED)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # check for QWT charts
-pkg_check_modules(QWT IMPORTED_TARGET Qt5Qwt6)
+pkg_check_modules(QWT IMPORTED_TARGET Qt6Qwt6)
 
 # check for CCfits library
 pkg_check_modules(cfitsio IMPORTED_TARGET REQUIRED cfitsio)
@@ -89,14 +89,6 @@ if (Python3_FOUND)
 else()
   message("python3 not found - not building python bindings")
 endif()
-
-# find the json package by nlohmann for I/O
-find_package(nlohmann_json)
-if (nlohmann_json_FOUND)
-  # find the inja template engine
-  find_package(inja)
-endif()
-
 
 
 

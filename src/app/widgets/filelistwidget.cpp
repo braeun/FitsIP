@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - widget containing a file list                                       *
  *                                                                              *
- * modified: 2025-08-19                                                         *
+ * modified: 2025-12-29                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -46,7 +46,7 @@ FileListWidget::FileListWidget(QWidget *parent) :
   connect(open,&QAction::triggered,this,[this](){emit openSelected();});
   QAction* copyToClipboard = contextMenu->addAction("Copy Selection to Clipboard");
   connect(copyToClipboard,&QAction::triggered,this,&FileListWidget::copySelectionToClipboard);
-  QAction* copyFiles = contextMenu->addAction("Copy Files...");
+  QAction* copyFiles = contextMenu->addAction("Copy Selected Files...");
   connect(copyFiles,&QAction::triggered,this,&FileListWidget::copyFiles);
   contextMenu->addSeparator();
   QAction* load = contextMenu->addAction("Load...");
@@ -245,6 +245,16 @@ void FileListWidget::copyFiles()
         if (!ret)
         {
           qWarning() << "Failed to copy " << info.absoluteFilePath() << " to " << dir.absoluteFilePath(info.fileName());
+        }
+        QString supportfile = info.baseName() + ".txt";
+        QString supportfilepath = info.absolutePath() + "/" + supportfile;
+        if (QFile::exists(supportfilepath))
+        {
+          bool ret = QFile::copy(supportfilepath,dir.absoluteFilePath(supportfile));
+          if (!ret)
+          {
+            qWarning() << "Failed to copy " << supportfilepath << " to " << dir.absoluteFilePath(supportfile);
+          }
         }
       }
     }

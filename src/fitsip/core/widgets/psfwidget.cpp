@@ -41,28 +41,48 @@ PSFWidget::~PSFWidget()
 
 void PSFWidget::updatePSFList()
 {
+  int index = -1;
   ui->functionBox->clear();
+  int i = 0;
   for (const auto& psf : PSFFactory::getInstance()->getList())
   {
     ui->functionBox->addItem(psf->getName());
+    if (lastFunction == psf->getName())
+    {
+      index = i;
+    }
+    ++i;
+  }
+  if (index >= 0)
+  {
+    ui->functionBox->setCurrentIndex(index);
+    selectionChanged(lastFunction);
+    if (ui->parameterTableWidget->rowCount() == lastParameters.size())
+    {
+      for (int row=0;row<ui->parameterTableWidget->rowCount();++row)
+      {
+        ui->parameterTableWidget->item(row,1)->setText(QString::number(lastParameters[row]));
+      }
+    }
   }
 }
 
 
 
-QString PSFWidget::getFunction() const
+QString PSFWidget::getFunction()
 {
-  return ui->functionBox->currentText();
+  lastFunction = ui->functionBox->currentText();
+  return lastFunction;
 }
 
-std::vector<ValueType> PSFWidget::getParameters() const
+std::vector<ValueType> PSFWidget::getParameters()
 {
-  std::vector<ValueType> parameters;
+  lastParameters.clear();
   for (int i=0;i<ui->parameterTableWidget->rowCount();i++)
   {
-    parameters.push_back(ui->parameterTableWidget->item(i,1)->text().toDouble());
+    lastParameters.push_back(ui->parameterTableWidget->item(i,1)->text().toDouble());
   }
-  return parameters;
+  return lastParameters;
 }
 
 

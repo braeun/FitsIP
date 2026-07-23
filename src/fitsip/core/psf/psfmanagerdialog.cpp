@@ -53,7 +53,7 @@ PSFManagerDialog::PSFManagerDialog(ImageCollection* collection, QWidget *parent)
   connect(ui->addImageButton,&QPushButton::clicked,this,[this](){addImagePSF();});
   connect(ui->deleteButton,&QPushButton::clicked,this,[this](){deletePSF();});
   connect(ui->renameButton,&QPushButton::clicked,this,[this](){renamePSF();});
-  connect(ui->fftInputBox,&QCheckBox::stateChanged,this,[this](){preview();});
+  connect(ui->fftInputBox,&QCheckBox::checkStateChanged,this,[this](){preview();});
   connect(ui->previewWidthBox,qOverload<int>(&QSpinBox::valueChanged),this,[this](int){preview();});
   connect(ui->previewHeightBox,qOverload<int>(&QSpinBox::valueChanged),this,[this](int){preview();});
   connect(psfWidget,&PSFWidget::functionSelected,this,[this](QString name){functionSelected(name);});

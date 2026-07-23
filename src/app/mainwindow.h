@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-11-01                                                         *
+ * modified: 2026-01-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -182,6 +182,8 @@ private slots:
   void on_actionPSF_Manager_triggered();
 
   void on_actionPlugins_triggered();
+
+  void on_actionClose_All_Images_Except_Current_triggered();
 
 private:
 

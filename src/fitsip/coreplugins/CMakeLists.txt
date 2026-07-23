@@ -63,8 +63,8 @@ target_compile_options(fitscoreplugins PRIVATE -fPIC)
 
 target_link_libraries(fitscoreplugins
   PUBLIC fitsip::core
-  PUBLIC Qt5::Widgets
-  PUBLIC Qt5::Core
+  PUBLIC Qt::Widgets
+  PUBLIC Qt::Core
   )
 
 if (USE_PYTHON)

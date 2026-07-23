@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - configuration dialog                                                *
  *                                                                              *
- * modified: 2025-03-13                                                         *
+ * modified: 2025-12-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -66,6 +66,7 @@ void ConfigurationDialog::commitFields(AppSettings &settings)
 {
   settings.setStyle(ui->styleBox->currentText());
   settings.setPalette(ui->paletteBox->currentText());
+  settings.setAlwaysUseRootPath(ui->initialRootBox->isChecked());
   settings.setAlwaysSaveFits(ui->alwaysSaveFitsBox->isChecked());
   settings.setWriteMetadataFile(ui->saveMetadataBox->isChecked());
   if (ui->fitsDoubleButton->isChecked())
@@ -99,6 +100,7 @@ void ConfigurationDialog::updateFields(const AppSettings &settings)
 {
   ui->styleBox->setCurrentText(settings.getStyle());
   ui->paletteBox->setCurrentText(settings.getPalette());
+  ui->initialRootBox->setChecked(settings.isAlwaysUseRootPath());
   ui->alwaysSaveFitsBox->setChecked(settings.isAlwaysSaveFits());
   ui->saveMetadataBox->setChecked(settings.isWriteMetadataFile());
   switch (settings.getFitsImageFormat())

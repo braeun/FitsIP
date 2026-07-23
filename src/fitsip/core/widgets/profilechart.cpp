@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - chart to display a profile                                          *
  *                                                                              *
- * modified: 2025-01-12                                                         *
+ * modified: 2026-07-23                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -28,6 +28,7 @@
 #include <qwt_plot_picker.h>
 #include <qwt_plot_zoomer.h>
 #include <QEvent>
+#include <QPen>
 
 ProfileChart::ProfileChart(QWidget* parent):QwtPlot(parent)
 {

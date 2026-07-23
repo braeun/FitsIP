@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - application settings                                                *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2025-12-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,15 +25,6 @@
 
 const char* AppSettings::MAINWINDOW_STATE = "mainwindow/state";
 const char* AppSettings::MAINWINDOW_GEOMETRY = "mainwindow/geometry";
-
-const char* AppSettings::PATH_LOG = "fits/path/log";
-const char* AppSettings::PATH_ROOT = "fits/path/root";
-const char* AppSettings::PATH_PLUGIN = "fits/path/plugin";
-const char* AppSettings::PATH_FILELIST = "fits/path/filelist";
-const char* AppSettings::PATH_PIXELLIST = "fits/path/pixellist";
-const char* AppSettings::PATH_STARLIST = "fits/path/starlist";
-const char* AppSettings::PATH_PROFILE = "fits/path/profile";
-const char* AppSettings::PATH_LAST = "fits/path/last";
 
 static const char* FILE_FILTERS = "files/filter";
 static const char* FILE_CURRENT_FILTER = "files/currentfilter";

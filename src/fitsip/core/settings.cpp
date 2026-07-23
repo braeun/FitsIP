@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - generic settings                                                    *
  *                                                                              *
- * modified: 2025-12-27                                                         *
+ * modified: 2025-12-30                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -26,12 +26,17 @@
 #include <QSettings>
 
 const char* Settings::PATH_IMAGE = "fits/path/image";
-
 const char* Settings::PATH_EXPORT = "fits/path/export";
-
 const char* Settings::PATH_LOGBOOK = "fits/path/logbook";
-
 const char* Settings::PATH_SCRIPT = "fits/path/script";
+const char* Settings::PATH_LOG = "fits/path/log";
+const char* Settings::PATH_ROOT = "fits/path/root";
+const char* Settings::PATH_PLUGIN = "fits/path/plugin";
+const char* Settings::PATH_FILELIST = "fits/path/filelist";
+const char* Settings::PATH_PIXELLIST = "fits/path/pixellist";
+const char* Settings::PATH_STARLIST = "fits/path/starlist";
+const char* Settings::PATH_PROFILE = "fits/path/profile";
+const char* Settings::PATH_LAST = "fits/path/last";
 
 static const char* PATH_INTERNAL = "fits/path/internal";
 
@@ -57,6 +62,7 @@ static const char* DB_PASSWORD = "fits/db/password";
 
 Settings::Settings()
 {
+  alwaysUseRoot = settings.value("fits/path/alwaysroot",false).toBool();
 }
 
 QString Settings::getString(const QString &setting, const QString &def)
@@ -66,9 +72,9 @@ QString Settings::getString(const QString &setting, const QString &def)
 
 QString Settings::getOpenFilename(QWidget* parent, const QString &setting, const QString &filter)
 {
-  QString path = settings.value(setting,".").toString();
+  QString path = settings.value(alwaysUseRoot?PATH_ROOT:setting,".").toString();
   QString fn = QFileDialog::getOpenFileName(parent,QApplication::applicationDisplayName(),path,filter);
-  if (!fn.isNull())
+  if (!fn.isNull() && !alwaysUseRoot)
   {
     QFileInfo info(fn);
     settings.setValue(setting,info.absolutePath());
@@ -78,9 +84,9 @@ QString Settings::getOpenFilename(QWidget* parent, const QString &setting, const
 
 QString Settings::getSaveFilename(QWidget* parent, const QString &setting, const QString &filter, QString* selectedFilter)
 {
-  QString path = settings.value(setting,".").toString();
+  QString path = settings.value(alwaysUseRoot?PATH_ROOT:setting,".").toString();
   QString fn = QFileDialog::getSaveFileName(parent,QApplication::applicationDisplayName(),path,filter,selectedFilter);
-  if (!fn.isNull())
+  if (!fn.isNull() && !alwaysUseRoot)
   {
     QFileInfo info(fn);
     settings.setValue(setting,info.absolutePath());
@@ -94,6 +100,16 @@ QString Settings::getExistingDirectory(QWidget *parent, const QString &setting)
   QString dir = QFileDialog::getExistingDirectory(parent,QApplication::applicationDisplayName(),path);
   if (!dir.isEmpty()) settings.setValue(setting,dir);
   return dir;
+}
+
+void Settings::setAlwaysUseRootPath(bool flag)
+{
+  alwaysUseRoot = flag;
+}
+
+bool Settings::isAlwaysUseRootPath() const
+{
+  return alwaysUseRoot;
 }
 
 void Settings::setPreviewWidth(int w)

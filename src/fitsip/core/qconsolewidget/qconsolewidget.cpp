@@ -1,6 +1,6 @@
 #include "qconsolewidget.h"
 #include "qconsoleiodevice.h"
-
+#include <QFile>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QKeyEvent>

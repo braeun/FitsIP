@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - main application window                                             *
  *                                                                              *
- * modified: 2025-11-08                                                         *
+ * modified: 2026-01-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -94,6 +94,8 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent),
   openFileListMenu->addAction("Copy",this,[=](){copyImage();});
   openFileListMenu->addSeparator();
   openFileListMenu->addAction("Close",this,[=](){on_actionClose_Image_triggered();});
+  openFileListMenu->addAction("Close All",this,[=](){on_actionClose_All_Images_triggered();});
+  openFileListMenu->addAction("Close All Except Current",this,[=](){on_actionClose_All_Images_Except_Current_triggered();});
 
   imageContextMenu = new QMenu;
   imageContextMenu->addAction("Add Pixel",this,[=](){addPixel(imageContextMenuAnchor);});
@@ -1391,7 +1393,7 @@ void MainWindow::on_actionAdd_Current_Image_to_List_triggered()
 
 void MainWindow::on_actionExport_Logbook_triggered()
 {
-#ifdef HAVE_INJA
+#if 1
   LogbookExportDialog d(this);
   if (d.exec())
   {
@@ -1506,3 +1508,9 @@ void MainWindow::showSysInfo()
   }
   sysinfoDialog->show();
 }
+
+void MainWindow::on_actionClose_All_Images_Except_Current_triggered()
+{
+  imageCollection->removeAllButActive();
+}
+

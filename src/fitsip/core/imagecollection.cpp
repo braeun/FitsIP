@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - collection of fits objects, i.e. opened images                      *
  *                                                                              *
- * modified: 2025-02-20                                                         *
+ * modified: 2026-01-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -95,6 +95,7 @@ std::shared_ptr<FitsObject> ImageCollection::removeActiveFile()
 
 void ImageCollection::removeAll()
 {
+  activeFile.reset();
   if (!files.empty())
   {
     QModelIndex parent;
@@ -102,6 +103,18 @@ void ImageCollection::removeAll()
     files.clear();
     endRemoveRows();
   }
+}
+
+void ImageCollection::removeAllButActive()
+{
+  if (!files.empty())
+  {
+    QModelIndex parent;
+    beginRemoveRows(parent,0,files.size()-1);
+    files.clear();
+    endRemoveRows();
+  }
+  addFile(activeFile);
 }
 
 void ImageCollection::addFile(std::shared_ptr<FitsObject> file)

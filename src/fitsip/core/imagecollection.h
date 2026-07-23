@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - collection of fits objects, i.e. opened images                      *
  *                                                                              *
- * modified: 2025-01-30                                                         *
+ * modified: 2026-01-01                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -55,6 +55,8 @@ public:
   std::shared_ptr<FitsObject> removeActiveFile();
 
   void removeAll();
+
+  void removeAllButActive();
 
   void addFile(std::shared_ptr<FitsObject> file);
 

@@ -27,8 +27,8 @@ target_compile_options(fitstestimages PRIVATE -fPIC)
 
 target_link_libraries(fitstestimages
   PUBLIC fitsip::core
-  PUBLIC Qt5::Widgets
-  PUBLIC Qt5::Core
+  PUBLIC Qt::Widgets
+  PUBLIC Qt::Core
   )
 
 if (USE_PYTHON)

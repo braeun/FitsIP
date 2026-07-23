@@ -317,6 +317,7 @@
     <addaction name="separator"/>
     <addaction name="actionClose_Image"/>
     <addaction name="actionClose_All_Images"/>
+    <addaction name="actionClose_All_Images_Except_Current"/>
     <addaction name="separator"/>
     <addaction name="menuFile_List"/>
     <addaction name="menuPixel_List"/>
@@ -1199,6 +1200,11 @@
   <action name="actionTelescopes">
    <property name="text">
     <string>Telescopes...</string>
+   </property>
+  </action>
+  <action name="actionClose_All_Images_Except_Current">
+   <property name="text">
+    <string>Close All Images Except Current</string>
    </property>
   </action>
   <zorder>historyDockWidget</zorder>

@@ -56,8 +56,8 @@ target_link_libraries(fits
 #  PRIVATE fitsip::coreplugins
   PRIVATE fitsip::core
   PRIVATE PkgConfig::QWT
-  PRIVATE Qt5::Xml
-  PRIVATE Qt5::Widgets
+  PRIVATE Qt::Xml
+  PRIVATE Qt::Widgets
 )
 
 if (FFTW_FOUND)
