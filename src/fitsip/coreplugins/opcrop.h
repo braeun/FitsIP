@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - crop image                                                          *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2026-08-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -48,7 +48,7 @@ public:
 
 private:
 
-  QRect findArea(const FitsImage& img, ValueType threshold, int border) const;
+  QRect findArea(const FitsImage& img, ValueType threshold, int neighbors, int border) const;
 
   OpCropDialog* dlg;
 

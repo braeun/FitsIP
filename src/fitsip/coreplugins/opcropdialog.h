@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to crop image                                                *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2026-08-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -45,6 +45,8 @@ public:
   QRect getSelection() const;
 
   ValueType getThreshold() const;
+
+  int getNeighbors() const;
 
   int getBorder() const;
 

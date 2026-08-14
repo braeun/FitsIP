@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - crop image                                                          *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2026-08-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -25,6 +25,7 @@
 #include <fitsip/core/fitsimage.h>
 #include <algorithm>
 #include <limits>
+#include <QMessageBox>
 
 #ifdef USE_PYTHON
 #undef SLOT
@@ -61,6 +62,7 @@ void OpCrop::bindPython(void* mod) const
 {
   py::module_* m = reinterpret_cast<py::module_*>(mod);
   m->def("crop",[](std::shared_ptr<FitsObject> obj, int x, int y, int w, int h){
+      if (!obj) return ERROR;
       QRect r(x,y,w,h);
       if (!r.isValid()) return ERROR;
       auto img = obj->getImage().subImage(r);
@@ -70,8 +72,9 @@ void OpCrop::bindPython(void* mod) const
       return OK;
     },
     "Crop the image",py::arg("obj"),py::arg("x"),py::arg("y"),py::arg("w"),py::arg("h"));
-  m->def("autocrop",[this](std::shared_ptr<FitsObject> obj, ValueType threshold, int border){
-      QRect r = findArea(obj->getImage(),threshold,border);
+  m->def("autocrop",[this](std::shared_ptr<FitsObject> obj, ValueType threshold, int neighbors, int border){
+      if (!obj) return ERROR;
+      QRect r = findArea(obj->getImage(),threshold,neighbors,border);
       if (!r.isValid()) return ERROR;
       auto img = obj->getImage().subImage(r);
       img.setMetadata(obj->getImage().getMetadata());
@@ -79,7 +82,7 @@ void OpCrop::bindPython(void* mod) const
       obj->getImage().log(QString("OpCrop: %1,%2 %3x%4").arg(r.x()).arg(r.y()).arg(r.width()).arg(r.height()));
       return OK;
     },
-    "Automatically crop the image",py::arg("obj"),py::arg("threshold"),py::arg("border"));
+    "Automatically crop the image",py::arg("obj"),py::arg("threshold"),py::arg("neighbors"),py::arg("border"));
 }
 #endif
 
@@ -96,7 +99,7 @@ OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, const Op
     }
     else
     {
-      r = findArea(image->getImage(),dlg->getThreshold(),dlg->getBorder());
+      r = findArea(image->getImage(),dlg->getThreshold(),dlg->getNeighbors(),dlg->getBorder());
     }
     if (r.isValid())
     {
@@ -109,28 +112,62 @@ OpPlugin::ResultType OpCrop::execute(std::shared_ptr<FitsObject> image, const Op
       logProfiler(image);
       return OK;
     }
+    else
+    {
+      QMessageBox::information(nullptr,"Crop...","No crop area found or specified!");
+    }
   }
   return CANCELLED;
 }
 
 
-QRect OpCrop::findArea(const FitsImage& img, ValueType threshold, int border) const
+QRect OpCrop::findArea(const FitsImage& img, ValueType threshold, int neighbors, int border) const
 {
+  FitsImage gray = img.toGray();
   int xmin = std::numeric_limits<int>::max();
   int xmax = std::numeric_limits<int>::min();
   int ymin = std::numeric_limits<int>::max();
   int ymax = std::numeric_limits<int>::min();
-  auto it = img.getConstPixelIterator();
-  for (int y=0;y<img.getHeight();++y)
+  auto it = gray.getConstPixelIterator();
+  for (int y=0;y<gray.getHeight();++y)
   {
-    for (int x=0;x<img.getWidth();++x)
+    for (int x=0;x<gray.getWidth();++x)
     {
-      if (it.getAbs() >= threshold)
+      if (it[0] >= threshold)
       {
-        xmin = std::min(xmin,x);
-        xmax = std::max(xmax,x);
-        ymin = std::min(ymin,y);
-        ymax = std::max(ymax,y);
+        /* only mark as valid if neighbors count neighboring pixels are also
+         * above the threshold. This only checks a line along the x and the y
+         * axis and not the complete square.
+         */
+        bool flag = true;
+        for (int j=1;j<neighbors&&x+j<gray.getWidth();++j)
+        {
+          auto it1 = it + j; //gray.getConstPixelIterator(x+j,y);
+          if (it1[0] < threshold)
+          {
+            flag = false;
+            break;
+          }
+        }
+        if (flag)
+        {
+          for (int j=1;j<neighbors&&y+j<gray.getHeight();++j)
+          {
+            auto it1 = it + j * gray.getWidth(); //gray.getConstPixelIterator(x,y+j);
+            if (it1[0] < threshold)
+            {
+              flag = false;
+              break;
+            }
+          }
+        }
+        if (flag)
+        {
+          xmin = std::min(xmin,x);
+          xmax = std::max(xmax,x);
+          ymin = std::min(ymin,y);
+          ymax = std::max(ymax,y);
+        }
       }
       ++it;
     }
@@ -139,10 +176,10 @@ QRect OpCrop::findArea(const FitsImage& img, ValueType threshold, int border) co
   xmin -= border;
   xmin = std::max(0,xmin);
   xmax += border;
-  xmax = std::min(xmax,(int)img.getWidth()-1);
+  xmax = std::min(xmax,(int)gray.getWidth()-1);
   ymin -= border;
   ymin = std::max(0,ymin);
   ymax += border;
-  ymax = std::min(ymax,(int)img.getHeight()-1);
+  ymax = std::min(ymax,(int)gray.getHeight()-1);
   return QRect(xmin,ymin,xmax-xmin+1,ymax-ymin+1);
 }

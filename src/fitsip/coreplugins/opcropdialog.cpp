@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - dialog to crop image                                                *
  *                                                                              *
- * modified: 2025-02-08                                                         *
+ * modified: 2026-08-14                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -42,7 +42,10 @@ bool OpCropDialog::isManual() const
 
 void OpCropDialog::setSelection(QRect r)
 {
-  ui->manualButton->setChecked(true);
+  if (r.isValid())
+  {
+    ui->manualButton->setChecked(true);
+  }
   ui->xField->setText(QString::number(r.x()));
   ui->yField->setText(QString::number(r.y()));
   ui->widthField->setText(QString::number(r.width()));
@@ -61,6 +64,11 @@ QRect OpCropDialog::getSelection() const
 ValueType OpCropDialog::getThreshold() const
 {
   return static_cast<ValueType>(ui->thresholdField->text().toDouble());
+}
+
+int OpCropDialog::getNeighbors() const
+{
+  return ui->neighborsField->text().toInt();
 }
 
 int OpCropDialog::getBorder() const

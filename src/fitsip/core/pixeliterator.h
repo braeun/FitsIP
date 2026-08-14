@@ -177,7 +177,8 @@ inline ValueType ConstPixelIterator::getAbs() const
     case 2:
       return std::hypot(*layers[0],*layers[1]);
     case 3:
-      return (*layers[0] * 11 + *layers[1] * 16 + *layers[2] * 5) / 32;
+//      return (*layers[0] * 11 + *layers[1] * 16 + *layers[2] * 5) / 32;
+      return 0.2989 * *layers[0] + 0.5870 * *layers[1] + 0.1140 * *layers[2];
   }
   ValueType v = 0;
   for (const ValueType* p : layers) v += *p * *p;

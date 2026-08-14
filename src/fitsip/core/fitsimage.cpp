@@ -432,6 +432,7 @@ void FitsImage::cut(ValueType lower, ValueType upper)
 
 FitsImage FitsImage::toGray() const
 {
+  if (getDepth() == 1) return *this;
   FitsImage gray(getName(),getWidth(),getHeight(),1);
   gray.setMetadata(getMetadata());
   ConstPixelIterator src = getConstPixelIterator();
