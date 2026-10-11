@@ -83,6 +83,24 @@ std::vector<std::shared_ptr<FitsObject>> QtImageIO::read(QString filename)
     }
   }
   ImageMetadata data = img.getMetadata();
+  QStringList keys = i.textKeys();
+  for (const QString& key : keys)
+  {
+    QString value =i.text(key);
+    if (key == "date")
+      data.setObsDateTime(QDateTime::fromString(value,Qt::ISODateWithMs));
+    else if (key == "object")
+      data.addEntry(ImageMetadata::keyObject,value);
+    else if (key == "observer")
+      data.addEntry(ImageMetadata::keyObserver,value);
+    else if (key == "instrument")
+      data.addEntry(ImageMetadata::keyInstrument,value);
+    else if (key == "telescope")
+      data.addEntry(ImageMetadata::keyTelescope,value);
+    else if (key == "exposure")
+      data.addEntry(ImageMetadata::keyExpTime,value);
+    qInfo() << key << i.text(key);
+  }
   readMetadata(filename,&data);
 #ifdef HAVE_EXIV2
   readExif(filename,&data);
@@ -131,19 +149,19 @@ void QtImageIO::readMetadata(QString filename, ImageMetadata* data)
         QString value = tokens.join(":").trimmed();
         if (id == "date")
           data->setObsDateTime(QDateTime::fromString(value,Qt::ISODateWithMs));
-        else if (id == "object")
-          data->setObject(value);
-        else if (id == "observer")
-          data->setObserver(value);
-        else if (id == "instrument")
-          data->setInstrument(value);
-        else if (id == "telescope")
-          data->setTelescope(value);
-        else if (id == "exposure")
+        else if (id == "object" && !data->hasEntry(ImageMetadata::keyObject))
+          data->addEntry(ImageMetadata::keyObject,value);
+        else if (id == "observer" && !data->hasEntry(ImageMetadata::keyObserver))
+          data->addEntry(ImageMetadata::keyObserver,value);
+        else if (id == "instrument" && !data->hasEntry(ImageMetadata::keyInstrument))
+          data->addEntry(ImageMetadata::keyInstrument,value);
+        else if (id == "telescope" && !data->hasEntry(ImageMetadata::keyTelescope))
+          data->addEntry(ImageMetadata::keyTelescope,value);
+        else if (id == "exposure" && !data->hasEntry(ImageMetadata::keyExpTime))
         {
           double v = value.toDouble();
           if (v < 1.0E-6) v = 0;
-          data->setExposureTime(v);
+          data->addEntry(ImageMetadata::keyExpTime,QString::number(v));
         }
       }
     }
@@ -159,11 +177,11 @@ void QtImageIO::writeMetadata(QString filename, const ImageMetadata& data)
   {
     QTextStream os(&file);
     os << "date: " << data.getObsDateTime().toString(Qt::ISODateWithMs) << Qt::endl;
-    os << "object: " << data.getObject() << Qt::endl;
-    os << "observer: " << data.getObserver() << Qt::endl;
-    os << "instrument: " << data.getInstrument() << Qt::endl;
-    os << "telescope: " << data.getTelescope() << Qt::endl;
-    os << "exposure: " << data.getExposureTime() << Qt::endl;
+    os << "object: " << data.getValue(ImageMetadata::keyObject) << Qt::endl;
+    os << "observer: " << data.getValue(ImageMetadata::keyObserver) << Qt::endl;
+    os << "instrument: " << data.getValue(ImageMetadata::keyInstrument) << Qt::endl;
+    os << "telescope: " << data.getValue(ImageMetadata::keyTelescope) << Qt::endl;
+    os << "exposure: " << data.getValue(ImageMetadata::keyExpTime) << Qt::endl;
   }
 }
 
@@ -221,17 +239,17 @@ void QtImageIO::readExif(QString filename, ImageMetadata* data)
 //  pos = exifData.findKey(Exiv2::ExifKey("Exif.Image.Make"));
 //  if (pos != exifData.end()) addTag(MAKE,QString::fromStdString(pos->value().toString()),"Make");
   pos = exifData.findKey(Exiv2::ExifKey("Exif.Image.Model"));
-  if (pos != exifData.end()) data->setInstrument(QString::fromStdString(pos->value().toString()));
+  if (pos != exifData.end()) data->addEntry(ImageMetadata::keyInstrument,QString::fromStdString(pos->value().toString()));
   pos = exifData.findKey(Exiv2::ExifKey("Exif.Photo.CameraOwnerName"));
   if (pos != exifData.end())
-    data->setObserver(QString::fromStdString(pos->value().toString()));
+    data->addEntry(ImageMetadata::keyObserver,QString::fromStdString(pos->value().toString()));
   else
   {
     pos = exifData.findKey(Exiv2::ExifKey("Exif.Canon.OwnerName"));
-    if (pos != exifData.end()) data->setObserver(QString::fromStdString(pos->value().toString()));
+    if (pos != exifData.end()) data->addEntry(ImageMetadata::keyObserver,QString::fromStdString(pos->value().toString()));
   }
   pos = exifData.findKey(Exiv2::ExifKey("Exif.Photo.ExposureTime"));
-  if (pos != exifData.end()) data->setExposureTime(pos->value().toFloat());
+  if (pos != exifData.end()) data->addEntry(ImageMetadata::keyExpTime,QString::number(pos->value().toFloat()));
 //  pos = exifData.findKey(Exiv2::ExifKey("Exif.Image.ISOSpeedRatings"));
 //  if (pos != exifData.end()) addTag(ISO,QString::fromStdString(pos->value().toString()),"ISOSpeedRatings");
   image->clearMetadata();
@@ -244,11 +262,11 @@ void QtImageIO::writeExif(QString filename, const FitsImage& img)
     auto image = Exiv2::ImageFactory::open(filename.toStdString());
     image->readMetadata();
     Exiv2::ExifData& exifData = image->exifData();
-    Exiv2::AsciiValue sv(img.getMetadata().getObserver().toStdString());
+    Exiv2::AsciiValue sv(img.getMetadata().getValue(ImageMetadata::keyObserver).toStdString());
     exifData.add(Exiv2::ExifKey("Exif.Photo.CameraOwnerName"),&sv);
-    sv = Exiv2::AsciiValue(img.getMetadata().getInstrument().toStdString());
+    sv = Exiv2::AsciiValue(img.getMetadata().getValue(ImageMetadata::keyInstrument).toStdString());
     exifData.add(Exiv2::ExifKey("Exif.Image.Model"),&sv);
-    Exiv2::FloatValue fv(static_cast<float>(img.getMetadata().getExposureTime()));
+    Exiv2::FloatValue fv(img.getMetadata().getValue(ImageMetadata::keyExpTime).toFloat());
     exifData.add(Exiv2::ExifKey("Exif.Photo.ExposureTime"),&fv);
   //  image->setExifData(exifData);
     image->writeMetadata();

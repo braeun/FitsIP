@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - metadata for the image                                              *
  *                                                                              *
- * modified: 2026-07-23                                                         *
+ * modified: 2026-10-11                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -23,16 +23,16 @@
 #include "imagemetadata.h"
 #include <QTimeZone>
 
-static const char* keyObject = "OBJECT";
-static const char* keyInstrument = "INSTRUME";
-static const char* keyTelescope = "TELESCOP";
-static const char* keyObserver = "OBSERVER";
-static const char* keyExpTime = "EXPTIME";
-static const char* keyDateObs = "DATE-OBS";
-static const char* keyTimeObs = "TIME-OBS";
-/* non standard keywords */
-static const char* keyPreFFTWidth = "PREFFTW";
-static const char* keyPreFFTHeight = "PREFFTH";
+const char* ImageMetadata::keyObject = "OBJECT";
+const char* ImageMetadata::keyInstrument = "INSTRUME";
+const char* ImageMetadata::keyTelescope = "TELESCOP";
+const char* ImageMetadata::keyObserver = "OBSERVER";
+const char* ImageMetadata::keyExpTime = "EXPTIME";
+const char* ImageMetadata::keyDateObs = "DATE-OBS";
+const char* ImageMetadata::keyTimeObs = "TIME-OBS";
+// /* non standard keywords */
+// static const char* keyPreFFTWidth = "PREFFTW";
+// static const char* keyPreFFTHeight = "PREFFTH";
 
 ImageMetadata::ImageMetadata()
 {
@@ -52,6 +52,11 @@ void ImageMetadata::addEntry(const QString& key, const QString& value, const QSt
 {
   Entry entry{value,comment};
   entries[key] = entry;
+}
+
+bool ImageMetadata::hasEntry(const QString& key)
+{
+  return entries.find(key) != entries.end();
 }
 
 QString ImageMetadata::getValue(const QString& key) const
@@ -85,55 +90,55 @@ void ImageMetadata::addHistory(const QString& msg)
   history.push_back(msg);
 }
 
-void ImageMetadata::setObject(const QString& s)
-{
-  addEntry(keyObject,s);
-}
+// void ImageMetadata::setObject(const QString& s)
+// {
+//   addEntry(keyObject,s);
+// }
 
-QString ImageMetadata::getObject() const
-{
-  return getValue(keyObject);
-}
+// QString ImageMetadata::getObject() const
+// {
+//   return getValue(keyObject);
+// }
 
-void ImageMetadata::setObserver(const QString& s)
-{
-  addEntry(keyObserver,s);
-}
+// void ImageMetadata::setObserver(const QString& s)
+// {
+//   addEntry(keyObserver,s);
+// }
 
-QString ImageMetadata::getObserver() const
-{
-  return getValue(keyObserver);
-}
+// QString ImageMetadata::getObserver() const
+// {
+//   return getValue(keyObserver);
+// }
 
-void ImageMetadata::setInstrument(const QString& s)
-{
-  addEntry(keyInstrument,s);
-}
+// void ImageMetadata::setInstrument(const QString& s)
+// {
+//   addEntry(keyInstrument,s);
+// }
 
-QString ImageMetadata::getInstrument() const
-{
-  return getValue(keyInstrument);
-}
+// QString ImageMetadata::getInstrument() const
+// {
+//   return getValue(keyInstrument);
+// }
 
-void ImageMetadata::setTelescope(const QString& s)
-{
-  addEntry(keyTelescope,s);
-}
+// void ImageMetadata::setTelescope(const QString& s)
+// {
+//   addEntry(keyTelescope,s);
+// }
 
-QString ImageMetadata::getTelescope() const
-{
-  return getValue(keyTelescope);
-}
+// QString ImageMetadata::getTelescope() const
+// {
+//   return getValue(keyTelescope);
+// }
 
-void ImageMetadata::setExposureTime(double t)
-{
-  addEntry(keyExpTime,QString::number(t));
-}
+// void ImageMetadata::setExposureTime(double t)
+// {
+//   addEntry(keyExpTime,QString::number(t));
+// }
 
-double ImageMetadata::getExposureTime() const
-{
-  return getValue(keyExpTime).toDouble();
-}
+// double ImageMetadata::getExposureTime() const
+// {
+//   return getValue(keyExpTime).toDouble();
+// }
 
 void ImageMetadata::setObsDateTime(QDateTime t)
 {

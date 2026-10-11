@@ -242,7 +242,7 @@ FitsImage FitsIO::load(CCfits::HDU* hdu, QString basename, const ImageMetadata& 
   }
   img.setMetadata(metadata);
   /* special handling for starlight xpress which stores unsigned 16bit */
-  if (metadata.getInstrument().toLower().contains("starlight xpress") && hdu->bitpix() == 16)
+  if (metadata.getValue(ImageMetadata::keyInstrument).toLower().contains("starlight xpress") && hdu->bitpix() == 16)
   {
     PixelIterator it = img.getPixelIterator();
     while (true)

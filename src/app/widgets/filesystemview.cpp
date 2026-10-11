@@ -77,6 +77,8 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   connect(imageContextMenu->addAction("Rename File..."),&QAction::triggered,this,[this]{rename();});
   imageContextMenu->addSeparator();
   connect(imageContextMenu->addAction("Remove File(s)..."),&QAction::triggered,this,[this]{remove();});
+  imageContextMenu->addSeparator();
+  connect(imageContextMenu->addAction("New Folder..."),&QAction::triggered,this,[this]{newFolder();});
 
   scriptContextMenu = new QMenu(this);
   connect(scriptContextMenu->addAction("Execute Script"),&QAction::triggered,this,[this]{if (QFileInfo(filesystemModel->filePath(contextIndex)).isFile()) emit runFile(filesystemModel->filePath(contextIndex));});
@@ -85,11 +87,15 @@ FileSystemView::FileSystemView(QWidget *parent):QWidget(parent),
   connect(scriptContextMenu->addAction("Rename File..."),&QAction::triggered,this,[this]{rename();});
   scriptContextMenu->addSeparator();
   connect(scriptContextMenu->addAction("Remove File(s)..."),&QAction::triggered,this,[this]{remove();});
+  scriptContextMenu->addSeparator();
+  connect(scriptContextMenu->addAction("New Folder..."),&QAction::triggered,this,[this]{newFolder();});
 
   fileContextMenu = new QMenu(this);
   connect(fileContextMenu->addAction("Rename File..."),&QAction::triggered,this,[this]{rename();});
   fileContextMenu->addSeparator();
   connect(fileContextMenu->addAction("Remove File(s)..."),&QAction::triggered,this,[this]{remove();});
+  fileContextMenu->addSeparator();
+  connect(fileContextMenu->addAction("New Folder..."),&QAction::triggered,this,[this]{newFolder();});
 
   connect(ui->filesystemView,&QTreeView::doubleClicked,this,&FileSystemView::handleDoubleClick);
   connect(ui->filesystemView,&QTreeView::customContextMenuRequested,this,[this](const QPoint& pos){showContextMenu(pos);});
@@ -194,7 +200,7 @@ void FileSystemView::newFolder()
   QString name = QInputDialog::getText(this,QApplication::applicationDisplayName(),"New folder:");
   if (!name.isEmpty())
   {
-    filesystemModel->mkdir(contextIndex,name);
+    filesystemModel->mkdir(contextIndex.parent(),name);
     filesystemModel->sort(0);
   }
 }

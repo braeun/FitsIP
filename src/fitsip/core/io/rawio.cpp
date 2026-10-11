@@ -93,9 +93,9 @@ std::vector<std::shared_ptr<FitsObject>> RawIO::read(QString filename)
     }
     LibRaw::dcraw_clear_mem(image);
     ImageMetadata meta = img.getMetadata();
-    meta.setExposureTime(ip.imgdata.other.shutter);
-    meta.setObserver(ip.imgdata.other.artist);
-    meta.setInstrument(ip.imgdata.idata.model);
+    meta.addEntry(ImageMetadata::keyExpTime,QString::number(ip.imgdata.other.shutter));
+    meta.addEntry(ImageMetadata::keyObserver,ip.imgdata.other.artist);
+    meta.addEntry(ImageMetadata::keyInstrument,ip.imgdata.idata.model);
     meta.setObsDateTime(QDateTime::fromSecsSinceEpoch(ip.imgdata.other.timestamp));
     img.setMetadata(meta);
     profiler.stop();

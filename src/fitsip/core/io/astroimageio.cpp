@@ -104,7 +104,8 @@ FitsImage AstroImageIO::read_0x0100(QFile *f, const QFileInfo& info)
   uint32_t bpp = *(reinterpret_cast<uint32_t*>(a.data()));
   if (bpp != 8) throw std::runtime_error("AstroImageIO: bpp!=8 is not supported");
   a = f->read(sizeof(double));
-  metadata.setExposureTime(*(reinterpret_cast<double*>(a.data())));
+  metadata.addEntry(ImageMetadata::keyExpTime,QString::number(*(reinterpret_cast<double*>(a.data()))));
+//  metadata.setExposureTime(*(reinterpret_cast<double*>(a.data())));
   /* metadata table */
   a = f->read(sizeof(uint32_t));
   uint32_t rows = *(reinterpret_cast<uint32_t*>(a.data()));
@@ -113,13 +114,13 @@ FitsImage AstroImageIO::read_0x0100(QFile *f, const QFileInfo& info)
     QString key = f->read(KEY_LEN);
     QString value = f->read(VALUE_LEN);
     if (key == ai_key_object)
-      metadata.setObject(value);
+      metadata.addEntry(ImageMetadata::keyObject,value);
     else if (key == ai_key_observer)
-      metadata.setObserver(value);
+      metadata.addEntry(ImageMetadata::keyObserver,value);
     else if (key == ai_key_instrument)
-      metadata.setInstrument(value);
+      metadata.addEntry(ImageMetadata::keyInstrument,value);
     else if (key == ai_key_telescope)
-      metadata.setTelescope(value);
+      metadata.addEntry(ImageMetadata::keyTelescope,value);
     --rows;
   }
   /* the image data */
@@ -155,7 +156,7 @@ FitsImage AstroImageIO::read_0x0200(QFile *f, const QFileInfo& info)
   uint32_t bytesPerPixel = *(reinterpret_cast<uint32_t*>(a.data()));
   if (bytesPerPixel != 1 && bytesPerPixel != 2 && bytesPerPixel != 4) throw std::runtime_error("AstroImageIO: unsupported bytes per pixel count");
   a = f->read(sizeof(double));
-  metadata.setExposureTime(*(reinterpret_cast<double*>(a.data())));
+  metadata.addEntry(ImageMetadata::keyExpTime,QString::number(*(reinterpret_cast<double*>(a.data()))));
   /* metadata table */
   a = f->read(sizeof(uint32_t));
   uint32_t rows = *(reinterpret_cast<uint32_t*>(a.data()));
@@ -164,13 +165,13 @@ FitsImage AstroImageIO::read_0x0200(QFile *f, const QFileInfo& info)
     QString key = f->read(KEY_LEN);
     QString value = f->read(VALUE_LEN);
     if (key == ai_key_object)
-      metadata.setObject(value);
+      metadata.addEntry(ImageMetadata::keyObject,value);
     else if (key == ai_key_observer)
-      metadata.setObserver(value);
+      metadata.addEntry(ImageMetadata::keyObserver,value);
     else if (key == ai_key_instrument)
-      metadata.setInstrument(value);
+      metadata.addEntry(ImageMetadata::keyInstrument,value);
     else if (key == ai_key_telescope)
-      metadata.setTelescope(value);
+      metadata.addEntry(ImageMetadata::keyTelescope,value);
     --rows;
   }
   /* the image data */

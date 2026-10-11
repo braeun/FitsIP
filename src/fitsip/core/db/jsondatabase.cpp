@@ -132,12 +132,12 @@ bool JsonDatabase::addTelescope(const Telescope& telescope)
   Telescope t = getTelescope(telescope.getName());
   if (t)
   {
-    qWarning() << "Camera with name" << telescope.getName() << "already exists";
+    qWarning() << "Telescope with name" << telescope.getName() << "already exists";
     return false;
   }
   telescopes.push_back(telescope);
   std::sort(telescopes.begin(),telescopes.end(),[](const Telescope& c1, const Telescope& c2){return c1.getName()<c2.getName();});
-  qInfo() << "Added camera: " << telescope.getName();
+  qInfo() << "Added telescope: " << telescope.getName();
   return save();
 }
 
@@ -149,7 +149,7 @@ bool JsonDatabase::updateTelescope(const Telescope& telescope)
     {
       t.setF(telescope.getF());
       t.setD(telescope.getD());
-      qInfo() << "Updated camera: " << telescope.getName();
+      qInfo() << "Updated telescpe: " << telescope.getName();
       break;
     }
   }

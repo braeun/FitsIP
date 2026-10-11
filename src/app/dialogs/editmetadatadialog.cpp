@@ -45,11 +45,11 @@ EditMetadataDialog::~EditMetadataDialog()
 
 void EditMetadataDialog::displayMetadata(const ImageMetadata &data)
 {
-  ui->objectField->setText(data.getObject());
-  ui->observerField->setText(data.getObserver());
-  ui->telescopeBox->setCurrentText(data.getTelescope());
-  ui->instrumentBox->setCurrentText(data.getInstrument());
-  ui->exposureField->setText(QString::number(data.getExposureTime()));
+  ui->objectField->setText(data.getValue(ImageMetadata::keyObject));
+  ui->observerField->setText(data.getValue(ImageMetadata::keyObserver));
+  ui->telescopeBox->setCurrentText(data.getValue(ImageMetadata::keyTelescope));
+  ui->instrumentBox->setCurrentText(data.getValue(ImageMetadata::keyInstrument));
+  ui->exposureField->setText(data.getValue(ImageMetadata::keyExpTime));
   ui->dateField->setDateTime(data.getObsDateTime());
   ui->tableWidget->clearContents();
   ui->tableWidget->setRowCount(data.getEntries().size());
@@ -67,11 +67,11 @@ void EditMetadataDialog::commit(ImageMetadata &data)
 {
   if (ui->tabWidget->currentIndex() == 0)
   {
-    data.setObject(ui->objectField->text());
-    data.setObserver(ui->observerField->text());
-    data.setTelescope(ui->telescopeBox->currentText());
-    data.setInstrument(ui->instrumentBox->currentText());
-    data.setExposureTime(ui->exposureField->text().toDouble());
+    data.addEntry(ImageMetadata::keyObject,ui->objectField->text());
+    data.addEntry(ImageMetadata::keyObserver,ui->observerField->text());
+    data.addEntry(ImageMetadata::keyTelescope,ui->telescopeBox->currentText());
+    data.addEntry(ImageMetadata::keyInstrument,ui->instrumentBox->currentText());
+    data.addEntry(ImageMetadata::keyExpTime,ui->exposureField->text());
     data.setObsDateTime(ui->dateField->dateTime());
   }
   else

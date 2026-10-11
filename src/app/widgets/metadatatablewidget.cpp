@@ -21,12 +21,12 @@ void MetadataTableWidget::clear()
 
 void MetadataTableWidget::setData(const ImageMetadata& data)
 {
-  ui->tableWidget->setItem(0,0,new QTableWidgetItem(data.getObject()));
+  ui->tableWidget->setItem(0,0,new QTableWidgetItem(data.getValue(ImageMetadata::keyObject)));
   ui->tableWidget->setItem(1,0,new QTableWidgetItem(data.getObsDateTime().toString(Qt::ISODate)));
-  ui->tableWidget->setItem(2,0,new QTableWidgetItem(data.getObserver()));
-  ui->tableWidget->setItem(3,0,new QTableWidgetItem(data.getTelescope()));
-  ui->tableWidget->setItem(4,0,new QTableWidgetItem(data.getInstrument()));
-  ui->tableWidget->setItem(5,0,new QTableWidgetItem(QString::number(data.getExposureTime())));
+  ui->tableWidget->setItem(2,0,new QTableWidgetItem(data.getValue(ImageMetadata::keyObserver)));
+  ui->tableWidget->setItem(3,0,new QTableWidgetItem(data.getValue(ImageMetadata::keyTelescope)));
+  ui->tableWidget->setItem(4,0,new QTableWidgetItem(data.getValue(ImageMetadata::keyInstrument)));
+  ui->tableWidget->setItem(5,0,new QTableWidgetItem(data.getValue(ImageMetadata::keyExpTime)));
 }
 
 // void MetadataTableWidget::setFile(std::shared_ptr<FitsObject> file)

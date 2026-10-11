@@ -2,7 +2,7 @@
  *                                                                              *
  * FitsIP - metadata for the image                                              *
  *                                                                              *
- * modified: 2025-03-14                                                         *
+ * modified: 2026-10-11                                                         *
  *                                                                              *
  ********************************************************************************
  * Copyright (C) Harald Braeuning                                               *
@@ -45,6 +45,8 @@ public:
 
   void addEntry(const QString& key, const QString& value, const QString& comment="");
 
+  bool hasEntry(const QString& key);
+
   QString getValue(const QString& key) const;
 
   QString getComment(const QString& key) const;
@@ -55,30 +57,37 @@ public:
 
   void addHistory(const QString& msg);
 
-  void setObject(const QString& s);
+  // void setObject(const QString& s);
 
-  QString getObject() const;
+  // QString getObject() const;
 
-  void setObserver(const QString& s);
+  // void setObserver(const QString& s);
 
-  QString getObserver() const;
+  // QString getObserver() const;
 
-  void setInstrument(const QString& s);
+  // void setInstrument(const QString& s);
 
-  QString getInstrument() const;
+  // QString getInstrument() const;
 
-  void setTelescope(const QString& s);
+  // void setTelescope(const QString& s);
 
-  QString getTelescope() const;
+  // QString getTelescope() const;
 
-  void setExposureTime(double t);
+  // void setExposureTime(double t);
 
-  double getExposureTime() const;
+  // double getExposureTime() const;
 
   void setObsDateTime(QDateTime t);
 
   QDateTime getObsDateTime() const;
 
+  static const char* keyObject;
+  static const char* keyInstrument;
+  static const char* keyTelescope;
+  static const char* keyObserver;
+  static const char* keyExpTime;
+  static const char* keyDateObs;
+  static const char* keyTimeObs;
 private:
   std::map<QString,Entry> entries;
   QStringList history;
